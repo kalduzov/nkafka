@@ -1,0 +1,217 @@
+version: '3.9'
+
+services:
+  zookeeper-1:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: zookeeper-1
+    container_name: zookeeper-1
+    ports:
+      - "2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '1'
+      ZOOKEEPER_SERVERS: 'zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - kafka-network
+  zookeeper-2:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: zookeeper-2
+    container_name: zookeeper-2
+    ports:
+      - "2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '2'
+      ZOOKEEPER_SERVERS: 'zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - kafka-network
+  zookeeper-3:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: zookeeper-3
+    container_name: zookeeper-3
+    ports:
+      - "2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '3'
+      ZOOKEEPER_SERVERS: 'zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - kafka-network
+
+  broker-1:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: broker-1
+    restart: always
+    container_name: broker-1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29091:29091"
+    environment:
+      KAFKA_BROKER_ID: '1'
+      KAFKA_BROKER_RACK: '1'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29091'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-1:9091,LISTENER_LOCAL://localhost:29091'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG4J_ROOT_LOGLEVEL: '${KAFKA_LOG4J_ROOT_LOGLEVEL}'
+    networks:
+      - kafka-network
+
+  broker-2:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: broker-2
+    restart: always
+    container_name: broker-2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: '2'
+      KAFKA_BROKER_RACK: '2'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29092'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-2:9091,LISTENER_LOCAL://localhost:29092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - kafka-network
+  
+  broker-3:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: broker-3
+    restart: always
+    container_name: broker-3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29093:29093"
+    environment:
+      KAFKA_BROKER_ID: '3'
+      KAFKA_BROKER_RACK: '3'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29093'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-3:9091,LISTENER_LOCAL://localhost:29093'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - kafka-network
+  
+  broker-4:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: broker-4
+    restart: always
+    container_name: broker-4
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29094:29094"
+    environment:
+      KAFKA_BROKER_ID: '4'
+      KAFKA_BROKER_RACK: '4'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29094'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-4:9091,LISTENER_LOCAL://localhost:29094'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - kafka-network
+  
+  broker-5:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: broker-5
+    restart: always
+    container_name: broker-5
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29095:29095"
+    environment:
+      KAFKA_BROKER_ID: '5'
+      KAFKA_BROKER_RACK: '5'
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29095'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://broker-5:9091,LISTENER_LOCAL://localhost:29095'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - kafka-network
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    container_name: jaeger
+    hostname: jaeger
+    ports:
+      - "6831:6831/udp"
+      - "16686:16686"
+    networks:
+      - kafka-network
+
+networks:
+  kafka-network:
+    driver: bridge

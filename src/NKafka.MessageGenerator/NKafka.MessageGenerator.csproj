@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <Compile Include="..\NKafka\Protocol\ApiKeys.cs">
+      <Link>ApiKeys.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Extensions" />
+  </ItemGroup>
+
+</Project>

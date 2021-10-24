@@ -1,0 +1,73 @@
+﻿const NKafka.Messages.AddOffsetsToTxnResponseMessage.HIGHEST_SUPPORTED_VERSION = NKafka.Protocol.ApiVersion.Version3 -> NKafka.Protocol.ApiVersion
+const NKafka.Messages.AddOffsetsToTxnResponseMessage.LOWEST_SUPPORTED_VERSION = NKafka.Protocol.ApiVersion.Version0 -> NKafka.Protocol.ApiVersion
+NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.IsPartitionEof.get -> bool
+NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.IsPartitionEof.set -> void
+NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.Message.get -> NKafka.Message<TKey, TValue>!
+NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.Message.set -> void
+NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.TopicPartition.get -> NKafka.TopicPartition!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.DeliveryResult(NKafka.Message<TKey, TValue>! message, NKafka.Clients.Producer.PersistenceStatus persisted, NKafka.Clients.Producer.TopicPartitionOffset! topicPartitionOffset) -> void
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Headers.get -> NKafka.Protocol.Records.Headers!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Key.get -> TKey
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Message.get -> NKafka.Message<TKey, TValue>!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Offset.get -> NKafka.Offset
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Partition.get -> NKafka.Partition
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Status.get -> NKafka.Clients.Producer.PersistenceStatus
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Timestamp.get -> NKafka.Timestamp
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Topic.get -> string!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartition.get -> NKafka.TopicPartition!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.get -> NKafka.Clients.Producer.TopicPartitionOffset!
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.set -> void
+NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Value.get -> TValue
+NKafka.IKafkaCluster
+NKafka.IKafkaCluster.AdminClient.get -> NKafka.Clients.Admin.IAdminClient!
+NKafka.IKafkaCluster.Brokers.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Node!>!
+NKafka.IKafkaCluster.BuildConsumer<TKey, TValue>(string! consumeGroupName, NKafka.Config.ConsumerConfig? consumerConfig = null, NKafka.Serialization.IAsyncSerializer<TKey>? keySerializer = null, NKafka.Serialization.IAsyncSerializer<TValue>? valueSerializer = null) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
+NKafka.IKafkaCluster.BuildProducer<TKey, TValue>(string! name = "__DefaultProducer__", NKafka.Config.ProducerConfig? producerConfig = null, NKafka.Serialization.IAsyncSerializer<TKey>? keySerializer = null, NKafka.Serialization.IAsyncSerializer<TValue>? valueSerializer = null) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
+NKafka.IKafkaCluster.Closed.get -> bool
+NKafka.IKafkaCluster.ClusterId.get -> string?
+NKafka.IKafkaCluster.Config.get -> NKafka.Config.ClusterConfig!
+NKafka.IKafkaCluster.Controller.get -> NKafka.Node!
+NKafka.IKafkaCluster.GetOffsetAsync(string! topic, NKafka.Partition partition, System.Threading.CancellationToken token = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<NKafka.Offset>
+NKafka.IKafkaCluster.GetPartitionsAsync(string! topic, System.Threading.CancellationToken token = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.Partition>!>
+NKafka.IKafkaCluster.OpenAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.IKafkaCluster.RefreshMetadataAsync(System.Threading.CancellationToken token = default(System.Threading.CancellationToken), System.Collections.Generic.IEnumerable<string!>? topics = null) -> System.Threading.Tasks.Task!
+NKafka.IKafkaCluster.Topics.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+NKafka.KafkaCluster.Closed.get -> bool
+NKafka.KafkaCluster.Config.get -> NKafka.Config.ClusterConfig!
+NKafka.KafkaCluster.Controller.get -> NKafka.Node!
+NKafka.KafkaCluster.Topics.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+NKafka.Message<TKey, TValue>
+NKafka.Message<TKey, TValue>.Headers.get -> NKafka.Protocol.Records.Headers!
+NKafka.Message<TKey, TValue>.Headers.set -> void
+NKafka.Message<TKey, TValue>.Key.get -> TKey
+NKafka.Message<TKey, TValue>.Key.set -> void
+NKafka.Message<TKey, TValue>.Message(TKey key, TValue value) -> void
+NKafka.Message<TKey, TValue>.Partition.get -> NKafka.Partition
+NKafka.Message<TKey, TValue>.Partition.set -> void
+NKafka.Message<TKey, TValue>.Timestamp.get -> NKafka.Timestamp
+NKafka.Message<TKey, TValue>.Timestamp.set -> void
+NKafka.Message<TKey, TValue>.Value.get -> TValue
+NKafka.Message<TKey, TValue>.Value.set -> void
+NKafka.Messages.AddOffsetsToTxnResponseMessage
+NKafka.Messages.AddOffsetsToTxnResponseMessage.AddOffsetsToTxnResponseMessage() -> void
+NKafka.Messages.AddOffsetsToTxnResponseMessage.AddOffsetsToTxnResponseMessage(NKafka.Protocol.BufferReader reader, NKafka.Protocol.ApiVersion version) -> void
+NKafka.Messages.AddOffsetsToTxnResponseMessage.HighestSupportedVersion.get -> NKafka.Protocol.ApiVersion
+NKafka.Messages.AddOffsetsToTxnResponseMessage.LowestSupportedVersion.get -> NKafka.Protocol.ApiVersion
+NKafka.Null
+NKafka.Null.Null() -> void
+NKafka.Protocol.BufferReader
+NKafka.Protocol.BufferReader.BufferReader() -> void
+NKafka.Protocol.BufferReader.BufferReader(byte[]! span) -> void
+NKafka.Protocol.RawTaggedFieldWriter.FieldsCount.get -> int
+NKafka.Protocol.TaggedField
+NKafka.Protocol.TaggedField.Data.get -> byte[]!
+NKafka.Protocol.TaggedField.Data.init -> void
+NKafka.Protocol.TaggedField.Tag.get -> int
+NKafka.Protocol.TaggedField.Tag.init -> void
+NKafka.Protocol.TaggedField.TaggedField(int Tag, byte[]! Data) -> void
+static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static readonly NKafka.Null.Instance -> NKafka.Null

@@ -1,0 +1,279 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E216684E-35E3-446D-B5EB-F89718D0D0FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29CCE93C-47E9-46FB-980C-8CC68A132789}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Directory.Build.props = tests\Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka", "src\NKafka\NKafka.csproj", "{FB078DD2-8878-4B17-BDB3-DD87AC391841}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C451-E7E8-4A76-AC94-8A165ED35DD2}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		LICENCE = LICENCE
+		README.md = README.md
+		changelog.md = changelog.md
+		global.json = global.json
+		.editorconfig = .editorconfig
+		NKafka.sln.DotSettings = NKafka.sln.DotSettings
+		update_repo.ps1 = update_repo.ps1
+		update_repo.sh = update_repo.sh
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.Samples", "samples\NKafka.Samples\NKafka.Samples.csproj", "{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{EE6B6414-02ED-4176-8A7B-FBEC797C0185}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.Benchmarks", "benchmarks\NKafka.Benchmarks\NKafka.Benchmarks.csproj", "{9A7A2274-6CBF-416A-9042-A9E643B34AF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.Samples.Confluent", "samples\NKafka.Samples.Confluent\NKafka.Samples.Confluent.csproj", "{90779538-4A63-4EBD-B4FF-39772E740919}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{E7275E10-1DB3-4348-BF03-DA06FB42CF40}"
+	ProjectSection(SolutionItems) = preProject
+		resources\message\AddOffsetsToTxnRequest.json = resources\message\AddOffsetsToTxnRequest.json
+		resources\message\AddOffsetsToTxnResponse.json = resources\message\AddOffsetsToTxnResponse.json
+		resources\message\AddPartitionsToTxnRequest.json = resources\message\AddPartitionsToTxnRequest.json
+		resources\message\AddPartitionsToTxnResponse.json = resources\message\AddPartitionsToTxnResponse.json
+		resources\message\AllocateProducerIdsRequest.json = resources\message\AllocateProducerIdsRequest.json
+		resources\message\AllocateProducerIdsResponse.json = resources\message\AllocateProducerIdsResponse.json
+		resources\message\AlterClientQuotasRequest.json = resources\message\AlterClientQuotasRequest.json
+		resources\message\AlterClientQuotasResponse.json = resources\message\AlterClientQuotasResponse.json
+		resources\message\AlterConfigsRequest.json = resources\message\AlterConfigsRequest.json
+		resources\message\AlterConfigsResponse.json = resources\message\AlterConfigsResponse.json
+		resources\message\AlterPartitionReassignmentsRequest.json = resources\message\AlterPartitionReassignmentsRequest.json
+		resources\message\AlterPartitionReassignmentsResponse.json = resources\message\AlterPartitionReassignmentsResponse.json
+		resources\message\AlterReplicaLogDirsRequest.json = resources\message\AlterReplicaLogDirsRequest.json
+		resources\message\AlterReplicaLogDirsResponse.json = resources\message\AlterReplicaLogDirsResponse.json
+		resources\message\AlterUserScramCredentialsRequest.json = resources\message\AlterUserScramCredentialsRequest.json
+		resources\message\AlterUserScramCredentialsResponse.json = resources\message\AlterUserScramCredentialsResponse.json
+		resources\message\ApiVersionsRequest.json = resources\message\ApiVersionsRequest.json
+		resources\message\ApiVersionsResponse.json = resources\message\ApiVersionsResponse.json
+		resources\message\BeginQuorumEpochRequest.json = resources\message\BeginQuorumEpochRequest.json
+		resources\message\BeginQuorumEpochResponse.json = resources\message\BeginQuorumEpochResponse.json
+		resources\message\BrokerHeartbeatRequest.json = resources\message\BrokerHeartbeatRequest.json
+		resources\message\BrokerHeartbeatResponse.json = resources\message\BrokerHeartbeatResponse.json
+		resources\message\BrokerRegistrationRequest.json = resources\message\BrokerRegistrationRequest.json
+		resources\message\BrokerRegistrationResponse.json = resources\message\BrokerRegistrationResponse.json
+		resources\message\ConsumerProtocolAssignment.json = resources\message\ConsumerProtocolAssignment.json
+		resources\message\ConsumerProtocolSubscription.json = resources\message\ConsumerProtocolSubscription.json
+		resources\message\ControlledShutdownRequest.json = resources\message\ControlledShutdownRequest.json
+		resources\message\ControlledShutdownResponse.json = resources\message\ControlledShutdownResponse.json
+		resources\message\CreateAclsRequest.json = resources\message\CreateAclsRequest.json
+		resources\message\CreateAclsResponse.json = resources\message\CreateAclsResponse.json
+		resources\message\CreateDelegationTokenRequest.json = resources\message\CreateDelegationTokenRequest.json
+		resources\message\CreateDelegationTokenResponse.json = resources\message\CreateDelegationTokenResponse.json
+		resources\message\CreatePartitionsRequest.json = resources\message\CreatePartitionsRequest.json
+		resources\message\CreatePartitionsResponse.json = resources\message\CreatePartitionsResponse.json
+		resources\message\CreateTopicsRequest.json = resources\message\CreateTopicsRequest.json
+		resources\message\CreateTopicsResponse.json = resources\message\CreateTopicsResponse.json
+		resources\message\DefaultPrincipalData.json = resources\message\DefaultPrincipalData.json
+		resources\message\DeleteAclsRequest.json = resources\message\DeleteAclsRequest.json
+		resources\message\DeleteAclsResponse.json = resources\message\DeleteAclsResponse.json
+		resources\message\DeleteGroupsRequest.json = resources\message\DeleteGroupsRequest.json
+		resources\message\DeleteGroupsResponse.json = resources\message\DeleteGroupsResponse.json
+		resources\message\DeleteRecordsRequest.json = resources\message\DeleteRecordsRequest.json
+		resources\message\DeleteRecordsResponse.json = resources\message\DeleteRecordsResponse.json
+		resources\message\DeleteTopicsRequest.json = resources\message\DeleteTopicsRequest.json
+		resources\message\DeleteTopicsResponse.json = resources\message\DeleteTopicsResponse.json
+		resources\message\DescribeAclsRequest.json = resources\message\DescribeAclsRequest.json
+		resources\message\DescribeAclsResponse.json = resources\message\DescribeAclsResponse.json
+		resources\message\DescribeClientQuotasRequest.json = resources\message\DescribeClientQuotasRequest.json
+		resources\message\DescribeClientQuotasResponse.json = resources\message\DescribeClientQuotasResponse.json
+		resources\message\DescribeClusterRequest.json = resources\message\DescribeClusterRequest.json
+		resources\message\DescribeClusterResponse.json = resources\message\DescribeClusterResponse.json
+		resources\message\DescribeConfigsRequest.json = resources\message\DescribeConfigsRequest.json
+		resources\message\DescribeConfigsResponse.json = resources\message\DescribeConfigsResponse.json
+		resources\message\DescribeDelegationTokenRequest.json = resources\message\DescribeDelegationTokenRequest.json
+		resources\message\DescribeDelegationTokenResponse.json = resources\message\DescribeDelegationTokenResponse.json
+		resources\message\DescribeGroupsRequest.json = resources\message\DescribeGroupsRequest.json
+		resources\message\DescribeGroupsResponse.json = resources\message\DescribeGroupsResponse.json
+		resources\message\DescribeLogDirsRequest.json = resources\message\DescribeLogDirsRequest.json
+		resources\message\DescribeLogDirsResponse.json = resources\message\DescribeLogDirsResponse.json
+		resources\message\DescribeProducersRequest.json = resources\message\DescribeProducersRequest.json
+		resources\message\DescribeProducersResponse.json = resources\message\DescribeProducersResponse.json
+		resources\message\DescribeQuorumRequest.json = resources\message\DescribeQuorumRequest.json
+		resources\message\DescribeQuorumResponse.json = resources\message\DescribeQuorumResponse.json
+		resources\message\DescribeTransactionsRequest.json = resources\message\DescribeTransactionsRequest.json
+		resources\message\DescribeTransactionsResponse.json = resources\message\DescribeTransactionsResponse.json
+		resources\message\DescribeUserScramCredentialsRequest.json = resources\message\DescribeUserScramCredentialsRequest.json
+		resources\message\DescribeUserScramCredentialsResponse.json = resources\message\DescribeUserScramCredentialsResponse.json
+		resources\message\ElectLeadersRequest.json = resources\message\ElectLeadersRequest.json
+		resources\message\ElectLeadersResponse.json = resources\message\ElectLeadersResponse.json
+		resources\message\EndQuorumEpochRequest.json = resources\message\EndQuorumEpochRequest.json
+		resources\message\EndQuorumEpochResponse.json = resources\message\EndQuorumEpochResponse.json
+		resources\message\EndTxnRequest.json = resources\message\EndTxnRequest.json
+		resources\message\EndTxnResponse.json = resources\message\EndTxnResponse.json
+		resources\message\EnvelopeRequest.json = resources\message\EnvelopeRequest.json
+		resources\message\EnvelopeResponse.json = resources\message\EnvelopeResponse.json
+		resources\message\ExpireDelegationTokenRequest.json = resources\message\ExpireDelegationTokenRequest.json
+		resources\message\ExpireDelegationTokenResponse.json = resources\message\ExpireDelegationTokenResponse.json
+		resources\message\FetchRequest.json = resources\message\FetchRequest.json
+		resources\message\FetchResponse.json = resources\message\FetchResponse.json
+		resources\message\FetchSnapshotRequest.json = resources\message\FetchSnapshotRequest.json
+		resources\message\FetchSnapshotResponse.json = resources\message\FetchSnapshotResponse.json
+		resources\message\FindCoordinatorRequest.json = resources\message\FindCoordinatorRequest.json
+		resources\message\FindCoordinatorResponse.json = resources\message\FindCoordinatorResponse.json
+		resources\message\HeartbeatRequest.json = resources\message\HeartbeatRequest.json
+		resources\message\HeartbeatResponse.json = resources\message\HeartbeatResponse.json
+		resources\message\IncrementalAlterConfigsRequest.json = resources\message\IncrementalAlterConfigsRequest.json
+		resources\message\IncrementalAlterConfigsResponse.json = resources\message\IncrementalAlterConfigsResponse.json
+		resources\message\InitProducerIdRequest.json = resources\message\InitProducerIdRequest.json
+		resources\message\InitProducerIdResponse.json = resources\message\InitProducerIdResponse.json
+		resources\message\JoinGroupRequest.json = resources\message\JoinGroupRequest.json
+		resources\message\JoinGroupResponse.json = resources\message\JoinGroupResponse.json
+		resources\message\LeaderAndIsrRequest.json = resources\message\LeaderAndIsrRequest.json
+		resources\message\LeaderAndIsrResponse.json = resources\message\LeaderAndIsrResponse.json
+		resources\message\LeaderChangeMessage.json = resources\message\LeaderChangeMessage.json
+		resources\message\LeaveGroupRequest.json = resources\message\LeaveGroupRequest.json
+		resources\message\LeaveGroupResponse.json = resources\message\LeaveGroupResponse.json
+		resources\message\ListGroupsRequest.json = resources\message\ListGroupsRequest.json
+		resources\message\ListGroupsResponse.json = resources\message\ListGroupsResponse.json
+		resources\message\ListOffsetsRequest.json = resources\message\ListOffsetsRequest.json
+		resources\message\ListOffsetsResponse.json = resources\message\ListOffsetsResponse.json
+		resources\message\ListPartitionReassignmentsRequest.json = resources\message\ListPartitionReassignmentsRequest.json
+		resources\message\ListPartitionReassignmentsResponse.json = resources\message\ListPartitionReassignmentsResponse.json
+		resources\message\ListTransactionsRequest.json = resources\message\ListTransactionsRequest.json
+		resources\message\ListTransactionsResponse.json = resources\message\ListTransactionsResponse.json
+		resources\message\MetadataRequest.json = resources\message\MetadataRequest.json
+		resources\message\MetadataResponse.json = resources\message\MetadataResponse.json
+		resources\message\OffsetCommitRequest.json = resources\message\OffsetCommitRequest.json
+		resources\message\OffsetCommitResponse.json = resources\message\OffsetCommitResponse.json
+		resources\message\OffsetDeleteRequest.json = resources\message\OffsetDeleteRequest.json
+		resources\message\OffsetDeleteResponse.json = resources\message\OffsetDeleteResponse.json
+		resources\message\OffsetFetchRequest.json = resources\message\OffsetFetchRequest.json
+		resources\message\OffsetFetchResponse.json = resources\message\OffsetFetchResponse.json
+		resources\message\OffsetForLeaderEpochRequest.json = resources\message\OffsetForLeaderEpochRequest.json
+		resources\message\OffsetForLeaderEpochResponse.json = resources\message\OffsetForLeaderEpochResponse.json
+		resources\message\ProduceRequest.json = resources\message\ProduceRequest.json
+		resources\message\ProduceResponse.json = resources\message\ProduceResponse.json
+		resources\message\RenewDelegationTokenRequest.json = resources\message\RenewDelegationTokenRequest.json
+		resources\message\RenewDelegationTokenResponse.json = resources\message\RenewDelegationTokenResponse.json
+		resources\message\RequestHeader.json = resources\message\RequestHeader.json
+		resources\message\ResponseHeader.json = resources\message\ResponseHeader.json
+		resources\message\SaslAuthenticateRequest.json = resources\message\SaslAuthenticateRequest.json
+		resources\message\SaslAuthenticateResponse.json = resources\message\SaslAuthenticateResponse.json
+		resources\message\SaslHandshakeRequest.json = resources\message\SaslHandshakeRequest.json
+		resources\message\SaslHandshakeResponse.json = resources\message\SaslHandshakeResponse.json
+		resources\message\SnapshotFooterRecord.json = resources\message\SnapshotFooterRecord.json
+		resources\message\SnapshotHeaderRecord.json = resources\message\SnapshotHeaderRecord.json
+		resources\message\StopReplicaRequest.json = resources\message\StopReplicaRequest.json
+		resources\message\StopReplicaResponse.json = resources\message\StopReplicaResponse.json
+		resources\message\SyncGroupRequest.json = resources\message\SyncGroupRequest.json
+		resources\message\SyncGroupResponse.json = resources\message\SyncGroupResponse.json
+		resources\message\TxnOffsetCommitRequest.json = resources\message\TxnOffsetCommitRequest.json
+		resources\message\TxnOffsetCommitResponse.json = resources\message\TxnOffsetCommitResponse.json
+		resources\message\UnregisterBrokerRequest.json = resources\message\UnregisterBrokerRequest.json
+		resources\message\UnregisterBrokerResponse.json = resources\message\UnregisterBrokerResponse.json
+		resources\message\UpdateFeaturesRequest.json = resources\message\UpdateFeaturesRequest.json
+		resources\message\UpdateFeaturesResponse.json = resources\message\UpdateFeaturesResponse.json
+		resources\message\UpdateMetadataRequest.json = resources\message\UpdateMetadataRequest.json
+		resources\message\UpdateMetadataResponse.json = resources\message\UpdateMetadataResponse.json
+		resources\message\VoteRequest.json = resources\message\VoteRequest.json
+		resources\message\VoteResponse.json = resources\message\VoteResponse.json
+		resources\message\WriteTxnMarkersRequest.json = resources\message\WriteTxnMarkersRequest.json
+		resources\message\WriteTxnMarkersResponse.json = resources\message\WriteTxnMarkersResponse.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.MessageGenerator.Tests", "tests\NKafka.MessageGenerator.Tests\NKafka.MessageGenerator.Tests.csproj", "{2A19FAFB-E28B-4ECF-A020-985DE664F157}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{29622E63-2B40-49ED-AFFE-CE7D1D6E2143}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.Tests", "tests\NKafka.Tests\NKafka.Tests.csproj", "{24148224-0644-448D-AA71-BAD284145726}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{855C7656-BEBA-4E23-973B-C4C6127E6580}"
+	ProjectSection(SolutionItems) = preProject
+		docs\index.md = docs\index.md
+		docs\for_developers.md = docs\for_developers.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.MessageGenerator", "src\NKafka.MessageGenerator\NKafka.MessageGenerator.csproj", "{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{04B6002E-2732-4C6A-A79C-B65FA0793332}"
+	ProjectSection(SolutionItems) = preProject
+		infra\docker-compose.yml = infra\docker-compose.yml
+		infra\.env = infra\.env
+		infra\readme.md = infra\readme.md
+		infra\docker-compose.big-cluster.yml = infra\docker-compose.big-cluster.yml
+		infra\docker-compose.simple.yml = infra\docker-compose.simple.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{0BCF7CE3-517C-4AE5-9D39-8B2C353CF89C}"
+	ProjectSection(SolutionItems) = preProject
+		infra\choco\install.ps1 = infra\choco\install.ps1
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "tools\Generator\Generator.csproj", "{70896BF0-A6BF-40EE-89EC-47C46C92EAA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DockerBrokersGenerator", "tools\DockerBrokersGenerator\DockerBrokersGenerator.csproj", "{26A11C4C-1023-46E5-A68F-AF2B5616FC52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A19FAFB-E28B-4ECF-A020-985DE664F157}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A19FAFB-E28B-4ECF-A020-985DE664F157}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A19FAFB-E28B-4ECF-A020-985DE664F157}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A19FAFB-E28B-4ECF-A020-985DE664F157}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24148224-0644-448D-AA71-BAD284145726}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24148224-0644-448D-AA71-BAD284145726}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24148224-0644-448D-AA71-BAD284145726}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24148224-0644-448D-AA71-BAD284145726}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70896BF0-A6BF-40EE-89EC-47C46C92EAA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70896BF0-A6BF-40EE-89EC-47C46C92EAA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70896BF0-A6BF-40EE-89EC-47C46C92EAA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70896BF0-A6BF-40EE-89EC-47C46C92EAA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26A11C4C-1023-46E5-A68F-AF2B5616FC52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26A11C4C-1023-46E5-A68F-AF2B5616FC52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26A11C4C-1023-46E5-A68F-AF2B5616FC52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26A11C4C-1023-46E5-A68F-AF2B5616FC52}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
+		{90779538-4A63-4EBD-B4FF-39772E740919} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
+		{2A19FAFB-E28B-4ECF-A020-985DE664F157} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{24148224-0644-448D-AA71-BAD284145726} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
+		{0BCF7CE3-517C-4AE5-9D39-8B2C353CF89C} = {04B6002E-2732-4C6A-A79C-B65FA0793332}
+		{70896BF0-A6BF-40EE-89EC-47C46C92EAA5} = {29622E63-2B40-49ED-AFFE-CE7D1D6E2143}
+		{26A11C4C-1023-46E5-A68F-AF2B5616FC52} = {29622E63-2B40-49ED-AFFE-CE7D1D6E2143}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39C07D03-F77E-4D2B-A72F-FCDC1313B058}
+	EndGlobalSection
+EndGlobal

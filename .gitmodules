@@ -1,0 +1,3 @@
+[submodule "kafka"]
+	path = kafka
+	url = https://github.com/apache/kafka.git

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NKafka\NKafka.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Messages" />
+    <Folder Include="Protocol\Records" />
+  </ItemGroup>
+
+</Project>

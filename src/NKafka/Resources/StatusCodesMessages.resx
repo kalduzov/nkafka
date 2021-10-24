@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+              xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+      PublicKeyToken=b77a5c561934e089
+    </value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+      PublicKeyToken=b77a5c561934e089
+    </value>
+  </resheader>
+  <data name="UnknownServerError" xml:space="preserve"><value>The server experienced an unexpected error when processing the request.</value></data>
+  <data name="OffsetOutOfRange" xml:space="preserve"><value>The requested offset is not within the range of offsets maintained by the server.</value></data>
+  <data name="CorruptMessage" xml:space="preserve"><value>This message has failed its CRC checksum, exceeds the valid size, has a null key for a compacted topic, or is otherwise corrupt.</value></data>
+  <data name="UnknownTopicOrPartition" xml:space="preserve"><value>This server does not host this topic-partition.</value></data>
+  <data name="InvalidFetchSize" xml:space="preserve"><value>The requested fetch size is invalid.</value></data>
+  <data name="LeaderNotAvailable" xml:space="preserve"><value>There is no leader for this topic-partition as we are in the middle of a leadership election.</value></data>
+  <data name="NotLeaderOrFollower" xml:space="preserve"><value>For requests intended only for the leader, this error indicates that the broker is not the current leader. For requests intended for any replica, this error indicates that the broker is not a replica of the topic partition.</value></data>
+  <data name="RequestTimedOut" xml:space="preserve"><value>The request timed out.</value></data>
+  <data name="BrokerNotAvailable" xml:space="preserve"><value>The broker is not available.</value></data>
+  <data name="ReplicaNotAvailable" xml:space="preserve"><value>The replica is not available for the requested topic-partition. Produce/Fetch requests and other requests intended only for the leader or follower return NotLeaderOrFollower if the broker is not a replica of the topic-partition.</value></data>
+  <data name="MessageTooLarge" xml:space="preserve"><value>The request included a message larger than the max message size the server will accept.</value></data>
+  <data name="StaleControllerEpoch" xml:space="preserve"><value>The controller moved to another broker.</value></data>
+  <data name="OffsetMetadataTooLarge" xml:space="preserve"><value>The metadata field of the offset request was too large.</value></data>
+  <data name="NetworkException" xml:space="preserve"><value>The server disconnected before a response was received.</value></data>
+  <data name="CoordinatorLoadInProgress" xml:space="preserve"><value>The coordinator is loading and hence can't process requests.</value></data>
+  <data name="CoordinatorNotAvailable" xml:space="preserve"><value>The coordinator is not available.</value></data>
+  <data name="NotCoordinator" xml:space="preserve"><value>This is not the correct coordinator.</value></data>
+  <data name="InvalidTopicException" xml:space="preserve"><value>The request attempted to perform an operation on an invalid topic.</value></data>
+  <data name="RecordListTooLarge" xml:space="preserve"><value>The request included message batch larger than the configured segment size on the server.</value></data>
+  <data name="NotEnoughReplicas" xml:space="preserve"><value>Messages are rejected since there are fewer in-sync replicas than required.</value></data>
+  <data name="NotEnoughReplicasAfterAppend" xml:space="preserve"><value>Messages are written to the log, but to fewer in-sync replicas than required.</value></data>
+  <data name="InvalidRequiredAcks" xml:space="preserve"><value>Produce request specified an invalid value for required acks.</value></data>
+  <data name="IllegalGeneration" xml:space="preserve"><value>Specified group generation id is not valid.</value></data>
+  <data name="InconsistentGroupProtocol" xml:space="preserve"><value>The group member's supported protocols are incompatible with those of existing members or first group member tried to join with empty protocol type or empty protocol list.</value></data>
+  <data name="InvalidGroupId" xml:space="preserve"><value>The configured groupId is invalid.</value></data>
+  <data name="UnknownMemberId" xml:space="preserve"><value>The coordinator is not aware of this member.</value></data>
+  <data name="InvalidSessionTimeout" xml:space="preserve"><value>The session timeout is not within the range allowed by the broker (as configured by group.min.session.timeout.ms and group.max.session.timeout.ms).</value></data>
+  <data name="RebalanceInProgress" xml:space="preserve"><value>The group is rebalancing, so a rejoin is needed.</value></data>
+  <data name="InvalidCommitOffsetSize" xml:space="preserve"><value>The committing offset data size is not valid.</value></data>
+  <data name="TopicAuthorizationFailed" xml:space="preserve"><value>Topic authorization failed.</value></data>
+  <data name="GroupAuthorizationFailed" xml:space="preserve"><value>Group authorization failed.</value></data>
+  <data name="ClusterAuthorizationFailed" xml:space="preserve"><value>Cluster authorization failed.</value></data>
+  <data name="InvalidTimestamp" xml:space="preserve"><value>The timestamp of the message is out of acceptable range.</value></data>
+  <data name="UnsupportedSaslMechanism" xml:space="preserve"><value>The broker does not support the requested SASL mechanism.</value></data>
+  <data name="IllegalSaslState" xml:space="preserve"><value>Request is not valid given the current SASL state.</value></data>
+  <data name="UnsupportedVersion" xml:space="preserve"><value>The version of API is not supported.</value></data>
+  <data name="TopicAlreadyExists" xml:space="preserve"><value>Topic with this name already exists.</value></data>
+  <data name="InvalidPartitions" xml:space="preserve"><value>Number of partitions is below 1.</value></data>
+  <data name="InvalidReplicationFactor" xml:space="preserve"><value>Replication factor is below 1 or larger than the number of available brokers.</value></data>
+  <data name="InvalidReplicaAssignment" xml:space="preserve"><value>Replica assignment is invalid.</value></data>
+  <data name="InvalidConfig" xml:space="preserve"><value>Configuration is invalid.</value></data>
+  <data name="NotController" xml:space="preserve"><value>This is not the correct controller for this cluster.</value></data>
+  <data name="InvalidRequest" xml:space="preserve"><value>This most likely occurs because of a request being malformed by the client library or the message was sent to an incompatible broker. See the broker logs for more details.</value></data>
+  <data name="UnsupportedForMessageFormat" xml:space="preserve"><value>The message format version on the broker does not support the request.</value></data>
+  <data name="PolicyViolation" xml:space="preserve"><value>Request parameters do not satisfy the configured policy.</value></data>
+  <data name="OutOfOrderSequenceNumber" xml:space="preserve"><value>The broker received an out of order sequence number.</value></data>
+  <data name="DuplicateSequenceNumber" xml:space="preserve"><value>The broker received a duplicate sequence number.</value></data>
+  <data name="InvalidProducerEpoch" xml:space="preserve"><value>Producer attempted to produce with an old epoch.</value></data>
+  <data name="InvalidTxnState" xml:space="preserve"><value>The producer attempted a transactional operation in an invalid state.</value></data>
+  <data name="InvalidProducerIdMapping" xml:space="preserve"><value>The producer attempted to use a producer id which is not currently assigned to its transactional id.</value></data>
+  <data name="InvalidTransactionTimeout" xml:space="preserve"><value>The transaction timeout is larger than the maximum value allowed by the broker (as configured by transaction.max.timeout.ms).</value></data>
+  <data name="ConcurrentTransactions" xml:space="preserve"><value>The producer attempted to update a transaction while another concurrent operation on the same transaction was ongoing.</value></data>
+  <data name="TransactionCoordinatorFenced" xml:space="preserve"><value>Indicates that the transaction coordinator sending a WriteTxnMarker is no longer the current coordinator for a given producer.</value></data>
+  <data name="TransactionalIdAuthorizationFailed" xml:space="preserve"><value>Transactional Id authorization failed.</value></data>
+  <data name="SecurityDisabled" xml:space="preserve"><value>Security features are disabled.</value></data>
+  <data name="OperationNotAttempted" xml:space="preserve"><value>The broker did not attempt to execute this operation. This may happen for batched RPCs where some operations in the batch failed, causing the broker to respond without trying the rest.</value></data>
+  <data name="KafkaStorageError" xml:space="preserve"><value>Disk error when trying to access log file on the disk.</value></data>
+  <data name="LogDirNotFound" xml:space="preserve"><value>The user-specified log directory is not found in the broker config.</value></data>
+  <data name="SaslAuthenticationFailed" xml:space="preserve"><value>SASL Authentication failed.</value></data>
+  <data name="UnknownProducerId" xml:space="preserve"><value>This exception is raised by the broker if it could not locate the producer metadata associated with the producerId in question. This could happen if, for instance, the producer's records were deleted because their retention time had elapsed. Once the last records of the producerId are removed, the producer's metadata is removed from the broker, and future appends by the producer will return thisexception.</value></data>
+  <data name="ReassignmentInProgress" xml:space="preserve"><value>A partition reassignment is in progress.</value></data>
+  <data name="DelegationTokenAuthDisabled" xml:space="preserve"><value>Delegation Token feature is not enabled.</value></data>
+  <data name="DelegationTokenNotFound" xml:space="preserve"><value>Delegation Token is not found on server.</value></data>
+  <data name="DelegationTokenOwnerMismatch" xml:space="preserve"><value>Specified Principal is not valid Owner/Renewer.</value></data>
+  <data name="DelegationTokenRequestNotAllowed" xml:space="preserve"><value>Delegation Token requests are not allowed on PLAINTEXT/1-way SSL channels and on delegation token authenticated channels.</value></data>
+  <data name="DelegationTokenAuthorizationFailed" xml:space="preserve"><value>Delegation Token authorization failed.</value></data>
+  <data name="DelegationTokenExpired" xml:space="preserve"><value>Delegation Token is expired.</value></data>
+  <data name="InvalidPrincipalType" xml:space="preserve"><value>Supplied principalType is not supported.</value></data>
+  <data name="NonEmptyGroup" xml:space="preserve"><value>The group is not empty.</value></data>
+  <data name="GroupIdNotFound" xml:space="preserve"><value>The group id does not exist.</value></data>
+  <data name="FetchSessionIdNotFound" xml:space="preserve"><value>The fetch session ID was not found.</value></data>
+  <data name="InvalidFetchSessionEpoch" xml:space="preserve"><value>The fetch session epoch is invalid.</value></data>
+  <data name="ListenerNotFound" xml:space="preserve"><value>There is no listener on the leader broker that matches the listener on which metadata request was processed.</value></data>
+  <data name="TopicDeletionDisabled" xml:space="preserve"><value>Topic deletion is disabled.</value></data>
+  <data name="FencedLeaderEpoch" xml:space="preserve"><value>The leader epoch in the request is older than the epoch on the broker.</value></data>
+  <data name="UnknownLeaderEpoch" xml:space="preserve"><value>The leader epoch in the request is newer than the epoch on the broker.</value></data>
+  <data name="UnsupportedCompressionType" xml:space="preserve"><value>The requesting client does not support the compression type of given partition.</value></data>
+  <data name="StaleBrokerEpoch" xml:space="preserve"><value>Broker epoch has changed.</value></data>
+  <data name="OffsetNotAvailable" xml:space="preserve"><value>The leader high watermark has not caught up from a recent leader election so the offsets cannot be guaranteed to be monotonically increasing.</value></data>
+  <data name="MemberIdRequired" xml:space="preserve"><value>The group member needs to have a valid member id before actually entering a consumer group.</value></data>
+  <data name="PreferredLeaderNotAvailable" xml:space="preserve"><value>The preferred leader was not available.</value></data>
+  <data name="GroupMaxSizeReached" xml:space="preserve"><value>The consumer group has reached its max size.</value></data>
+  <data name="FencedInstanceId" xml:space="preserve"><value>The broker rejected this static consumer since another consumer with the same group.instance.id has registered with a different member.id.</value></data>
+  <data name="EligibleLeadersNotAvailable" xml:space="preserve"><value>Eligible topic partition leaders are not available.</value></data>
+  <data name="ElectionNotNeeded" xml:space="preserve"><value>Leader election not needed for topic partition.</value></data>
+  <data name="NoReassignmentInProgress" xml:space="preserve"><value>No partition reassignment is in progress.</value></data>
+  <data name="GroupSubscribedToTopic" xml:space="preserve"><value>Deleting offsets of a topic is forbidden while the consumer group is actively subscribed to it.</value></data>
+  <data name="InvalidRecord" xml:space="preserve"><value>This record has failed the validation on broker and hence will be rejected.</value></data>
+  <data name="UnstableOffsetCommit" xml:space="preserve"><value>There are unstable offsets that need to be cleared.</value></data>
+  <data name="ThrottlingQuotaExceeded" xml:space="preserve"><value>The throttling quota has been exceeded.</value></data>
+  <data name="ProducerFenced" xml:space="preserve"><value>There is a newer producer with the same transactionalId which fences the current one.</value></data>
+  <data name="ResourceNotFound" xml:space="preserve"><value>A request illegally referred to a resource that does not exist.</value></data>
+  <data name="DuplicateResource" xml:space="preserve"><value>A request illegally referred to the same resource twice.</value></data>
+  <data name="UnacceptableCredential" xml:space="preserve"><value>Requested credential would not meet criteria for acceptability.</value></data>
+  <data name="InconsistentVoterSet" xml:space="preserve"><value>Indicates that the either the sender or recipient of a voter-only request is not one of the expected voters</value></data>
+  <data name="InvalidUpdateVersion" xml:space="preserve"><value>The given update version was invalid.</value></data>
+  <data name="FeatureUpdateFailed" xml:space="preserve"><value>Unable to update finalized features due to an unexpected server error.</value></data>
+  <data name="PrincipalDeserializationFailure" xml:space="preserve"><value>Request principal deserialization failed during forwarding. This indicates an internal error on the broker cluster security setup.</value></data>
+  <data name="SnapshotNotFound" xml:space="preserve"><value>Requested snapshot was not found</value></data>
+  <data name="PositionOutOfRange" xml:space="preserve"><value>Requested position is not greater than or equal to zero, and less than the size of the snapshot.</value></data>
+  <data name="UnknownTopicId" xml:space="preserve"><value>This server does not host this topic ID.</value></data>
+  <data name="DuplicateBrokerRegistration" xml:space="preserve"><value>This broker ID is already in use.</value></data>
+  <data name="BrokerIdNotRegistered" xml:space="preserve"><value>The given broker ID was not registered.</value></data>
+  <data name="InconsistentTopicId" xml:space="preserve"><value>The log's topic ID did not match the topic ID in the request</value></data>
+  <data name="InconsistentClusterId" xml:space="preserve"><value>The clusterId in the request does not match that found on the server</value></data>
+  <data name="TransactionalIdNotFound" xml:space="preserve"><value>The transactionalId could not be found</value></data>
+  <data name="FetchSessionTopicIdError" xml:space="preserve"><value>The fetch session encountered inconsistent topic ID usage</value></data>
+  <data name="IneligibleReplica" xml:space="preserve">
+        <value>The new ISR contains at least one ineligible replica.</value>
+    </data>
+  <data name="NewLeaderElected" xml:space="preserve">
+        <value>The AlterPartition request successfully updated the partition state but the leader has changed.</value>
+    </data>
+</root>

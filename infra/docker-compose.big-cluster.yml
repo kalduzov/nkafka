@@ -1,0 +1,873 @@
+version: '3.9'
+
+services:
+  bc_zookeeper-1:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: bc_zookeeper-1
+    container_name: bc_zookeeper-1
+#    ports:
+#      - "23000:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '1'
+      ZOOKEEPER_SERVERS: 'bc_zookeeper-1:2888:3888;bc_zookeeper-2:2888:3888;bc_zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - bc_kafka-network
+  bc_zookeeper-2:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: bc_zookeeper-2
+    container_name: bc_zookeeper-2
+#    ports:
+#      - "22182:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '2'
+      ZOOKEEPER_SERVERS: 'bc_zookeeper-1:2888:3888;bc_zookeeper-2:2888:3888;bc_zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - bc_kafka-network
+  bc_zookeeper-3:
+    image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    restart: always
+    hostname: bc_zookeeper-3
+    container_name: bc_zookeeper-3
+#    ports:
+#      - "22183:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: '3'
+      ZOOKEEPER_SERVERS: 'bc_zookeeper-1:2888:3888;bc_zookeeper-2:2888:3888;bc_zookeeper-3:2888:3888'
+      ZOOKEEPER_CLIENT_PORT: '${ZOOKEEPER_CLIENT_PORT}'
+      ZOOKEEPER_PEER_PORT: '${ZOOKEEPER_PEER_PORT}'
+      ZOOKEEPER_LEADER_PORT: '${ZOOKEEPER_LEADER_PORT}'
+      ZOOKEEPER_INIT_LIMIT: '${ZOOKEEPER_INIT_LIMIT}'
+      ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
+      ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
+    networks:
+      - bc_kafka-network
+
+  bc_broker-6:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-6
+    restart: always
+    container_name: bc_broker-6
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29101:29101'
+    environment:
+      KAFKA_BROKER_ID: '6'
+      KAFKA_BROKER_RACK: '6'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29101'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-6:9091,LISTENER_LOCAL://localhost:29101'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-7:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-7
+    restart: always
+    container_name: bc_broker-7
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29102:29102'
+    environment:
+      KAFKA_BROKER_ID: '7'
+      KAFKA_BROKER_RACK: '7'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29102'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-7:9091,LISTENER_LOCAL://localhost:29102'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-8:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-8
+    restart: always
+    container_name: bc_broker-8
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29103:29103'
+    environment:
+      KAFKA_BROKER_ID: '8'
+      KAFKA_BROKER_RACK: '8'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29103'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-8:9091,LISTENER_LOCAL://localhost:29103'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-9:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-9
+    restart: always
+    container_name: bc_broker-9
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29104:29104'
+    environment:
+      KAFKA_BROKER_ID: '9'
+      KAFKA_BROKER_RACK: '9'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29104'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-9:9091,LISTENER_LOCAL://localhost:29104'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-10:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-10
+    restart: always
+    container_name: bc_broker-10
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29105:29105'
+    environment:
+      KAFKA_BROKER_ID: '10'
+      KAFKA_BROKER_RACK: '10'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29105'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-10:9091,LISTENER_LOCAL://localhost:29105'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-11:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-11
+    restart: always
+    container_name: bc_broker-11
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29106:29106'
+    environment:
+      KAFKA_BROKER_ID: '11'
+      KAFKA_BROKER_RACK: '11'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29106'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-11:9091,LISTENER_LOCAL://localhost:29106'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-12:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-12
+    restart: always
+    container_name: bc_broker-12
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29107:29107'
+    environment:
+      KAFKA_BROKER_ID: '12'
+      KAFKA_BROKER_RACK: '12'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29107'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-12:9091,LISTENER_LOCAL://localhost:29107'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-13:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-13
+    restart: always
+    container_name: bc_broker-13
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29108:29108'
+    environment:
+      KAFKA_BROKER_ID: '13'
+      KAFKA_BROKER_RACK: '13'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29108'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-13:9091,LISTENER_LOCAL://localhost:29108'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-14:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-14
+    restart: always
+    container_name: bc_broker-14
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29109:29109'
+    environment:
+      KAFKA_BROKER_ID: '14'
+      KAFKA_BROKER_RACK: '14'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29109'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-14:9091,LISTENER_LOCAL://localhost:29109'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-15:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-15
+    restart: always
+    container_name: bc_broker-15
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29110:29110'
+    environment:
+      KAFKA_BROKER_ID: '15'
+      KAFKA_BROKER_RACK: '15'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29110'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-15:9091,LISTENER_LOCAL://localhost:29110'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-16:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-16
+    restart: always
+    container_name: bc_broker-16
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29111:29111'
+    environment:
+      KAFKA_BROKER_ID: '16'
+      KAFKA_BROKER_RACK: '16'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29111'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-16:9091,LISTENER_LOCAL://localhost:29111'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-17:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-17
+    restart: always
+    container_name: bc_broker-17
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29112:29112'
+    environment:
+      KAFKA_BROKER_ID: '17'
+      KAFKA_BROKER_RACK: '17'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29112'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-17:9091,LISTENER_LOCAL://localhost:29112'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-18:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-18
+    restart: always
+    container_name: bc_broker-18
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29113:29113'
+    environment:
+      KAFKA_BROKER_ID: '18'
+      KAFKA_BROKER_RACK: '18'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29113'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-18:9091,LISTENER_LOCAL://localhost:29113'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-19:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-19
+    restart: always
+    container_name: bc_broker-19
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29114:29114'
+    environment:
+      KAFKA_BROKER_ID: '19'
+      KAFKA_BROKER_RACK: '19'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29114'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-19:9091,LISTENER_LOCAL://localhost:29114'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-20:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-20
+    restart: always
+    container_name: bc_broker-20
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29115:29115'
+    environment:
+      KAFKA_BROKER_ID: '20'
+      KAFKA_BROKER_RACK: '20'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29115'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-20:9091,LISTENER_LOCAL://localhost:29115'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-21:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-21
+    restart: always
+    container_name: bc_broker-21
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29116:29116'
+    environment:
+      KAFKA_BROKER_ID: '21'
+      KAFKA_BROKER_RACK: '21'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29116'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-21:9091,LISTENER_LOCAL://localhost:29116'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-22:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-22
+    restart: always
+    container_name: bc_broker-22
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29117:29117'
+    environment:
+      KAFKA_BROKER_ID: '22'
+      KAFKA_BROKER_RACK: '22'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29117'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-22:9091,LISTENER_LOCAL://localhost:29117'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-23:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-23
+    restart: always
+    container_name: bc_broker-23
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29118:29118'
+    environment:
+      KAFKA_BROKER_ID: '23'
+      KAFKA_BROKER_RACK: '23'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29118'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-23:9091,LISTENER_LOCAL://localhost:29118'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-24:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-24
+    restart: always
+    container_name: bc_broker-24
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29119:29119'
+    environment:
+      KAFKA_BROKER_ID: '24'
+      KAFKA_BROKER_RACK: '24'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29119'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-24:9091,LISTENER_LOCAL://localhost:29119'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-25:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-25
+    restart: always
+    container_name: bc_broker-25
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29120:29120'
+    environment:
+      KAFKA_BROKER_ID: '25'
+      KAFKA_BROKER_RACK: '25'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29120'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-25:9091,LISTENER_LOCAL://localhost:29120'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-26:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-26
+    restart: always
+    container_name: bc_broker-26
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29121:29121'
+    environment:
+      KAFKA_BROKER_ID: '26'
+      KAFKA_BROKER_RACK: '26'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29121'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-26:9091,LISTENER_LOCAL://localhost:29121'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-27:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-27
+    restart: always
+    container_name: bc_broker-27
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29122:29122'
+    environment:
+      KAFKA_BROKER_ID: '27'
+      KAFKA_BROKER_RACK: '27'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29122'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-27:9091,LISTENER_LOCAL://localhost:29122'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-28:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-28
+    restart: always
+    container_name: bc_broker-28
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29123:29123'
+    environment:
+      KAFKA_BROKER_ID: '28'
+      KAFKA_BROKER_RACK: '28'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29123'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-28:9091,LISTENER_LOCAL://localhost:29123'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-29:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-29
+    restart: always
+    container_name: bc_broker-29
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29124:29124'
+    environment:
+      KAFKA_BROKER_ID: '29'
+      KAFKA_BROKER_RACK: '29'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29124'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-29:9091,LISTENER_LOCAL://localhost:29124'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-30:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-30
+    restart: always
+    container_name: bc_broker-30
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29125:29125'
+    environment:
+      KAFKA_BROKER_ID: '30'
+      KAFKA_BROKER_RACK: '30'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29125'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-30:9091,LISTENER_LOCAL://localhost:29125'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-31:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-31
+    restart: always
+    container_name: bc_broker-31
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29126:29126'
+    environment:
+      KAFKA_BROKER_ID: '31'
+      KAFKA_BROKER_RACK: '31'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29126'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-31:9091,LISTENER_LOCAL://localhost:29126'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-32:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-32
+    restart: always
+    container_name: bc_broker-32
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29127:29127'
+    environment:
+      KAFKA_BROKER_ID: '32'
+      KAFKA_BROKER_RACK: '32'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29127'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-32:9091,LISTENER_LOCAL://localhost:29127'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+  bc_broker-33:
+    image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
+    hostname: bc_broker-33
+    restart: always
+    container_name: bc_broker-33
+    depends_on:
+      - bc_zookeeper-1
+      - bc_zookeeper-2
+      - bc_zookeeper-3
+    ports:
+      - '29128:29128'
+    environment:
+      KAFKA_BROKER_ID: '33'
+      KAFKA_BROKER_RACK: '33'
+      KAFKA_ZOOKEEPER_CONNECT: 'bc_zookeeper-1:2181,bc_zookeeper-2:2181,bc_zookeeper-3:2181'
+      KAFKA_LISTENERS: 'LISTENER_INTERNAL://:9091,LISTENER_LOCAL://:29128'
+      KAFKA_ADVERTISED_LISTENERS: 'LISTENER_INTERNAL://bc_broker-33:9091,LISTENER_LOCAL://localhost:29128'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'LISTENER_INTERNAL'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${KAFKA_LISTENER_SECURITY_PROTOCOL_MAP}'
+      KAFKA_DEFAULT_REPLICATION_FACTOR: '2'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+      KAFKA_ZOOKEEPER_SESSION_TIMEOUT_MS: '3000'
+      KAFKA_ZOOKEEPER_CONNECTION_TIMEOUT_MS: '3000'
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    networks:
+      - bc_kafka-network
+
+networks:
+  bc_kafka-network:
+    driver: bridge

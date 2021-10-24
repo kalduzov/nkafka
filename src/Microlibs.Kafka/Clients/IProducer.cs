@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microlibs.Kafka
+namespace Microlibs.Kafka.Clients
 {
-    public interface IProducer : IDisposable
+    public interface IProducer : IClient
     {
         /// <summary>
-        /// 
+        /// Отправляет сообщение в кафку в режиме FireAndForget
         /// </summary>
-        /// <param name="topicName"></param>
-        /// <param name="Message"></param>
-        /// <typeparam name="T"></typeparam>
-        public void Produce<T>(string topicName, T Message);
+        /// <param name="topicName">Имя топика</param>
+        /// <param name="message">Сообщение</param>
+        /// <typeparam name="T">Тип сообщения</typeparam>
+        public void Produce<T>(string topicName, T message);
 
         /// <summary>
         /// 

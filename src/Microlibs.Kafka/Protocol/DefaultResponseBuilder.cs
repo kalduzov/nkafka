@@ -12,7 +12,47 @@ namespace Microlibs.Kafka.Protocol
             return apiKey switch
             {
                 ApiKeys.ApiVersions => BuildApiVersionResponse(binaryReader, responseLength),
+                ApiKeys.DescribeCluster => BuildDescribeClusterResponse(binaryReader, responseLength),
             };
+        }
+
+        private static ResponseMessage BuildDescribeClusterResponse(BinaryReader binaryReader, int responseLength)
+        {
+            var trottleTimeMs = binaryReader.ReadInt32().Swap();
+
+            var errorCode = binaryReader.ReadInt16().Swap();
+
+            if (errorCode != (short)ErrorCodes.None)
+            {
+                throw new ArgumentException("Ошибка получения запроса");
+            }
+
+            var errorMessageLen = binaryReader.ReadInt16().Swap();
+
+            if (errorMessageLen != 0)
+            {
+                //var errorMessage = 
+            }
+
+            var clusterId = binaryReader.ReadCompactString();
+            var controllerId = binaryReader.ReadInt32().Swap();
+
+            var arrayLen = binaryReader.ReadByte();
+
+            if (arrayLen > 1)
+            {
+                for (var i = 0; i < arrayLen - 1; i++)
+                {
+                    var brokerId = binaryReader.ReadInt32().Swap();
+                    var host = binaryReader.ReadCompactString();
+                    var port = binaryReader.ReadInt32().Swap();
+                    var rack = binaryReader.ReadCompactNullableString();
+                }
+            }
+
+            var clusterAuthorizedOperations = binaryReader.ReadInt32().Swap();
+
+            return new DescribeResponseMessage(trottleTimeMs, clusterId, controllerId, clusterAuthorizedOperations);
         }
 
         private static ApiVersionMessage BuildApiVersionResponse(BinaryReader binaryReader, int responseLength)

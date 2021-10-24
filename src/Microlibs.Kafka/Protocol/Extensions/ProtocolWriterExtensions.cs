@@ -44,7 +44,26 @@ internal static class ProtocolWriterExtensions
         return ((short)apiKey).ToBigEndian();
     }
 
-    private static Span<byte> ToBigEndian(this int value)
+    internal static string ReadCompactString(this BinaryReader reader)
+    {
+        var len = reader.ReadByte();
+        var buf = reader.ReadBytes(len - 1);
+        return Encoding.UTF8.GetString(buf);
+    }
+    
+    internal static string ReadCompactNullableString(this BinaryReader reader)
+    {
+        var len = reader.ReadInt16().Swap();
+
+        if (len == 0)
+        {
+            return null!;
+        }
+        var buf = reader.ReadBytes(len - 1);
+        return Encoding.UTF8.GetString(buf);
+    }
+
+    internal static Span<byte> ToBigEndian(this int value)
     {
         Span<byte> bytes = stackalloc byte[4];
 

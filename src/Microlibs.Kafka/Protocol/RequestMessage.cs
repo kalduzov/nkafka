@@ -1,4 +1,5 @@
 ﻿using System;
+using Microlibs.Kafka.Protocol.RequestsMessages;
 
 namespace Microlibs.Kafka.Protocol
 {
@@ -6,7 +7,9 @@ namespace Microlibs.Kafka.Protocol
     {
         internal static readonly RequestMessage Empty = new EmptyRequestMessage();
 
-        public int Length { get; set; } = 0;
+        public int Length { get; protected init; }
+
+        public ApiKeys ApiKey { get; protected init; }
 
         public abstract ReadOnlySpan<byte> AsReadOnlySpan();
     }

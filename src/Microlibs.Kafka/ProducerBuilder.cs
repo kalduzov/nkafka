@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Microlibs.Kafka.Clients;
 using Microlibs.Kafka.Config;
+using Microlibs.Kafka.Protocol.Connection;
 
 namespace Microlibs.Kafka
 {
@@ -8,13 +10,13 @@ namespace Microlibs.Kafka
     {
         private readonly ProducerConfig _producerConfig;
         private readonly ConcurrentDictionary<string, IProducer> _producers = new();
-        private readonly InternalConnectionPool _connectionPool;
+        private readonly BrokerConnectionPool _connectionPool;
         private readonly Action<string> _disposeAction;
 
         public ProducerBuilder(ProducerConfig producerConfig)
         {
             _producerConfig = producerConfig;
-            _connectionPool = new InternalConnectionPool(producerConfig);
+            _connectionPool = new BrokerConnectionPool(producerConfig);
             _disposeAction = DisposeAction;
         }
 

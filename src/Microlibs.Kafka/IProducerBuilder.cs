@@ -1,3 +1,5 @@
+using Microlibs.Kafka.Clients;
+
 namespace Microlibs.Kafka
 {
     public interface IProducerBuilder

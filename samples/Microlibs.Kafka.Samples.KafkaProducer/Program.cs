@@ -6,10 +6,9 @@ using Microlibs.Kafka.Config;
 var producerBuilder = KafkaCluster.CreateProducerBuilder(
     new ProducerConfig
     {
-        BootstrapServers = new []
+        BootstrapServers = new[]
         {
-            "localhost:9092",
-            "localhost:9093"
+            "localhost:9092"
         }
     });
 
@@ -22,5 +21,5 @@ using var producer = producerBuilder.Build();
 
     await producer.ProduceAsync("test_topic", test, CancellationToken.None);
     Console.WriteLine("Produce OK");
+    Console.ReadKey();
 }
-

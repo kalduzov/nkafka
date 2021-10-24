@@ -8,6 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Microlibs.Kafka
 {
+    /// <summary>
+    /// 
+    /// </summary>
+
+    // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class KafkaCluster : IKafkaCluster
     {
         private readonly IRequestBuilder _requestBuilder;

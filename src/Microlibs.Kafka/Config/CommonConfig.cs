@@ -17,6 +17,12 @@ namespace Microlibs.Kafka.Config
         /// </summary>
         public string ClientId { get; set; } = GetHostName();
 
+        /// <summary>
+        /// Таймаут обновления данных по брокерам в ms
+        /// </summary>
+        /// <remarks>Default - 1000ms</remarks>
+        public int BrokerUpdateTimeout { get; set; } = 1000;
+
         private static string GetHostName()
         {
             try

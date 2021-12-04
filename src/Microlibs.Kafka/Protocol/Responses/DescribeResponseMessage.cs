@@ -1,4 +1,21 @@
 ﻿namespace Microlibs.Kafka.Protocol.Responses
 {
-    public record DescribeResponseMessage(int TrottleTimeMs, string ClusterId, int ControllerId, int ClusterAuthorizedOperations) : ResponseMessage;
+    public class DescribeResponseMessage : KafkaResponseMessage
+    {
+        public DescribeResponseMessage(int trottleTimeMs, string clusterId, int controllerId, int clusterAuthorizedOperations)
+        {
+            this.TrottleTimeMs = trottleTimeMs;
+            this.ClusterId = clusterId;
+            this.ControllerId = controllerId;
+            this.ClusterAuthorizedOperations = clusterAuthorizedOperations;
+        }
+
+        public int TrottleTimeMs { get; init; }
+
+        public string ClusterId { get; init; }
+
+        public int ControllerId { get; init; }
+
+        public int ClusterAuthorizedOperations { get; init; }
+    }
 }

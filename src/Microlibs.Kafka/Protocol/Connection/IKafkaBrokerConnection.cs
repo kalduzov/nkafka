@@ -2,14 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Microlibs.Kafka.Protocol
+namespace Microlibs.Kafka.Protocol.Connection
 {
     internal interface IKafkaBrokerConnection : IDisposable
     {
-        void Send(KafkaRequest request);
+        void Send(KafkaRequestMessage requestMessage);
 
         Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-            where TResponseMessage : ResponseMessage
-            where TRequestMessage : RequestMessage;
+            where TResponseMessage : KafkaResponseMessage
+            where TRequestMessage : KafkaContent;
     }
 }

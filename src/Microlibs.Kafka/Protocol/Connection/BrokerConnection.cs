@@ -5,14 +5,15 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Buffers.Binary;
+using System.IO.Pipelines;
+using Microlibs.Kafka.Protocol.Extensions;
 
 namespace Microlibs.Kafka.Protocol.Connection
 {
     internal sealed class BrokerConnection : IKafkaBrokerConnection, IEquatable<BrokerConnection>
     {
-        private readonly BrokerEndpoint _brokerEndpoint;
-
-        private class ResponseTaskCompletionSource : TaskCompletionSource<ResponseMessage>
+        private class ResponseTaskCompletionSource : TaskCompletionSource<KafkaResponseMessage>
         {
             public ResponseTaskCompletionSource(ApiKeys apiKey, int correlationId)
             {
@@ -25,25 +26,26 @@ namespace Microlibs.Kafka.Protocol.Connection
             public ApiKeys ApiKey { get; }
         }
 
+        private readonly BrokerEndpoint _brokerEndpoint;
         private readonly Socket _socket;
-        private int _requestId;
+        private volatile int _requestId;
         private NetworkStream _networkStream;
         private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tckPool;
         private readonly Task _responsesReaderTask;
         private bool _disposed = false;
         private readonly ArrayPool<byte> _arrayPool = ArrayPool<byte>.Shared;
-
         private readonly ConcurrentBag<Task> _bag = new();
         private readonly CancellationTokenSource _responseProcessingTokenSource = new();
+        private readonly Timer _timer;
 
         public BrokerConnection(BrokerEndpoint brokerEndpoint)
         {
             _brokerEndpoint = brokerEndpoint;
-
             _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
             _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
-
             _responsesReaderTask = Task.Factory.StartNew(Action, TaskCreationOptions.LongRunning);
+
+            _timer = new Timer(state => { }, this, 0, 100);
         }
 
         public override int GetHashCode()
@@ -64,6 +66,11 @@ namespace Microlibs.Kafka.Protocol.Connection
             {
                 while (!_responseProcessingTokenSource.IsCancellationRequested)
                 {
+                    if (_disposed)
+                    {
+                        return;
+                    }
+
                     if (!_socket.Connected)
                     {
                         await Task.Delay(250);
@@ -102,10 +109,8 @@ namespace Microlibs.Kafka.Protocol.Connection
 
             try
             {
-                await using var memoryStream = new MemoryStream(buffer);
-                using var binaryReader = new BinaryReader(memoryStream);
-
-                var requestId = binaryReader.ReadInt32().Swap();
+                var memory = buffer.AsMemory();
+                var requestId = BinaryPrimitives.ReadInt32BigEndian(memory[..4].Span);
 
                 if (_tckPool.TryGetValue(requestId, out var responseInfo))
                 {
@@ -118,17 +123,18 @@ namespace Microlibs.Kafka.Protocol.Connection
 
                     try
                     {
-                        var response = DefaultResponseBuilder.Create(responseInfo.ApiKey, binaryReader, responseLength);
+                        var response =
+                            new KafkaResponseMessage(); //DefaultResponseBuilder.Create(responseInfo.ApiKey, memory.Slice(3, buffer.Length - 4), responseLength);
 
                         responseInfo.SetResult(response);
                     }
                     catch (KafkaException exc)
                     {
-                        responseInfo.SetException(new KafkaException(exc.InternalError, "Ошибка при чтении запроса", exc));
+                        responseInfo.SetException(new KafkaException(exc.InternalStatus, "Ошибка при чтении запроса", exc));
                     }
                     catch (Exception exc)
                     {
-                        responseInfo.SetException(new KafkaException(ErrorCodes.UnknownServerError, "Неизвестная ошибка при чтении запроса", exc));
+                        responseInfo.SetException(new KafkaException(StatusCodes.UnknownServerError, "Неизвестная ошибка при чтении запроса", exc));
                     }
                     finally
                     {
@@ -142,8 +148,17 @@ namespace Microlibs.Kafka.Protocol.Connection
             }
         }
 
-        public void Send(KafkaRequest request)
+        public void Send(KafkaRequestMessage requestMessage)
         {
+            CheckDisposed();
+        }
+
+        private void CheckDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(BrokerConnection));
+            }
         }
 
         // public Task<TResponseMessage> SendAsync<TResponseMessage>(KafkaRequest request, CancellationToken token)
@@ -153,23 +168,25 @@ namespace Microlibs.Kafka.Protocol.Connection
         // }
 
         public Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-            where TResponseMessage : ResponseMessage
-            where TRequestMessage : RequestMessage
+            where TResponseMessage : KafkaResponseMessage
+            where TRequestMessage : KafkaContent
         {
             return InternalSendAsync<TResponseMessage, TRequestMessage>(message, token);
         }
 
         private async Task<TResponseMessage> InternalSendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-            where TResponseMessage : ResponseMessage
-            where TRequestMessage : RequestMessage
+            where TResponseMessage : KafkaResponseMessage
+            where TRequestMessage : KafkaContent
         {
+            CheckDisposed();
+
             await ReEstablishConnectionAsync(token);
 
             //await CheckApiVersion(request, token);
 
             var requestId = Interlocked.Increment(ref _requestId);
 
-            var request = new KafkaRequest(new RequestHeader(message.ApiKey, 0, requestId, "test"), message);
+            var request = new KafkaRequestMessage(new KafkaRequestHeader(message.ApiKey, 0, requestId, "test"), message);
 
             using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
@@ -193,7 +210,7 @@ namespace Microlibs.Kafka.Protocol.Connection
             }
             catch (Exception exc)
             {
-                responseCsInfo.SetException(new KafkaException(ErrorCodes.UnknownServerError, "Не удалость отправить запрос", exc));
+                responseCsInfo.SetException(new KafkaException(StatusCodes.UnknownServerError, "Не удалость отправить запрос", exc));
             }
 
             return (TResponseMessage)await responseCsInfo.Task;
@@ -253,6 +270,7 @@ namespace Microlibs.Kafka.Protocol.Connection
 
                 _networkStream.Dispose();
                 _socket.Dispose();
+                _timer.Dispose();
             }
 
             _disposed = true;

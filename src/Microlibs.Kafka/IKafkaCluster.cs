@@ -1,26 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using Microlibs.Kafka.Clients;
+using Microlibs.Kafka.Clients.Producer;
+using Microlibs.Kafka.Config;
 
 namespace Microlibs.Kafka
 {
     /// <summary>
     /// 
     /// </summary>
-    public interface IKafkaCluster
+    public interface IKafkaCluster : IDisposable
     {
-        async Task<string> CreateTopic(string name, CancellationToken token = default)
-        {
-            var topics = new[]
-            {
-                name
-            };
-            var result = await CreateTopics(topics, token);
-
-            return result.First();
-        }
-
-        Task<IEnumerable<string>> CreateTopics(IReadOnlyCollection<string> names, CancellationToken token = default);
+        CommonConfig Config { get; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="producerConfig"></param>
+        /// <returns></returns>
+        IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string name, ProducerConfig? producerConfig = null);
     }
 }

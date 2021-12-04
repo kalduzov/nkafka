@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using Microlibs.Kafka.Clients.Producer;
 using Microlibs.Kafka.Config;
-using Microlibs.Kafka.Protocol;
+using Microlibs.Kafka.Protocol.Connection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microlibs.Kafka
 {
@@ -15,28 +14,43 @@ namespace Microlibs.Kafka
     // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class KafkaCluster : IKafkaCluster
     {
-        private readonly IRequestBuilder _requestBuilder;
-        private readonly ILogger _logger;
+        private readonly ILoggerFactory _loggerFactory;
+        private readonly KafkaConnectionPoolManager _connectionPoolManager;
 
-        private KafkaCluster(IRequestBuilder requestBuilder, ILogger logger)
+        private KafkaCluster(CommonConfig config, ILoggerFactory? loggerFactory)
         {
-            _logger = logger;
-            _requestBuilder = requestBuilder;
+            Config = config;
+            _loggerFactory = loggerFactory ?? new NullLoggerFactory();
+            _connectionPoolManager = new KafkaConnectionPoolManager();
         }
 
-        public static IProducerBuilder CreateProducerBuilder(CommonConfig config)
+        /// <summary>
+        /// Инициализирует подсистему для нового кафка кластера. 
+        /// </summary>
+        /// <param name="config">Конфигурация</param>
+        /// <param name="loggerFactory">Экземпляр фабрики логирования</param>
+        public static IKafkaCluster Create(CommonConfig config, ILoggerFactory? loggerFactory = null)
         {
-            if (config is ProducerConfig producerConfig)
-            {
-                return new ProducerBuilder(producerConfig);
-            }
-
-            throw new ArgumentException("Параметр должен быть типом ProducerConfig", nameof(config));
+            return new KafkaCluster(config, loggerFactory ?? NullLoggerFactory.Instance);
         }
 
-        public Task<IEnumerable<string>> CreateTopics(IReadOnlyCollection<string> names, CancellationToken token = default)
+        public CommonConfig Config { get; }
+
+        /// <summary>
+        /// Создает новый продюсер для работы с кластером или возвращает уже существующий
+        /// </summary>
+        /// <param name="producerConfig">Конфигурация продюсера</param>
+        /// <remarks>Библиотека </remarks>
+        public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string name, ProducerConfig? producerConfig = null)
         {
-            throw new NotImplementedException();
+            var config = producerConfig ?? ProducerConfig.BaseFrom(Config);
+
+            return new Producer<TKey, TValue>(name, config, null, null, null, null, DateTime.Today.TimeOfDay, _loggerFactory);
+        }
+
+        public void Dispose()
+        {
+            _connectionPoolManager.Dispose();
         }
     }
 }

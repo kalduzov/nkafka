@@ -9,6 +9,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C451-E7E8-4A76-AC94-8A165ED35DD2}"
 ProjectSection(SolutionItems) = preProject
 	J:\git\Kafka\Directory.Build.props = J:\git\Kafka\Directory.Build.props
+	LICENCE = LICENCE
+	Kafka.sln.DotSettings = Kafka.sln.DotSettings
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"
@@ -17,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Samples.Kaf
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{EE6B6414-02ED-4176-8A7B-FBEC797C0185}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microslibs.Kafka.Benchmarks", "benchmarks\Microslibs.Kafka.Benchmarks\Microslibs.Kafka.Benchmarks.csproj", "{9A7A2274-6CBF-416A-9042-A9E643B34AF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Benchmarks", "benchmarks\Microlibs.Kafka.Benchmarks\Microlibs.Kafka.Benchmarks.csproj", "{9A7A2274-6CBF-416A-9042-A9E643B34AF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests.SerializerTests", "tests\Microlibs.Kafka.Tests.SerializerTests\Microlibs.Kafka.Tests.SerializerTests.csproj", "{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +32,7 @@ Global
 		{FB078DD2-8878-4B17-BDB3-DD87AC391841} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
 		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -42,5 +47,9 @@ Global
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

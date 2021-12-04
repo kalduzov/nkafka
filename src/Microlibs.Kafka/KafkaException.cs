@@ -5,12 +5,12 @@ namespace Microlibs.Kafka
 {
     public class KafkaException : Exception
     {
-        internal KafkaException(ErrorCodes code, string message, Exception innerException = null!)
+        internal KafkaException(StatusCodes code, string message, Exception innerException = null!)
             : base(message, innerException)
         {
-            InternalError = code;
+            InternalStatus = code;
         }
 
-        public ErrorCodes InternalError { get; }
+        public StatusCodes InternalStatus { get; }
     }
 }

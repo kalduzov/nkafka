@@ -1,18 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
+        <TargetFramework>netstandard2.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Compressions" />
+        <Folder Include="Compressions" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FastEnum" Version="1.6.1" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+        <PackageReference Include="FastEnum" Version="1.6.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
+        <PackageReference Include="System.IO.Pipelines" Version="5.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Clients\Producer\Producer.Logging.cs">
+            <DependentUpon>Producer.cs</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>

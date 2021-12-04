@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Microlibs.Kafka.Protocol;
+
+namespace Microlibs.Kafka.Protocol.Extensions;
 
 internal static class ProtocolWriterExtensions
 {
@@ -11,7 +12,7 @@ internal static class ProtocolWriterExtensions
         writer.Write(value.ToBigEndian());
     }
 
-    public static void WriteHeader(this BinaryWriter writer, RequestHeader header)
+    public static void WriteHeader(this BinaryWriter writer, KafkaRequestHeader header)
     {
         writer.Write(header.ApiKey.AsShort());
         writer.Write(header.ApiVersion.ToBigEndian());
@@ -20,9 +21,9 @@ internal static class ProtocolWriterExtensions
         writer.Write(header.ClientId.AsNullableString()); //todo возможно стоит это кешировать?
     }
 
-    public static void WriteMessage(this BinaryWriter writer, RequestMessage message)
+    public static void WriteMessage(this BinaryWriter writer, KafkaContent content)
     {
-        writer.Write(message.AsReadOnlySpan());
+        writer.Write(content.AsReadOnlySpan());
     }
 
     private static ReadOnlySpan<byte> AsNullableString(this string str)

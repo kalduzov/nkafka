@@ -9,7 +9,7 @@ using Microlibs.Kafka.Protocol.Responses;
 
 namespace Microlibs.Kafka.Protocol.Connection
 {
-    internal class BrokerConnectionPool : IDisposable, IAsyncDisposable
+    internal sealed class BrokerConnectionPool : IDisposable, IAsyncDisposable
     {
         private readonly CommonConfig _commonConfig;
         private readonly List<IKafkaBrokerConnection> _connections;
@@ -32,21 +32,21 @@ namespace Microlibs.Kafka.Protocol.Connection
             {
                 var connection = _connections.First();
 
-                var message = new DescribeClusterMessage
+                var message = new DescribeClusterContent
                 {
                     IncludeClusterAuthorizedOperations = true
                 };
 
                 try
                 {
-                    var describe = await connection.SendAsync<DescribeResponseMessage, DescribeClusterMessage>(message, token);
+                    var describe = await connection.SendAsync<DescribeResponseMessage, DescribeClusterContent>(message, token);
                 }
                 catch (Exception exc)
                 {
                     Console.WriteLine(exc.Message);
                 }
 
-                await Task.Delay(_commonConfig.BrokerUpdateTimeout, token);
+                //await Task.Delay(_commonConfig.BrokerUpdateTimeout, token);
             }
         }
 

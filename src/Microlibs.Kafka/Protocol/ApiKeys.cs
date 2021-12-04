@@ -1,6 +1,6 @@
 ﻿namespace Microlibs.Kafka.Protocol
 {
-    internal enum ApiKeys : short
+    public enum ApiKeys : short
     {
         Produce = 0,
         Fetch = 1,
@@ -54,8 +54,13 @@
         AlterClientQuotas = 49,
         DescribeUserScramCredentials = 50,
         AlterUserScramCredentials = 51,
+        Vote = 52,
+        BeginQuorumEpoch = 53,
+        EndQuorumEpoch = 54,
+        DescribeQuorum = 55,
         AlterIsr = 56,
         UpdateFeatures = 57,
+        Envelope = 58,
         DescribeCluster = 60,
         DescribeProducers = 61,
         DescribeTransactions = 65,

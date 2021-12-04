@@ -2,8 +2,7 @@
 
 namespace Microlibs.Kafka.Clients
 {
-    public interface IClient: IDisposable
+    public interface IClient : IDisposable
     {
-        
     }
 }

@@ -6,26 +6,37 @@ using System.Threading.Tasks;
 namespace Microlibs.Kafka.Clients.Producer
 {
     /// <summary>
-    /// 
     /// </summary>
     /// <typeparam name="TKey">Key type</typeparam>
     /// <typeparam name="TValue">Value type</typeparam>
-    public interface IProducer<TKey, TValue> : IDisposable
+    public interface IProducer<TKey, TValue> : IProducer
     {
+        /// <summary>
+        /// </summary>
+        Task FlushAsync(CancellationToken cancellationToken);
+
+        void Flush(TimeSpan timeout);
+
+        IReadOnlyCollection<PartitionInfo> PartitionsFor(string topic);
+
+        void Close(TimeSpan timeout);
+
+        Task CloseAsync(CancellationToken token);
+
         #region Produce
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicName"></param>
         /// <param name="message"></param>
         /// <param name="token"></param>
         /// <returns></returns>
         Task<DeliveryResult<TKey, TValue>> ProduceAsync(string topicName, Message<TKey, TValue> message, CancellationToken token = default)
-            => ProduceAsync(new TopicPartition(topicName, Partition.Any), message, token);
+        {
+            return ProduceAsync(new TopicPartition(topicName, Partition.Any), message, token);
+        }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicPartition"></param>
         /// <param name="message"></param>
@@ -37,7 +48,6 @@ namespace Microlibs.Kafka.Clients.Producer
             CancellationToken token = default);
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicName"></param>
         /// <param name="messages"></param>
@@ -47,10 +57,11 @@ namespace Microlibs.Kafka.Clients.Producer
             string topicName,
             IEnumerable<Message<TKey, TValue>> messages,
             CancellationToken token = default)
-            => ProduceAsync(new TopicPartition(topicName, Partition.Any), messages, token);
+        {
+            return ProduceAsync(new TopicPartition(topicName, Partition.Any), messages, token);
+        }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicPartition"></param>
         /// <param name="messages"></param>
@@ -62,46 +73,50 @@ namespace Microlibs.Kafka.Clients.Producer
             CancellationToken token = default);
 
         /// <summary>
-        /// Fire and forget produce message
+        ///     Fire and forget produce message
         /// </summary>
         /// <param name="topicName"></param>
         /// <param name="message"></param>
         void Produce(string topicName, Message<TKey, TValue> message)
-            => Produce(new TopicPartition(topicName, Partition.Any), message);
+        {
+            Produce(new TopicPartition(topicName, Partition.Any), message);
+        }
 
         /// <summary>
-        /// Fire and forget produce message
+        ///     Fire and forget produce message
         /// </summary>
         /// <param name="topicPartition"></param>
         /// <param name="message"></param>
         void Produce(TopicPartition topicPartition, Message<TKey, TValue> message);
 
         /// <summary>
-        /// Fire and forget produce message
+        ///     Fire and forget produce message
         /// </summary>
         /// <param name="topicName"></param>
         /// <param name="messages"></param>
         void Produce(string topicName, IEnumerable<Message<TKey, TValue>> messages)
-            => Produce(new TopicPartition(topicName, Partition.Any), messages);
+        {
+            Produce(new TopicPartition(topicName, Partition.Any), messages);
+        }
 
         /// <summary>
-        /// Fire and forget produce message
+        ///     Fire and forget produce message
         /// </summary>
         /// <param name="topicPartition"></param>
         /// <param name="messages"></param>
         void Produce(TopicPartition topicPartition, IEnumerable<Message<TKey, TValue>> messages);
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicName"></param>
         /// <param name="message"></param>
         /// <param name="deliveryCallback"></param>
         void Produce(string topicName, Message<TKey, TValue> message, Action<DeliveryResult<TKey, TValue>> deliveryCallback)
-            => Produce(new TopicPartition(topicName, Partition.Any), message, deliveryCallback);
+        {
+            Produce(new TopicPartition(topicName, Partition.Any), message, deliveryCallback);
+        }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="topicPartition"></param>
         /// <param name="message"></param>
@@ -109,13 +124,6 @@ namespace Microlibs.Kafka.Clients.Producer
         void Produce(TopicPartition topicPartition, Message<TKey, TValue> message, Action<DeliveryResult<TKey, TValue>> deliveryCallback);
 
         #endregion Produce
-
-        /// <summary>
-        /// 
-        /// </summary>
-        Task FlushAsync(CancellationToken cancellationToken);
-
-        void Flush(TimeSpan timeout);
 
         #region Transaction
 
@@ -132,12 +140,6 @@ namespace Microlibs.Kafka.Clients.Producer
         void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata);
 
         #endregion
-
-        IReadOnlyCollection<PartitionInfo> PartitionsFor(string topic);
-
-        void Close(TimeSpan timeout);
-
-        Task CloseAsync(CancellationToken token);
     }
 
     public class PartitionInfo
@@ -159,4 +161,11 @@ namespace Microlibs.Kafka.Clients.Producer
     public class OffsetAndMetadata
     {
     }
+}
+
+/// <summary>
+///     Маркерный интерфейс для продюсера
+/// </summary>
+public interface IProducer : IDisposable, IAsyncDisposable
+{
 }

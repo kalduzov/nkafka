@@ -5,9 +5,9 @@ namespace Microlibs.Kafka.Clients;
 
 internal class Metadata
 {
+    private MetadataCache _cache;
     private bool _needFullUpdate;
     private int _updateVersion;
-    private MetadataCache _cache;
 
     public void Bootstrap(IReadOnlyCollection<IPEndPoint> addresses)
     {

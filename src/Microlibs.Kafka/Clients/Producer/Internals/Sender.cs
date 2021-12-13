@@ -8,21 +8,21 @@ namespace Microlibs.Kafka.Clients.Producer.Internals;
 
 internal class Sender : ISender
 {
-    private readonly ProducerMetadata _metadata;
     private readonly RecordAccumulator _accumulator;
-    private readonly bool _guaranteeMessageOrder;
-    private readonly int _maxRequestSize;
-    private readonly short _asks;
-    private readonly int _retries;
-    private readonly Timestamp _time;
-    private readonly int _requestTimeoutMs;
-    private readonly long _retryBackoffMs;
-    private readonly TransactionManager _transactionManager;
     private readonly ApiVersions _apiVersions;
-
-    private bool _running;
-    private readonly ILogger<Sender> _logger;
+    private readonly short _asks;
+    private readonly bool _guaranteeMessageOrder;
     private readonly Dictionary<TopicPartition, List<ProducerBatch>> _inFlightBatches;
+    private readonly ILogger<Sender> _logger;
+    private readonly int _maxRequestSize;
+    private readonly ProducerMetadata _metadata;
+    private readonly int _requestTimeoutMs;
+    private readonly int _retries;
+    private readonly long _retryBackoffMs;
+    private readonly Timestamp _time;
+    private readonly TransactionManager _transactionManager;
+
+    private readonly bool _running;
 
     public Sender(
         ILoggerFactory loggerFactory,
@@ -71,6 +71,7 @@ internal class Sender : ISender
         TransactionManager transactionManager,
         ApiVersions apiVersions)
     {
+        _logger = loggerFactory.CreateLogger<Sender>();
     }
 
     public void Wakeup()

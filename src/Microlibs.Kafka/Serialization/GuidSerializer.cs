@@ -2,7 +2,7 @@
 
 namespace Microlibs.Kafka.Serialization;
 
-public sealed class GuidSerializer: ISerializer<Guid>
+public sealed class GuidSerializer : ISerializer<Guid>
 {
     public byte[] Serialize(Guid data)
     {

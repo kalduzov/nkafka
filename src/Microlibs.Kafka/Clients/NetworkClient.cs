@@ -7,20 +7,20 @@ namespace Microlibs.Kafka.Clients;
 
 internal class NetworkClient : IClient
 {
-    private readonly ProducerMetadata _metadata;
-    private readonly string _clientId;
-    private readonly int _maxInflightRequests;
-    private readonly int _reconnectBackoffMs;
-    private readonly int _reconnectBackoffMaxMs;
-    private readonly int _socketSendBuffer;
-    private readonly int _socketReceiveBuffer;
-    private readonly int _defaultRequestTimeoutMs;
-    private readonly int _connectionSetupTimeoutMs;
-    private readonly int _connectionSetupTimeoutMaxMs;
-    private readonly TimeSpan _time;
-    private readonly bool _discoverBrokerVersions;
     private readonly ApiVersions _apiVersions;
+    private readonly string _clientId;
+    private readonly int _connectionSetupTimeoutMaxMs;
+    private readonly int _connectionSetupTimeoutMs;
+    private readonly int _defaultRequestTimeoutMs;
+    private readonly bool _discoverBrokerVersions;
     private readonly ILoggerFactory _loggerFactory;
+    private readonly int _maxInflightRequests;
+    private readonly ProducerMetadata _metadata;
+    private readonly int _reconnectBackoffMaxMs;
+    private readonly int _reconnectBackoffMs;
+    private readonly int _socketReceiveBuffer;
+    private readonly int _socketSendBuffer;
+    private readonly TimeSpan _time;
 
     public NetworkClient(
         ProducerMetadata metadata,

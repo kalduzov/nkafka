@@ -1,21 +1,20 @@
-﻿namespace Microlibs.Kafka.Protocol.Responses
+﻿namespace Microlibs.Kafka.Protocol.Responses;
+
+public class DescribeResponseMessage : KafkaResponseMessage
 {
-    public class DescribeResponseMessage : KafkaResponseMessage
+    public DescribeResponseMessage(int trottleTimeMs, string clusterId, int controllerId, int clusterAuthorizedOperations)
     {
-        public DescribeResponseMessage(int trottleTimeMs, string clusterId, int controllerId, int clusterAuthorizedOperations)
-        {
-            this.TrottleTimeMs = trottleTimeMs;
-            this.ClusterId = clusterId;
-            this.ControllerId = controllerId;
-            this.ClusterAuthorizedOperations = clusterAuthorizedOperations;
-        }
-
-        public int TrottleTimeMs { get; init; }
-
-        public string ClusterId { get; init; }
-
-        public int ControllerId { get; init; }
-
-        public int ClusterAuthorizedOperations { get; init; }
+        TrottleTimeMs = trottleTimeMs;
+        ClusterId = clusterId;
+        ControllerId = controllerId;
+        ClusterAuthorizedOperations = clusterAuthorizedOperations;
     }
+
+    public int TrottleTimeMs { get; init; }
+
+    public string ClusterId { get; init; }
+
+    public int ControllerId { get; init; }
+
+    public int ClusterAuthorizedOperations { get; init; }
 }

@@ -1,11 +1,10 @@
-﻿namespace Microlibs.Kafka.Protocol
+﻿namespace Microlibs.Kafka.Protocol;
+
+internal interface IRequestBuilder
 {
-    internal interface IRequestBuilder
-    {
-        // KafkaRequestMessage Create<TMessage>(ApiKeys apiKey, int correlationId, string topicName, TMessage message);
-        //
-        // KafkaRequestMessage Create(ApiKeys apiKey, int correlationId);
-        //
-        // KafkaRequestMessage Create<TMessage>(ApiKeys apiKey, TMessage message);
-    }
+    // KafkaRequestMessage Create<TMessage>(ApiKeys apiKey, int correlationId, string topicName, TMessage message);
+    //
+    // KafkaRequestMessage Create(ApiKeys apiKey, int correlationId);
+    //
+    // KafkaRequestMessage Create<TMessage>(ApiKeys apiKey, TMessage message);
 }

@@ -4,17 +4,22 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Nullable>enable</Nullable>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <PackageTags>Kafka</PackageTags>
+        <PackageId>Microlibs.Kafka</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Compressions" />
+        <Folder Include="Compressions"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FastEnum" Version="1.6.1" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
-        <PackageReference Include="System.IO.Pipelines" Version="5.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0"/>
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.0"/>
+        <PackageReference Include="System.IO.Pipelines" Version="5.0.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FastEnum" Version="1.7.0"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -1,10 +1,9 @@
-namespace Microlibs.Kafka.Config
+namespace Microlibs.Kafka.Config;
+
+public record ConsumerConfig : CommonConfig
 {
-    public record ConsumerConfig : CommonConfig
-    {
-        /// <summary>
-        /// group.id
-        /// </summary>
-        public string GroupId { get; set; } = null!;
-    }
+    /// <summary>
+    ///     group.id
+    /// </summary>
+    public string GroupId { get; set; } = null!;
 }

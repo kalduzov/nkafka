@@ -4,13 +4,37 @@ namespace Microlibs.Kafka.Internal;
 
 public abstract class Buffer<T>
 {
+    private int _limit;
     private int _mark = -1;
     private int _position;
-    private int _limit;
-    private int _capacity;
+
+    public Buffer(int mark, int position, int limit, int capacity)
+    {
+        if (capacity < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(capacity), $"capacity < 0: ({capacity} < 0)");
+        }
+
+        Capacity = capacity;
+
+        Limit = limit;
+        Position = position;
+
+        if (mark < 0)
+        {
+            return;
+        }
+
+        if (mark > position)
+        {
+            throw new ArgumentOutOfRangeException(nameof(mark), $"mark > position: ({mark} > {position})");
+        }
+
+        _mark = mark;
+    }
 
     /// <summary>
-    /// Get or set this buffer's limit.
+    ///     Get or set this buffer's limit.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public int Limit
@@ -18,7 +42,7 @@ public abstract class Buffer<T>
         get => _limit;
         set
         {
-            if (value > _capacity || value < 0)
+            if (value > Capacity || value < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(Limit));
             }
@@ -38,7 +62,7 @@ public abstract class Buffer<T>
     }
 
     /// <summary>
-    /// Get or set this buffer's position.
+    ///     Get or set this buffer's position.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public int Position
@@ -61,12 +85,11 @@ public abstract class Buffer<T>
     }
 
     /// <summary>
-    /// Get this buffer's capacity.
+    ///     Get this buffer's capacity.
     /// </summary>
-    public int Capacity => _capacity;
+    public int Capacity { get; }
 
     /// <summary>
-    /// 
     /// </summary>
     public int Remaining
     {
@@ -79,36 +102,10 @@ public abstract class Buffer<T>
     }
 
     /// <summary>
-    /// 
     /// </summary>
     public bool HasRemaining => _position < _limit;
 
     public abstract bool IsReadOnly { get; }
-
-    public Buffer(int mark, int position, int limit, int capacity)
-    {
-        if (capacity < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(capacity), $"capacity < 0: ({capacity} < 0)");
-        }
-
-        _capacity = capacity;
-
-        Limit = limit;
-        Position = position;
-
-        if (mark < 0)
-        {
-            return;
-        }
-
-        if (mark > position)
-        {
-            throw new ArgumentOutOfRangeException(nameof(mark), $"mark > position: ({mark} > {position})");
-        }
-
-        _mark = mark;
-    }
 
     public Buffer<T> Mark()
     {
@@ -134,7 +131,7 @@ public abstract class Buffer<T>
     public Buffer<T> Clear()
     {
         Position = 0;
-        Limit = _capacity;
+        Limit = Capacity;
         _mark = -1;
 
         return this;
@@ -158,8 +155,8 @@ public abstract class Buffer<T>
     }
 
     public abstract Buffer<T> Slice();
-    
+
     public abstract Buffer<T> Slice(int index, int lenght);
-    
+
     public abstract Buffer<T> Copy();
 }

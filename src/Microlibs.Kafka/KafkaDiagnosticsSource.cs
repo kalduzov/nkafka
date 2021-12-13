@@ -9,7 +9,7 @@ internal static class KafkaDiagnosticsSource
     internal static Activity? ProduceMessage<TKey, TValue>(TopicPartition topicPartition, Message<TKey, TValue> message, bool isFireAndForget)
     {
         var activity = _activitySource
-            .CreateActivity(nameof(ProduceMessage), ActivityKind.Producer)
+            .StartActivity(nameof(ProduceMessage))
             ?.AddTag("Partition", topicPartition.Partition.Value.ToString())
             .AddTag("Topic", topicPartition.Topic)
             .AddTag("FireAndForget", isFireAndForget.ToString())
@@ -27,8 +27,6 @@ internal static class KafkaDiagnosticsSource
                 activity?.AddTag("Key", message.Key);
             }
         }
-
-        activity?.Start();
 
         return activity;
     }

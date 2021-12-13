@@ -15,6 +15,41 @@ public class Headers : IEnumerable<IHeader>
     private readonly List<IHeader> headers = new();
 
     /// <summary>
+    ///     Gets the header at the specified index
+    /// </summary>
+    /// <param key="index">
+    ///     The zero-based index of the element to get.
+    /// </param>
+    public IHeader this[int index] => headers[index];
+
+    /// <summary>
+    ///     The number of headers in the collection.
+    /// </summary>
+    public int Count => headers.Count;
+
+    /// <summary>
+    ///     Returns an enumerator that iterates through the headers collection.
+    /// </summary>
+    /// <returns>
+    ///     An enumerator object that can be used to iterate through the headers collection.
+    /// </returns>
+    public IEnumerator<IHeader> GetEnumerator()
+    {
+        return new HeadersEnumerator(this);
+    }
+
+    /// <summary>
+    ///     Returns an enumerator that iterates through the headers collection.
+    /// </summary>
+    /// <returns>
+    ///     An enumerator object that can be used to iterate through the headers collection.
+    /// </returns>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return new HeadersEnumerator(this);
+    }
+
+    /// <summary>
     ///     Append a new header to the collection.
     /// </summary>
     /// <param name="key">
@@ -60,7 +95,7 @@ public class Headers : IEnumerable<IHeader>
     /// </exception>
     public byte[] GetLastBytes(string key)
     {
-        if (TryGetLastBytes(key, out byte[] result))
+        if (TryGetLastBytes(key, out var result))
         {
             return result;
         }
@@ -75,17 +110,17 @@ public class Headers : IEnumerable<IHeader>
     ///     The key to get the associated value of.
     /// </param>
     /// <param name="lastHeader">
-    ///     The value of the latest element in the collection with the 
+    ///     The value of the latest element in the collection with the
     ///     specified key, if a header with that key was present in the
     ///     collection.
     /// </param>
     /// <returns>
-    ///     true if the a value with the specified key was present in 
+    ///     true if the a value with the specified key was present in
     ///     the collection, false otherwise.
     /// </returns>
     public bool TryGetLastBytes(string key, out byte[] lastHeader)
     {
-        for (int i = headers.Count - 1; i >= 0; --i)
+        for (var i = headers.Count - 1; i >= 0; --i)
         {
             if (headers[i].Key == key)
             {
@@ -95,7 +130,7 @@ public class Headers : IEnumerable<IHeader>
             }
         }
 
-        lastHeader = default(byte[]);
+        lastHeader = default;
 
         return false;
     }
@@ -107,11 +142,13 @@ public class Headers : IEnumerable<IHeader>
     ///     The key to remove all headers for
     /// </param>
     public void Remove(string key)
-        => headers.RemoveAll(a => a.Key == key);
+    {
+        headers.RemoveAll(a => a.Key == key);
+    }
 
     internal class HeadersEnumerator : IEnumerator<IHeader>
     {
-        private Headers headers;
+        private readonly Headers headers;
 
         private int location = -1;
 
@@ -142,38 +179,7 @@ public class Headers : IEnumerable<IHeader>
 
         public void Reset()
         {
-            this.location = -1;
+            location = -1;
         }
     }
-
-    /// <summary>
-    ///     Returns an enumerator that iterates through the headers collection.
-    /// </summary>
-    /// <returns>
-    ///     An enumerator object that can be used to iterate through the headers collection.
-    /// </returns>
-    public IEnumerator<IHeader> GetEnumerator()
-        => new HeadersEnumerator(this);
-
-    /// <summary>
-    ///     Returns an enumerator that iterates through the headers collection.
-    /// </summary>
-    /// <returns>
-    ///     An enumerator object that can be used to iterate through the headers collection.
-    /// </returns>
-    IEnumerator IEnumerable.GetEnumerator()
-        => new HeadersEnumerator(this);
-
-    /// <summary>
-    ///     Gets the header at the specified index
-    /// </summary>
-    /// <param key="index">
-    ///     The zero-based index of the element to get.
-    /// </param>
-    public IHeader this[int index] => headers[index];
-
-    /// <summary>
-    ///     The number of headers in the collection.
-    /// </summary>
-    public int Count => headers.Count;
 }

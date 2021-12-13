@@ -1,11 +1,12 @@
-﻿using Microlibs.Kafka.Protocol;
+﻿using Microlibs.Kafka.Exceptions;
+using Microlibs.Kafka.Protocol;
 
 namespace Microlibs.Kafka.Config;
 
 /**
  * Thrown if the user supplies an invalid configuration
  */
-public class ConfigException : KafkaException
+public class ConfigException : ProtocolKafkaException
 {
     public ConfigException(string message)
         : base(StatusCodes.None, message)

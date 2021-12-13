@@ -10,20 +10,7 @@ namespace Microlibs.Kafka;
 /// </remarks>
 public class Header : IHeader
 {
-    private byte[] val;
-
-    /// <summary>
-    ///     The header key.
-    /// </summary>
-    public string Key { get; private set; }
-
-    /// <summary>
-    ///     Get the serialized header value data.
-    /// </summary>
-    public byte[] GetValueBytes()
-    {
-        return val;
-    }
+    private readonly byte[] val;
 
     /// <summary>
     ///     Create a new Header instance.
@@ -43,5 +30,18 @@ public class Header : IHeader
 
         Key = key;
         val = value;
+    }
+
+    /// <summary>
+    ///     The header key.
+    /// </summary>
+    public string Key { get; }
+
+    /// <summary>
+    ///     Get the serialized header value data.
+    /// </summary>
+    public byte[] GetValueBytes()
+    {
+        return val;
     }
 }

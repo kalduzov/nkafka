@@ -2,25 +2,25 @@
 using System.Threading;
 using Microlibs.Kafka;
 using Microlibs.Kafka.Config;
-using Microsoft.Extensions.Logging.Abstractions;
 
-var loggerFactory = new NullLoggerFactory();
-
-using var kafkaCluster = KafkaCluster.Create(
+await using var kafkaCluster = await KafkaCluster.CreateAsync(
     new ClusterConfig
     {
         BootstrapServers = new[]
         {
-            "localhost:9092"
+            "localhost:9091"
         }
-    },
-    loggerFactory);
+    });
 
-using var producer = kafkaCluster.BuildProducer<int, int>();
+using var producer = kafkaCluster.BuildProducer<Null, int>();
 {
-    var test = new Message<int, int>(1, 1);
+    var test = new Message<Null, int>
+    {
+        Value = 1
+    };
 
     await producer.ProduceAsync("test_topic", test, CancellationToken.None);
     Console.WriteLine("Produce OK");
-    Console.ReadKey();
 }
+
+Console.ReadKey();

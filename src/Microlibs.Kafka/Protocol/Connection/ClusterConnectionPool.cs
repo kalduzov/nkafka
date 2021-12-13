@@ -1,6 +1,5 @@
-﻿namespace Microlibs.Kafka.Protocol.Connection
+﻿namespace Microlibs.Kafka.Protocol.Connection;
+
+internal class ClusterConnectionPool
 {
-    internal class ClusterConnectionPool
-    {
-    }
 }

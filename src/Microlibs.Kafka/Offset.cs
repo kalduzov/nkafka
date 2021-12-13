@@ -46,20 +46,13 @@ public struct Offset : IEquatable<Offset>
     public long Value { get; }
 
     /// <summary>
-    ///     Gets whether or not this is one of the special 
+    ///     Gets whether or not this is one of the special
     ///     offset values.
     /// </summary>
-    public bool IsSpecial
-    {
-        get
-        {
-            return
-                Value == _OFFSET_BEGINNING
-                || Value == _OFFSET_END
-                || Value == _OFFSET_STORED
-                || Value == _OFFSET_INVALID;
-        }
-    }
+    public bool IsSpecial => Value == _OFFSET_BEGINNING
+                             || Value == _OFFSET_END
+                             || Value == _OFFSET_STORED
+                             || Value == _OFFSET_INVALID;
 
     /// <summary>
     ///     Tests whether this Offset value is equal to the specified object.
@@ -90,7 +83,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if other has the same value. false otherwise.
     /// </returns>
     public bool Equals(Offset other)
-        => other.Value == Value;
+    {
+        return other.Value == Value;
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is equal to Offset value b.
@@ -105,7 +100,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a and b are equal. false otherwise.
     /// </returns>
     public static bool operator ==(Offset a, Offset b)
-        => a.Equals(b);
+    {
+        return a.Equals(b);
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is not equal to Offset value b.
@@ -120,7 +117,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a and b are not equal. false otherwise.
     /// </returns>
     public static bool operator !=(Offset a, Offset b)
-        => !(a == b);
+    {
+        return !(a == b);
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is greater than Offset value b.
@@ -135,7 +134,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a is greater than Offset value b. false otherwise.
     /// </returns>
     public static bool operator >(Offset a, Offset b)
-        => a.Value > b.Value;
+    {
+        return a.Value > b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is less than Offset value b.
@@ -150,7 +151,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a is less than Offset value b. false otherwise.
     /// </returns>
     public static bool operator <(Offset a, Offset b)
-        => a.Value < b.Value;
+    {
+        return a.Value < b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is greater than or equal to Offset value b.
@@ -165,7 +168,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a is greater than or equal to Offset value b. false otherwise.
     /// </returns>
     public static bool operator >=(Offset a, Offset b)
-        => a.Value >= b.Value;
+    {
+        return a.Value >= b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Offset value a is less than or equal to Offset value b.
@@ -180,7 +185,9 @@ public struct Offset : IEquatable<Offset>
     ///     true if Offset value a is less than or equal to Offset value b. false otherwise.
     /// </returns>
     public static bool operator <=(Offset a, Offset b)
-        => a.Value <= b.Value;
+    {
+        return a.Value <= b.Value;
+    }
 
     /// <summary>
     ///     Add an integer value to an Offset value.
@@ -195,7 +202,9 @@ public struct Offset : IEquatable<Offset>
     ///     The Offset value incremented by the integer value b.
     /// </returns>
     public static Offset operator +(Offset a, int b)
-        => new(a.Value + b);
+    {
+        return new(a.Value + b);
+    }
 
     /// <summary>
     ///     Add a long value to an Offset value.
@@ -210,7 +219,9 @@ public struct Offset : IEquatable<Offset>
     ///     The Offset value incremented by the long value b.
     /// </returns>
     public static Offset operator +(Offset a, long b)
-        => new(a.Value + b);
+    {
+        return new(a.Value + b);
+    }
 
     /// <summary>
     ///     Returns a hash code for this Offset.
@@ -219,7 +230,9 @@ public struct Offset : IEquatable<Offset>
     ///     An integer that specifies a hash value for this Offset.
     /// </returns>
     public override int GetHashCode()
-        => Value.GetHashCode();
+    {
+        return Value.GetHashCode();
+    }
 
     /// <summary>
     ///     Converts the specified long value to an Offset value.
@@ -228,7 +241,9 @@ public struct Offset : IEquatable<Offset>
     ///     The long value to convert.
     /// </param>
     public static implicit operator Offset(long v)
-        => new(v);
+    {
+        return new(v);
+    }
 
     /// <summary>
     ///     Converts the specified Offset value to a long value.
@@ -237,7 +252,9 @@ public struct Offset : IEquatable<Offset>
     ///     The Offset value to convert.
     /// </param>
     public static implicit operator long(Offset o)
-        => o.Value;
+    {
+        return o.Value;
+    }
 
     /// <summary>
     ///     Returns a string representation of the Offset object.

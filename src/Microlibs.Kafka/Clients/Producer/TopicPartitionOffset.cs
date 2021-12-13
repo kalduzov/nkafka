@@ -15,7 +15,9 @@ public class TopicPartitionOffset
     ///     A Kafka offset value.
     /// </param>
     public TopicPartitionOffset(TopicPartition tp, Offset offset)
-        : this(tp.Topic, tp.Partition, offset) {}
+        : this(tp.Topic, tp.Partition, offset)
+    {
+    }
 
     /// <summary>
     ///     Initializes a new TopicPartitionOffset instance.
@@ -54,8 +56,7 @@ public class TopicPartitionOffset
     /// <summary>
     ///     Gets the TopicPartition component of this TopicPartitionOffset instance.
     /// </summary>
-    public TopicPartition TopicPartition
-        => new TopicPartition(Topic, Partition);
+    public TopicPartition TopicPartition => new(Topic, Partition);
 
     /// <summary>
     ///     Tests whether this TopicPartitionOffset instance is equal to the specified object.
@@ -74,6 +75,7 @@ public class TopicPartitionOffset
         }
 
         var tp = (TopicPartitionOffset)obj;
+
         return tp.Partition == Partition && tp.Topic == Topic && tp.Offset == Offset;
     }
 
@@ -83,9 +85,10 @@ public class TopicPartitionOffset
     /// <returns>
     ///     An integer that specifies a hash value for this TopicPartitionOffset.
     /// </returns>
-    public override int GetHashCode()  
-        // x by prime number is quick and gives decent distribution.
-        => (Partition.GetHashCode()*251 + Topic.GetHashCode())*251 + Offset.GetHashCode();
+    public override int GetHashCode() // x by prime number is quick and gives decent distribution.
+    {
+        return (Partition.GetHashCode() * 251 + Topic.GetHashCode()) * 251 + Offset.GetHashCode();
+    }
 
     /// <summary>
     ///     Tests whether TopicPartitionOffset instance a is equal to TopicPartitionOffset instance b.
@@ -103,9 +106,9 @@ public class TopicPartitionOffset
     {
         if (a is null)
         {
-            return (b is null);
+            return b is null;
         }
-            
+
         return a.Equals(b);
     }
 
@@ -122,7 +125,9 @@ public class TopicPartitionOffset
     ///     true if TopicPartitionOffset instances a and b are not equal. false otherwise.
     /// </returns>
     public static bool operator !=(TopicPartitionOffset a, TopicPartitionOffset b)
-        => !(a == b);
+    {
+        return !(a == b);
+    }
 
     /// <summary>
     ///     Returns a string representation of the TopicPartitionOffset object.
@@ -131,5 +136,7 @@ public class TopicPartitionOffset
     ///     A string that represents the TopicPartitionOffset object.
     /// </returns>
     public override string ToString()
-        => $"{Topic} [{Partition}] @{Offset}";
+    {
+        return $"{Topic} [{Partition}] @{Offset}";
+    }
 }

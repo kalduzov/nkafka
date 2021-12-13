@@ -1,6 +1,6 @@
 ﻿namespace Microlibs.Kafka.Serialization;
 
-public sealed class LongSerializer: ISerializer<long>
+public sealed class LongSerializer : ISerializer<long>
 {
     public byte[] Serialize(long data)
     {

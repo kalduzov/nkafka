@@ -6,10 +6,10 @@
 public enum Acks : short
 {
     /// <summary>
-    /// no set
+    ///     no set
     /// </summary>
     NoSet = -2,
-    
+
     /// <summary>
     ///     None
     /// </summary>

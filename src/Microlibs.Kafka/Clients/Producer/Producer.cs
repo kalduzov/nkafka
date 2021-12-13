@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer.Internals;
 using Microlibs.Kafka.Config;
+using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol;
 using Microlibs.Kafka.Serialization;
 using Microsoft.Extensions.Logging;
@@ -18,15 +19,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
 {
     private const string _NETWORK_THREAD_PREFIX = "kafka-producer-thread";
     private const string _DEFAULT_PRODUCER_NAME = "__DefaultProducer";
-
-    private readonly TimeSpan _time;
-
-    private readonly string _name;
-    private readonly ProducerConfig _config;
-    private ISerializer<TKey> _keySerializer;
-    private ISerializer<TValue> _valueSerializer;
-    private readonly IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> _interceptors;
-    private readonly ILogger _logger;
 
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Dictionary<Type, object> _defaultSerializers = new()
@@ -42,32 +34,59 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         [typeof(Guid)] = Serializers.Guid
     };
 
-    private readonly IPartitioner _partitioner;
-    private readonly ApiVersions _apiVersions;
-    private readonly TransactionManager _transactionManager;
     private readonly RecordAccumulator _accumulator;
-    private readonly ProducerMetadata _metadata;
-    private readonly ISender _sender;
-
-    private readonly CancellationTokenSource _tokenSource = new();
+    private readonly ApiVersions _apiVersions;
+    private readonly ProducerConfig _config;
 
     private readonly Thread _idThread;
+    private readonly IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> _interceptors;
+
+    private readonly KafkaCluster _kafkaCluster;
+    private readonly ILogger _logger;
+    private readonly ProducerMetadata _metadata;
+
+    private readonly string _name;
+
+    private readonly IPartitioner _partitioner;
+    private readonly ISender _sender;
+    private readonly TimeSpan _time;
+
+    private readonly CancellationTokenSource _tokenSource = new();
+    private readonly TransactionManager _transactionManager;
     private bool _enableDeliveryReports;
+    private ISerializer<TKey> _keySerializer;
+    private ISerializer<TValue> _valueSerializer;
 
     /// <summary>
-    /// A producer is instantiated by providing a set of key-value pairs as configuration.
-    /// Valid configuration strings are documented <see cref="http://must_be_link_to_docs"/>
+    ///     A producer is instantiated by providing a set of key-value pairs as configuration.
+    ///     Valid configuration strings are documented <see cref="http://must_be_link_to_docs" />
     /// </summary>
     /// <param name="config">The producer configs</param>
-    /// <param name="keySerializer">The serializer for key that implements <see cref="ISerializer{T}"/></param>
-    /// <param name="valueSerializer">The serializer for value that implements <see cref="ISerializer{T}"/></param>
-    /// /// <remarks> After creating a <see cref="Producer"/> you must always use Dispose() it to avoid resource leaks</remarks>
-    public Producer(ProducerConfig config, ISerializer<TKey> keySerializer = null!, ISerializer<TValue> valueSerializer = null!)
-        : this(_DEFAULT_PRODUCER_NAME, config, keySerializer, valueSerializer, null, null!, DateTime.Today.TimeOfDay, NullLoggerFactory.Instance)
+    /// <param name="kafkaCluster"></param>
+    /// <param name="keySerializer">The serializer for key that implements <see cref="ISerializer{T}" /></param>
+    /// <param name="valueSerializer">The serializer for value that implements <see cref="ISerializer{T}" /></param>
+    /// ///
+    /// <remarks> After creating a <see cref="Producer" /> you must always use Dispose() it to avoid resource leaks</remarks>
+    public Producer(
+        KafkaCluster kafkaCluster,
+        ProducerConfig config,
+        ISerializer<TKey> keySerializer = null!,
+        ISerializer<TValue> valueSerializer = null!)
+        : this(
+            kafkaCluster,
+            _DEFAULT_PRODUCER_NAME,
+            config,
+            keySerializer,
+            valueSerializer,
+            null,
+            null!,
+            DateTime.Today.TimeOfDay,
+            NullLoggerFactory.Instance)
     {
     }
 
     internal Producer(
+        KafkaCluster kafkaCluster,
         string name,
         ProducerConfig config,
         ISerializer<TKey> keySerializer,
@@ -77,8 +96,9 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         TimeSpan time,
         ILoggerFactory loggerFactory)
     {
+        _kafkaCluster = kafkaCluster;
         _time = time;
-        _logger = loggerFactory.CreateLogger(_name);
+        _logger = loggerFactory.CreateLogger(name);
         _name = name;
         _config = config;
 
@@ -139,8 +159,144 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         {
             Close(TimeSpan.Zero, true); //возможно уже что-то успело создатся, поэтому пробуем подчистить все за собой 
 
-            throw new KafkaException(StatusCodes.UnknownServerError, "Failed to construct kafka producer", exc);
+            throw new ProtocolKafkaException(StatusCodes.UnknownServerError, "Failed to construct kafka producer", exc);
         }
+    }
+
+    public Task AbortTransaction(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId)
+    {
+    }
+
+    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata)
+    {
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="messages"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task<IEnumerable<DeliveryResult<TKey, TValue>>> ProduceAsync(
+        TopicPartition topicPartition,
+        IEnumerable<Message<TKey, TValue>> messages,
+        CancellationToken token = default)
+    {
+        var enumerable = messages as Message<TKey, TValue>[] ?? messages.ToArray();
+
+        var list = new List<Task<DeliveryResult<TKey, TValue>>>(enumerable.Length);
+        list.AddRange(enumerable.Select(message => ProduceAsync(topicPartition, message, token)));
+
+        await Task.WhenAll(list);
+
+        return list.Select(x => x.GetAwaiter().GetResult());
+    }
+
+    /// <summary>
+    ///     Fire and forget produce message
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="message"></param>
+    public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
+    {
+        using var _ = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, true);
+
+        //todo call interceptors
+        ThrowIfProducerClosed();
+    }
+
+    /// <summary>
+    ///     Fire and forget produce message
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="messages"></param>
+    public void Produce(TopicPartition topicPartition, IEnumerable<Message<TKey, TValue>> messages)
+    {
+        foreach (var message in messages)
+        {
+            Produce(topicPartition, message);
+        }
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="message"></param>
+    /// <param name="deliveryCallback"></param>
+    public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message, Action<DeliveryResult<TKey, TValue>> deliveryCallback)
+    {
+    }
+
+    /// <summary>
+    /// </summary>
+    public Task FlushAsync(CancellationToken cancellationToken)
+    {
+        return null;
+    }
+
+    public void Flush(TimeSpan timeout)
+    {
+    }
+
+    public Task InitTransaction(CancellationToken cancellationToken)
+    {
+        return null;
+    }
+
+    public Task BeginTransaction(CancellationToken cancellationToken)
+    {
+        return null;
+    }
+
+    public Task CommitTransaction(CancellationToken cancellationToken)
+    {
+        return null;
+    }
+
+    /// <summary>
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="message"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task<DeliveryResult<TKey, TValue>> ProduceAsync(
+        TopicPartition topicPartition,
+        Message<TKey, TValue> message,
+        CancellationToken token = default)
+    {
+        using var _ = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, false);
+        await Task.Yield();
+
+        return new DeliveryResult<TKey, TValue>();
+    }
+
+    public IReadOnlyCollection<PartitionInfo> PartitionsFor(string topic)
+    {
+        return null;
+    }
+
+    public void Close(TimeSpan timeout)
+    {
+    }
+
+    public Task CloseAsync(CancellationToken token)
+    {
+        return null;
+    }
+
+    /// <summary>
+    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources
+    ///     asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    public ValueTask DisposeAsync()
+    {
+        return default;
     }
 
     private ISender BuildSender(ILoggerFactory loggerFactory, ProducerMetadata metadata)
@@ -320,7 +476,7 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
 
         if (valueSerializer is null)
         {
-            if (!_defaultSerializers.TryGetValue(typeof(TKey), out var serializer))
+            if (!_defaultSerializers.TryGetValue(typeof(TValue), out var serializer))
             {
                 throw new ArgumentNullException(
                     $"Value serializer not specified and there is no default serializer defined for type {typeof(TValue).Name}.");
@@ -346,19 +502,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         stopWatch.Stop();
     }
 
-    public Task AbortTransaction(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId)
-    {
-    }
-
-    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata)
-    {
-    }
-
     private void ThrowIfProducerClosed()
     {
     }
@@ -368,110 +511,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     }
 
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="messages"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public async Task<IEnumerable<DeliveryResult<TKey, TValue>>> ProduceAsync(
-        TopicPartition topicPartition,
-        IEnumerable<Message<TKey, TValue>> messages,
-        CancellationToken token = default)
-    {
-        var enumerable = messages as Message<TKey, TValue>[] ?? messages.ToArray();
-
-        var list = new List<Task<DeliveryResult<TKey, TValue>>>(enumerable.Length);
-        list.AddRange(enumerable.Select(message => ProduceAsync(topicPartition, message, token)));
-
-        await Task.WhenAll(list);
-
-        return list.Select(x => x.GetAwaiter().GetResult());
-    }
-
-    /// <summary>
-    /// Fire and forget produce message
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
-    {
-        using var _ = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, true);
-
-        //todo call interceptors
-        ThrowIfProducerClosed();
-    }
-
-    /// <summary>
-    /// Fire and forget produce message
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="messages"></param>
-    public void Produce(TopicPartition topicPartition, IEnumerable<Message<TKey, TValue>> messages)
-    {
-        foreach (var message in messages)
-        {
-            Produce(topicPartition, message);
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    /// <param name="deliveryCallback"></param>
-    public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message, Action<DeliveryResult<TKey, TValue>> deliveryCallback)
-    {
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public Task FlushAsync(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    public void Flush(TimeSpan timeout)
-    {
-    }
-
-    public Task InitTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    public Task BeginTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    public Task CommitTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
-    public async Task<DeliveryResult<TKey, TValue>> ProduceAsync(
-        TopicPartition topicPartition,
-        Message<TKey, TValue> message,
-        CancellationToken token = default)
-    {
-        using var _ = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, false);
-        await Task.Yield();
-
-        return new DeliveryResult<TKey, TValue>();
-    }
-
-    /// <summary>
-    /// 
     /// </summary>
     public Task FlushAsync()
     {
@@ -480,20 +519,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
 
     public void Flush()
     {
-    }
-
-    public IReadOnlyCollection<PartitionInfo> PartitionsFor(string topic)
-    {
-        return null;
-    }
-
-    public void Close(TimeSpan timeout)
-    {
-    }
-
-    public Task CloseAsync(CancellationToken token)
-    {
-        return null;
     }
 
     private async Task<DeliveryResult<TKey, TValue>> InternalProduceAsync(

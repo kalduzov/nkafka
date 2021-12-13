@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace Microlibs.Kafka.Serialization;
 
-namespace Microlibs.Kafka.Serialization
+public interface ISerializer<in T>
 {
-    public interface ISerializer<in T>
-    {
-        byte[] Serialize(T data);
-    }
+    byte[] Serialize(T data);
 }

@@ -4,10 +4,10 @@ namespace Microlibs.Kafka;
 
 /// <summary>
 ///     Represents a Kafka partition.
-/// </summary>  
+/// </summary>
 /// <remarks>
-///     This structure is the same size as an int - 
-///     its purpose is to add some syntactical sugar 
+///     This structure is the same size as an int -
+///     its purpose is to add some syntactical sugar
 ///     related to special values.
 /// </remarks>
 public struct Partition : IEquatable<Partition>
@@ -17,7 +17,7 @@ public struct Partition : IEquatable<Partition>
     /// <summary>
     ///     A special value that refers to an unspecified / unknown partition.
     /// </summary>
-    public static readonly Partition Any = new Partition(RD_KAFKA_PARTITION_UA);
+    public static readonly Partition Any = new(RD_KAFKA_PARTITION_UA);
 
     /// <summary>
     ///     Initializes a new instance of the Partition structure.
@@ -36,7 +36,7 @@ public struct Partition : IEquatable<Partition>
     public int Value { get; }
 
     /// <summary>
-    ///     Gets whether or not this is one of the special 
+    ///     Gets whether or not this is one of the special
     ///     partition values.
     /// </summary>
     public bool IsSpecial => Value == RD_KAFKA_PARTITION_UA;
@@ -70,7 +70,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if other has the same value. false otherwise.
     /// </returns>
     public bool Equals(Partition other)
-        => other.Value == Value;
+    {
+        return other.Value == Value;
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is equal to Partition value b.
@@ -85,7 +87,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a and b are equal. false otherwise.
     /// </returns>
     public static bool operator ==(Partition a, Partition b)
-        => a.Equals(b);
+    {
+        return a.Equals(b);
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is not equal to Partition value b.
@@ -100,7 +104,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a and b are not equal. false otherwise.
     /// </returns>
     public static bool operator !=(Partition a, Partition b)
-        => !(a == b);
+    {
+        return !(a == b);
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is greater than Partition value b.
@@ -115,7 +121,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a is greater than Partition value b. false otherwise.
     /// </returns>
     public static bool operator >(Partition a, Partition b)
-        => a.Value > b.Value;
+    {
+        return a.Value > b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is less than Partition value b.
@@ -130,7 +138,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a is less than Partition value b. false otherwise.
     /// </returns>
     public static bool operator <(Partition a, Partition b)
-        => a.Value < b.Value;
+    {
+        return a.Value < b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is greater than or equal to Partition value b.
@@ -145,7 +155,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a is greater than or equal to Partition value b. false otherwise.
     /// </returns>
     public static bool operator >=(Partition a, Partition b)
-        => a.Value >= b.Value;
+    {
+        return a.Value >= b.Value;
+    }
 
     /// <summary>
     ///     Tests whether Partition value a is less than or equal to Partition value b.
@@ -160,7 +172,9 @@ public struct Partition : IEquatable<Partition>
     ///     true if Partition value a is less than or equal to Partition value b. false otherwise.
     /// </returns>
     public static bool operator <=(Partition a, Partition b)
-        => a.Value <= b.Value;
+    {
+        return a.Value <= b.Value;
+    }
 
     /// <summary>
     ///     Returns a hash code for this Partition.
@@ -169,7 +183,9 @@ public struct Partition : IEquatable<Partition>
     ///     An integer that specifies a hash value for this Partition.
     /// </returns>
     public override int GetHashCode()
-        => Value.GetHashCode();
+    {
+        return Value.GetHashCode();
+    }
 
     /// <summary>
     ///     Converts the specified int value to an Partition value.
@@ -178,7 +194,9 @@ public struct Partition : IEquatable<Partition>
     ///     The int value to convert.
     /// </param>
     public static implicit operator Partition(int v)
-        => new Partition(v);
+    {
+        return new(v);
+    }
 
     /// <summary>
     ///     Converts the specified Partition value to an int value.
@@ -187,7 +205,9 @@ public struct Partition : IEquatable<Partition>
     ///     The Partition value to convert.
     /// </param>
     public static implicit operator int(Partition o)
-        => o.Value;
+    {
+        return o.Value;
+    }
 
     /// <summary>
     ///     Returns a string representation of the Partition object.
@@ -200,7 +220,7 @@ public struct Partition : IEquatable<Partition>
         switch (Value)
         {
             case RD_KAFKA_PARTITION_UA:
-                return $"[Any]";
+                return "[Any]";
             default:
                 return $"[{Value}]";
         }

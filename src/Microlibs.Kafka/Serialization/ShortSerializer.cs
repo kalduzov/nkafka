@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Microlibs.Kafka.Serialization;
+﻿namespace Microlibs.Kafka.Serialization;
 
 public sealed class ShortSerializer : ISerializer<short>
 {

@@ -18,7 +18,6 @@ public sealed class RecordAccumulator
         TransactionManager transactionManager,
         BufferPool bufferPool)
     {
-        
     }
 
     public async Task<TaskCompletionSource<int>> AppendAsync(

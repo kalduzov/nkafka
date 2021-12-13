@@ -6,7 +6,7 @@ namespace Microlibs.Kafka.Common.Network;
 public interface IChannelBuilder : IDisposable
 {
     /// <summary>
-    /// Returns a Channel with TransportLayer and Authenticator configured.
+    ///     Returns a Channel with TransportLayer and Authenticator configured.
     /// </summary>
     /// <param name="id">channel id</param>
     /// <param name="key">SelectionKey</param>

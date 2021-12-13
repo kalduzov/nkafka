@@ -49,9 +49,10 @@ internal static class ProtocolWriterExtensions
     {
         var len = reader.ReadByte();
         var buf = reader.ReadBytes(len - 1);
+
         return Encoding.UTF8.GetString(buf);
     }
-    
+
     internal static string ReadCompactNullableString(this BinaryReader reader)
     {
         var len = reader.ReadInt16().Swap();
@@ -60,7 +61,9 @@ internal static class ProtocolWriterExtensions
         {
             return null!;
         }
+
         var buf = reader.ReadBytes(len - 1);
+
         return Encoding.UTF8.GetString(buf);
     }
 
@@ -98,7 +101,7 @@ internal static class ProtocolWriterExtensions
         else
         {
             bytes[1] = (byte)(value >> 8);
-            bytes[0] = (byte)(value);
+            bytes[0] = (byte)value;
         }
 
         return bytes.ToArray();

@@ -1,6 +1,5 @@
-﻿namespace Microlibs.Kafka
+﻿namespace Microlibs.Kafka;
+
+public interface IConsumerBuilder
 {
-    public interface IConsumerBuilder
-    {
-    }
 }

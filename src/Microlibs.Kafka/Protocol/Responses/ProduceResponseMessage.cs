@@ -1,6 +1,5 @@
-namespace Microlibs.Kafka.Protocol.Responses
+namespace Microlibs.Kafka.Protocol.Responses;
+
+public record ProduceResponseMessage : ResponseMessage
 {
-    public record ProduceResponseMessage : ResponseMessage
-    {
-    }
 }

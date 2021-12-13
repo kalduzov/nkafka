@@ -7,11 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.1"/>
+        <PackageReference Include="Confluent.Kafka" Version="1.8.2"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Microlibs.Kafka\Microlibs.Kafka.csproj" />
+        <ProjectReference Include="..\..\src\Microlibs.Kafka\Microlibs.Kafka.csproj"/>
     </ItemGroup>
 
 </Project>

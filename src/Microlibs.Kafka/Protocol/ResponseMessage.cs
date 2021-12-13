@@ -1,6 +1,5 @@
-﻿namespace Microlibs.Kafka.Protocol
+﻿namespace Microlibs.Kafka.Protocol;
+
+public abstract record ResponseMessage
 {
-    public abstract record ResponseMessage
-    {
-    }
 }

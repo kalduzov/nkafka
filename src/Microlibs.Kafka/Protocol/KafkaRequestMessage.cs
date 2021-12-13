@@ -2,38 +2,36 @@ using System;
 using System.IO;
 using Microlibs.Kafka.Protocol.Extensions;
 
-namespace Microlibs.Kafka.Protocol
+namespace Microlibs.Kafka.Protocol;
+
+public class KafkaRequestMessage
 {
-    public class KafkaRequestMessage
+    public readonly int RequestLength;
+
+    public KafkaRequestMessage(KafkaRequestHeader header, KafkaContent content)
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public short ApiVersion { get; set; }
+        Header = header;
+        Content = content;
+        RequestLength = header.Length + content.Length;
+    }
 
-        public KafkaRequestHeader Header { get; set; }
+    /// <summary>
+    /// </summary>
+    public short ApiVersion { get; set; }
 
-        public KafkaContent Content { get; set; }
-        
-        public readonly int RequestLength;
+    public KafkaRequestHeader Header { get; set; }
 
-        public KafkaRequestMessage(KafkaRequestHeader header, KafkaContent content)
-        {
-            Header = header;
-            Content = content;
-            RequestLength = header.Length + content.Length;
-        }
+    public KafkaContent Content { get; set; }
 
-        public ReadOnlyMemory<byte> ToByteStream()
-        {
-            using var memoryStream = new MemoryStream();
-            using var writer = new BinaryWriter(memoryStream);
+    public ReadOnlyMemory<byte> ToByteStream()
+    {
+        using var memoryStream = new MemoryStream();
+        using var writer = new BinaryWriter(memoryStream);
 
-            writer.WriteLength(RequestLength);
-            writer.WriteHeader(Header);
-            writer.WriteMessage(Content);
+        writer.WriteLength(RequestLength);
+        writer.WriteHeader(Header);
+        writer.WriteMessage(Content);
 
-            return memoryStream.ToArray();
-        }
+        return memoryStream.ToArray();
     }
 }

@@ -1,21 +1,20 @@
 ﻿using System;
 using Microlibs.Kafka.Protocol.Extensions;
 
-namespace Microlibs.Kafka.Protocol.RequestsMessages
+namespace Microlibs.Kafka.Protocol.RequestsMessages;
+
+internal class DescribeClusterContent : KafkaContent
 {
-    internal class DescribeClusterContent : KafkaContent
+    public DescribeClusterContent()
     {
-        public DescribeClusterContent()
-        {
-            Length = 0x4;
-            ApiKey = ApiKeys.DescribeCluster;
-        }
+        Length = 0x4;
+        ApiKey = ApiKeys.DescribeCluster;
+    }
 
-        public bool IncludeClusterAuthorizedOperations { get; set; }
+    public bool IncludeClusterAuthorizedOperations { get; set; }
 
-        public override ReadOnlySpan<byte> AsReadOnlySpan()
-        {
-            return (IncludeClusterAuthorizedOperations ? 1 : 0).ToBigEndian();
-        }
+    public override ReadOnlySpan<byte> AsReadOnlySpan()
+    {
+        return (IncludeClusterAuthorizedOperations ? 1 : 0).ToBigEndian();
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using FastEnumUtility;
+using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol;
 using Microlibs.Kafka.Protocol.Extensions;
 
@@ -11,12 +12,6 @@ namespace Microlibs.Kafka.Serialization;
 public sealed class ListSerializer<T> : ISerializer<List<T>>
 {
     private const int _NULL_ENTRY_VALUE = -1;
-
-    private enum SerializationStrategy
-    {
-        ConstantSize,
-        VariableSize
-    }
 
     // ReSharper disable once StaticMemberInGenericType
     private static readonly HashSet<Type> _fixedLengthSerializers = new()
@@ -29,8 +24,9 @@ public sealed class ListSerializer<T> : ISerializer<List<T>>
         typeof(GuidSerializer)
     };
 
-    private readonly ISerializer<T> _serializer;
     private readonly SerializationStrategy _serializationStrategy;
+
+    private readonly ISerializer<T> _serializer;
 
     public ListSerializer(ISerializer<T> serializer)
     {
@@ -79,7 +75,7 @@ public sealed class ListSerializer<T> : ISerializer<List<T>>
         }
         catch (Exception exc)
         {
-            throw new KafkaException(StatusCodes.UnknownServerError, "Failed to serialize list", exc);
+            throw new ProtocolKafkaException(StatusCodes.UnknownServerError, "Failed to serialize list", exc);
         }
     }
 
@@ -101,5 +97,11 @@ public sealed class ListSerializer<T> : ISerializer<List<T>>
         {
             memoryStream.Write(entry.ToBigEndian());
         }
+    }
+
+    private enum SerializationStrategy
+    {
+        ConstantSize,
+        VariableSize
     }
 }

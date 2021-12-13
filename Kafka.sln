@@ -11,6 +11,7 @@ ProjectSection(SolutionItems) = preProject
 	J:\git\Kafka\Directory.Build.props = J:\git\Kafka\Directory.Build.props
 	LICENCE = LICENCE
 	Kafka.sln.DotSettings = Kafka.sln.DotSettings
+	docker-compose.yml = docker-compose.yml
 EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"

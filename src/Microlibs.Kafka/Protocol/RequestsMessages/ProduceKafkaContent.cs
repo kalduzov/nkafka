@@ -1,12 +1,11 @@
 ﻿using System;
 
-namespace Microlibs.Kafka.Protocol.RequestsMessages
+namespace Microlibs.Kafka.Protocol.RequestsMessages;
+
+internal class ProduceKafkaContent : KafkaContent
 {
-    internal class ProduceKafkaContent : KafkaContent
+    public override ReadOnlySpan<byte> AsReadOnlySpan()
     {
-        public override ReadOnlySpan<byte> AsReadOnlySpan()
-        {
-            return default;
-        }
+        return default;
     }
 }

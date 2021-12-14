@@ -1,4 +1,6 @@
-﻿namespace Microlibs.Kafka.Config;
+﻿using Microlibs.Kafka.Exceptions;
+
+namespace Microlibs.Kafka.Config;
 
 /// <summary>
 ///     Конфигурация кластера
@@ -20,6 +22,7 @@ public record ClusterConfig : CommonConfig
     /// <summary>
     ///     Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные
     /// </summary>
+    /// <exception cref="KafkaConfigException">Throw if configuration is not valid</exception>
     internal override void Validate()
     {
         base.Validate();

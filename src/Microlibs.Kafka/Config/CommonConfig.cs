@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
+using Microlibs.Kafka.Exceptions;
 
 namespace Microlibs.Kafka.Config;
 
@@ -131,6 +132,7 @@ public abstract record CommonConfig
     {
         if (BootstrapServers.Count == 0)
         {
+            throw new KafkaConfigException("BootstrapServers not set");
         }
     }
 }

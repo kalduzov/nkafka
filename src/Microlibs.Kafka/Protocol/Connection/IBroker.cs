@@ -9,7 +9,7 @@ namespace Microlibs.Kafka.Protocol.Connection;
 /// <summary>
 ///     Интерфейсы брокера
 /// </summary>
-public interface IBroker : IDisposable
+public interface IBroker : IDisposable, IAsyncDisposable
 {
     /// <summary>
     ///     Список топиков обслуживающихся на брокере
@@ -36,12 +36,16 @@ public interface IBroker : IDisposable
     /// </summary>
     IReadOnlyCollection<TopicPartition> TopicPartitions { get; }
 
-    void Send(KafkaRequestMessage requestMessage);
+    /// <summary>
+    /// Отправка сообщений брокеру по типу fire and forget
+    /// </summary>
+    void Send<TRequestMessage>(TRequestMessage message)
+        where TRequestMessage : KafkaContent;
 
     /// <summary>
-    ///     Отправка сообщения в брокер и ожидание получения результата этого сообщения
+    ///     Отправка сообщения брокеру и ожидание получения результата этого сообщения
     /// </summary>
     Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-        where TResponseMessage : KafkaResponseMessage
+        where TResponseMessage : KafkaResponseMessage, new()
         where TRequestMessage : KafkaContent;
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Microlibs.Kafka.Protocol.RequestsMessages;
 
@@ -9,8 +10,8 @@ internal class EmptyKafkaContent : KafkaContent
         Length = 0x00;
     }
 
-    public override ReadOnlySpan<byte> AsReadOnlySpan()
+    public override void SerializeToStream(Stream stream)
     {
-        return Array.Empty<byte>();
+        stream.Write(Array.Empty<byte>());
     }
 }

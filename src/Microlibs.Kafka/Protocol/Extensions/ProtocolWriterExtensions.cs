@@ -7,26 +7,26 @@ namespace Microlibs.Kafka.Protocol.Extensions;
 
 internal static class ProtocolWriterExtensions
 {
-    public static void WriteLength(this BinaryWriter writer, int value)
+    public static void WriteLength(this Stream writer, int value)
     {
         writer.Write(value.ToBigEndian());
     }
 
-    public static void WriteHeader(this BinaryWriter writer, KafkaRequestHeader header)
+    public static void WriteHeader(this Stream writer, KafkaRequestHeader header)
     {
         writer.Write(header.ApiKey.AsShort());
-        writer.Write(header.ApiVersion.ToBigEndian());
+        writer.Write(((short)header.ApiVersion).ToBigEndian());
         writer.Write(header.CorrelationId.ToBigEndian());
 
         writer.Write(header.ClientId.AsNullableString()); //todo возможно стоит это кешировать?
     }
 
-    public static void WriteMessage(this BinaryWriter writer, KafkaContent content)
+    public static void WriteMessage(this Stream writer, KafkaContent content)
     {
-        writer.Write(content.AsReadOnlySpan());
+        content.SerializeToStream(writer);
     }
 
-    private static ReadOnlySpan<byte> AsNullableString(this string str)
+    public static ReadOnlySpan<byte> AsNullableString(this string str)
     {
         var buf = new byte[0x2 + str.Length];
 
@@ -40,6 +40,13 @@ internal static class ProtocolWriterExtensions
         return buf;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static byte AsByte(this bool value)
+    {
+        return value ? (byte)1 : (byte)00;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static Span<byte> AsShort(this ApiKeys apiKey)
     {
         return ((short)apiKey).ToBigEndian();
@@ -48,7 +55,15 @@ internal static class ProtocolWriterExtensions
     internal static string ReadCompactString(this BinaryReader reader)
     {
         var len = reader.ReadByte();
-        var buf = reader.ReadBytes(len - 1);
+        var buf = reader.ReadBytes(len);
+
+        return Encoding.UTF8.GetString(buf);
+    }
+
+    internal static string ReadNormalString(this BinaryReader reader)
+    {
+        var len = reader.ReadInt16().Swap();
+        var buf = reader.ReadBytes(len);
 
         return Encoding.UTF8.GetString(buf);
     }
@@ -57,12 +72,12 @@ internal static class ProtocolWriterExtensions
     {
         var len = reader.ReadInt16().Swap();
 
-        if (len == 0)
+        if (len <= 0)
         {
             return null!;
         }
 
-        var buf = reader.ReadBytes(len - 1);
+        var buf = reader.ReadBytes(len);
 
         return Encoding.UTF8.GetString(buf);
     }
@@ -89,7 +104,7 @@ internal static class ProtocolWriterExtensions
         return bytes.ToArray();
     }
 
-    private static Span<byte> ToBigEndian(this short value)
+    public static Span<byte> ToBigEndian(this short value)
     {
         Span<byte> bytes = stackalloc byte[2];
 

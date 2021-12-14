@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microlibs.Kafka.Protocol.Extensions;
 
 namespace Microlibs.Kafka.Protocol.RequestsMessages;
@@ -13,8 +14,8 @@ internal class DescribeClusterContent : KafkaContent
 
     public bool IncludeClusterAuthorizedOperations { get; set; }
 
-    public override ReadOnlySpan<byte> AsReadOnlySpan()
+    public override void SerializeToStream(Stream stream)
     {
-        return (IncludeClusterAuthorizedOperations ? 1 : 0).ToBigEndian();
+        stream.Write((IncludeClusterAuthorizedOperations ? 1 : 0).ToBigEndian());
     }
 }

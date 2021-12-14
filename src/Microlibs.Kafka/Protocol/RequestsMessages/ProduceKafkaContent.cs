@@ -1,11 +1,10 @@
-﻿using System;
+﻿using System.IO;
 
 namespace Microlibs.Kafka.Protocol.RequestsMessages;
 
 internal class ProduceKafkaContent : KafkaContent
 {
-    public override ReadOnlySpan<byte> AsReadOnlySpan()
+    public override void SerializeToStream(Stream stream)
     {
-        return default;
     }
 }

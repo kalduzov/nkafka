@@ -302,7 +302,7 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     private ISender BuildSender(ILoggerFactory loggerFactory, ProducerMetadata metadata)
     {
         var maxInflightRequests = ConfigureInflightRequests(_config);
-        var channelBuilder = ClientUtils.CreateChannelBuilder(_config, _time, loggerFactory);
+        //var channelBuilder = ClientUtils.CreateChannelBuilder(_config, _time, loggerFactory);
         var client = new NetworkClient(
             metadata,
             _config.ClientId,

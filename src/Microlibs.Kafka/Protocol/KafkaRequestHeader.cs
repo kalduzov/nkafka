@@ -2,7 +2,7 @@
 
 public readonly struct KafkaRequestHeader
 {
-    public KafkaRequestHeader(ApiKeys apiKey, short apiVersion, int correlationId, string clientId)
+    public KafkaRequestHeader(ApiKeys apiKey, ApiVersions apiVersion, int correlationId, string clientId)
     {
         ApiKey = apiKey;
         ApiVersion = apiVersion;
@@ -14,7 +14,7 @@ public readonly struct KafkaRequestHeader
 
     public readonly ApiKeys ApiKey;
 
-    public readonly short ApiVersion;
+    public readonly ApiVersions ApiVersion;
 
     public readonly int CorrelationId;
 

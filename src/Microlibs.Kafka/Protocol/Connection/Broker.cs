@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol.Extensions;
+using Microsoft.IO;
 
 namespace Microlibs.Kafka.Protocol.Connection;
 
@@ -17,32 +18,17 @@ namespace Microlibs.Kafka.Protocol.Connection;
 /// </summary>
 internal sealed class Broker : IBroker, IEquatable<Broker>
 {
-    private readonly ArrayPool<byte> _arrayPool = ArrayPool<byte>.Shared;
+    private readonly RecyclableMemoryStreamManager _streamManager = new();
+    private readonly ArrayPool<byte> _arrayPool;
     private readonly ConcurrentBag<Task> _bag = new();
-
-    private readonly BrokerEndpoint _brokerEndpoint;
-
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
     private readonly Task _responsesReaderTask;
     private readonly Socket _socket;
     private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tckPool;
-    private readonly Timer _timer;
+    private readonly Timer _bagCleanerTimer;
     private bool _disposed;
-
     private NetworkStream _networkStream;
     private volatile int _requestId;
-
-    public Broker(BrokerEndpoint brokerEndpoint, int id = -1, string? rack = null)
-    {
-        Id = id;
-        _brokerEndpoint = brokerEndpoint;
-        _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-        _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
-        _responsesReaderTask = Task.Factory.StartNew(ResponseReaderAction, TaskCreationOptions.LongRunning);
-        _timer = new Timer(state => { }, this, 0, 100);
-    }
-
-    public bool DataAvailable => _networkStream is { DataAvailable: true };
 
     public IReadOnlyCollection<string> Topics { get; }
 
@@ -56,29 +42,66 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     /// </summary>
     public int Id { get; }
 
+    public string? Rack { get; }
+
     /// <summary>
     ///     Точка подключения к брокеру
     /// </summary>
     public EndPoint EndPoint { get; set; }
 
     /// <summary>
-    ///     Список партиций топиков
+    ///     Список партиций топиков связанных с этим брокером
     /// </summary>
     public IReadOnlyCollection<TopicPartition> TopicPartitions { get; }
 
-    public void Send(KafkaRequestMessage requestMessage)
+    public Broker(EndPoint endpoint, int id = -1, string? rack = null)
+    {
+        Id = id;
+        Rack = rack;
+        EndPoint = endpoint;
+
+        _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
+        _responsesReaderTask = Task.Factory.StartNew(ResponseReaderAction, TaskCreationOptions.LongRunning);
+
+        _bagCleanerTimer = new Timer(
+            _ =>
+            {
+                if (!_bag.TryTake(out var task))
+                {
+                    return;
+                }
+
+                if (task.Status != TaskStatus.RanToCompletion)
+                {
+                    _bag.Add(task);
+                }
+            },
+            this,
+            0,
+            100);
+
+        //todo конфигурировать через опции клиента
+        var maxMessageSize = 84000;
+        var maxRequests = 10;
+
+        _arrayPool = ArrayPool<byte>.Create(maxMessageSize, maxRequests);
+    }
+
+    /// <summary>
+    /// Отправка сообщений брокеру по типу fire and forget
+    /// </summary>
+    public void Send<TRequestMessage>(TRequestMessage message)
+        where TRequestMessage : KafkaContent
     {
         CheckDisposed();
     }
 
-    // public Task<TResponseMessage> SendAsync<TResponseMessage>(KafkaRequest request, CancellationToken token)
-    //     where TResponseMessage : ResponseMessage
-    // {
-    //     return InternalSendAsync<TResponseMessage>(request, token);
-    // }
-
+    /// <summary>
+    ///     Отправка сообщения брокеру и ожидание получения результата этого сообщения
+    /// </summary>
     public Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-        where TResponseMessage : KafkaResponseMessage
+        where TResponseMessage : KafkaResponseMessage, new()
         where TRequestMessage : KafkaContent
     {
         return InternalSendAsync<TResponseMessage, TRequestMessage>(message, token);
@@ -114,12 +137,19 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             return true;
         }
 
-        return _brokerEndpoint.Equals(other._brokerEndpoint);
+        return EndPoint.Equals(other.EndPoint);
     }
 
     public override int GetHashCode()
     {
         return Id;
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    public ValueTask DisposeAsync()
+    {
+        return default;
     }
 
     public override bool Equals(object obj)
@@ -174,11 +204,14 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private async Task ParseResponseAsync(byte[] buffer, int responseLength, CancellationToken cancellationToken)
     {
+        //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
         await Task.Yield();
 
         try
         {
-            var memory = buffer.AsMemory();
+            await using var stream = _streamManager.GetStream(buffer) as RecyclableMemoryStream;
+
+            var memory = stream.GetMemory();
             var requestId = BinaryPrimitives.ReadInt32BigEndian(memory[..4].Span);
 
             if (_tckPool.TryGetValue(requestId, out var responseInfo))
@@ -192,10 +225,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
                 try
                 {
-                    var response =
-                        new KafkaResponseMessage(); //DefaultResponseBuilder.Create(responseInfo.ApiKey, memory.Slice(3, buffer.Length - 4), responseLength);
-
-                    responseInfo.SetResult(response);
+                    responseInfo.ResponseMessage.DeserializeFromStream(stream);
+                    responseInfo.SetResult(responseInfo.ResponseMessage);
                 }
                 catch (ProtocolKafkaException exc)
                 {
@@ -226,23 +257,22 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
     }
 
-    private async Task<TResponseMessage> InternalSendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-        where TResponseMessage : KafkaResponseMessage
+    private async Task<TResponseMessage> InternalSendAsync<TResponseMessage, TRequestMessage>(TRequestMessage content, CancellationToken token)
+        where TResponseMessage : KafkaResponseMessage, new()
         where TRequestMessage : KafkaContent
     {
-        CheckDisposed();
-
         await ReEstablishConnectionAsync(token);
 
         //await CheckApiVersion(request, token);
 
         var requestId = Interlocked.Increment(ref _requestId);
 
-        var request = new KafkaRequestMessage(new KafkaRequestHeader(message.ApiKey, 0, requestId, "test"), message);
+        var request = new KafkaRequestMessage(new KafkaRequestHeader(content.ApiKey, content.Version, requestId, "test"), content);
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var responseCsInfo = new ResponseTaskCompletionSource(request.Header.ApiKey, requestId);
+        var response = new TResponseMessage();
+        var responseCsInfo = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId, response);
 
         token.Register(
             state =>
@@ -255,8 +285,12 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         try
         {
-            var buffer = request.ToByteStream();
-            await _networkStream.WriteAsync(buffer, token);
+            await using (var stream = _streamManager.GetStream())
+            {
+                request.ToByteStream(stream);
+                var bufferForSend = stream.ToArray();
+                await _networkStream.WriteAsync(bufferForSend, token);
+            }
 
             _tckPool.TryAdd(requestId, responseCsInfo);
         }
@@ -290,7 +324,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         {
             if (!_socket.Connected && !cancellationToken.IsCancellationRequested)
             {
-                await _socket.ConnectAsync(_brokerEndpoint.Host, _brokerEndpoint.Port);
+                await _socket.ConnectAsync(EndPoint);
                 _networkStream = new NetworkStream(_socket);
             }
         }
@@ -322,7 +356,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
             _networkStream.Dispose();
             _socket.Dispose();
-            _timer.Dispose();
+            _bagCleanerTimer.Dispose();
         }
 
         _disposed = true;
@@ -330,14 +364,18 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private class ResponseTaskCompletionSource : TaskCompletionSource<KafkaResponseMessage>
     {
-        public ResponseTaskCompletionSource(ApiKeys apiKey, int correlationId)
+        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version, int correlationId, KafkaResponseMessage responseMessage)
         {
             ApiKey = apiKey;
             CorrelationId = correlationId;
+            ResponseMessage = responseMessage;
+            responseMessage.Version = version;
         }
 
-        public int CorrelationId { get; }
+        private int CorrelationId { get; }
 
-        public ApiKeys ApiKey { get; }
+        public KafkaResponseMessage ResponseMessage { get; }
+
+        private ApiKeys ApiKey { get; }
     }
 }

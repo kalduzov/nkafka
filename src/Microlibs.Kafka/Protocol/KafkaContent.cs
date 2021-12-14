@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Protocol.RequestsMessages;
 
@@ -7,6 +8,7 @@ namespace Microlibs.Kafka.Protocol;
 public abstract class KafkaContent : IDisposable
 {
     internal static readonly KafkaContent Empty = new EmptyKafkaContent();
+    
     private bool _canCalculateLength;
 
     private bool _disposed;
@@ -19,6 +21,8 @@ public abstract class KafkaContent : IDisposable
     public int Length { get; protected init; }
 
     public ApiKeys ApiKey { get; protected init; }
+    
+    public ApiVersions Version { get; set; }
 
     public void Dispose()
     {
@@ -26,8 +30,8 @@ public abstract class KafkaContent : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    public abstract ReadOnlySpan<byte> AsReadOnlySpan();
-
+    public abstract void SerializeToStream(Stream stream);
+    
     protected virtual void Dispose(bool disposing)
     {
         if (disposing && !_disposed)

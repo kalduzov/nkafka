@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Linq;
-using Microlibs.Kafka.Serialization;
+using System.IO;
+using System.Text;
+using Microlibs.Kafka.Protocol.Extensions;
 
 namespace Microlibs.Kafka.Protocol.RequestsMessages;
 
 public class MetadataRequestMessage : KafkaContent
 {
-    public MetadataRequestMessage(params string[] topics)
-    {
-        Topics = topics;
-        ApiKey = ApiKeys.Metadata;
-    }
-
     /// <summary>
     ///     The topics to fetch metadata for
     /// </summary>
@@ -33,11 +28,62 @@ public class MetadataRequestMessage : KafkaContent
     /// </summary>
     public bool IncludeTopicAuthorizedOperations { get; set; }
 
-    public override ReadOnlySpan<byte> AsReadOnlySpan()
+    public MetadataRequestMessage(params string[] topics)
     {
-        var serializer = new ListSerializer<string>(Serializers.String);
-        var data = serializer.Serialize(Topics.ToList());
+        Topics = topics ?? Array.Empty<string>();
+        ApiKey = ApiKeys.Metadata;
+        Length = CalculateLen();
+    }
 
-        return default;
+    private int CalculateLen()
+    {
+        var len = 4; //Длинна массива topics
+
+        switch (Version)
+        {
+            case >= ApiVersions.Version0 and <= ApiVersions.Version3:
+            {
+                foreach (var topic in Topics)
+                {
+                    len += 2 + Encoding.UTF8.GetBytes(topic).Length;
+                }
+
+                break;
+            }
+        }
+
+        return len;
+    }
+
+    public override void SerializeToStream(Stream stream)
+    {
+        if (Version == ApiVersions.Version0 || Topics.Length > 0)
+        {
+            stream.Write(Topics.Length.ToBigEndian());
+
+            foreach (var topic in Topics)
+            {
+                stream.Write(topic.AsNullableString());
+            }
+        }
+        else
+        {
+            stream.Write((-1).ToBigEndian());
+        }
+
+        if (Version > ApiVersions.Version3)
+        {
+            stream.WriteByte(AllowAutoTopicCreation.AsByte());
+        }
+
+        if (Version is > ApiVersions.Version7 and <= ApiVersions.Version11)
+        {
+            stream.WriteByte(IncludeClusterAuthorizedOperations.AsByte());
+        }
+
+        if (Version > ApiVersions.Version7)
+        {
+            stream.WriteByte(IncludeTopicAuthorizedOperations.AsByte());
+        }
     }
 }

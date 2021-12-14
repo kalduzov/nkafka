@@ -23,15 +23,10 @@ public class KafkaRequestMessage
 
     public KafkaContent Content { get; set; }
 
-    public ReadOnlyMemory<byte> ToByteStream()
+    public void ToByteStream(Stream stream)
     {
-        using var memoryStream = new MemoryStream();
-        using var writer = new BinaryWriter(memoryStream);
-
-        writer.WriteLength(RequestLength);
-        writer.WriteHeader(Header);
-        writer.WriteMessage(Content);
-
-        return memoryStream.ToArray();
+        stream.WriteLength(RequestLength);
+        stream.WriteHeader(Header);
+        stream.WriteMessage(Content);
     }
 }

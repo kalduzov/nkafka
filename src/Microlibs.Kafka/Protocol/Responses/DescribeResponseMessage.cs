@@ -1,13 +1,13 @@
-﻿namespace Microlibs.Kafka.Protocol.Responses;
+﻿using System.Buffers;
+using System.IO;
+using Microsoft.IO;
+
+namespace Microlibs.Kafka.Protocol.Responses;
 
 public class DescribeResponseMessage : KafkaResponseMessage
 {
-    public DescribeResponseMessage(int trottleTimeMs, string clusterId, int controllerId, int clusterAuthorizedOperations)
+    public DescribeResponseMessage()
     {
-        TrottleTimeMs = trottleTimeMs;
-        ClusterId = clusterId;
-        ControllerId = controllerId;
-        ClusterAuthorizedOperations = clusterAuthorizedOperations;
     }
 
     public int TrottleTimeMs { get; init; }
@@ -17,4 +17,9 @@ public class DescribeResponseMessage : KafkaResponseMessage
     public int ControllerId { get; init; }
 
     public int ClusterAuthorizedOperations { get; init; }
+
+    public override void DeserializeFromStream(Stream stream)
+    {
+
+    }
 }

@@ -26,15 +26,18 @@ public class ProduceBenchmarks
 
         _confluentProducer = confluentProducerBuilder.Build();
 
-        var cluster = KafkaCluster.Create(
-            new ClusterConfig
+        var clusterConfig = new ClusterConfig
+        {
+            BootstrapServers = new[]
             {
-                BootstrapServers = new[]
-                {
-                    "localhost:9092"
-                }
-            },
-            NullLoggerFactory.Instance);
+                "localhost:9092"
+            }
+        };
+
+        var cluster = clusterConfig
+            .CreateNewClusterAsync(NullLoggerFactory.Instance)
+            .GetAwaiter()
+            .GetResult();
 
         _newProducer = cluster.BuildProducer<Null, int>();
     }

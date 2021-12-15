@@ -172,8 +172,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     {
         Task.Yield();
 
-        //BinaryReader? reader = null;
-
         try
         {
             while (!_responseProcessingTokenSource.IsCancellationRequested)
@@ -222,7 +220,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
                 try
                 {
-                    responseInfo.ResponseMessage.DeserializeFromStream(memory[8..].Span);
+                    responseInfo.ResponseMessage.DeserializeFromStream(memory[8..].Span); //в заголовке первые 8 байт служебные, они нам уже не нужны
                     responseInfo.SetResult(responseInfo.ResponseMessage);
                 }
                 catch (ProtocolKafkaException exc)

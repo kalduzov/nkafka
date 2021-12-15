@@ -8,10 +8,19 @@ internal static class ProtocolReaderExtensions
 {
     internal static ReadOnlySpan<byte> ReadNullableString(this ReadOnlySpan<byte> span, out string value)
     {
-        var countBytes = 0;
-        value = null;
+        var nextSpan = span.ReadInt16(out var stringLength);
 
-        return span;
+        if (stringLength == -1)
+        {
+            value = null!;
+
+            return nextSpan;
+        }
+
+        var byteSting = nextSpan[..stringLength];
+        value = Encoding.UTF8.GetString(byteSting);
+
+        return nextSpan[stringLength..];
     }
 
     internal static ReadOnlySpan<byte> ReadString(this ReadOnlySpan<byte> span, out string value)
@@ -35,5 +44,12 @@ internal static class ProtocolReaderExtensions
         value = ReadInt32BigEndian(span[..4]);
 
         return span[4..];
+    }
+
+    internal static ReadOnlySpan<byte> ReadBoolean(this ReadOnlySpan<byte> span, out bool value)
+    {
+        value = span[..1][0] == 1;
+
+        return span[1..];
     }
 }

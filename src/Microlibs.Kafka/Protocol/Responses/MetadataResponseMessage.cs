@@ -61,7 +61,8 @@ public class MetadataResponseMessage : KafkaResponseMessage
             nextSpan = nextSpan.ReadInt32(out _controllerId);
         }
 
-        // DeserializeTopics(reader);
+        nextSpan = DeserializeTopics(nextSpan);
+
         //
         // ClusterAuthorizedOperations = Version switch
         // {
@@ -79,41 +80,83 @@ public class MetadataResponseMessage : KafkaResponseMessage
         // }
     }
 
-    private void DeserializeTopics(BinaryReader reader)
+    private ReadOnlySpan<byte> DeserializeTopics(ReadOnlySpan<byte> span)
     {
-        var topicsCount = reader.ReadInt32().Swap();
-
+        var nextSpan = span.ReadInt32(out var topicsCount);
         var topics = new List<TopicInfo>(topicsCount);
 
         for (var i = 0; i < topicsCount; i++)
         {
-            var errorCode = (StatusCodes)reader.ReadInt16().Swap();
-            var name = reader.ReadNormalString();
+            nextSpan = nextSpan
+                .ReadInt16(out var errorCode)
+                .ReadString(out var name);
 
-            var topicId = Guid.Empty;
+            var isInternal = false;
 
-            if (Version > ApiVersions.Version9)
+            if (Version >= ApiVersions.Version1)
             {
-                var tid = reader.ReadBytes(16); //todo надо скорректировать чтение guid
+                nextSpan = nextSpan.ReadBoolean(out isInternal);
             }
 
-            var isInternal = reader.ReadBoolean();
-
-            var partitions = DeserializePartition(reader);
+            nextSpan = DeserializePartition(nextSpan, out var partitions);
 
             var topicAuthorizedOperations = -1;
 
             if (Version > ApiVersions.Version7)
             {
-                topicAuthorizedOperations = reader.ReadInt32().Swap();
+                nextSpan = nextSpan.ReadInt32(out topicAuthorizedOperations);
             }
 
-            var topic = new TopicInfo(errorCode, name, isInternal, topicAuthorizedOperations, partitions, topicId);
+            var topic = new TopicInfo((StatusCodes)errorCode, name, isInternal, topicAuthorizedOperations, partitions, Guid.Empty);
 
             topics.Add(topic);
         }
 
         Topics = topics;
+
+        return nextSpan;
+    }
+
+    private ReadOnlySpan<byte> DeserializePartition(ReadOnlySpan<byte> span, out IReadOnlyCollection<PartitionInfo> partitions)
+    {
+        var nextSpan = span.ReadInt32(out var partitionCount);
+        var partitionsLocal = new List<PartitionInfo>(partitionCount);
+
+        for (var i = 0; i < partitionCount; i++)
+        {
+            nextSpan = nextSpan
+                .ReadInt16(out var errorCode)
+                .ReadInt32(out var partitionIndex)
+                .ReadInt32(out var leaderId);
+
+            if (Version >= ApiVersions.Version7)
+            {
+                nextSpan = nextSpan.ReadInt32(out var leader_epoch);
+            }
+
+            nextSpan = nextSpan.ReadInt32(out var replicasCount);
+            var replicaNodes = new int[replicasCount];
+
+            for (var j = 0; j < replicasCount; j++)
+            {
+                nextSpan = nextSpan.ReadInt32(out replicaNodes[j]);
+            }
+
+            nextSpan = nextSpan.ReadInt32(out var isrCount);
+            var isrNodes = new int[isrCount];
+
+            for (var j = 0; j < isrCount; j++)
+            {
+                nextSpan = nextSpan.ReadInt32(out isrNodes[j]);
+            }
+
+            var partitionInfo = new PartitionInfo();
+            partitionsLocal.Add(partitionInfo);
+        }
+
+        partitions = partitionsLocal;
+
+        return nextSpan;
     }
 
     private IReadOnlyCollection<PartitionInfo> DeserializePartition(BinaryReader reader)
@@ -156,6 +199,6 @@ public class MetadataResponseMessage : KafkaResponseMessage
 
         Brokers = brokers;
 
-        return span;
+        return nextSpan;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Microlibs.Kafka.Protocol;
@@ -13,6 +14,7 @@ internal static class VarInt
         return Encoding.UTF8.GetString(buf);
     }
 
+    [MethodImpl()]
     internal static int WriteVarUInt64(this Stream stream, ulong value)
     {
         var count = 0;

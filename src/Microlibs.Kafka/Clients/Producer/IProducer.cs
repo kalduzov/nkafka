@@ -125,26 +125,6 @@ namespace Microlibs.Kafka.Clients.Producer
         void Produce(TopicPartition topicPartition, Message<TKey, TValue> message, Action<DeliveryResult<TKey, TValue>> deliveryCallback);
 
         #endregion Produce
-
-        #region Transaction
-
-        Task InitTransaction(CancellationToken cancellationToken);
-
-        Task BeginTransaction(CancellationToken cancellationToken);
-
-        Task CommitTransaction(CancellationToken cancellationToken);
-
-        Task AbortTransaction(CancellationToken cancellationToken);
-
-        void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId);
-
-        void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata);
-
-        #endregion
-    }
-
-    public class ProducerRecord<TKey, TValue>
-    {
     }
 
     public class RecordMetadata

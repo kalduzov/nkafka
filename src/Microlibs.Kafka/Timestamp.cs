@@ -4,12 +4,12 @@ namespace Microlibs.Kafka;
 
 public struct Timestamp : IEquatable<Timestamp>
 {
-    private const long RD_KAFKA_NO_TIMESTAMP = 0;
+    private const long _RD_KAFKA_NO_TIMESTAMP = 0;
 
     /// <summary>
     ///     A read-only field representing an unspecified timestamp.
     /// </summary>
-    public static Timestamp Default => new Timestamp(RD_KAFKA_NO_TIMESTAMP, TimestampType.NotAvailable);
+    public static Timestamp Default => new(_RD_KAFKA_NO_TIMESTAMP, TimestampType.NotAvailable);
 
     /// <summary>
     ///     Unix epoch as a UTC DateTime. Unix time is defined as
@@ -18,8 +18,7 @@ public struct Timestamp : IEquatable<Timestamp>
     /// </summary>
     public static readonly DateTime UnixTimeEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    private const long UnixTimeEpochMilliseconds
-        = 62135596800000; // = UnixTimeEpoch.TotalMiliseconds
+    private const long _UNIX_TIME_EPOCH_MILLISECONDS = 62135596800000; // = UnixTimeEpoch.TotalMiliseconds
 
     /// <summary>
     ///     Initializes a new instance of the Timestamp structure.
@@ -191,7 +190,7 @@ public struct Timestamp : IEquatable<Timestamp>
     /// </returns>
     public static long DateTimeToUnixTimestampMs(DateTime dateTime)
     {
-        return dateTime.ToUniversalTime().Ticks / TimeSpan.TicksPerMillisecond - UnixTimeEpochMilliseconds;
+        return dateTime.ToUniversalTime().Ticks / TimeSpan.TicksPerMillisecond - _UNIX_TIME_EPOCH_MILLISECONDS;
     }
 
     /// <summary>

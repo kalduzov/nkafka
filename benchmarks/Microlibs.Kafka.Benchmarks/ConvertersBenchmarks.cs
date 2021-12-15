@@ -17,8 +17,6 @@ public class ConvertersBenchmarks
         0x01
     };
 
-    private readonly Memory<byte> _memory = _data.AsMemory();
-
     [Benchmark(Baseline = true)]
     public int BitConverterByteArray()
     {

@@ -26,5 +26,15 @@ public record ClusterConfig : CommonConfig
     internal override void Validate()
     {
         base.Validate();
+
+        if (BrokerUpdateTimeoutMs <= 0)
+        {
+            throw new ConfigException("BrokerUpdateTimeoutMs <= 0");
+        }
+
+        if (ClusterInitTimeoutMs <= 0)
+        {
+            throw new ConfigException("BrokerUpdateTimeoutMs <= 0");
+        }
     }
 }

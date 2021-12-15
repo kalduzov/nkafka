@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer.Internals;
@@ -38,21 +36,17 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     private readonly ApiVersions _apiVersions;
     private readonly ProducerConfig _config;
 
-    private readonly Thread _idThread;
     private readonly IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> _interceptors;
 
     private readonly KafkaCluster _kafkaCluster;
     private readonly ILogger _logger;
-    private readonly ProducerMetadata _metadata;
 
     private readonly string _name;
 
     private readonly IPartitioner _partitioner;
-    private readonly ISender _sender;
     private readonly TimeSpan _time;
 
     private readonly CancellationTokenSource _tokenSource = new();
-    private readonly TransactionManager _transactionManager;
     private bool _enableDeliveryReports;
     private ISerializer<TKey> _keySerializer;
     private ISerializer<TValue> _valueSerializer;
@@ -78,7 +72,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
             config,
             keySerializer,
             valueSerializer,
-            null,
             null!,
             DateTime.Today.TimeOfDay,
             NullLoggerFactory.Instance)
@@ -91,7 +84,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         ProducerConfig config,
         ISerializer<TKey> keySerializer,
         ISerializer<TValue> valueSerializer,
-        ProducerMetadata? metadata,
         IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> interceptors,
         TimeSpan time,
         ILoggerFactory loggerFactory)
@@ -121,38 +113,10 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
 
             _apiVersions = new ApiVersions();
 
-            _transactionManager = ConfigureTransactionState(loggerFactory);
-
             var deliveryTimeoutMs = ConfigureDeliveryTimeout();
-            var bufferPool = new BufferPool(config.BufferMemory, config.BatchSize, time);
-            _accumulator = new RecordAccumulator(config, loggerFactory, deliveryTimeoutMs, time, _apiVersions, _transactionManager, bufferPool);
-
-            var addresses = ParseAndValidateAddresses(config.BootstrapServers, config.ClientDnsLookup);
-
-            var clusterResourceListeners = ConfigureClusterResourceListeners(keySerializer, valueSerializer, interceptors);
-            _metadata = metadata
-                        ?? new ProducerMetadata(
-                            config.RetryBackoffMs,
-                            config.MetadataMaxAgeConfig,
-                            config.MetadataMaxIdleConfig,
-                            loggerFactory,
-                            clusterResourceListeners,
-                            DateTime.Today.TimeOfDay);
-            _metadata.Bootstrap(addresses);
-
-            _sender = BuildSender(loggerFactory, _metadata);
-
-            var ioThreadName = _NETWORK_THREAD_PREFIX + " | " + _name + " | " + clientId;
+            _accumulator = new RecordAccumulator(config, loggerFactory, deliveryTimeoutMs, time, _apiVersions);
 
             //create new long thread for IO operations
-            _idThread = new Thread(ctx => _sender.Run((ctx as CancellationTokenSource)!.Token))
-            {
-                Name = ioThreadName,
-                IsBackground = true
-            };
-
-            _idThread.Start(_tokenSource);
-
             _logger.LogDebug(logFormat + "Kafka producer started", clientId, transactionalId);
         }
         catch (Exception exc)
@@ -243,21 +207,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     {
     }
 
-    public Task InitTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    public Task BeginTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
-    public Task CommitTransaction(CancellationToken cancellationToken)
-    {
-        return null;
-    }
-
     /// <summary>
     /// </summary>
     /// <param name="topicPartition"></param>
@@ -299,44 +248,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         return default;
     }
 
-    private ISender BuildSender(ILoggerFactory loggerFactory, ProducerMetadata metadata)
-    {
-        var maxInflightRequests = ConfigureInflightRequests(_config);
-        //var channelBuilder = ClientUtils.CreateChannelBuilder(_config, _time, loggerFactory);
-        var client = new NetworkClient(
-            metadata,
-            _config.ClientId,
-            maxInflightRequests,
-            _config.ReconnectBackoffMs,
-            _config.ReconnectBackoffMaxMs,
-            _config.SendBufferConfig,
-            _config.ReceiveBufferConfig,
-            _config.RequestTimeoutMs,
-            _config.SocketConnectionSetupTimeoutMs,
-            _config.SocketConnectionSetupTimeoutMaxMs,
-            _time,
-            true,
-            _apiVersions,
-            loggerFactory);
-
-        var acks = ConfigureAcks(_config, _logger);
-
-        return new Sender(
-            loggerFactory,
-            client,
-            metadata,
-            _accumulator,
-            maxInflightRequests == 1,
-            _config.MaxRequestSize,
-            acks,
-            _config.Retries,
-            _time,
-            _config.RequestTimeoutMs,
-            _config.RetryBackoffMs,
-            _transactionManager,
-            _apiVersions);
-    }
-
     private void Close(TimeSpan timeSpan, bool swallowException)
     {
         _tokenSource.Cancel(!swallowException);
@@ -361,67 +272,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         }
 
         return acks;
-    }
-
-    private static int ConfigureInflightRequests(ProducerConfig config)
-    {
-        if (config.IdempotenceEnabled && config.MaxInFlightPerRequest < 5)
-        {
-            throw new ConfigException("Must set  MaxInFlight to at most 5 to use the idempotent producer.");
-        }
-
-        return config.MaxInFlightPerRequest;
-    }
-
-    private ClusterResourceListeners ConfigureClusterResourceListeners(
-        ISerializer<TKey> keySerializer,
-        ISerializer<TValue> valueSerializer,
-        IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> interceptors)
-    {
-        return null;
-    }
-
-    private IReadOnlyCollection<IPEndPoint> ParseAndValidateAddresses(IReadOnlyList<string> configBootstrapServers, string configClientDnsLookup)
-    {
-        return Array.Empty<IPEndPoint>();
-    }
-
-    private TransactionManager ConfigureTransactionState(ILoggerFactory loggerFactory)
-    {
-        TransactionManager transactionManager = null;
-
-        // var userConfiguredIdempotence = _config.IdempotenceEnabled;
-        // var userConfiguredTransactions = _config.TransactionalId;
-
-        // if (userConfiguredTransactions && !userConfiguredIdempotence)
-        // {
-        //     _logger.LogInformation("Overriding the default {ENABLE_IDEMPOTENCE_CONFIG} to true since {TRANSACTIONAL_ID_CONFIG} is specified.", ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,
-        //         ProducerConfig.TRANSACTIONAL_ID_CONFIG);
-        // }
-
-        if (_config.IdempotenceEnabled)
-        {
-            // var transactionTimeoutMs = _config.TransactionTimeoutMs;
-            // var retryBackoffMs = _config.RetryBackoffMs;
-
-            transactionManager = new TransactionManager(
-                loggerFactory,
-                _config.TransactionalId,
-                _config.TransactionTimeoutMs,
-                _config.RetryBackoffMs,
-                _apiVersions);
-
-            if (transactionManager.IsTransactional)
-            {
-                _logger.LogInformation("Instantiated a transactional producer");
-            }
-            else
-            {
-                _logger.LogInformation("Instantiated an idempotent producer");
-            }
-        }
-
-        return transactionManager;
     }
 
     private static int LingerMs(ProducerConfig config)
@@ -490,23 +340,7 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         }
     }
 
-    public void InitTransaction()
-    {
-        ThrowIfNoTransactionManager();
-        ThrowIfProducerClosed();
-        var stopWatch = Stopwatch.StartNew();
-        var result = _transactionManager.InitTransaction();
-        _sender.Wakeup();
-
-        //result.Await(_config.MaxBlockTimeMs);
-        stopWatch.Stop();
-    }
-
     private void ThrowIfProducerClosed()
-    {
-    }
-
-    private void ThrowIfNoTransactionManager()
     {
     }
 
@@ -531,8 +365,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         var valueByte = SerializeValue(message.Value);
 
         var tcs = await _accumulator.AppendAsync(topicPartition, message.Timestamp, keyByte, valueByte, headers, token);
-
-        _sender.Wakeup();
 
         if (_config.EnableDeliveryReports)
         {
@@ -570,8 +402,4 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
             throw new ProduceException(exc);
         }
     }
-}
-
-internal class ClusterResourceListeners
-{
 }

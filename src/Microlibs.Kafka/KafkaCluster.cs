@@ -68,6 +68,7 @@ public sealed class KafkaCluster : IKafkaCluster
         _logger = _loggerFactory.CreateLogger<KafkaCluster>();
         _brokerConnectionPool = new BrokerConnectionPool(config);
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, null, Timeout.Infinite, Timeout.Infinite);
+        _topics = Array.Empty<string>();
     }
 
     /// <summary>
@@ -94,7 +95,6 @@ public sealed class KafkaCluster : IKafkaCluster
                 name,
                 producerConfig,
                 null!,
-                null!,
                 null,
                 null!,
                 DateTime.Today.TimeOfDay,
@@ -116,7 +116,7 @@ public sealed class KafkaCluster : IKafkaCluster
     {
         ThrowIfClusterClosed();
 
-        return null;
+        throw new NotImplementedException();
     }
 
     /// <summary>

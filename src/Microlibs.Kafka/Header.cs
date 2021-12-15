@@ -10,7 +10,7 @@ namespace Microlibs.Kafka;
 /// </remarks>
 public class Header : IHeader
 {
-    private readonly byte[] val;
+    private readonly byte[] _val;
 
     /// <summary>
     ///     Create a new Header instance.
@@ -21,15 +21,11 @@ public class Header : IHeader
     /// <param name="value">
     ///     The header value (may be null).
     /// </param>
+    /// <exception cref="ArgumentNullException"></exception>
     public Header(string key, byte[] value)
     {
-        if (key == null)
-        {
-            throw new ArgumentNullException("Kafka message header key cannot be null.");
-        }
-
-        Key = key;
-        val = value;
+        Key = key ?? throw new ArgumentNullException(nameof(key), "Kafka message header key cannot be null");
+        _val = value;
     }
 
     /// <summary>
@@ -42,6 +38,6 @@ public class Header : IHeader
     /// </summary>
     public byte[] GetValueBytes()
     {
-        return val;
+        return _val;
     }
 }

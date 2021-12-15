@@ -13,12 +13,7 @@ public class ConfigException : ProtocolKafkaException
     {
     }
 
-    public ConfigException(string name, object value)
-        : this(name, value, null)
-    {
-    }
-
-    public ConfigException(string name, object value, string message)
+    public ConfigException(string name, object value, string? message = null)
         : base(StatusCodes.None, "Invalid value " + value + " for configuration " + name + (message == null ? "" : ": " + message))
     {
     }

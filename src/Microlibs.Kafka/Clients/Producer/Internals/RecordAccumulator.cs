@@ -14,13 +14,11 @@ public sealed class RecordAccumulator
         ILoggerFactory loggerFactory,
         int deliveryTimeoutMs,
         TimeSpan time,
-        ApiVersions apiVersions,
-        TransactionManager transactionManager,
-        BufferPool bufferPool)
+        ApiVersions apiVersions)
     {
     }
 
-    public async Task<TaskCompletionSource<int>> AppendAsync(
+    public Task<TaskCompletionSource<int>> AppendAsync(
         TopicPartition topicPartition,
         Timestamp messageTimestamp,
         byte[] keyByte,
@@ -28,6 +26,6 @@ public sealed class RecordAccumulator
         Headers headers,
         CancellationToken token)
     {
-        return new TaskCompletionSource<int>(TaskCreationOptions.None);
+        return Task.FromResult(new TaskCompletionSource<int>(TaskCreationOptions.None));
     }
 }

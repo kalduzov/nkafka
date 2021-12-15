@@ -15,7 +15,7 @@ public static class ProducerExtensions
     /// <remarks>Если такой продюсер уже существует и не уничтожен - то возвращается он</remarks>
     public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster)
     {
-        return BuildProducer<TKey, TValue>(kafkaCluster, null);
+        return BuildProducer<TKey, TValue>(kafkaCluster, null!);
     }
 
     /// <summary>

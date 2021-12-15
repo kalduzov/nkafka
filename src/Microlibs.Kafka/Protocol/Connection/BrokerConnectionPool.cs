@@ -97,6 +97,7 @@ internal sealed class BrokerConnectionPool : IDisposable, IAsyncDisposable
 
     public Task<bool> TryAddBrokerAsync(Broker newBroker, bool isController, bool b, CancellationToken token)
     {
+        
         return Task.FromResult(true);
     }
 }

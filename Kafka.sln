@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Benchmarks"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests.SerializerTests", "tests\Microlibs.Kafka.Tests.SerializerTests\Microlibs.Kafka.Tests.SerializerTests.csproj", "{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests.VarIntTests", "tests\Microlibs.Kafka.Tests.VarIntTests\Microlibs.Kafka.Tests.VarIntTests.csproj", "{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,7 @@ Global
 		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
 		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -52,5 +55,9 @@ Global
 		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

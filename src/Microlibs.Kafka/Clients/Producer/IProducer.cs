@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Microlibs.Kafka.Protocol;
 
 namespace Microlibs.Kafka.Clients.Producer
 {
@@ -140,10 +141,6 @@ namespace Microlibs.Kafka.Clients.Producer
         void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata);
 
         #endregion
-    }
-
-    public class PartitionInfo
-    {
     }
 
     public class ProducerRecord<TKey, TValue>

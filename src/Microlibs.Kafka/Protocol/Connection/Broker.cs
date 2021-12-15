@@ -1,6 +1,5 @@
 using System;
 using System.Buffers;
-using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol.Extensions;
 using Microsoft.IO;
@@ -20,17 +20,20 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 {
     private readonly RecyclableMemoryStreamManager _streamManager = new();
     private readonly ArrayPool<byte> _arrayPool;
-    private readonly ConcurrentBag<Task> _bag = new();
+    private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
     private readonly Task _responsesReaderTask;
     private readonly Socket _socket;
     private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tckPool;
-    private readonly Timer _bagCleanerTimer;
+    private readonly Timer _cleanerTimer;
     private bool _disposed;
     private NetworkStream _networkStream;
     private volatile int _requestId;
+    private readonly ManualResetEvent _manualResetEvent;
 
     public IReadOnlyCollection<string> Topics { get; }
+
+    private CommonConfig _commonConfig;
 
     /// <summary>
     ///     Флаг указывающий, что данный брокер является контроллером
@@ -60,32 +63,57 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         Rack = rack;
         EndPoint = endpoint;
 
+        _manualResetEvent = new ManualResetEvent(false);
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
-        _responsesReaderTask = Task.Factory.StartNew(ResponseReaderAction, TaskCreationOptions.LongRunning);
+        _responsesReaderTask = Task.Factory.StartNew(
+            ResponseReaderAction,
+            _responseProcessingTokenSource.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
 
-        _bagCleanerTimer = new Timer(
-            _ =>
-            {
-                if (!_bag.TryTake(out var task))
-                {
-                    return;
-                }
-
-                if (task.Status != TaskStatus.RanToCompletion)
-                {
-                    _bag.Add(task);
-                }
-            },
-            this,
-            0,
-            100);
+        _cleanerTimer = new Timer(_ => ClearingBugWithResponses(), null, 0, 1000);
 
         //todo конфигурировать через опции клиента
         var maxMessageSize = 84000;
         var maxRequests = 10;
 
         _arrayPool = ArrayPool<byte>.Create(maxMessageSize, maxRequests);
+    }
+
+    private void ClearingBugWithResponses()
+    {
+        var cts = new CancellationTokenSource(1000 / 2);
+
+        while (!cts.IsCancellationRequested)
+        {
+            // if (!_responsesTasks.(out var task))
+            // {
+            //     return;
+            // }
+            //
+            // if (task.Status != TaskStatus.RanToCompletion)
+            // {
+            //     _responsesTasks.Add(task);
+            // }
+        }
+
+        if (_responsesTasks.IsEmpty)
+        {
+            _manualResetEvent.Reset();
+        }
+        else
+        {
+            _manualResetEvent.Set();
+        }
+    }
+
+    public async Task OpenAsync(CommonConfig commonConfig, CancellationToken token)
+    {
+        _commonConfig = commonConfig;
+        
+        // var request = new Api
+        // await SendAsync<>()
     }
 
     /// <summary>
@@ -165,6 +193,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         {
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
+                _manualResetEvent.WaitOne();
+
                 if (_disposed)
                 {
                     return;
@@ -190,10 +220,12 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
                 reader ??= new BinaryReader(_networkStream);
 
                 var responseLength = reader.ReadInt32().Swap();
-                var buffer = _arrayPool.Rent(responseLength);
-                reader.Read(buffer, 0, responseLength);
+                var requestId = reader.ReadInt32().Swap();
 
-                _bag.Add(ParseResponseAsync(buffer, responseLength, _responseProcessingTokenSource.Token));
+                var buffer = _arrayPool.Rent(responseLength - 4);
+                reader.Read(buffer, 0, responseLength - 4);
+
+                _responsesTasks.TryAdd(requestId, ParseResponseAsync(buffer, requestId, _responseProcessingTokenSource.Token));
             }
         }
         finally
@@ -202,7 +234,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
     }
 
-    private async Task ParseResponseAsync(byte[] buffer, int responseLength, CancellationToken cancellationToken)
+    private async Task ParseResponseAsync(byte[] buffer, int requestId, CancellationToken cancellationToken)
     {
         //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
         await Task.Yield();
@@ -211,10 +243,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         {
             await using var stream = _streamManager.GetStream(buffer) as RecyclableMemoryStream;
 
-            var memory = stream.GetMemory();
-            var requestId = BinaryPrimitives.ReadInt32BigEndian(memory[..4].Span);
-
-            if (_tckPool.TryGetValue(requestId, out var responseInfo))
+            if (_tckPool.TryRemove(requestId, out var responseInfo))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -242,9 +271,14 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
                     _tckPool.TryRemove(requestId, out responseInfo);
                 }
             }
+            else
+            {
+                Console.WriteLine($"Не удалось получить данные по запросу {requestId}");
+            }
         }
         finally
         {
+            _responsesTasks.TryRemove(requestId, out _);
             _arrayPool.Return(buffer, true);
         }
     }
@@ -261,6 +295,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         where TResponseMessage : KafkaResponseMessage, new()
         where TRequestMessage : KafkaContent
     {
+        using var _ = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, _requestId, Id);
+
         await ReEstablishConnectionAsync(token);
 
         //await CheckApiVersion(request, token);
@@ -271,8 +307,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var response = new TResponseMessage();
-        var responseCsInfo = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId, response);
+        var responseMessage = new TResponseMessage();
+        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId, responseMessage);
 
         token.Register(
             state =>
@@ -280,7 +316,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
                 var awaiter = state as ResponseTaskCompletionSource;
                 awaiter.TrySetCanceled();
             },
-            responseCsInfo,
+            taskCompletionSource,
             false);
 
         try
@@ -290,16 +326,17 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
                 request.ToByteStream(stream);
                 var bufferForSend = stream.ToArray();
                 await _networkStream.WriteAsync(bufferForSend, token);
+                _manualResetEvent.Set();
             }
 
-            _tckPool.TryAdd(requestId, responseCsInfo);
+            _tckPool.TryAdd(requestId, taskCompletionSource);
         }
         catch (Exception exc)
         {
-            responseCsInfo.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалость отправить запрос", exc));
+            taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалость отправить запрос", exc));
         }
 
-        return (TResponseMessage)await responseCsInfo.Task;
+        return (TResponseMessage)await taskCompletionSource.Task;
     }
 
     // private async Task CheckApiVersion(KafkaRequest request, CancellationToken token)
@@ -343,6 +380,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         if (disposing)
         {
+            _manualResetEvent.Dispose();
             _responseProcessingTokenSource.Cancel();
 
             foreach (var value in _tckPool.Values)
@@ -352,11 +390,11 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
             _tckPool.Clear();
             _responsesReaderTask.Dispose();
-            _bag.Clear();
+            _responsesTasks.Clear();
 
             _networkStream.Dispose();
             _socket.Dispose();
-            _bagCleanerTimer.Dispose();
+            _cleanerTimer.Dispose();
         }
 
         _disposed = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microlibs.Kafka.Config;
 
 namespace Microlibs.Kafka.Protocol.Connection;
 
@@ -35,6 +36,8 @@ public interface IBroker : IDisposable, IAsyncDisposable
     ///     Список партиций топиков
     /// </summary>
     IReadOnlyCollection<TopicPartition> TopicPartitions { get; }
+
+    Task OpenAsync(CommonConfig commonConfig, CancellationToken token);
 
     /// <summary>
     /// Отправка сообщений брокеру по типу fire and forget

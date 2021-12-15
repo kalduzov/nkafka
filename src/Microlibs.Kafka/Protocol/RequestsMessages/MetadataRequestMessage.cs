@@ -28,8 +28,9 @@ public class MetadataRequestMessage : KafkaContent
     /// </summary>
     public bool IncludeTopicAuthorizedOperations { get; set; }
 
-    public MetadataRequestMessage(params string[] topics)
+    public MetadataRequestMessage(ApiVersions version, params string[] topics)
     {
+        Version = version;
         Topics = topics ?? Array.Empty<string>();
         ApiKey = ApiKeys.Metadata;
         Length = CalculateLen();
@@ -39,17 +40,24 @@ public class MetadataRequestMessage : KafkaContent
     {
         var len = 4; //Длинна массива topics
 
-        switch (Version)
+        foreach (var topic in Topics)
         {
-            case >= ApiVersions.Version0 and <= ApiVersions.Version3:
-            {
-                foreach (var topic in Topics)
-                {
-                    len += 2 + Encoding.UTF8.GetBytes(topic).Length;
-                }
+            len += 2 + Encoding.UTF8.GetBytes(topic).Length;
+        }
 
-                break;
-            }
+        if (Version > ApiVersions.Version3)
+        {
+            len += 1;
+        }
+
+        if (Version > ApiVersions.Version7)
+        {
+            len += 2;
+        }
+
+        if (Version > ApiVersions.Version11)
+        {
+            len--;
         }
 
         return len;

@@ -1,10 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using Microlibs.Kafka.Protocol;
 
 namespace Microlibs.Kafka;
 
 internal static class KafkaDiagnosticsSource
 {
     private static readonly ActivitySource _activitySource = new("Microlibs.Kafka");
+    
+    private static readonly ActivitySource _internalActivitySource = new("Microlibs.Kafka.Internal");
 
     internal static Activity? ProduceMessage<TKey, TValue>(TopicPartition topicPartition, Message<TKey, TValue> message, bool isFireAndForget)
     {
@@ -27,6 +31,18 @@ internal static class KafkaDiagnosticsSource
                 activity?.AddTag("Key", message.Key);
             }
         }
+
+        return activity;
+    }
+
+    public static Activity? InternalSendMessage(ApiKeys key, ApiVersions version, int requestId, int brokerId)
+    {
+        var activity = _internalActivitySource
+            .StartActivity(nameof(InternalSendMessage))
+            ?.AddTag("Key", key)
+            .AddTag("Version", version)
+            .AddTag("RequestId", requestId)
+            .AddTag("BrokerId", brokerId);
 
         return activity;
     }

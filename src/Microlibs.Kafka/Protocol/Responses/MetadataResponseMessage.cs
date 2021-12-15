@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microlibs.Kafka.Protocol.Extensions;
 
@@ -41,7 +42,6 @@ public class MetadataResponseMessage : KafkaResponseMessage
     {
         using var reader = new BinaryReader(stream);
 
-        var _ = reader.ReadInt32().Swap(); //пропускаем id запроса
         Code = (StatusCodes)reader.ReadInt16().Swap();
 
         if (!IsSuccessStatusCode) //Нет смысла дальше считывать данные - уже была ошибка
@@ -83,18 +83,47 @@ public class MetadataResponseMessage : KafkaResponseMessage
 
     private void DeserializeTopics(BinaryReader reader)
     {
-        var topicsCount = reader.ReadInt16().Swap();
+        var topicsCount = reader.ReadInt32().Swap();
 
         var topics = new List<TopicInfo>(topicsCount);
 
-        for (int i = 0; i < topicsCount; i++)
+        for (var i = 0; i < topicsCount; i++)
         {
             var errorCode = (StatusCodes)reader.ReadInt16().Swap();
             var name = reader.ReadNormalString();
-            var is_internal = reader.ReadBoolean();
+
+            var topicId = Guid.Empty;
+
+            if (Version > ApiVersions.Version9)
+            {
+                var tid = reader.ReadBytes(16); //todo надо скорректировать чтение guid
+            }
+
+            var isInternal = reader.ReadBoolean();
+
+            var partitions = DeserializePartition(reader);
+
+            var topicAuthorizedOperations = -1;
+
+            if (Version > ApiVersions.Version7)
+            {
+                topicAuthorizedOperations = reader.ReadInt32().Swap();
+            }
+
+            var topic = new TopicInfo(errorCode, name, isInternal, topicAuthorizedOperations, partitions, topicId);
+
+            topics.Add(topic);
         }
 
         Topics = topics;
+    }
+
+    private IReadOnlyCollection<PartitionInfo> DeserializePartition(BinaryReader reader)
+    {
+        var partitionCount = reader.ReadInt32().Swap();
+        var partitions = new List<PartitionInfo>(partitionCount);
+
+        return partitions;
     }
 
     private void DeserializeBrokers(BinaryReader reader)

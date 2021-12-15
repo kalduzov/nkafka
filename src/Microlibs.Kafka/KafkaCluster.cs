@@ -129,10 +129,9 @@ public sealed class KafkaCluster : IKafkaCluster
 
         var broker = _brokerConnectionPool.GetLeastLoadedBroker();
 
-        var request = new MetadataRequestMessage(topics)
+        var request = new MetadataRequestMessage(ApiVersions.Version4, topics)
         {
             AllowAutoTopicCreation = true,
-            Version = ApiVersions.Version3,
         };
 
         var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
@@ -181,10 +180,9 @@ public sealed class KafkaCluster : IKafkaCluster
     {
         var broker = _brokerConnectionPool.GetLeastLoadedBroker();
 
-        var request = new MetadataRequestMessage(_topics)
+        var request = new MetadataRequestMessage(ApiVersions.Version0, _topics)
         {
             AllowAutoTopicCreation = true,
-            Version = ApiVersions.Version0,
         };
 
         var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);

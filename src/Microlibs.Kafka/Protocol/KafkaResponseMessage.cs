@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using Microlibs.Kafka.Protocol;
 
 namespace Microlibs.Kafka;
@@ -7,7 +6,7 @@ namespace Microlibs.Kafka;
 public abstract class KafkaResponseMessage : IDisposable
 {
     private const StatusCodes _DEFAULT_CODE = StatusCodes.None;
-    private StatusCodes _code;
+    protected short _code;
     private KafkaContent? _content;
 
     private bool _disposed;
@@ -20,7 +19,7 @@ public abstract class KafkaResponseMessage : IDisposable
 
     public KafkaResponseMessage(StatusCodes code)
     {
-        _code = code;
+        _code = (short)code;
         Version = ApiVersions.LastVersion;
     }
 
@@ -34,19 +33,11 @@ public abstract class KafkaResponseMessage : IDisposable
         }
     }
 
-    public StatusCodes Code
-    {
-        get => _code;
-        set
-        {
-            CheckDisposed();
-            _code = value;
-        }
-    }
+    public StatusCodes Code => (StatusCodes)_code;
 
-    public bool IsSuccessStatusCode => _code == _DEFAULT_CODE;
+    public bool IsSuccessStatusCode => Code == _DEFAULT_CODE;
 
-    public abstract void DeserializeFromStream(Stream stream);
+    public abstract void DeserializeFromStream(ReadOnlySpan<byte> span);
 
     private void CheckDisposed()
     {

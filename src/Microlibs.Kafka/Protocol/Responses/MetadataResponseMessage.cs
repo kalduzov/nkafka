@@ -2,83 +2,81 @@
 using System.Collections.Generic;
 using System.IO;
 using Microlibs.Kafka.Protocol.Extensions;
+using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace Microlibs.Kafka.Protocol.Responses;
 
 public class MetadataResponseMessage : KafkaResponseMessage
 {
+    private int _throttleTimeMs;
+    private int _controllerId;
+    private string? _clusterId;
+    private int _clusterAuthorizedOperations;
+
     /// <summary>
     ///     The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request
     ///     did not violate any quota
     /// </summary>
-    public int ThrottleTimeMs { get; private set; }
+    public int ThrottleTimeMs => _throttleTimeMs;
 
     /// <summary>
     ///     The ID of the controller broker
     /// </summary>
-    public int ControllerId { get; private set; }
+    public int ControllerId => _controllerId;
 
     /// <summary>
     ///     The cluster ID that responding broker belongs to
     /// </summary>
-    public string? ClusterId { get; private set; }
+    public string? ClusterId => _clusterId;
 
     /// <summary>
     ///     32-bit bitfield to represent authorized operations for this cluster
     /// </summary>
-    public int ClusterAuthorizedOperations { get; private set; }
+    public int ClusterAuthorizedOperations => _clusterAuthorizedOperations;
 
     /// <summary>
     ///     Each broker in the response
     /// </summary>
-    public IReadOnlyCollection<BrokerInfo> Brokers { get; private set; }
+    public IReadOnlyCollection<BrokerInfo> Brokers { get; private set; } = Array.Empty<BrokerInfo>();
 
     /// <summary>
     ///     Each topic in the response
     /// </summary>
-    public IReadOnlyCollection<TopicInfo> Topics { get; private set; }
+    public IReadOnlyCollection<TopicInfo> Topics { get; private set; } = Array.Empty<TopicInfo>();
 
-    public override void DeserializeFromStream(Stream stream)
+    public override void DeserializeFromStream(ReadOnlySpan<byte> span)
     {
-        using var reader = new BinaryReader(stream);
-
-        Code = (StatusCodes)reader.ReadInt16().Swap();
-
-        if (!IsSuccessStatusCode) //Нет смысла дальше считывать данные - уже была ошибка
-        {
-            return;
-        }
-
-        ThrottleTimeMs = Version switch
-        {
-            >= ApiVersions.Version3 => reader.ReadInt32().Swap(),
-            _ => ThrottleTimeMs
-        };
-
-        DeserializeBrokers(reader);
+        var nextSpan = span;
 
         if (Version >= ApiVersions.Version3)
         {
-            ClusterId = reader.ReadCompactNullableString();
-            ControllerId = reader.ReadInt32().Swap();
+            nextSpan = nextSpan.ReadInt32(out _throttleTimeMs);
         }
 
-        DeserializeTopics(reader);
+        nextSpan = DeserializeBrokers(nextSpan);
 
-        ClusterAuthorizedOperations = Version switch
+        if (Version >= ApiVersions.Version3)
         {
-            >= ApiVersions.Version8 and <= ApiVersions.Version10 => reader.ReadInt32().Swap(),
-            _ => ClusterAuthorizedOperations
-        };
-
-        switch (Version)
-        {
-            case >= ApiVersions.Version11:
-            {
-                //TAG_BUFFER
-                break;
-            }
+            nextSpan = nextSpan.ReadNullableString(out _clusterId);
+            nextSpan = nextSpan.ReadInt32(out _controllerId);
         }
+
+        // DeserializeTopics(reader);
+        //
+        // ClusterAuthorizedOperations = Version switch
+        // {
+        //     >= ApiVersions.Version8 and <= ApiVersions.Version10 => reader.ReadInt32().Swap(),
+        //     _ => ClusterAuthorizedOperations
+        // };
+        //
+        // switch (Version)
+        // {
+        //     case >= ApiVersions.Version11:
+        //     {
+        //         //TAG_BUFFER
+        //         break;
+        //     }
+        // }
     }
 
     private void DeserializeTopics(BinaryReader reader)
@@ -126,23 +124,30 @@ public class MetadataResponseMessage : KafkaResponseMessage
         return partitions;
     }
 
-    private void DeserializeBrokers(BinaryReader reader)
+    private ReadOnlySpan<byte> DeserializeBrokers(ReadOnlySpan<byte> span)
     {
-        var brokersCount = reader.ReadInt16().Swap();
+        var brokersCount = 0;
+
+        var nextSpan = span;
+
+        if (Version < ApiVersions.Version9)
+        {
+            nextSpan = nextSpan.ReadInt32(out brokersCount);
+        }
 
         var brokers = new List<BrokerInfo>(brokersCount);
 
         for (var i = 0; i < brokersCount; i++)
         {
-            var id = reader.ReadInt32().Swap();
-            var host = reader.ReadNormalString();
-            var port = reader.ReadInt32().Swap();
+            nextSpan = nextSpan.ReadInt32(out var id);
+            nextSpan = nextSpan.ReadString(out var host);
+            nextSpan = nextSpan.ReadInt32(out var port);
 
             string rack = null!;
 
             if (Version >= ApiVersions.Version3)
             {
-                rack = reader.ReadCompactNullableString();
+                nextSpan = nextSpan.ReadNullableString(out rack);
             }
 
             var brokerInfo = new BrokerInfo(id, host, port, rack);
@@ -150,5 +155,7 @@ public class MetadataResponseMessage : KafkaResponseMessage
         }
 
         Brokers = brokers;
+
+        return span;
     }
 }

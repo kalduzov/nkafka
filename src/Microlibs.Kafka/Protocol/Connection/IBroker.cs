@@ -31,6 +31,11 @@ public interface IBroker : IDisposable, IAsyncDisposable
     ///     Точка подключения к брокеру
     /// </summary>
     public EndPoint EndPoint { get; set; }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    string? Rack { get; }
 
     /// <summary>
     ///     Список партиций топиков

@@ -2,7 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
+using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -11,6 +11,7 @@ using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol.Extensions;
 using Microsoft.IO;
+using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace Microlibs.Kafka.Protocol.Connection;
 
@@ -19,10 +20,8 @@ namespace Microlibs.Kafka.Protocol.Connection;
 internal sealed class Broker : IBroker, IEquatable<Broker>
 {
     private readonly RecyclableMemoryStreamManager _streamManager = new();
-    private readonly ArrayPool<byte> _arrayPool;
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
-    private readonly Task _responsesReaderTask;
     private readonly Socket _socket;
     private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tckPool;
     private readonly Timer _cleanerTimer;
@@ -35,6 +34,11 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private CommonConfig _commonConfig;
 
+    private Task _receivedDataFromSocketTask;
+    private Task _processData;
+
+    private readonly Pipe _pipe = new(new PipeOptions());
+
     /// <summary>
     ///     Флаг указывающий, что данный брокер является контроллером
     /// </summary>
@@ -45,6 +49,9 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     /// </summary>
     public int Id { get; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public string? Rack { get; }
 
     /// <summary>
@@ -66,52 +73,28 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         _manualResetEvent = new ManualResetEvent(false);
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
-        _responsesReaderTask = Task.Factory.StartNew(
-            ResponseReaderAction,
-            _responseProcessingTokenSource.Token,
-            TaskCreationOptions.LongRunning,
-            TaskScheduler.Default);
 
-        _cleanerTimer = new Timer(_ => ClearingBugWithResponses(), null, 0, 1000);
+        _processData = ResponseReaderAction(_pipe.Reader);
+
+        // _responsesReaderTask = Task.Factory.StartNew(
+        //     ResponseReaderAction,
+        //     _responseProcessingTokenSource.Token,
+        //     TaskCreationOptions.LongRunning,
+        //     TaskScheduler.Default);
+
+        //_cleanerTimer = new Timer(_ => ClearingBugWithResponses(), null, 0, 1000);
 
         //todo конфигурировать через опции клиента
         var maxMessageSize = 84000;
         var maxRequests = 10;
 
-        _arrayPool = ArrayPool<byte>.Create(maxMessageSize, maxRequests);
-    }
-
-    private void ClearingBugWithResponses()
-    {
-        var cts = new CancellationTokenSource(1000 / 2);
-
-        while (!cts.IsCancellationRequested)
-        {
-            // if (!_responsesTasks.(out var task))
-            // {
-            //     return;
-            // }
-            //
-            // if (task.Status != TaskStatus.RanToCompletion)
-            // {
-            //     _responsesTasks.Add(task);
-            // }
-        }
-
-        if (_responsesTasks.IsEmpty)
-        {
-            _manualResetEvent.Reset();
-        }
-        else
-        {
-            _manualResetEvent.Set();
-        }
+        ArrayPool<byte>.Create(maxMessageSize, maxRequests);
     }
 
     public async Task OpenAsync(CommonConfig commonConfig, CancellationToken token)
     {
         _commonConfig = commonConfig;
-        
+
         // var request = new Api
         // await SendAsync<>()
     }
@@ -175,9 +158,9 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
     /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return default;
+        await Task.WhenAll(_receivedDataFromSocketTask, _processData).ConfigureAwait(false);
     }
 
     public override bool Equals(object obj)
@@ -185,64 +168,49 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         return ReferenceEquals(this, obj) || obj is Broker other && Equals(other);
     }
 
-    private async Task ResponseReaderAction()
+    private async Task ResponseReaderAction(PipeReader reader)
     {
-        BinaryReader? reader = null;
+        Task.Yield();
+
+        //BinaryReader? reader = null;
 
         try
         {
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
-                _manualResetEvent.WaitOne();
+                var result = await reader.ReadAsync(_responseProcessingTokenSource.Token);
+                var buffer = result.Buffer;
 
-                if (_disposed)
+                var requestId = ReadInt32BigEndian(buffer.Slice(4, 4).FirstSpan);
+
+                if (buffer.IsSingleSegment)
                 {
-                    return;
+                    _responsesTasks.TryAdd(
+                        requestId,
+                        ParseResponseAsSingleSegmentAsync(buffer.First, requestId, _responseProcessingTokenSource.Token));
                 }
 
-                if (!_socket.Connected)
+                reader.AdvanceTo(buffer.End);
+
+                if (result.IsCompleted)
                 {
-                    await Task.Delay(250);
-
-                    continue;
+                    break;
                 }
-
-                if (reader is not null && _networkStream is not null)
-                {
-                    reader = new BinaryReader(_networkStream);
-                }
-
-                if (!(_networkStream?.DataAvailable ?? false))
-                {
-                    continue;
-                }
-
-                reader ??= new BinaryReader(_networkStream);
-
-                var responseLength = reader.ReadInt32().Swap();
-                var requestId = reader.ReadInt32().Swap();
-
-                var buffer = _arrayPool.Rent(responseLength - 4);
-                reader.Read(buffer, 0, responseLength - 4);
-
-                _responsesTasks.TryAdd(requestId, ParseResponseAsync(buffer, requestId, _responseProcessingTokenSource.Token));
             }
         }
         finally
         {
-            reader?.Dispose();
+            await reader.CompleteAsync();
         }
     }
 
-    private async Task ParseResponseAsync(byte[] buffer, int requestId, CancellationToken cancellationToken)
+    private async Task ParseResponseAsSingleSegmentAsync(ReadOnlyMemory<byte> memory, int requestId, CancellationToken cancellationToken)
     {
         //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
         await Task.Yield();
 
         try
         {
-            await using var stream = _streamManager.GetStream(buffer) as RecyclableMemoryStream;
-
             if (_tckPool.TryRemove(requestId, out var responseInfo))
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -254,7 +222,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
                 try
                 {
-                    responseInfo.ResponseMessage.DeserializeFromStream(stream);
+                    responseInfo.ResponseMessage.DeserializeFromStream(memory[8..].Span);
                     responseInfo.SetResult(responseInfo.ResponseMessage);
                 }
                 catch (ProtocolKafkaException exc)
@@ -279,7 +247,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         finally
         {
             _responsesTasks.TryRemove(requestId, out _);
-            _arrayPool.Return(buffer, true);
+
+            //_arrayPool.Return(buffer, true);
         }
     }
 
@@ -363,6 +332,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             {
                 await _socket.ConnectAsync(EndPoint);
                 _networkStream = new NetworkStream(_socket);
+                _receivedDataFromSocketTask = _networkStream.CopyToAsync(_pipe.Writer, cancellationToken);
             }
         }
         catch (Exception exception)
@@ -380,18 +350,18 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         if (disposing)
         {
-            _manualResetEvent.Dispose();
             _responseProcessingTokenSource.Cancel();
 
-            foreach (var value in _tckPool.Values)
+            // Ждем когда остановится обработка потока данных из сокета
+            Task.WaitAll(_receivedDataFromSocketTask, _processData);
+
+            foreach (var value in _tckPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
             {
                 value.SetException(new ObjectDisposedException(nameof(Broker), "Соединение с брокером было уничтожено"));
             }
 
             _tckPool.Clear();
-            _responsesReaderTask.Dispose();
             _responsesTasks.Clear();
-
             _networkStream.Dispose();
             _socket.Dispose();
             _cleanerTimer.Dispose();

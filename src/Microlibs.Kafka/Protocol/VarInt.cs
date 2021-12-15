@@ -14,7 +14,7 @@ internal static class VarInt
         return Encoding.UTF8.GetString(buf);
     }
 
-    [MethodImpl()]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static int WriteVarUInt64(this Stream stream, ulong value)
     {
         var count = 0;

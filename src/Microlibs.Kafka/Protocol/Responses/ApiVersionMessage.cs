@@ -1,7 +1,6 @@
-﻿using System.Buffers;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.IO;
 
 namespace Microlibs.Kafka.Protocol.Responses;
 
@@ -11,7 +10,7 @@ public class ApiVersionMessage : KafkaResponseMessage
 
     public int ThrottleTimeMs { get; internal set; }
 
-    public override void DeserializeFromStream(Stream stream)
+    public override void DeserializeFromStream(ReadOnlySpan<byte> span)
     {
     }
 }

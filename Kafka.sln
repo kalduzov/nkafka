@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E216684E-35E3-446D-B5EB-F89718D0D0FE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{29CCE93C-47E9-46FB-980C-8CC68A132789}"
@@ -7,12 +10,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka", "src\Microlibs.Kafka\Microlibs.Kafka.csproj", "{FB078DD2-8878-4B17-BDB3-DD87AC391841}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C451-E7E8-4A76-AC94-8A165ED35DD2}"
-ProjectSection(SolutionItems) = preProject
-	J:\git\Kafka\Directory.Build.props = J:\git\Kafka\Directory.Build.props
-	LICENCE = LICENCE
-	Kafka.sln.DotSettings = Kafka.sln.DotSettings
-	docker-compose.yml = docker-compose.yml
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		docker-compose.yml = docker-compose.yml
+		Kafka.sln.DotSettings = Kafka.sln.DotSettings
+		LICENCE = LICENCE
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"
 EndProject
@@ -28,18 +31,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests.VarIn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests.MessagesEncodingDecodingTests", "tests\Microlibs.Kafka.Tests.MessagesEncodingDecodingTests\Microlibs.Kafka.Tests.MessagesEncodingDecodingTests.csproj", "{053081C4-3A9C-4275-9B3A-7534FB1BDA81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Samples.Confluent", "samples\Microlibs.Kafka.Samples.Confluent\Microlibs.Kafka.Samples.Confluent.csproj", "{90779538-4A63-4EBD-B4FF-39772E740919}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{FB078DD2-8878-4B17-BDB3-DD87AC391841} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
-		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
-		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
-		{053081C4-3A9C-4275-9B3A-7534FB1BDA81} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FB078DD2-8878-4B17-BDB3-DD87AC391841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -66,5 +63,24 @@ Global
 		{053081C4-3A9C-4275-9B3A-7534FB1BDA81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{053081C4-3A9C-4275-9B3A-7534FB1BDA81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{053081C4-3A9C-4275-9B3A-7534FB1BDA81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FB078DD2-8878-4B17-BDB3-DD87AC391841} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
+		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
+		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
+		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{053081C4-3A9C-4275-9B3A-7534FB1BDA81} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
+		{90779538-4A63-4EBD-B4FF-39772E740919} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {39C07D03-F77E-4D2B-A72F-FCDC1313B058}
 	EndGlobalSection
 EndGlobal

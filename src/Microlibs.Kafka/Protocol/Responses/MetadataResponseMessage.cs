@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipelines;
 using Microlibs.Kafka.Protocol.Extensions;
 using static System.Buffers.Binary.BinaryPrimitives;
 
@@ -44,9 +45,13 @@ public class MetadataResponseMessage : KafkaResponseMessage
     /// </summary>
     public IReadOnlyCollection<TopicInfo> Topics { get; private set; } = Array.Empty<TopicInfo>();
 
-    public override void DeserializeFromStream(ReadOnlySpan<byte> span)
+    public override void DeserializeFromStream(PipeReader reader)
     {
-        var nextSpan = span;
+        if (!reader.TryRead(out var result))
+        {
+            return;
+        }
+        var nextSpan = result.Buffer.FirstSpan;
 
         if (Version >= ApiVersions.Version3)
         {
@@ -78,6 +83,8 @@ public class MetadataResponseMessage : KafkaResponseMessage
         //         break;
         //     }
         // }
+        
+        reader.AdvanceTo(result.Buffer.End);
     }
 
     private ReadOnlySpan<byte> DeserializeTopics(ReadOnlySpan<byte> span)
@@ -145,9 +152,16 @@ public class MetadataResponseMessage : KafkaResponseMessage
             nextSpan = nextSpan.ReadInt32(out var isrCount);
             var isrNodes = new int[isrCount];
 
-            for (var j = 0; j < isrCount; j++)
+            try
             {
-                nextSpan = nextSpan.ReadInt32(out isrNodes[j]);
+                for (var j = 0; j < isrCount; j++)
+                {
+                    nextSpan = nextSpan.ReadInt32(out isrNodes[j]);
+                }
+            }
+            catch (Exception exc)
+            {
+                exc.ToString();
             }
 
             var partitionInfo = new PartitionInfo();

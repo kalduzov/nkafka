@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Pipelines;
 using Microlibs.Kafka.Protocol;
 
 namespace Microlibs.Kafka;
@@ -37,7 +38,7 @@ public abstract class KafkaResponseMessage : IDisposable
 
     public bool IsSuccessStatusCode => Code == _DEFAULT_CODE;
 
-    public abstract void DeserializeFromStream(ReadOnlySpan<byte> span);
+    public abstract void DeserializeFromStream(PipeReader reader);
 
     private void CheckDisposed()
     {

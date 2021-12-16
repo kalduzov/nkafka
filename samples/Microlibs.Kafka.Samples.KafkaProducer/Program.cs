@@ -1,7 +1,11 @@
 ﻿using System;
-using System.Threading;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
 using Microlibs.Kafka;
 using Microlibs.Kafka.Config;
+
+var stopwatch = Stopwatch.StartNew();
 
 var clusterConfig = new ClusterConfig
 {
@@ -14,11 +18,16 @@ var clusterConfig = new ClusterConfig
 
 await using var kafkaCluster = await clusterConfig.CreateNewClusterAsync();
 
- for (int i = 0; i < 10; i++)
- {
-     await kafkaCluster.RefreshMetadataAsync(default, "test");
-     Console.WriteLine($"Ok {i}");
-}
+var tasks = Enumerable.Range(0, 10000)
+    .Select(
+        i =>
+        {
+            //Console.WriteLine($"Ok {i}");
+
+            return kafkaCluster.RefreshMetadataAsync(default, "test");
+        });
+
+await Task.WhenAll(tasks);
 
 // await using var producer = kafkaCluster.BuildProducer<Null, int>();
 //
@@ -29,6 +38,7 @@ await using var kafkaCluster = await clusterConfig.CreateNewClusterAsync();
 // };
 //
 // await producer.ProduceAsync("test_topic", test, CancellationToken.None);
-Console.WriteLine("Produce OK");
+Console.WriteLine($"All OK. {stopwatch.Elapsed}");
+
 
 Console.ReadKey();

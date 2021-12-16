@@ -92,15 +92,15 @@ public abstract record CommonConfig
     ///     The connection setup timeout will increase exponentially for each consecutive connection failure up to this
     ///     maximum.
     ///     To avoid connection storms, a randomization factor of 0.2 will be applied to the timeout resulting in a random
-    ///     range
-    ///     between 20% below and 20% above the computed value.
+    ///     range between 20% below and 20% above the computed value.
     /// </summary>
     public int SocketConnectionSetupTimeoutMaxMs { get; set; } = 30000;
 
     /// <summary>
     ///     Close idle connections after the number of milliseconds specified by this config
+    ///     default: 60 seconds
     /// </summary>
-    public int? ConnectionsMaxIdleMs { get; set; }
+    public int ConnectionsMaxIdleMs { get; set; } = 60000;
 
     /// <summary>
     /// </summary>

@@ -2,6 +2,7 @@ using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
@@ -19,6 +20,7 @@ namespace Microlibs.Kafka.Protocol.Connection;
 /// </summary>
 internal sealed class Broker : IBroker, IEquatable<Broker>
 {
+    private readonly ArrayPool<byte> _arrayPool;
     private readonly RecyclableMemoryStreamManager _streamManager = new();
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
@@ -27,17 +29,21 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     private readonly Timer _cleanerTimer;
     private bool _disposed;
     private NetworkStream _networkStream;
-    private volatile int _requestId;
-    private readonly ManualResetEvent _manualResetEvent;
+    private volatile int _requestId = -1;
 
     public IReadOnlyCollection<string> Topics { get; }
 
     private CommonConfig _commonConfig;
-
     private Task _receivedDataFromSocketTask;
-    private Task _processData;
+    private readonly Task _processData;
 
-    private readonly Pipe _pipe = new(new PipeOptions());
+    private readonly Memory<byte> _size = new(new byte[sizeof(int)]);
+
+    /*
+     * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
+     * соединение с брокером автоматически закроется 
+     */
+    private readonly Stopwatch _globalTimeWaiting = new();
 
     /// <summary>
     ///     Флаг указывающий, что данный брокер является контроллером
@@ -70,11 +76,10 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         Rack = rack;
         EndPoint = endpoint;
 
-        _manualResetEvent = new ManualResetEvent(false);
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
 
-        _processData = ResponseReaderAction(_pipe.Reader);
+        _processData = ResponseReaderAction();
 
         // _responsesReaderTask = Task.Factory.StartNew(
         //     ResponseReaderAction,
@@ -88,7 +93,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         var maxMessageSize = 84000;
         var maxRequests = 10;
 
-        ArrayPool<byte>.Create(maxMessageSize, maxRequests);
+        _arrayPool = ArrayPool<byte>.Create(maxMessageSize, maxRequests);
     }
 
     public async Task OpenAsync(CommonConfig commonConfig, CancellationToken token)
@@ -168,41 +173,87 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         return ReferenceEquals(this, obj) || obj is Broker other && Equals(other);
     }
 
-    private async Task ResponseReaderAction(PipeReader reader)
+    private async Task ResponseReaderAction()
     {
-        Task.Yield();
+        await Task.Yield();
 
         try
         {
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
-                var result = await reader.ReadAsync(_responseProcessingTokenSource.Token);
-                var buffer = result.Buffer;
-
-                var requestId = ReadInt32BigEndian(buffer.Slice(4, 4).FirstSpan);
-
-                if (buffer.IsSingleSegment)
+                if (!(_networkStream?.DataAvailable ?? false))
                 {
-                    _responsesTasks.TryAdd(
-                        requestId,
-                        ParseResponseAsSingleSegmentAsync(buffer.First, requestId, _responseProcessingTokenSource.Token));
+                    continue;
                 }
 
-                reader.AdvanceTo(buffer.End);
+                await _networkStream.ReadAsync(_size).ConfigureAwait(false);
+                var requestLength = ReadInt32BigEndian(_size.Span);
 
-                if (result.IsCompleted)
+                if (requestLength == 0) //Данных нет. выходим из цикла
                 {
-                    break;
+                    continue;
                 }
+
+                var bodyLen = requestLength - await _networkStream.ReadAsync(_size).ConfigureAwait(false);
+                var requestId = ReadInt32BigEndian(_size.Span);
+
+                Debug.WriteLine($"Get new message BrockerId {Id}, CorrelationId={requestId}, ResponseLength={requestLength}");
+
+                var buffer = _arrayPool.Rent(bodyLen);
+
+                await _networkStream.ReadAsync(buffer.AsMemory(0, bodyLen)).ConfigureAwait(false);
+
+                _responsesTasks.TryAdd(
+                    requestId,
+                    ParseResponseAsync(buffer, requestId, requestLength - 4, _responseProcessingTokenSource.Token));
             }
         }
-        finally
+        catch (Exception exc)
         {
-            await reader.CompleteAsync();
+            Console.WriteLine(exc.Message);
         }
     }
 
-    private async Task ParseResponseAsSingleSegmentAsync(ReadOnlyMemory<byte> memory, int requestId, CancellationToken cancellationToken)
+    //Вычитывает из канала длинну следующего сообщения без учета длинны запроса и id запроса
+    private static async Task<(int requestLength, int requestId)> ParseHeaderResponseAsync(PipeReader reader, CancellationToken token)
+    {
+        var requestLength = -1;
+        var requestId = -1;
+
+        while (!token.IsCancellationRequested)
+        {
+            var result = await reader.ReadAsync(token); //Читаем первый кусок данных
+            var buffer = result.Buffer;
+
+            if (buffer.IsEmpty)
+            {
+                break;
+            }
+
+            if (buffer.Length <= 8) //Если длинна буфера меньше 8 (размер 2х int'ов)
+            {
+                // То сообщаем что мы ничего не прочитали из канала и пробуем в цикле получить новый буфер с другой длинной.
+                // Текущие данные вернуться в новом буфере
+                reader.AdvanceTo(buffer.Start);
+
+                continue;
+            }
+
+            // у буфер подходящей длины, теперь мы можем читать из него необходимые данные 
+            buffer.FirstSpan
+                .ReadInt32(out requestLength)
+                .ReadInt32(out requestId);
+
+            // сообщаем что мы прочитали из буфера 8 байт, теперь следующее чтение из канала вернет буфер без учета прочитанных байт
+            reader.AdvanceTo(buffer.GetPosition(8));
+
+            break;
+        }
+
+        return (requestLength - 4, requestId); // Возвращаем длинну оставшейся части сообщения и id запроса
+    }
+
+    private async Task ParseResponseAsync(byte[] buffer, int requestId, int bodyLen, CancellationToken cancellationToken)
     {
         //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
         await Task.Yield();
@@ -220,8 +271,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
                 try
                 {
-                    responseInfo.ResponseMessage.DeserializeFromStream(memory[8..].Span); //в заголовке первые 8 байт служебные, они нам уже не нужны
-                    responseInfo.SetResult(responseInfo.ResponseMessage);
+                    var message = responseInfo.BuildResponseMessage(buffer.AsSpan(), bodyLen);
+                    responseInfo.SetResult(message);
                 }
                 catch (ProtocolKafkaException exc)
                 {
@@ -246,7 +297,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         {
             _responsesTasks.TryRemove(requestId, out _);
 
-            //_arrayPool.Return(buffer, true);
+            _arrayPool.Return(buffer);
         }
     }
 
@@ -262,6 +313,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         where TResponseMessage : KafkaResponseMessage, new()
         where TRequestMessage : KafkaContent
     {
+        _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
+
         using var _ = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, _requestId, Id);
 
         await ReEstablishConnectionAsync(token);
@@ -274,8 +327,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var responseMessage = new TResponseMessage();
-        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId, responseMessage);
+        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId);
 
         token.Register(
             state =>
@@ -288,18 +340,17 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         try
         {
-            await using (var stream = _streamManager.GetStream())
-            {
-                request.ToByteStream(stream);
-                var bufferForSend = stream.ToArray();
-                await _networkStream.WriteAsync(bufferForSend, token);
-                _manualResetEvent.Set();
-            }
-
             _tckPool.TryAdd(requestId, taskCompletionSource);
+
+            await using var stream = _streamManager.GetStream();
+
+            request.ToByteStream(stream);
+            var bufferForSend = stream.ToArray();
+            await _networkStream.WriteAsync(bufferForSend, token);
         }
         catch (Exception exc)
         {
+            _tckPool.TryRemove(requestId, out var _); //Если не удалось отправить запрос, то удаляем сообщение 
             taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалость отправить запрос", exc));
         }
 
@@ -330,7 +381,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             {
                 await _socket.ConnectAsync(EndPoint);
                 _networkStream = new NetworkStream(_socket);
-                _receivedDataFromSocketTask = _networkStream.CopyToAsync(_pipe.Writer, cancellationToken);
+                _globalTimeWaiting.Start();
             }
         }
         catch (Exception exception)
@@ -370,18 +421,22 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private class ResponseTaskCompletionSource : TaskCompletionSource<KafkaResponseMessage>
     {
-        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version, int correlationId, KafkaResponseMessage responseMessage)
+        private readonly int _correlationId;
+
+        private readonly ApiKeys _apiKey;
+
+        private readonly ApiVersions _version;
+
+        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version, int correlationId)
         {
-            ApiKey = apiKey;
-            CorrelationId = correlationId;
-            ResponseMessage = responseMessage;
-            responseMessage.Version = version;
+            _apiKey = apiKey;
+            _correlationId = correlationId;
+            _version = version;
         }
 
-        private int CorrelationId { get; }
-
-        public KafkaResponseMessage ResponseMessage { get; }
-
-        private ApiKeys ApiKey { get; }
+        internal KafkaResponseMessage BuildResponseMessage(ReadOnlySpan<byte> span, int bodyLen)
+        {
+            return DefaultResponseBuilder.Create(_apiKey, _version, bodyLen, span);
+        }
     }
 }

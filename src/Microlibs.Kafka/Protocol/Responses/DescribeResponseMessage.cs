@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Pipelines;
 
 namespace Microlibs.Kafka.Protocol.Responses;
 
@@ -17,7 +18,7 @@ public class DescribeResponseMessage : KafkaResponseMessage
 
     public int ClusterAuthorizedOperations { get; init; }
 
-    public override void DeserializeFromStream(ReadOnlySpan<byte> span)
+    public override void DeserializeFromStream(PipeReader reader)
     {
 
     }

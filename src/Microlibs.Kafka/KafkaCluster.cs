@@ -123,7 +123,7 @@ public sealed class KafkaCluster : IKafkaCluster
     ///     Обновляет метаданные по указанным топикам
     /// </summary>
     /// <param name="topics">Список топиков, по которым необходимо получить информацию из брокеров</param>
-    public async Task RefreshMetadataAsync(CancellationToken token, params string[] topics)
+    public async Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token, params string[] topics)
     {
         ThrowIfClusterClosed();
 
@@ -134,7 +134,11 @@ public sealed class KafkaCluster : IKafkaCluster
             AllowAutoTopicCreation = true,
         };
 
-        var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
+        var message = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
+        
+        //Console.WriteLine($"Message {message.ClusterId ?? "none"}");
+        
+        return message;
     }
 
     public void Dispose()

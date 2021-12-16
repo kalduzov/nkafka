@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer;
 using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Protocol.Connection;
+using Microlibs.Kafka.Protocol.Responses;
 
 namespace Microlibs.Kafka;
 
@@ -63,5 +64,5 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     ///     Обновляет метаданные по указанным топикам
     /// </summary>
     /// <param name="topics">Список топиков, по которым необходимо получить информацию из брокеров</param>
-    Task RefreshMetadataAsync(CancellationToken token, params string[] topics);
+    Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token, params string[] topics);
 }

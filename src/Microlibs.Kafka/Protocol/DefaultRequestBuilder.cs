@@ -35,4 +35,8 @@ internal class DefaultRequestBuilder : IRequestBuilder
     //
     //     return new KafkaRequestMessage(header, message);
     // }
+    public KafkaRequestMessage Create(ApiKeys apiKey, ApiVersions version)
+    {
+        return null;
+    }
 }

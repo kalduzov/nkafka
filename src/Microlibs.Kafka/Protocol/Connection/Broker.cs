@@ -436,7 +436,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         internal KafkaResponseMessage BuildResponseMessage(ReadOnlySpan<byte> span, int bodyLen)
         {
-            return DefaultResponseBuilder.Create(_apiKey, _version, bodyLen, span);
+            return DefaultResponseBuilder.Build(_apiKey, _version, bodyLen, span);
         }
     }
 }

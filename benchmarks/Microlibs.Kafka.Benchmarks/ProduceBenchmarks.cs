@@ -1,7 +1,9 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Microlibs.Kafka.Clients.Producer;
 using Microlibs.Kafka.Config;
+using Microlibs.Kafka.Protocol.Responses;
 using Microsoft.Extensions.Logging.Abstractions;
 using ConfluentKafka = Confluent.Kafka;
 
@@ -9,22 +11,22 @@ namespace Microlibs.Kafka.Benchmarks;
 
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net50)]
+[SimpleJob(RuntimeMoniker.Net60)]
 public class ProduceBenchmarks
 {
-    private ConfluentKafka.IProducer<ConfluentKafka.Null, int> _confluentProducer;
-    private IProducer<Null, int> _newProducer;
+    private ConfluentKafka.IAdminClient _adminClient;
+    private IKafkaCluster _cluster;
 
     [GlobalSetup]
     public void GlobalSetup()
     {
-        var confluentProducerBuilder = new ConfluentKafka.ProducerBuilder<ConfluentKafka.Null, int>(
-            new ConfluentKafka.ProducerConfig
+        var adminClientBuilder = new ConfluentKafka.AdminClientBuilder(
+            new ConfluentKafka.AdminClientConfig
             {
-                BootstrapServers = "localhost:9092",
-                EnableDeliveryReports = false
+                BootstrapServers = "localhost:9091",
             });
 
-        _confluentProducer = confluentProducerBuilder.Build();
+        _adminClient = adminClientBuilder.Build();
 
         var clusterConfig = new ClusterConfig
         {
@@ -34,39 +36,21 @@ public class ProduceBenchmarks
             }
         };
 
-        var cluster = clusterConfig
+        _cluster = clusterConfig
             .CreateNewClusterAsync(NullLoggerFactory.Instance)
             .GetAwaiter()
             .GetResult();
+    }
 
-        _newProducer = cluster.BuildProducer<Null, int>();
+    [Benchmark(Baseline = true)]
+    public ConfluentKafka.Metadata ConfluentKafkaGetMetadata()
+    {
+        return _adminClient.GetMetadata("test", TimeSpan.FromSeconds(10));
     }
 
     [Benchmark]
-    public void ConfluentKafkaProduce()
+    public Task<MetadataResponseMessage> NewKafkaGetMetadata()
     {
-        // foreach (var val in Enumerable.Range(1, 5))
-        // {
-        var message = new ConfluentKafka.Message<ConfluentKafka.Null, int>
-        {
-            Value = 1
-        };
-        _confluentProducer.Produce("test1", message);
-
-        //}
-    }
-
-    [Benchmark]
-    public void NewProduce()
-    {
-        // foreach (var val in Enumerable.Range(1, 5))
-        // {
-        var message = new Message<Null, int>
-        {
-            Value = 1
-        };
-        _newProducer.Produce("test1", message);
-
-        //}
+        return _cluster.RefreshMetadataAsync(default, "test");
     }
 }

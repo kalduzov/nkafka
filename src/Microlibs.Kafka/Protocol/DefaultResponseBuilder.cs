@@ -5,7 +5,7 @@ namespace Microlibs.Kafka.Protocol
 {
     internal static partial class DefaultResponseBuilder
     {
-        public static KafkaResponseMessage Create(ApiKeys apiKey, ApiVersions apiVersion, int responseLength, ReadOnlySpan<byte> span)
+        public static KafkaResponseMessage Build(ApiKeys apiKey, ApiVersions apiVersion, int responseLength, ReadOnlySpan<byte> span)
         {
             return apiKey switch
             {
@@ -15,6 +15,9 @@ namespace Microlibs.Kafka.Protocol
 
         private static KafkaResponseMessage BuildMetadataResponse(ReadOnlySpan<byte> span, ApiVersions apiVersion, int responseLength)
         {
+            var reader = new SpanReader(span);
+            var x = reader.ReadInt();
+            var y = reader.ReadInt();
             return new MetadataResponseMessage();
         }
 

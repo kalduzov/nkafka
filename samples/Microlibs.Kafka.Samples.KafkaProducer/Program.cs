@@ -18,16 +18,11 @@ var clusterConfig = new ClusterConfig
 
 await using var kafkaCluster = await clusterConfig.CreateNewClusterAsync();
 
-var tasks = Enumerable.Range(0, 10000)
-    .Select(
-        i =>
-        {
-            //Console.WriteLine($"Ok {i}");
-
-            return kafkaCluster.RefreshMetadataAsync(default, "test");
-        });
-
-await Task.WhenAll(tasks);
+// var tasks = Enumerable.Range(0, 10000)
+//     .Select(
+//         i => kafkaCluster.RefreshMetadataAsync(default, "test"));
+//
+// await Task.WhenAll(tasks);
 
 // await using var producer = kafkaCluster.BuildProducer<Null, int>();
 //

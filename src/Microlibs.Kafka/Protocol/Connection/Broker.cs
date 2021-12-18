@@ -81,14 +81,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         _processData = ResponseReaderAction();
 
-        // _responsesReaderTask = Task.Factory.StartNew(
-        //     ResponseReaderAction,
-        //     _responseProcessingTokenSource.Token,
-        //     TaskCreationOptions.LongRunning,
-        //     TaskScheduler.Default);
-
-        //_cleanerTimer = new Timer(_ => ClearingBugWithResponses(), null, 0, 1000);
-
         //todo конфигурировать через опции клиента
         var maxMessageSize = 84000;
         var maxRequests = 10;
@@ -179,10 +171,12 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         try
         {
+            var sw = new SpinWait();
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
                 if (!(_networkStream?.DataAvailable ?? false))
                 {
+                    sw.SpinOnce();
                     continue;
                 }
 
@@ -210,7 +204,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
         catch (Exception exc)
         {
-            Console.WriteLine(exc.Message);
+            Debug.WriteLine(exc.Message);
         }
     }
 
@@ -290,7 +284,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             }
             else
             {
-                Console.WriteLine($"Не удалось получить данные по запросу {requestId}");
+                Debug.WriteLine($"Не удалось получить данные по запросу {requestId}");
             }
         }
         finally
@@ -327,7 +321,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion, requestId);
+        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion);
 
         token.Register(
             state =>
@@ -386,7 +380,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception.Message);
+            Debug.WriteLine(exception.Message);
         }
     }
 
@@ -421,16 +415,13 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private class ResponseTaskCompletionSource : TaskCompletionSource<KafkaResponseMessage>
     {
-        private readonly int _correlationId;
-
         private readonly ApiKeys _apiKey;
 
         private readonly ApiVersions _version;
 
-        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version, int correlationId)
+        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version)
         {
             _apiKey = apiKey;
-            _correlationId = correlationId;
             _version = version;
         }
 

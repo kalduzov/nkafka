@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer;
@@ -135,9 +136,9 @@ public sealed class KafkaCluster : IKafkaCluster
         };
 
         var message = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
-        
-        //Console.WriteLine($"Message {message.ClusterId ?? "none"}");
-        
+
+        Debug.WriteLine($"Message {message.ClusterId ?? "none"}");
+
         return message;
     }
 

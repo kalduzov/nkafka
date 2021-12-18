@@ -84,7 +84,7 @@ internal sealed class BrokerConnectionPool : IDisposable, IAsyncDisposable
 
     public IReadOnlyCollection<IBroker> GetBrokers()
     {
-        return null;
+        return _connections;
     }
 
     /// <summary>

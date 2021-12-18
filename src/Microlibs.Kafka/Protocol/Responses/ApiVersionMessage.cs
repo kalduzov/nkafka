@@ -5,13 +5,10 @@ using System.IO.Pipelines;
 
 namespace Microlibs.Kafka.Protocol.Responses;
 
-public class ApiVersionMessage : KafkaResponseMessage
+public record ApiVersionMessage : KafkaResponseMessage
 {
     public IReadOnlyCollection<ApiVersion> ApiVersions { get; internal set; }
 
     public int ThrottleTimeMs { get; internal set; }
 
-    public override void DeserializeFromStream(PipeReader reader)
-    {
-    }
 }

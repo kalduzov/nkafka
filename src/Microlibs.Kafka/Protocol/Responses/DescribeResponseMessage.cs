@@ -4,7 +4,7 @@ using System.IO.Pipelines;
 
 namespace Microlibs.Kafka.Protocol.Responses;
 
-public class DescribeResponseMessage : KafkaResponseMessage
+public record DescribeResponseMessage : KafkaResponseMessage
 {
     public DescribeResponseMessage()
     {
@@ -17,9 +17,4 @@ public class DescribeResponseMessage : KafkaResponseMessage
     public int ControllerId { get; init; }
 
     public int ClusterAuthorizedOperations { get; init; }
-
-    public override void DeserializeFromStream(PipeReader reader)
-    {
-
-    }
 }

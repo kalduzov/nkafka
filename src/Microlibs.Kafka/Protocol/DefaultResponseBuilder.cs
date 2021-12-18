@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microlibs.Kafka.Protocol.Responses;
 
 namespace Microlibs.Kafka.Protocol
@@ -15,95 +16,189 @@ namespace Microlibs.Kafka.Protocol
 
         private static KafkaResponseMessage BuildMetadataResponse(ReadOnlySpan<byte> span, ApiVersions apiVersion, int responseLength)
         {
-            var reader = new SpanReader(span);
-            var x = reader.ReadInt();
-            var y = reader.ReadInt();
-            return new MetadataResponseMessage();
+            var reader = new KafkaBufferReader(span);
+
+            var throttleTimeMs = apiVersion switch
+            {
+                >= ApiVersions.Version3 => reader.ReadInt(),
+                _ => -1
+            };
+
+            var brokers = DeserializeBrokers(ref reader);
+
+            var clusterId = apiVersion switch
+            {
+                >= ApiVersions.Version2 => ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                _ => null,
+            };
+
+            var controllerId = apiVersion switch
+            {
+                >= ApiVersions.Version1 => reader.ReadInt(),
+                _ => -1
+            };
+
+            var topics = DeserializeTopics(ref reader);
+
+            var clusterAuthorizedOperations = apiVersion switch
+            {
+                >= ApiVersions.Version8 and <= ApiVersions.Version10 => reader.ReadInt(),
+                _ => -2147483648
+            };
+
+            var _ = apiVersion switch
+            {
+                >= ApiVersions.Version9 => reader.ReadEmptyTaggedFieldArray(),
+                _ => -1
+            };
+
+            return new MetadataResponseMessage
+            {
+                ThrottleTimeMs = throttleTimeMs,
+                Brokers = brokers,
+                Version = apiVersion,
+                ClusterId = clusterId,
+                ControllerId = controllerId,
+                Topics = topics,
+                ClusterAuthorizedOperations = clusterAuthorizedOperations
+            };
+
+            IReadOnlyCollection<BrokerInfo> DeserializeBrokers(ref KafkaBufferReader reader)
+            {
+                var brokersCount = apiVersion switch
+                {
+                    >= ApiVersions.Version9 => reader.ReadCompactArrayLength(),
+                    _ => reader.ReadInt()
+                };
+
+                var deserializeBrokers = new List<BrokerInfo>(brokersCount);
+
+                for (var i = 0; i < brokersCount; i++)
+                {
+                    var id = reader.ReadInt();
+                    var host = ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9);
+                    var port = reader.ReadInt();
+                    var rack = apiVersion switch
+                    {
+                        >= ApiVersions.Version3 => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                        _ => null!
+                    };
+
+                    var brokerInfo = new BrokerInfo(id, host, port, rack);
+                    deserializeBrokers.Add(brokerInfo);
+                }
+
+                return deserializeBrokers;
+            }
+
+            IReadOnlyCollection<TopicInfo> DeserializeTopics(ref KafkaBufferReader reader)
+            {
+                var topicsCount = apiVersion switch
+                {
+                    >= ApiVersions.Version9 => reader.ReadCompactArrayLength(),
+                    _ => reader.ReadInt()
+                };
+
+                var deserializeTopics = new List<TopicInfo>(topicsCount);
+
+                for (var i = 0; i < topicsCount; i++)
+                {
+                    var errorCode = reader.ReadShort();
+                    var name = apiVersion switch
+                    {
+                        >= ApiVersions.Version12 => ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                        _ => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9)
+                    };
+
+                    var topicId = Guid.Empty;
+
+                    // var topicId = Guid.Parse(
+                    //     apiVersion switch
+                    //     {
+                    //         >= ApiVersions.Version10 => localReader.readb
+                    //     });
+
+                    var isInternal = apiVersion switch
+                    {
+                        >= ApiVersions.Version1 => reader.ReadBoolean(),
+                        _ => false
+                    };
+
+                    var partitions = DeserializePartitions(ref reader);
+
+                    var topicAuthorizedOperations = apiVersion switch
+                    {
+                        >= ApiVersions.Version8 => reader.ReadInt(),
+                        _ => -2147483648
+                    };
+
+                    var topic = new TopicInfo((StatusCodes)errorCode, name, isInternal, topicAuthorizedOperations, partitions, topicId);
+                    deserializeTopics.Add(topic);
+                }
+
+                return deserializeTopics;
+
+                IReadOnlyCollection<PartitionInfo> DeserializePartitions(ref KafkaBufferReader reader)
+                {
+                    var partitionsCount = apiVersion switch
+                    {
+                        >= ApiVersions.Version9 => reader.ReadCompactArrayLength(),
+                        _ => reader.ReadInt()
+                    };
+                    var partitions = new List<PartitionInfo>(partitionsCount);
+
+                    for (var i = 0; i < partitionsCount; i++)
+                    {
+                        var errorCode = reader.ReadShort();
+                        var partitionIndex = reader.ReadInt();
+                        var leaderId = reader.ReadInt();
+                        var leaderEpoch = apiVersion switch
+                        {
+                            >= ApiVersions.Version7 => reader.ReadInt(),
+                            _ => -1
+                        };
+
+                        var replicaNodes = apiVersion switch
+                        {
+                            >= ApiVersions.Version9 => reader.ReadCompactIntArray(),
+                            _ => reader.ReadIntArray(),
+                        };
+                        var isrNodes = apiVersion switch
+                        {
+                            >= ApiVersions.Version9 => reader.ReadCompactIntArray(),
+                            _ => reader.ReadIntArray(),
+                        };
+                        var offlineReplicas = apiVersion switch
+                        {
+                            >= ApiVersions.Version5 and <= ApiVersions.Version8 => reader.ReadIntArray(),
+                            >= ApiVersions.Version9 => reader.ReadCompactIntArray(),
+                            _ => null
+                        };
+                        var partition = new PartitionInfo(
+                            (StatusCodes)errorCode,
+                            partitionIndex,
+                            leaderId,
+                            leaderEpoch,
+                            replicaNodes,
+                            isrNodes,
+                            offlineReplicas);
+
+                        partitions.Add(partition);
+                    }
+
+                    return partitions;
+                }
+            }
         }
 
-        // private static ResponseMessage BuildDescribeClusterResponse(Memory<byte> memory, int responseLength)
-        // {
-        //     var trottleTimeMs = memory[..4].ToInt32();
-        //
-        //     var errorCode = memory.Slice(3,2).ToInt16();
-        //
-        //     if (errorCode != (short)StatusCodes.None)
-        //     {
-        //         throw new ArgumentException("Ошибка получения запроса");
-        //     }
-        //
-        //     var errorMessageLen = memory.Slice(5,2).ToInt16();
-        //
-        //     if (errorMessageLen != 0)
-        //     {
-        //         //var errorMessage = 
-        //     }
-        //
-        //     var clusterId = "";//memory.ReadCompactString();
-        //     var controllerId = 1;// memory.ReadInt32().Swap();
-        //
-        //     // var arrayLen = memory.ReadByte();
-        //     //
-        //     // if (arrayLen > 1)
-        //     // {
-        //     //     for (var i = 0; i < arrayLen - 1; i++)
-        //     //     {
-        //     //         var brokerId = memory.ReadInt32().Swap();
-        //     //         var host = memory.ReadCompactString();
-        //     //         var port = memory.ReadInt32().Swap();
-        //     //         var rack = memory.ReadCompactNullableString();
-        //     //     }
-        //     // }
-        //
-        //     var clusterAuthorizedOperations = 1;// memory.ReadInt32().Swap();
-        //
-        //     return new DescribeResponseMessage(trottleTimeMs, clusterId, controllerId, clusterAuthorizedOperations);
-        // }
+        private static string ReadStringByVersion(ref KafkaBufferReader reader, ApiVersions currentVersion, ApiVersions flexibleVersion)
+        {
+            return currentVersion < flexibleVersion ? reader.ReadString() : reader.ReadCompactString();
+        }
 
-        // private static ApiVersionMessage BuildApiVersionResponse(Memory<byte> memory, int responseLength)
-        // {
-        //     var errorCode = memory.ReadInt16().Swap();
-        //
-        //     if (errorCode != (short)ErrorCodes.None)
-        //     {
-        //         throw new ArgumentException("Ошибка получения запроса");
-        //     }
-        //
-        //     var lenArray = memory.ReadInt32().Swap();
-        //
-        //     var list = new List<ApiVersion>(lenArray);
-        //
-        //     for (var i = 0; i < lenArray; i++)
-        //     {
-        //         var apiKey = memory.ReadInt16().Swap();
-        //         var minVersion = memory.ReadInt16().Swap();
-        //         var maxVersion = memory.ReadInt16().Swap();
-        //
-        //         list.Add(new ApiVersion(apiKey, minVersion, maxVersion));
-        //     }
-        //
-        //     var message = new ApiVersionMessage
-        //     {
-        //         ApiVersions = list
-        //     };
-        //
-        //     //ver 1 and ver 2
-        //     if (memory.BaseStream.Position < responseLength - 1)
-        //     {
-        //         var throttleTimeMs = memory.ReadInt32().Swap();
-        //
-        //         message = message with
-        //         {
-        //             ThrottleTimeMs = throttleTimeMs
-        //         };
-        //
-        //         //ver 3
-        //         if (memory.BaseStream.Position < responseLength - 1)
-        //         {
-        //         }
-        //     }
-        //
-        //     return message;
-        // }
+        private static string? ReadNullableStringByVersion(ref KafkaBufferReader reader, ApiVersions currentVersion, ApiVersions flexibleVersion)
+        {
+            return currentVersion < flexibleVersion ? reader.ReadNullableString() : reader.ReadCompactNullableString();
+        }
     }
 }

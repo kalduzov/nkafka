@@ -7,7 +7,7 @@ public record TopicInfo
 {
     public TopicInfo(
         StatusCodes code,
-        string name,
+        string? name,
         bool isInternal,
         int topicAuthorizedOperations,
         IReadOnlyCollection<PartitionInfo> partitions,

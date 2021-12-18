@@ -20,7 +20,7 @@ public class SpanReaderTests
             testValue
         };
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadByte();
 
@@ -35,7 +35,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadInt();
 
@@ -50,7 +50,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadUInt();
 
@@ -65,7 +65,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadShort();
 
@@ -80,7 +80,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadUShort();
 
@@ -95,7 +95,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadLong();
 
@@ -110,7 +110,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadULong();
 
@@ -125,7 +125,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadDouble();
 
@@ -140,7 +140,7 @@ public class SpanReaderTests
         var data = BitConverter.GetBytes(testValue);
         Array.Reverse(data); //big endian required
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadBoolean();
 
@@ -155,11 +155,65 @@ public class SpanReaderTests
             0x05
         };
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         var value = reader.ReadBoolean();
 
         value.Should().Be(true);
+    }
+
+    [Theory(DisplayName = "Read unsigned varlong from simple buffer test ")]
+    [InlineData(0, 0)]
+    [InlineData(1, 1)]
+    [InlineData(2, 2)]
+    [InlineData(10, 10)]
+    [InlineData(27, 27)]
+    [InlineData(64, 64)]
+    [InlineData(127, 127)]
+    [InlineData(0b1010_1100_0000_0010, 300)]
+    public void ReadUnsignedVarLong_FromSimpleBuffer_Successful(ulong variant, ulong testValue)
+    {
+        var data = BitConverter.GetBytes(variant);
+        var variantBuffer = GetVariantBuffer(data);
+        var reader = new KafkaBufferReader(variantBuffer);
+
+        var value = reader.ReadUnsignedVarLong();
+
+        value.Should().Be(testValue);
+    }
+    
+    [Theory(DisplayName = "Read varlong from simple buffer test ")]
+    [InlineData(0, 0)]
+    [InlineData(1, -1)]
+    [InlineData(2, 1)]
+    [InlineData(3, -2)]
+    public void ReadVarLong_FromSimpleBuffer_Successful(long variant, long testValue)
+    {
+        var data = BitConverter.GetBytes(variant);
+        var variantBuffer = GetVariantBuffer(data);
+        var reader = new KafkaBufferReader(variantBuffer);
+
+        var value = reader.ReadVarLong();
+
+        value.Should().Be(testValue);
+    }
+
+    private static byte[] GetVariantBuffer(byte[] data)
+    {
+        Array.Reverse(data);
+
+        for (var i = 0; i < data.Length; i++)
+        {
+            if (data[i] != 0)
+            {
+                return data[i..];
+            }
+        }
+
+        return new byte[]
+        {
+            0
+        };
     }
 
     #endregion
@@ -175,7 +229,7 @@ public class SpanReaderTests
 
         //var data = new byte[] {0x01}; //data for check code the test :)
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         try
         {
@@ -202,7 +256,7 @@ public class SpanReaderTests
 
         //var data = new byte[4]; //data for check code the test :)
 
-        var reader = new SpanReader(data);
+        var reader = new KafkaBufferReader(data);
 
         try
         {

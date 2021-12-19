@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="GenerateMessages">
 
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -9,9 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Common" />
         <Folder Include="Compressions" />
-        <Folder Include="Internal" />
+        <Folder Include="Protocol\Records" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,5 +29,11 @@
             <DependentUpon>Producer.cs</DependentUpon>
         </Compile>
     </ItemGroup>
+
+    <UsingTask TaskName="Microlibs.Kafka.BuildTasks.MessagesGeneratorTask" AssemblyFile="..\Microlibs.Kafka.BuildTasks\bin\debug\netstandard2.0\Microlibs.Kafka.BuildTasks.dll" />
+
+    <Target Name="GenerateMessages">
+<!--        <MessagesGeneratorTask SolutionDirectory="$(SolutionDir)"/>-->
+    </Target>
 
 </Project>

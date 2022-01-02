@@ -21,18 +21,44 @@
  * limitations under the License.
  */
 using System;
+using System.IO;
+using Microlibs.Kafka.Protocol.Requests;
 
-namespace Microlibs.Kafka.Exceptions;
+namespace Microlibs.Kafka.Protocol;
 
-public class KafkaConfigException : KafkaException
+public abstract class RequestBody : IDisposable
 {
-    public KafkaConfigException(string message)
-        : base(message)
+    internal static readonly RequestBody EmptyBody = new EmptyRequestBody();
+
+    private bool _disposed;
+
+    public int Length { get; protected init; }
+
+    public ApiKeys ApiKey { get; protected init; }
+
+    public ApiVersions Version { get; set; }
+
+    public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
+    public abstract void SerializeToStream(Stream stream);
+
+    protected virtual void Dispose(bool disposing)
     {
+        if (disposing && !_disposed)
+        {
+            _disposed = true;
+        }
+    }
+
+    protected void CheckDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().ToString());
+        }
     }
 }

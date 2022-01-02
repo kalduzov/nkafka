@@ -1,9 +1,31 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 using System;
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO.Pipelines;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -33,7 +55,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     public IReadOnlyCollection<string> Topics { get; }
 
-    private CommonConfig _commonConfig;
+    private CommonConfig _config;
     private Task _receivedDataFromSocketTask;
     private readonly Task _processData;
 
@@ -90,17 +112,53 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     public async Task OpenAsync(CommonConfig commonConfig, CancellationToken token)
     {
-        _commonConfig = commonConfig;
+        
+        _config = commonConfig;
 
         // var request = new Api
         // await SendAsync<>()
     }
 
     /// <summary>
+    /// Закрывает соединение с токеном
+    /// </summary>
+    public void Close()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _responseProcessingTokenSource.Cancel();
+
+        // Ждем когда остановится обработка потока данных из сокета
+        Task.WaitAll(
+            new[]
+            {
+                _receivedDataFromSocketTask,
+                _processData
+            },
+            _config.CloseBrokerTimeoutMs);
+
+        foreach (var value in _tckPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
+        {
+            value.SetException(new ObjectDisposedException(nameof(Broker), "Соединение с брокером было уничтожено"));
+        }
+
+        _tckPool.Clear();
+        _responsesTasks.Clear();
+        _networkStream.Dispose();
+        _socket.Dispose();
+        _cleanerTimer.Dispose();
+
+        _disposed = true;
+    }
+
+    /// <summary>
     /// Отправка сообщений брокеру по типу fire and forget
     /// </summary>
     public void Send<TRequestMessage>(TRequestMessage message)
-        where TRequestMessage : KafkaContent
+        where TRequestMessage : RequestBody
     {
         CheckDisposed();
     }
@@ -110,7 +168,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     /// </summary>
     public Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
         where TResponseMessage : KafkaResponseMessage, new()
-        where TRequestMessage : KafkaContent
+        where TRequestMessage : RequestBody
     {
         return InternalSendAsync<TResponseMessage, TRequestMessage>(message, token);
     }
@@ -121,18 +179,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         GC.SuppressFinalize(this);
     }
 
-    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
-    /// <param name="other">An object to compare with this object.</param>
-    /// <returns>
-    ///     <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise,
-    ///     <see langword="false" />.
-    /// </returns>
-    /// <footer>
-    ///     <a href="https://docs.microsoft.com/en-us/dotnet/api/System.IEquatable-1.Equals?view=netstandard-2.1">
-    ///         `IEquatable.Equals`
-    ///         on docs.microsoft.com
-    ///     </a>
-    /// </footer>
     public bool Equals(Broker? other)
     {
         if (ReferenceEquals(null, other))
@@ -172,11 +218,13 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         try
         {
             var sw = new SpinWait();
+
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
                 if (!(_networkStream?.DataAvailable ?? false))
                 {
                     sw.SpinOnce();
+
                     continue;
                 }
 
@@ -206,45 +254,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         {
             Debug.WriteLine(exc.Message);
         }
-    }
-
-    //Вычитывает из канала длинну следующего сообщения без учета длинны запроса и id запроса
-    private static async Task<(int requestLength, int requestId)> ParseHeaderResponseAsync(PipeReader reader, CancellationToken token)
-    {
-        var requestLength = -1;
-        var requestId = -1;
-
-        while (!token.IsCancellationRequested)
-        {
-            var result = await reader.ReadAsync(token); //Читаем первый кусок данных
-            var buffer = result.Buffer;
-
-            if (buffer.IsEmpty)
-            {
-                break;
-            }
-
-            if (buffer.Length <= 8) //Если длинна буфера меньше 8 (размер 2х int'ов)
-            {
-                // То сообщаем что мы ничего не прочитали из канала и пробуем в цикле получить новый буфер с другой длинной.
-                // Текущие данные вернуться в новом буфере
-                reader.AdvanceTo(buffer.Start);
-
-                continue;
-            }
-
-            // у буфер подходящей длины, теперь мы можем читать из него необходимые данные 
-            buffer.FirstSpan
-                .ReadInt32(out requestLength)
-                .ReadInt32(out requestId);
-
-            // сообщаем что мы прочитали из буфера 8 байт, теперь следующее чтение из канала вернет буфер без учета прочитанных байт
-            reader.AdvanceTo(buffer.GetPosition(8));
-
-            break;
-        }
-
-        return (requestLength - 4, requestId); // Возвращаем длинну оставшейся части сообщения и id запроса
     }
 
     private async Task ParseResponseAsync(byte[] buffer, int requestId, int bodyLen, CancellationToken cancellationToken)
@@ -305,19 +314,17 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private async Task<TResponseMessage> InternalSendAsync<TResponseMessage, TRequestMessage>(TRequestMessage content, CancellationToken token)
         where TResponseMessage : KafkaResponseMessage, new()
-        where TRequestMessage : KafkaContent
+        where TRequestMessage : RequestBody
     {
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
 
         using var _ = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, _requestId, Id);
 
-        await ReEstablishConnectionAsync(token);
-
-        //await CheckApiVersion(request, token);
-
         var requestId = Interlocked.Increment(ref _requestId);
+        var request = new KafkaRequestMessage(new KafkaRequestHeader(content.ApiKey, content.Version, requestId, _config.ClientId), content);
+        await ThrowIfBrokerDontSupportApiVersion(request);
 
-        var request = new KafkaRequestMessage(new KafkaRequestHeader(content.ApiKey, content.Version, requestId, "test"), content);
+        await ReEstablishConnectionAsync(token);
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
@@ -349,6 +356,10 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
 
         return (TResponseMessage)await taskCompletionSource.Task;
+    }
+
+    private async Task ThrowIfBrokerDontSupportApiVersion(KafkaRequestMessage request)
+    {
     }
 
     // private async Task CheckApiVersion(KafkaRequest request, CancellationToken token)
@@ -386,31 +397,10 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     private void Dispose(bool disposing)
     {
-        if (_disposed)
-        {
-            return;
-        }
-
         if (disposing)
         {
-            _responseProcessingTokenSource.Cancel();
-
-            // Ждем когда остановится обработка потока данных из сокета
-            Task.WaitAll(_receivedDataFromSocketTask, _processData);
-
-            foreach (var value in _tckPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
-            {
-                value.SetException(new ObjectDisposedException(nameof(Broker), "Соединение с брокером было уничтожено"));
-            }
-
-            _tckPool.Clear();
-            _responsesTasks.Clear();
-            _networkStream.Dispose();
-            _socket.Dispose();
-            _cleanerTimer.Dispose();
+            Close();
         }
-
-        _disposed = true;
     }
 
     private class ResponseTaskCompletionSource : TaskCompletionSource<KafkaResponseMessage>

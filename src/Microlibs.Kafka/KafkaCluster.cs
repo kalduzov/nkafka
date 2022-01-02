@@ -1,4 +1,27 @@
-﻿using System;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -8,7 +31,7 @@ using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol;
 using Microlibs.Kafka.Protocol.Connection;
-using Microlibs.Kafka.Protocol.RequestsMessages;
+using Microlibs.Kafka.Protocol.Requests;
 using Microlibs.Kafka.Protocol.Responses;
 using Microsoft.Extensions.Logging;
 
@@ -20,20 +43,29 @@ namespace Microlibs.Kafka;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class KafkaCluster : IKafkaCluster
 {
-    private readonly BrokerConnectionPool _brokerConnectionPool;
+    private const string _DEFAULT_PRODUCER_NAME = "__DefaultProducer";
+
+    private readonly BrokerConnectionPool _brokersConnectionPool;
     private readonly Dictionary<string, IConsumer?> _consumers = new();
     private readonly object _lockObject = new();
     private readonly ILogger<KafkaCluster> _logger;
-
     private readonly ILoggerFactory _loggerFactory;
 
     //Минимально поддерживаемая версия api кафки 
-    private readonly Version _minSupportVersion = new(0, 10, 0, 0);
+    private readonly Version _minSupportVersion = new(1, 0, 0, 0);
     private readonly Dictionary<string, IProducer?> _producers = new();
     private readonly Timer _metadataUpdaterTimer;
     private volatile int _metadataUpdating;
     private string[] _topics;
 
+    /// <summary>
+    /// Идентификатор кластера
+    /// </summary>
+    public string ClusterId { get; }
+
+    /// <summary>
+    ///     Конфигурация кластера
+    /// </summary>
     public ClusterConfig Config { get; }
 
     /// <summary>
@@ -51,12 +83,12 @@ public sealed class KafkaCluster : IKafkaCluster
     /// <summary>
     ///     Информация о брокере, который является контроллером
     /// </summary>
-    public IBroker Controller => _brokerConnectionPool.GetController();
+    public IBroker Controller => _brokersConnectionPool.GetController();
 
     /// <summary>
     ///     Список всех брокеров кластера
     /// </summary>
-    public IReadOnlyCollection<IBroker> Brokers => _brokerConnectionPool.GetBrokers();
+    public IReadOnlyCollection<IBroker> Brokers => _brokersConnectionPool.GetBrokers();
 
     /// <summary>
     /// Создает новый класс описывающий конкретный кластер
@@ -67,7 +99,7 @@ public sealed class KafkaCluster : IKafkaCluster
         Config = config;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<KafkaCluster>();
-        _brokerConnectionPool = new BrokerConnectionPool(config);
+        _brokersConnectionPool = new BrokerConnectionPool(config);
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, null, Timeout.Infinite, Timeout.Infinite);
         _topics = Array.Empty<string>();
     }
@@ -77,29 +109,35 @@ public sealed class KafkaCluster : IKafkaCluster
     /// </summary>
     /// <param name="name"></param>
     /// <param name="producerConfig">Конфигурация продюсера</param>
-    /// <remarks>Библиотека </remarks>
-    public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string name, ProducerConfig? producerConfig = null)
+    public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string? name = null, ProducerConfig? producerConfig = null)
     {
         ThrowIfClusterClosed();
 
         lock (_lockObject)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = _DEFAULT_PRODUCER_NAME;
+            }
+
             if (_producers.TryGetValue(name, out var producer))
             {
-                return (IProducer<TKey, TValue>)producer!;
+                Debug.Assert(producer is not null);
+
+                return (IProducer<TKey, TValue>)producer;
             }
 
             producerConfig = producerConfig != null ? producerConfig.Merge(Config) : ProducerConfig.BaseFrom(Config);
 
             producer = new Producer<TKey, TValue>(
-                this,
-                name,
-                producerConfig,
-                null!,
-                null,
-                null!,
-                DateTime.Today.TimeOfDay,
-                _loggerFactory);
+                kafkaCluster: this,
+                name: name,
+                config: producerConfig,
+                keySerializer: null!,
+                valueSerializer: null,
+                interceptors: null!,
+                time: DateTime.Today.TimeOfDay,
+                loggerFactory: _loggerFactory);
 
             _producers.Add(name, producer);
 
@@ -128,7 +166,7 @@ public sealed class KafkaCluster : IKafkaCluster
     {
         ThrowIfClusterClosed();
 
-        var broker = _brokerConnectionPool.GetLeastLoadedBroker();
+        var broker = _brokersConnectionPool.GetLeastLoadedBroker();
 
         var request = new MetadataRequestMessage(ApiVersions.Version4, topics)
         {
@@ -145,7 +183,7 @@ public sealed class KafkaCluster : IKafkaCluster
     public void Dispose()
     {
         _metadataUpdaterTimer.Dispose();
-        _brokerConnectionPool.Dispose();
+        _brokersConnectionPool.Dispose();
     }
 
     /// <summary>
@@ -156,7 +194,7 @@ public sealed class KafkaCluster : IKafkaCluster
     public async ValueTask DisposeAsync()
     {
         await _metadataUpdaterTimer.DisposeAsync();
-        await _brokerConnectionPool.DisposeAsync();
+        await _brokersConnectionPool.DisposeAsync();
     }
 
     private async void UpdateMetadataCallback(object state)
@@ -183,7 +221,7 @@ public sealed class KafkaCluster : IKafkaCluster
 
     private async Task UpdateMetadata(CancellationToken token)
     {
-        var broker = _brokerConnectionPool.GetLeastLoadedBroker();
+        var broker = _brokersConnectionPool.GetLeastLoadedBroker();
 
         var request = new MetadataRequestMessage(ApiVersions.Version0, _topics)
         {
@@ -198,7 +236,7 @@ public sealed class KafkaCluster : IKafkaCluster
             var newBroker = new Broker(endpoint, nodeId, rack);
             var isController = response.ControllerId == nodeId;
 
-            var _ = await _brokerConnectionPool.TryAddBrokerAsync(newBroker, isController, false, token);
+            var _ = await _brokersConnectionPool.TryAddBrokerAsync(newBroker, isController, false, token);
         }
 
         // foreach (var VARIABLE in response.)

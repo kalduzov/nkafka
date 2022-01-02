@@ -1,4 +1,26 @@
-﻿using System;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -9,15 +31,11 @@ using Microlibs.Kafka.Exceptions;
 using Microlibs.Kafka.Protocol;
 using Microlibs.Kafka.Serialization;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Microlibs.Kafka.Clients.Producer;
 
 public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TValue>
 {
-    private const string _NETWORK_THREAD_PREFIX = "kafka-producer-thread";
-    private const string _DEFAULT_PRODUCER_NAME = "__DefaultProducer";
-
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Dictionary<Type, object> _defaultSerializers = new()
     {
@@ -51,32 +69,32 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     private ISerializer<TKey> _keySerializer;
     private ISerializer<TValue> _valueSerializer;
 
-    /// <summary>
-    ///     A producer is instantiated by providing a set of key-value pairs as configuration.
-    ///     Valid configuration strings are documented <see cref="http://must_be_link_to_docs" />
-    /// </summary>
-    /// <param name="config">The producer configs</param>
-    /// <param name="kafkaCluster"></param>
-    /// <param name="keySerializer">The serializer for key that implements <see cref="ISerializer{T}" /></param>
-    /// <param name="valueSerializer">The serializer for value that implements <see cref="ISerializer{T}" /></param>
-    /// ///
-    /// <remarks> After creating a <see cref="Producer" /> you must always use Dispose() it to avoid resource leaks</remarks>
-    public Producer(
-        KafkaCluster kafkaCluster,
-        ProducerConfig config,
-        ISerializer<TKey> keySerializer = null!,
-        ISerializer<TValue> valueSerializer = null!)
-        : this(
-            kafkaCluster,
-            _DEFAULT_PRODUCER_NAME,
-            config,
-            keySerializer,
-            valueSerializer,
-            null!,
-            DateTime.Today.TimeOfDay,
-            NullLoggerFactory.Instance)
-    {
-    }
+    // /// <summary>
+    // ///     A producer is instantiated by providing a set of key-value pairs as configuration.
+    // ///     Valid configuration strings are documented <see cref="http://must_be_link_to_docs" />
+    // /// </summary>
+    // /// <param name="config">The producer configs</param>
+    // /// <param name="kafkaCluster"></param>
+    // /// <param name="keySerializer">The serializer for key that implements <see cref="ISerializer{T}" /></param>
+    // /// <param name="valueSerializer">The serializer for value that implements <see cref="ISerializer{T}" /></param>
+    // /// ///
+    // /// <remarks> After creating a <see cref="Producer" /> you must always use Dispose() it to avoid resource leaks</remarks>
+    // public Producer(
+    //     KafkaCluster kafkaCluster,
+    //     ProducerConfig config,
+    //     ISerializer<TKey> keySerializer = null!,
+    //     ISerializer<TValue> valueSerializer = null!)
+    //     : this(
+    //         kafkaCluster,
+    //         _DEFAULT_PRODUCER_NAME,
+    //         config,
+    //         keySerializer,
+    //         valueSerializer,
+    //         null!,
+    //         DateTime.Today.TimeOfDay,
+    //         NullLoggerFactory.Instance)
+    // {
+    // }
 
     internal Producer(
         KafkaCluster kafkaCluster,

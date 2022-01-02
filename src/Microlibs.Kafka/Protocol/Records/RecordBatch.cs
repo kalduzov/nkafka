@@ -20,19 +20,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+namespace Microlibs.Kafka.Protocol.Records;
 
-namespace Microlibs.Kafka.Exceptions;
-
-public class KafkaConfigException : KafkaException
+public class RecordBatch
 {
-    public KafkaConfigException(string message)
-        : base(message)
-    {
-    }
-
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    
 }

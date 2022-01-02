@@ -20,19 +20,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+namespace Microlibs.Kafka.Protocol;
 
-namespace Microlibs.Kafka.Exceptions;
-
-public class KafkaConfigException : KafkaException
+public readonly struct KafkaRequestHeader
 {
-    public KafkaConfigException(string message)
-        : base(message)
+    public KafkaRequestHeader(ApiKeys apiKey, ApiVersions apiVersion, int correlationId, string clientId)
     {
+        ApiKey = apiKey;
+        ApiVersion = apiVersion;
+        CorrelationId = correlationId;
+        ClientId = clientId;
+
+        Length = 0x2 + 0x2 + 0x4 + 0x2 + ClientId.Length;
     }
 
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public readonly ApiKeys ApiKey;
+
+    public readonly ApiVersions ApiVersion;
+
+    public readonly int CorrelationId;
+
+    public readonly string ClientId;
+
+    public readonly int Length;
 }

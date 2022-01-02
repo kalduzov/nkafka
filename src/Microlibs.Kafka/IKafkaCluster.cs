@@ -1,4 +1,27 @@
-﻿using System;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +38,11 @@ namespace Microlibs.Kafka;
 public interface IKafkaCluster : IDisposable, IAsyncDisposable
 {
     /// <summary>
+    /// Идентификатор кластера
+    /// </summary>
+    string ClusterId { get; }
+    
+    /// <summary>
     ///     Конфигурация кластера
     /// </summary>
     ClusterConfig Config { get; }
@@ -22,7 +50,7 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     /// <summary>
     ///     Список топиков в кластере
     /// </summary>
-    /// <remarks>Возвращаются все топики, которые были запрошены для кластера</remarks>
+    /// <remarks>Возвращаются все топики, которые были запрошены или существуют в кластере</remarks>
     IReadOnlyCollection<string> Topics { get; }
 
     /// <summary>
@@ -50,7 +78,7 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     ///     Если продюсер с таким именем уже сушествует, то вернется его экземпляр. Если нет, то будет создан новый
     ///     продюсер
     /// </remarks>
-    IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string name, ProducerConfig? producerConfig = null);
+    IProducer<TKey, TValue> BuildProducer<TKey, TValue>(string? name = null, ProducerConfig? producerConfig = null);
 
     /// <summary>
     ///     Создает консьюмера связанного с текущим кластером
@@ -63,6 +91,7 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     /// <summary>
     ///     Обновляет метаданные по указанным топикам
     /// </summary>
+    /// <param name="token"></param>
     /// <param name="topics">Список топиков, по которым необходимо получить информацию из брокеров</param>
     Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token, params string[] topics);
 }

@@ -1,4 +1,4 @@
-﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 
@@ -21,18 +21,19 @@
  * limitations under the License.
  */
 using System;
+using System.IO;
 
-namespace Microlibs.Kafka.Exceptions;
+namespace Microlibs.Kafka.Protocol.Requests;
 
-public class KafkaConfigException : KafkaException
+internal class EmptyRequestBody : RequestBody
 {
-    public KafkaConfigException(string message)
-        : base(message)
+    public EmptyRequestBody()
     {
+        Length = 0x00;
     }
 
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
+    public override void SerializeToStream(Stream stream)
     {
+        stream.Write(Array.Empty<byte>());
     }
 }

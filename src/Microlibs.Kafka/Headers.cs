@@ -1,4 +1,26 @@
-﻿using System;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,7 +34,7 @@ namespace Microlibs.Kafka;
 /// </remarks>
 public class Headers : IEnumerable<IHeader>
 {
-    private readonly List<IHeader> headers = new();
+    private readonly List<IHeader> _headers = new();
 
     /// <summary>
     ///     Gets the header at the specified index
@@ -20,12 +42,12 @@ public class Headers : IEnumerable<IHeader>
     /// <param key="index">
     ///     The zero-based index of the element to get.
     /// </param>
-    public IHeader this[int index] => headers[index];
+    public IHeader this[int index] => _headers[index];
 
     /// <summary>
     ///     The number of headers in the collection.
     /// </summary>
-    public int Count => headers.Count;
+    public int Count => _headers.Count;
 
     /// <summary>
     ///     Returns an enumerator that iterates through the headers collection.
@@ -62,12 +84,12 @@ public class Headers : IEnumerable<IHeader>
     /// </param>
     public void Add(string key, byte[] val)
     {
-        if (key == null)
+        if (key is null)
         {
-            throw new ArgumentNullException("Kafka message header key cannot be null.");
+            throw new ArgumentNullException(nameof(key), "Kafka message header key cannot be null");
         }
 
-        headers.Add(new Header(key, val));
+        _headers.Add(new Header(key, val));
     }
 
     /// <summary>
@@ -78,7 +100,7 @@ public class Headers : IEnumerable<IHeader>
     /// </param>
     public void Add(Header header)
     {
-        headers.Add(header);
+        _headers.Add(header);
     }
 
     /// <summary>
@@ -120,17 +142,19 @@ public class Headers : IEnumerable<IHeader>
     /// </returns>
     public bool TryGetLastBytes(string key, out byte[] lastHeader)
     {
-        for (var i = headers.Count - 1; i >= 0; --i)
+        for (var i = _headers.Count - 1; i >= 0; --i)
         {
-            if (headers[i].Key == key)
+            if (_headers[i].Key != key)
             {
-                lastHeader = headers[i].GetValueBytes();
-
-                return true;
+                continue;
             }
+
+            lastHeader = _headers[i].GetValueBytes();
+
+            return true;
         }
 
-        lastHeader = default;
+        lastHeader = default!;
 
         return false;
     }
@@ -143,23 +167,23 @@ public class Headers : IEnumerable<IHeader>
     /// </param>
     public void Remove(string key)
     {
-        headers.RemoveAll(a => a.Key == key);
+        _headers.RemoveAll(a => a.Key == key);
     }
 
     internal class HeadersEnumerator : IEnumerator<IHeader>
     {
-        private readonly Headers headers;
+        private readonly Headers _headers;
 
-        private int location = -1;
+        private int _location = -1;
 
         public HeadersEnumerator(Headers headers)
         {
-            this.headers = headers;
+            this._headers = headers;
         }
 
         public object Current => ((IEnumerator<IHeader>)this).Current;
 
-        IHeader IEnumerator<IHeader>.Current => headers.headers[location];
+        IHeader IEnumerator<IHeader>.Current => _headers._headers[_location];
 
         public void Dispose()
         {
@@ -167,9 +191,9 @@ public class Headers : IEnumerable<IHeader>
 
         public bool MoveNext()
         {
-            location += 1;
+            _location += 1;
 
-            if (location >= headers.headers.Count)
+            if (_location >= _headers._headers.Count)
             {
                 return false;
             }
@@ -179,7 +203,7 @@ public class Headers : IEnumerable<IHeader>
 
         public void Reset()
         {
-            location = -1;
+            _location = -1;
         }
     }
 }

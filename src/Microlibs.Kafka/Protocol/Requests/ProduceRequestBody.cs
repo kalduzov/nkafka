@@ -20,19 +20,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+using System.IO;
 
-namespace Microlibs.Kafka.Exceptions;
+namespace Microlibs.Kafka.Protocol.Requests;
 
-public class KafkaConfigException : KafkaException
+internal class ProduceRequestBody : RequestBody
 {
-    public KafkaConfigException(string message)
-        : base(message)
-    {
-    }
-
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
+    public override void SerializeToStream(Stream stream)
     {
     }
 }

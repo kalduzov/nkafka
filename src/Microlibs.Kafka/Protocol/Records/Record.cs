@@ -20,19 +20,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System;
+namespace Microlibs.Kafka.Protocol.Records;
 
-namespace Microlibs.Kafka.Exceptions;
-
-public class KafkaConfigException : KafkaException
+public class Record
 {
-    public KafkaConfigException(string message)
-        : base(message)
-    {
-    }
+    public int Length { get; set; }
 
-    public KafkaConfigException(string message, Exception innerException)
-        : base(message, innerException)
-    {
-    }
+    public byte Attributes { get; set; }
+
+    public long TimestampDelta { get; set; }
+
+    public int OffsetDelta { get; set; }
+
+    public byte[]? Key { get; set; }
+
+    public byte[]? Value { get; set; }
+
+    public Headers Headers { get; set; }
 }

@@ -259,6 +259,11 @@ public sealed class KafkaCluster : IKafkaCluster
 
         Closed = false;
 
+        foreach (var broker in Brokers)
+        {
+            await broker.OpenAsync(Config, token);
+        }
+
         await UpdateMetadata(token);
     }
 

@@ -112,7 +112,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
     public async Task OpenAsync(CommonConfig commonConfig, CancellationToken token)
     {
-        
         _config = commonConfig;
 
         // var request = new Api
@@ -326,6 +325,11 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
         await ReEstablishConnectionAsync(token);
 
+        if (token.IsCancellationRequested)
+        {
+            return await Task.FromCanceled<TResponseMessage>(token);
+        }
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
         var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion);
@@ -351,8 +355,12 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         }
         catch (Exception exc)
         {
-            _tckPool.TryRemove(requestId, out var _); //Если не удалось отправить запрос, то удаляем сообщение 
-            taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалось отправить запрос", exc));
+            _tckPool.TryRemove(requestId, out var _); //Если не удалось отправить запрос, то удаляем сообщение
+
+            if (!taskCompletionSource.Task.IsCanceled || !taskCompletionSource.Task.IsCompleted)
+            {
+                taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалось отправить запрос", exc));
+            }
         }
 
         return (TResponseMessage)await taskCompletionSource.Task;
@@ -389,9 +397,15 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
                 _globalTimeWaiting.Start();
             }
         }
-        catch (Exception exception)
+        catch (SocketException exc)
         {
-            Debug.WriteLine(exception.Message);
+            Debug.WriteLine(exc.Message);
+
+            throw;
+        }
+        catch (Exception exc)
+        {
+            Debug.WriteLine(exc.Message);
         }
     }
 

@@ -11,7 +11,7 @@ var clusterConfig = new ClusterConfig
 {
     BootstrapServers = new[]
     {
-        "localhost:9091"
+        "localhost:29091"
     },
     ClusterInitTimeoutMs = 160000 //160сек для отладки
 };

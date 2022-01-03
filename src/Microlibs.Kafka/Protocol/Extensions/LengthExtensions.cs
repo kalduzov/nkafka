@@ -20,6 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 
 namespace Microlibs.Kafka.Protocol.Extensions;
@@ -36,7 +37,12 @@ internal static class LengthExtensions
         return len;
     }
 
-    private static byte GetVarIntLen(long number)
+    internal static byte GetVarIntLen(this int number)
+    {
+        return GetVarLongLen(number);
+    }
+
+    internal static byte GetVarLongLen(this long number)
     {
         byte len = number switch
         {

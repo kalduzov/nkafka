@@ -23,7 +23,7 @@ public class ProduceBenchmarks
         var adminClientBuilder = new ConfluentKafka.AdminClientBuilder(
             new ConfluentKafka.AdminClientConfig
             {
-                BootstrapServers = "localhost:9091",
+                BootstrapServers = "localhost:29091",
             });
 
         _adminClient = adminClientBuilder.Build();
@@ -32,7 +32,7 @@ public class ProduceBenchmarks
         {
             BootstrapServers = new[]
             {
-                "localhost:9092"
+                "localhost:29092"
             }
         };
 

@@ -40,7 +40,7 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     /// <summary>
     /// Идентификатор кластера
     /// </summary>
-    string ClusterId { get; }
+    string? ClusterId { get; }
     
     /// <summary>
     ///     Конфигурация кластера

@@ -99,7 +99,7 @@ internal sealed class BrokerConnectionPool : IDisposable, IAsyncDisposable
 
     public IBroker GetController()
     {
-        return null;
+        return _connections.First(x => x.IsController);
     }
 
     public IReadOnlyCollection<IBroker> GetBrokers()

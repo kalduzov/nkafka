@@ -51,7 +51,7 @@ public sealed class KafkaCluster : IKafkaCluster
     private readonly ILogger<KafkaCluster> _logger;
     private readonly ILoggerFactory _loggerFactory;
 
-    //Минимально поддерживаемая версия api кафки 
+    //Минимально поддерживаемая версия кафки 
     private readonly Version _minSupportVersion = new(1, 0, 0, 0);
     private readonly Dictionary<string, IProducer?> _producers = new();
     private readonly Timer _metadataUpdaterTimer;
@@ -61,7 +61,7 @@ public sealed class KafkaCluster : IKafkaCluster
     /// <summary>
     /// Идентификатор кластера
     /// </summary>
-    public string ClusterId { get; }
+    public string? ClusterId { get; private set; }
 
     /// <summary>
     ///     Конфигурация кластера
@@ -238,6 +238,8 @@ public sealed class KafkaCluster : IKafkaCluster
 
             var _ = await _brokersConnectionPool.TryAddBrokerAsync(newBroker, isController, false, token);
         }
+
+        ClusterId = response.ClusterId;
 
         // foreach (var VARIABLE in response.)
         // {

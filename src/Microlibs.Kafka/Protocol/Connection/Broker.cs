@@ -32,7 +32,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Exceptions;
-using Microlibs.Kafka.Protocol.Extensions;
 using Microsoft.IO;
 using static System.Buffers.Binary.BinaryPrimitives;
 
@@ -352,7 +351,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         catch (Exception exc)
         {
             _tckPool.TryRemove(requestId, out var _); //Если не удалось отправить запрос, то удаляем сообщение 
-            taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалость отправить запрос", exc));
+            taskCompletionSource.SetException(new ProtocolKafkaException(StatusCodes.UnknownServerError, "Не удалось отправить запрос", exc));
         }
 
         return (TResponseMessage)await taskCompletionSource.Task;

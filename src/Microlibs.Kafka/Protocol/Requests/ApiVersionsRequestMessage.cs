@@ -20,7 +20,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System.IO;
+using System.Text;
+using Microlibs.Kafka.Protocol.Extensions;
 
 namespace Microlibs.Kafka.Protocol.Requests;
 
@@ -42,13 +45,24 @@ public class ApiVersionsRequestMessage : RequestBody
     private int CalculateLen()
     {
         var len = 0;
-        
-        //ClientSoftwareName.AsNullableString()
+
+        if (Version >= ApiVersions.Version3)
+        {
+            var clientSoftwareNameLen = Encoding.UTF8.GetByteCount(ClientSoftwareName);
+            len += clientSoftwareNameLen.GetVarIntLen() + clientSoftwareNameLen;
+            var clientSoftwareVersionLen = Encoding.UTF8.GetByteCount(ClientSoftwareVersion);
+            len += clientSoftwareVersionLen.GetVarIntLen() + clientSoftwareVersionLen;
+            len += 1; //empty tagged fields
+        }
+
         return len;
     }
 
     public override void SerializeToStream(Stream stream)
     {
-
+        if (Version >= ApiVersions.Version3)
+        {
+            
+        }
     }
 }

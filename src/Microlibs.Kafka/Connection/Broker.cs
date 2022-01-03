@@ -32,10 +32,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Config;
 using Microlibs.Kafka.Exceptions;
+using Microlibs.Kafka.Protocol;
 using Microsoft.IO;
 using static System.Buffers.Binary.BinaryPrimitives;
 
-namespace Microlibs.Kafka.Protocol.Connection;
+namespace Microlibs.Kafka.Connection;
 
 /// <summary>
 /// </summary>

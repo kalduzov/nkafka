@@ -27,8 +27,9 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Config;
+using Microlibs.Kafka.Protocol;
 
-namespace Microlibs.Kafka.Protocol.Connection;
+namespace Microlibs.Kafka.Connection;
 
 /// <summary>
 ///     Интерфейсы брокера

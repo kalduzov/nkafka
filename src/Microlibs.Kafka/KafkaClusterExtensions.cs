@@ -20,6 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,18 +44,19 @@ public static class KafkaClusterExtensions
         /*
         * Создание нового кластера состоит из нескольких шагов
         * 1. Валидируем конфигурацию. Нам важно работать с валидной конфигураций.
-        * 2. Создаем новый структуру кластера c уже валидной конфигурации
-        * 3. Когда структура создана и инициализирована - запускаем кластер
+        * 2. Создаем новый структуру кластера c уже валидной конфигурацией
+        * 3. Когда структура создана и инициализирована - "запускаем" кластер
         */
 
-        var loggerFactoryInstance = loggerFactory ?? NullLoggerFactory.Instance;
-        var localLogger = loggerFactoryInstance.CreateLogger<KafkaCluster>();
+        //Если фабрики нет - ничего никуда не пишем
+        var factory = loggerFactory ?? NullLoggerFactory.Instance;
+        var logger = factory.CreateLogger<KafkaCluster>();
 
-        localLogger.LogDebug("Creating new cluster");
+        logger.LogDebug(Utils._LOGGER_PREFIX + "Creating new cluster");
 
         config.Validate();
 
-        var cluster = new KafkaCluster(config, loggerFactoryInstance);
+        var cluster = new KafkaCluster(config, factory);
 
         var cts = new CancellationTokenSource(config.ClusterInitTimeoutMs);
 
@@ -72,7 +74,10 @@ public static class KafkaClusterExtensions
             }
 
             await cluster.DisposeAsync(); //Не удалось инициализировать кластер - очишаем ресурсы, которые, возможно, уже были частично инициалированы
-            throw new ClusterKafkaException($"Не удалось инциализировать кластер за выделенное время {config.ClusterInitTimeoutMs}ms", exc);
+
+            throw new ClusterKafkaException(
+                Utils._LOGGER_PREFIX + $"Не удалось инциализировать кластер за выделенное время {config.ClusterInitTimeoutMs}ms",
+                exc);
         }
         finally
         {

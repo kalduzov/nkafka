@@ -21,7 +21,6 @@
  * limitations under the License.
  */
 
-using System;
 using System.Diagnostics;
 using Microlibs.Kafka.Protocol;
 

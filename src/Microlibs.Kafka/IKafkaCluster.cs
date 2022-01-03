@@ -27,7 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer;
 using Microlibs.Kafka.Config;
-using Microlibs.Kafka.Protocol.Connection;
+using Microlibs.Kafka.Connection;
 using Microlibs.Kafka.Protocol.Responses;
 
 namespace Microlibs.Kafka;

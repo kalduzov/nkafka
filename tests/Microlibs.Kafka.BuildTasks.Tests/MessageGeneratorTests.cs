@@ -2,7 +2,7 @@ using System.IO;
 using Microlibs.Kafka.BuildTasks;
 using Xunit;
 
-namespace Microlibs.Kafka.Tests.BuildTasksTests;
+namespace Microlibs.Kafka.BuildTasks.Tests;
 
 public class MessageGeneratorTests
 {

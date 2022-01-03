@@ -39,7 +39,7 @@ public class Headers : IEnumerable<IHeader>
     /// <summary>
     ///     Gets the header at the specified index
     /// </summary>
-    /// <param key="index">
+    /// <param name="index">
     ///     The zero-based index of the element to get.
     /// </param>
     public IHeader this[int index] => _headers[index];

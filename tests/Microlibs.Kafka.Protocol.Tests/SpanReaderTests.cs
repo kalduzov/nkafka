@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microlibs.Kafka.Protocol;
 using Xunit;
 
-namespace Microlibs.Kafka.Tests.ProtocolTests;
+namespace Microlibs.Kafka.Protocol.Tests;
 
 public class SpanReaderTests
 {

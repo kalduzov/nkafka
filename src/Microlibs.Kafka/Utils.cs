@@ -24,12 +24,14 @@ using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Microlibs.Kafka.Tests.VarIntTests")]
+[assembly:InternalsVisibleTo("Microlibs.Kafka.VarInt.Tests")]
 
 namespace Microlibs.Kafka;
 
 internal static class Utils
 {
+    internal const string _LOGGER_PREFIX = "[Kafka] ";
+    
     internal static EndPoint BuildBrokerEndPoint(string bootstrapServer)
     {
         var (host, port) = GetHostAndPort(bootstrapServer);

@@ -4,7 +4,7 @@ using FluentAssertions;
 using Microlibs.Kafka.Protocol;
 using Xunit;
 
-namespace Microlibs.Kafka.Tests.VarIntTests;
+namespace Microlibs.Kafka.VarInt.Tests;
 
 public class WriteVarIntToStreamTests
 {

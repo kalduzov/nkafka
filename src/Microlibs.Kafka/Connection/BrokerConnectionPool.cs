@@ -28,7 +28,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Config;
 
-namespace Microlibs.Kafka.Protocol.Connection;
+namespace Microlibs.Kafka.Connection;
 
 internal sealed class BrokerConnectionPool : IDisposable, IAsyncDisposable
 {

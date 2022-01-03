@@ -28,10 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Benchmarks", "benchmarks\Microlibs.Kafka.Benchmarks\Microlibs.Kafka.Benchmarks.csproj", "{9A7A2274-6CBF-416A-9042-A9E643B34AF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Serializer.Tests", "tests\Microlibs.Kafka.Serializer.Tests\Microlibs.Kafka.Serializer.Tests.csproj", "{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.VarInt.Tests", "tests\Microlibs.Kafka.VarInt.Tests\Microlibs.Kafka.VarInt.Tests.csproj", "{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Samples.Confluent", "samples\Microlibs.Kafka.Samples.Confluent\Microlibs.Kafka.Samples.Confluent.csproj", "{90779538-4A63-4EBD-B4FF-39772E740919}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{E7275E10-1DB3-4348-BF03-DA06FB42CF40}"
@@ -183,8 +179,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "resources", "resources", "{
 		resources\message\WriteTxnMarkersResponse.json = resources\message\WriteTxnMarkersResponse.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Protocol.Tests", "tests\Microlibs.Kafka.Protocol.Tests\Microlibs.Kafka.Protocol.Tests.csproj", "{7FFBB3B2-A328-4EFF-859E-1261E38195E3}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.BuildTasks", "src\Microlibs.Kafka.BuildTasks\Microlibs.Kafka.BuildTasks.csproj", "{868CE19C-FC8E-4488-9D3E-DC0CDCEE3953}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.BuildTasks.Tests", "tests\Microlibs.Kafka.BuildTasks.Tests\Microlibs.Kafka.BuildTasks.Tests.csproj", "{2A19FAFB-E28B-4ECF-A020-985DE664F157}"
@@ -193,7 +187,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{29622E63
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileLockRemover", "tools\FileLockRemover\FileLockRemover.csproj", "{FBD2443B-29DB-44E9-AD6B-E7F0100048DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Cluster.Tests", "tests\Microlibs.Kafka.Cluster.Tests\Microlibs.Kafka.Cluster.Tests.csproj", "{24148224-0644-448D-AA71-BAD284145726}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Microlibs.Kafka.Tests", "tests\Microlibs.Kafka.Tests\Microlibs.Kafka.Tests.csproj", "{24148224-0644-448D-AA71-BAD284145726}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,22 +207,10 @@ Global
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{90779538-4A63-4EBD-B4FF-39772E740919}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90779538-4A63-4EBD-B4FF-39772E740919}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FFBB3B2-A328-4EFF-859E-1261E38195E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FFBB3B2-A328-4EFF-859E-1261E38195E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FFBB3B2-A328-4EFF-859E-1261E38195E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FFBB3B2-A328-4EFF-859E-1261E38195E3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{868CE19C-FC8E-4488-9D3E-DC0CDCEE3953}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{868CE19C-FC8E-4488-9D3E-DC0CDCEE3953}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{868CE19C-FC8E-4488-9D3E-DC0CDCEE3953}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -253,10 +235,7 @@ Global
 		{FB078DD2-8878-4B17-BDB3-DD87AC391841} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
 		{9AD1B2DD-C0C8-482E-BC48-9456C7C7C507} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
 		{9A7A2274-6CBF-416A-9042-A9E643B34AF3} = {EE6B6414-02ED-4176-8A7B-FBEC797C0185}
-		{F7FBC3A9-4FE7-46BB-AC28-DE8952567156} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
-		{F4CDE0E9-5B01-4B2A-A55A-D1EC8EDE54F0} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 		{90779538-4A63-4EBD-B4FF-39772E740919} = {01D4B64F-6FEB-4172-BC31-72B9A78BB506}
-		{7FFBB3B2-A328-4EFF-859E-1261E38195E3} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 		{868CE19C-FC8E-4488-9D3E-DC0CDCEE3953} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
 		{2A19FAFB-E28B-4ECF-A020-985DE664F157} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 		{FBD2443B-29DB-44E9-AD6B-E7F0100048DD} = {29622E63-2B40-49ED-AFFE-CE7D1D6E2143}

@@ -24,7 +24,7 @@ using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Microlibs.Kafka.VarInt.Tests")]
+[assembly:InternalsVisibleTo("Microlibs.Kafka.Tests")]
 
 namespace Microlibs.Kafka;
 

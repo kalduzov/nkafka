@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microlibs.Kafka.Serialization;
 using Xunit;
 
-namespace Microlibs.Kafka.Serializer.Tests;
+namespace Microlibs.Kafka.Tests;
 
 public class ListSerializerTests
 {

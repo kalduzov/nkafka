@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using FluentAssertions;
-using Microlibs.Kafka.Protocol;
+using Microlibs.Kafka.Protocol.Extensions;
 using Xunit;
 
-namespace Microlibs.Kafka.VarInt.Tests;
+namespace Microlibs.Kafka.Tests;
 
 public class WriteVarIntToStreamTests
 {

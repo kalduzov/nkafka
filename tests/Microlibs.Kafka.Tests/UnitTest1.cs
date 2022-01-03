@@ -1,8 +1,8 @@
 using Xunit;
 
-namespace Microlibs.Kafka.Cluster.Tests;
+namespace Microlibs.Kafka.Tests;
 
-public class UnitTest1
+public class Cluster
 {
     [Fact]
     public void Test1()

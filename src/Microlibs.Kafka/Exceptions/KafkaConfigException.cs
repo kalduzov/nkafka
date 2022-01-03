@@ -20,6 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 
 namespace Microlibs.Kafka.Exceptions;
@@ -33,6 +34,11 @@ public class KafkaConfigException : KafkaException
 
     public KafkaConfigException(string message, Exception innerException)
         : base(message, innerException)
+    {
+    }
+
+    public KafkaConfigException(string name, object value, string? message = null)
+        : base("Invalid value " + value + " for configuration " + name + (message == null ? "" : ": " + message))
     {
     }
 }

@@ -286,7 +286,7 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         }
         else if (acks != -1)
         {
-            throw new ConfigException("Must set {0} to all in order to use the idempotent");
+            throw new KafkaConfigException("Must set {0} to all in order to use the idempotent");
         }
 
         return acks;

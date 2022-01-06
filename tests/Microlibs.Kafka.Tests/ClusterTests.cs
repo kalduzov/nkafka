@@ -23,4 +23,26 @@ public class ClusterTests
         var awaiting = FluentActions.Awaiting(() => clusterConfig.CreateNewClusterAsync());
         await awaiting.Should().ThrowAsync<ClusterKafkaException>();
     }
+
+    [Fact(DisplayName = "Create new cluster broker updated")]
+    public async Task CreateNewClusterAsync_BrokerUpdated()
+    {
+        var clusterConfig = new ClusterConfig
+        {
+            BootstrapServers = new[]
+            {
+                "localhost:29091"
+            },
+            ClusterInitTimeoutMs = 10000
+        };
+
+        await using var kafkaCluster = await clusterConfig.CreateNewClusterAsync();
+        kafkaCluster.Brokers.Should().HaveCount(5);
+        kafkaCluster.Controller.Should().NotBeNull();
+        kafkaCluster.Controller.Id.Should().BePositive();
+        kafkaCluster.ClusterId.Should().NotBeNull();
+        kafkaCluster.ClusterId.Should().HaveLength(22);
+        var partitions = await kafkaCluster.GetPartitionsAsync("test");
+        partitions.Should().HaveCount(5);
+    }
 }

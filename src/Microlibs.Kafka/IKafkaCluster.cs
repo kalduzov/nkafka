@@ -41,7 +41,7 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     /// Идентификатор кластера
     /// </summary>
     string? ClusterId { get; }
-    
+
     /// <summary>
     ///     Конфигурация кластера
     /// </summary>
@@ -68,6 +68,17 @@ public interface IKafkaCluster : IDisposable, IAsyncDisposable
     ///     Список всех брокеров кластера
     /// </summary>
     IReadOnlyCollection<IBroker> Brokers { get; }
+
+    /// <summary>
+    /// Возвращает список партиций для топика
+    /// </summary>
+    /// <remarks>Если топик не найден во внутреннем кеше, то происходит запрос к брокеру за информацией о топике. В случае, если такого топика нет в кафке - вовзращается null</remarks>
+    Task<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);
+
+    /// <summary>
+    /// Возвращает текущее смещение партиции в топике
+    /// </summary>
+    Task<Offset> GetOffsetAsync(string topic, Partition partition, CancellationToken token = default);
 
     /// <summary>
     ///     Создает продюсера связанного с текущим кластером

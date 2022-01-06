@@ -69,33 +69,6 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
     private ISerializer<TKey> _keySerializer;
     private ISerializer<TValue> _valueSerializer;
 
-    // /// <summary>
-    // ///     A producer is instantiated by providing a set of key-value pairs as configuration.
-    // ///     Valid configuration strings are documented <see cref="http://must_be_link_to_docs" />
-    // /// </summary>
-    // /// <param name="config">The producer configs</param>
-    // /// <param name="kafkaCluster"></param>
-    // /// <param name="keySerializer">The serializer for key that implements <see cref="ISerializer{T}" /></param>
-    // /// <param name="valueSerializer">The serializer for value that implements <see cref="ISerializer{T}" /></param>
-    // /// ///
-    // /// <remarks> After creating a <see cref="Producer" /> you must always use Dispose() it to avoid resource leaks</remarks>
-    // public Producer(
-    //     KafkaCluster kafkaCluster,
-    //     ProducerConfig config,
-    //     ISerializer<TKey> keySerializer = null!,
-    //     ISerializer<TValue> valueSerializer = null!)
-    //     : this(
-    //         kafkaCluster,
-    //         _DEFAULT_PRODUCER_NAME,
-    //         config,
-    //         keySerializer,
-    //         valueSerializer,
-    //         null!,
-    //         DateTime.Today.TimeOfDay,
-    //         NullLoggerFactory.Instance)
-    // {
-    // }
-
     internal Producer(
         KafkaCluster kafkaCluster,
         string name,
@@ -103,11 +76,9 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
         ISerializer<TKey> keySerializer,
         ISerializer<TValue> valueSerializer,
         IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> interceptors,
-        TimeSpan time,
         ILoggerFactory loggerFactory)
     {
         _kafkaCluster = kafkaCluster;
-        _time = time;
         _logger = loggerFactory.CreateLogger(name);
         _name = name;
         _config = config;
@@ -132,7 +103,7 @@ public sealed partial class Producer<TKey, TValue> : Client, IProducer<TKey, TVa
             _apiVersions = new ApiVersions();
 
             var deliveryTimeoutMs = ConfigureDeliveryTimeout();
-            _accumulator = new RecordAccumulator(config, loggerFactory, deliveryTimeoutMs, time, _apiVersions);
+            _accumulator = new RecordAccumulator(config, loggerFactory, deliveryTimeoutMs, null,  _apiVersions);
 
             //create new long thread for IO operations
             _logger.LogDebug(logFormat + "Kafka producer started", clientId, transactionalId);

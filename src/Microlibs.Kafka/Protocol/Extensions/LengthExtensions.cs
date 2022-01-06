@@ -22,6 +22,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 
 namespace Microlibs.Kafka.Protocol.Extensions;
 
@@ -33,6 +34,16 @@ internal static class LengthExtensions
     internal static int GetArrayLength<T>(this T[] array, bool isFlexibility = false)
     {
         var len = isFlexibility ? GetVarIntLen(array.Length + 1) : 4; //4 байта стандартная длинна для массивов в протоколе
+
+        return len;
+    }
+    
+    /// <summary>
+    /// Возвращает полную длинну данных в массиве
+    /// </summary>
+    internal static int GetArrayLength<T>(this IReadOnlyCollection<T> array, bool isFlexibility = false)
+    {
+        var len = isFlexibility ? GetVarIntLen(array.Count + 1) : 4; //4 байта стандартная длинна для массивов в протоколе
 
         return len;
     }

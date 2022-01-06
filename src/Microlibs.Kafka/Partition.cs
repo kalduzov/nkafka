@@ -32,7 +32,7 @@ namespace Microlibs.Kafka;
 ///     its purpose is to add some syntactical sugar
 ///     related to special values.
 /// </remarks>
-public struct Partition : IEquatable<Partition>
+public struct Partition : IEquatable<Partition>, IComparable<Partition>
 {
     private const int RD_KAFKA_PARTITION_UA = -1;
 
@@ -207,6 +207,11 @@ public struct Partition : IEquatable<Partition>
     public override int GetHashCode()
     {
         return Value.GetHashCode();
+    }
+
+    public int CompareTo(Partition other)
+    {
+        return Value.CompareTo(other.Value);
     }
 
     /// <summary>

@@ -20,6 +20,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microlibs.Kafka.Protocol.Extensions;
@@ -31,7 +33,7 @@ public class MetadataRequestMessage : RequestBody
     /// <summary>
     ///     The topics to fetch metadata for
     /// </summary>
-    public string[] Topics { get; }
+    public IReadOnlyCollection<string> Topics { get; }
 
     /// <summary>
     ///     If this is true, the broker may auto-create topics that we requested which do not already exist, if it is
@@ -49,7 +51,7 @@ public class MetadataRequestMessage : RequestBody
     /// </summary>
     public bool IncludeTopicAuthorizedOperations { get; set; }
 
-    public MetadataRequestMessage(ApiVersions version, params string[] topics)
+    public MetadataRequestMessage(ApiVersions version, IReadOnlyCollection<string> topics)
     {
         Version = version;
         Topics = topics;
@@ -61,9 +63,8 @@ public class MetadataRequestMessage : RequestBody
     {
         var len = Topics.GetArrayLength(); //4; //Длинна массива topics
 
-        for (var index = Topics.Length - 1; index >= 0; index--)
+        foreach (var topic in Topics)
         {
-            var topic = Topics[index];
             len += 2 + Encoding.UTF8.GetByteCount(topic);
         }
 
@@ -87,9 +88,9 @@ public class MetadataRequestMessage : RequestBody
 
     public override void SerializeToStream(Stream stream)
     {
-        if (Version == ApiVersions.Version0 || Topics.Length > 0)
+        if (Version == ApiVersions.Version0 || Topics.Count > 0)
         {
-            stream.Write(Topics.Length.ToBigEndian());
+            stream.Write(Topics.Count.ToBigEndian());
 
             foreach (var topic in Topics)
             {

@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Config;
@@ -56,7 +57,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     public IReadOnlyCollection<string> Topics { get; }
 
     private CommonConfig _config;
-    private Task _receivedDataFromSocketTask;
+
+    //private Task _receivedDataFromSocketTask;
     private readonly Task _processData;
 
     private readonly Memory<byte> _size = new(new byte[sizeof(int)]);
@@ -92,11 +94,12 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     /// </summary>
     public IReadOnlyCollection<TopicPartition> TopicPartitions { get; }
 
-    public Broker(EndPoint endpoint, int id = -1, string? rack = null)
+    public Broker(EndPoint endpoint, int id = -1, string? rack = null, bool isController = false)
     {
         Id = id;
         Rack = rack;
         EndPoint = endpoint;
+        IsController = isController;
 
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
         _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(); //todo вынести в настройки
@@ -134,7 +137,6 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         Task.WaitAll(
             new[]
             {
-                _receivedDataFromSocketTask,
                 _processData
             },
             _config.CloseBrokerTimeoutMs);
@@ -148,7 +150,8 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         _responsesTasks.Clear();
         _networkStream.Dispose();
         _socket.Dispose();
-        _cleanerTimer.Dispose();
+
+        //_cleanerTimer.Dispose();
 
         _disposed = true;
     }
@@ -202,7 +205,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
     /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
-        await Task.WhenAll(_receivedDataFromSocketTask, _processData).ConfigureAwait(false);
+        await _processData.ConfigureAwait(false);
     }
 
     public override bool Equals(object obj)
@@ -338,7 +341,7 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             state =>
             {
                 var awaiter = state as ResponseTaskCompletionSource;
-                awaiter.TrySetCanceled();
+                awaiter?.TrySetCanceled();
             },
             taskCompletionSource,
             false);
@@ -351,6 +354,9 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
 
             request.ToByteStream(stream);
             var bufferForSend = stream.ToArray();
+            
+            Debug.WriteLine(ByteArrayToString(bufferForSend));
+            
             await _networkStream.WriteAsync(bufferForSend, token);
         }
         catch (Exception exc)
@@ -366,8 +372,9 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
         return (TResponseMessage)await taskCompletionSource.Task;
     }
 
-    private async Task ThrowIfBrokerDontSupportApiVersion(KafkaRequestMessage request)
+    private Task ThrowIfBrokerDontSupportApiVersion(KafkaRequestMessage request)
     {
+        return Task.CompletedTask;
     }
 
     // private async Task CheckApiVersion(KafkaRequest request, CancellationToken token)
@@ -434,4 +441,15 @@ internal sealed class Broker : IBroker, IEquatable<Broker>
             return DefaultResponseBuilder.Build(_apiKey, _version, bodyLen, span);
         }
     }
+
+#if DEBUG
+    public static string ByteArrayToString(byte[] ba)
+    {
+        var hex = new StringBuilder(ba.Length * 2);
+        foreach (var b in ba)
+            hex.AppendFormat("{0:x2}", b);
+
+        return hex.ToString();
+    }
+#endif
 }

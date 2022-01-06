@@ -32,11 +32,11 @@ namespace Microlibs.Kafka.Protocol
         {
             return apiKey switch
             {
-                ApiKeys.Metadata => BuildMetadataResponse(span, apiVersion, responseLength),
+                ApiKeys.Metadata => BuildMetadataResponse(span, apiVersion),
             };
         }
 
-        private static KafkaResponseMessage BuildMetadataResponse(ReadOnlySpan<byte> span, ApiVersions apiVersion, int responseLength)
+        private static KafkaResponseMessage BuildMetadataResponse(ReadOnlySpan<byte> span, ApiVersions apiVersion)
         {
             var reader = new KafkaBufferReader(span);
 
@@ -50,7 +50,7 @@ namespace Microlibs.Kafka.Protocol
 
             var clusterId = apiVersion switch
             {
-                >= ApiVersions.Version2 => ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                >= ApiVersions.Version2 => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
                 _ => null,
             };
 
@@ -102,7 +102,7 @@ namespace Microlibs.Kafka.Protocol
                     var port = reader.ReadInt();
                     var rack = apiVersion switch
                     {
-                        >= ApiVersions.Version3 => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                        >= ApiVersions.Version1 => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
                         _ => null!
                     };
 
@@ -128,8 +128,8 @@ namespace Microlibs.Kafka.Protocol
                     var errorCode = reader.ReadShort();
                     var name = apiVersion switch
                     {
-                        >= ApiVersions.Version12 => ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
-                        _ => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9)
+                        >= ApiVersions.Version12 => ReadNullableStringByVersion(ref reader, apiVersion, ApiVersions.Version9),
+                        _ => ReadStringByVersion(ref reader, apiVersion, ApiVersions.Version9)
                     };
 
                     var topicId = Guid.Empty;

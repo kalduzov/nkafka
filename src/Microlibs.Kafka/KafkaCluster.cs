@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microlibs.Kafka.Clients.Producer;
@@ -45,7 +46,6 @@ public sealed class KafkaCluster : IKafkaCluster
 {
     private const string _DEFAULT_PRODUCER_NAME = "__DefaultProducer";
 
-    private readonly BrokerConnectionPool _brokersConnectionPool;
     private readonly Dictionary<string, IConsumer?> _consumers = new();
     private readonly object _lockObject = new();
     private readonly ILogger<KafkaCluster> _logger;
@@ -56,7 +56,10 @@ public sealed class KafkaCluster : IKafkaCluster
     private readonly Dictionary<string, IProducer?> _producers = new();
     private readonly Timer _metadataUpdaterTimer;
     private volatile int _metadataUpdating;
-    private string[] _topics;
+    private readonly HashSet<string> _topics;
+    private List<IBroker> _brokers;
+
+    private Dictionary<string, SortedSet<Partition>> _partitions = new();
 
     /// <summary>
     /// Идентификатор кластера
@@ -83,12 +86,12 @@ public sealed class KafkaCluster : IKafkaCluster
     /// <summary>
     ///     Информация о брокере, который является контроллером
     /// </summary>
-    public IBroker Controller => _brokersConnectionPool.GetController();
+    public IBroker Controller { get; private set; }
 
     /// <summary>
     ///     Список всех брокеров кластера
     /// </summary>
-    public IReadOnlyCollection<IBroker> Brokers => _brokersConnectionPool.GetBrokers();
+    public IReadOnlyCollection<IBroker> Brokers => _brokers;
 
     /// <summary>
     /// Создает новый класс описывающий конкретный кластер
@@ -99,9 +102,39 @@ public sealed class KafkaCluster : IKafkaCluster
         Config = config;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<KafkaCluster>();
-        _brokersConnectionPool = new BrokerConnectionPool(config);
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, null, Timeout.Infinite, Timeout.Infinite);
-        _topics = Array.Empty<string>();
+        _topics = new HashSet<string>();
+        _brokers = SeedBrokers(Config);
+    }
+
+    /// <summary>
+    /// Возвращает список партиций для топика
+    /// </summary>
+    public async Task<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default)
+    {
+        ThrowIfClusterClosed();
+
+        if (_partitions.TryGetValue(topic, out var partitions) && partitions.Count != 0)
+        {
+            return partitions;
+        }
+
+        await RefreshMetadataAsync(token, topic).ConfigureAwait(false);
+
+        if (_partitions.TryGetValue(topic, out partitions) && partitions.Count != 0)
+        {
+            return partitions;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Возвращает текущее смещение партиции в топике
+    /// </summary>
+    public Task<Offset> GetOffsetAsync(string topic, Partition partition, CancellationToken token = default)
+    {
+        return null;
     }
 
     /// <summary>
@@ -136,7 +169,6 @@ public sealed class KafkaCluster : IKafkaCluster
                 keySerializer: null!,
                 valueSerializer: null,
                 interceptors: null!,
-                time: DateTime.Today.TimeOfDay,
                 loggerFactory: _loggerFactory);
 
             _producers.Add(name, producer);
@@ -166,7 +198,7 @@ public sealed class KafkaCluster : IKafkaCluster
     {
         ThrowIfClusterClosed();
 
-        var broker = _brokersConnectionPool.GetLeastLoadedBroker();
+        var broker = GetLeastLoadedBroker();
 
         var request = new MetadataRequestMessage(ApiVersions.Version4, topics)
         {
@@ -177,13 +209,15 @@ public sealed class KafkaCluster : IKafkaCluster
 
         Debug.WriteLine($"Message {message.ClusterId ?? "none"}");
 
+        UpdateBrokers(message.Brokers, token);
+        UpdateTopicPartitions(message.Topics, token);
+
         return message;
     }
 
     public void Dispose()
     {
         _metadataUpdaterTimer.Dispose();
-        _brokersConnectionPool.Dispose();
     }
 
     /// <summary>
@@ -194,7 +228,57 @@ public sealed class KafkaCluster : IKafkaCluster
     public async ValueTask DisposeAsync()
     {
         await _metadataUpdaterTimer.DisposeAsync();
-        await _brokersConnectionPool.DisposeAsync();
+    }
+
+    private List<IBroker> SeedBrokers(CommonConfig commonConfig)
+    {
+        var brokers = new List<IBroker>(Config.BootstrapServers.Count);
+
+        foreach (var bootstrapServer in commonConfig.BootstrapServers)
+        {
+            var endpoint = Utils.BuildBrokerEndPoint(bootstrapServer);
+            var connection = new Broker(endpoint);
+            brokers.Add(connection);
+        }
+
+        return brokers;
+    }
+
+    private void UpdateTopicPartitions(IReadOnlyCollection<TopicInfo> messageTopics, CancellationToken token)
+    {
+        foreach (var messageTopic in messageTopics)
+        {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _topics.Add(messageTopic.Name);
+
+            SortedSet<Partition> partitions;
+
+            if (!_partitions.ContainsKey(messageTopic.Name))
+            {
+                partitions = new SortedSet<Partition>();
+                _partitions.Add(messageTopic.Name, partitions);
+            }
+
+            partitions = _partitions[messageTopic.Name];
+
+            foreach (var topicPartition in messageTopic.Partitions)
+            {
+                partitions.Add(new Partition(topicPartition.PartitionIndex));
+            }
+        }
+    }
+
+    private void UpdateBrokers(IReadOnlyCollection<BrokerInfo> messageBrokers, CancellationToken token)
+    {
+    }
+
+    private IBroker GetLeastLoadedBroker()
+    {
+        return Brokers.First();
     }
 
     private async void UpdateMetadataCallback(object state)
@@ -221,30 +305,44 @@ public sealed class KafkaCluster : IKafkaCluster
 
     private async Task UpdateMetadata(CancellationToken token)
     {
-        var broker = _brokersConnectionPool.GetLeastLoadedBroker();
+        var broker = GetLeastLoadedBroker();
 
-        var request = new MetadataRequestMessage(ApiVersions.Version0, _topics)
-        {
-            AllowAutoTopicCreation = true,
-        };
+        var request = new MetadataRequestMessage(ApiVersions.Version2, _topics);
 
         var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
+
+        var brokers = new List<IBroker>(response.Brokers.Count);
 
         foreach (var (nodeId, host, port, rack) in response.Brokers)
         {
             var endpoint = Utils.BuildEndPoint(host, port);
             var newBroker = new Broker(endpoint, nodeId, rack);
-            var isController = response.ControllerId == nodeId;
 
-            var _ = await _brokersConnectionPool.TryAddBrokerAsync(newBroker, isController, false, token);
+            if (response.ControllerId != -1)
+            {
+                var isController = response.ControllerId == nodeId;
+
+                if (isController)
+                {
+                    Controller = newBroker;
+                }
+            }
+
+            await newBroker.OpenAsync(Config, token);
+            brokers.Add(newBroker);
+        }
+
+        var oldBrokers = _brokers;
+        _brokers = brokers;
+
+        foreach (var oldBroker in oldBrokers)
+        {
+            oldBroker.Close();
         }
 
         ClusterId = response.ClusterId;
 
-        // foreach (var VARIABLE in response.)
-        // {
-        //     
-        // }
+        UpdateTopicPartitions(response.Topics, token);
     }
 
     /// <summary>
@@ -264,7 +362,10 @@ public sealed class KafkaCluster : IKafkaCluster
             await broker.OpenAsync(Config, token);
         }
 
-        await UpdateMetadata(token);
+        if (Config.FullUpdateMetadata)
+        {
+            await UpdateMetadata(token);
+        }
     }
 
     private void ThrowIfClusterClosed()

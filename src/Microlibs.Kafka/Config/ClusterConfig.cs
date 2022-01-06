@@ -20,6 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using Microlibs.Kafka.Exceptions;
 
 namespace Microlibs.Kafka.Config;
@@ -30,16 +31,24 @@ namespace Microlibs.Kafka.Config;
 public record ClusterConfig : CommonConfig
 {
     /// <summary>
-    ///     Таймаут обновления данных по брокерам в ms
+    ///     Таймаут обновления метаданных
     /// </summary>
     /// <remarks>Default - 1000ms</remarks>
-    public int BrokerUpdateTimeoutMs { get; set; } = 1000;
+    public int MetadataUpdateTimeoutMs { get; set; } = 1000;
 
     /// <summary>
     ///     Сколько времени ждать инициализации кластера в ms
     /// </summary>
     /// <remarks>Default - 15 sec</remarks>
     public int ClusterInitTimeoutMs { get; set; } = 15000;
+
+    /// <summary>
+    /// Полностью обновлять метаданные или нет
+    /// </summary>
+    /// <remarks>Полное обновление метаданных может сильно раздуть память если в кластере очень много топиков и партиций.
+    /// Если метаданные обновляются не полностью, то запрашиваются данные только по тем топикам, которые используется клиентом кластера
+    /// </remarks>
+    public bool FullUpdateMetadata { get; set; } = true;
 
     /// <summary>
     ///     Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные
@@ -49,7 +58,7 @@ public record ClusterConfig : CommonConfig
     {
         base.Validate();
 
-        if (BrokerUpdateTimeoutMs <= 0)
+        if (MetadataUpdateTimeoutMs <= 0)
         {
             throw new KafkaConfigException("BrokerUpdateTimeoutMs <= 0");
         }

@@ -36,7 +36,7 @@ public sealed class RecordAccumulator
         ProducerConfig config,
         ILoggerFactory loggerFactory,
         int deliveryTimeoutMs,
-        TimeSpan time,
+        TimeSpan? time,
         ApiVersions apiVersions)
     {
     }

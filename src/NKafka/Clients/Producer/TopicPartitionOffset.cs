@@ -1,0 +1,164 @@
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ * 
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+namespace NKafka.Clients.Producer;
+
+/// <summary>
+///     Represents a Kafka (topic, partition, offset) tuple.
+/// </summary>
+public class TopicPartitionOffset
+{
+    /// <summary>
+    ///     Initializes a new TopicPartitionOffset instance.
+    /// </summary>
+    /// <param name="tp">
+    ///     Kafka topic name and partition.
+    /// </param>
+    /// <param name="offset">
+    ///     A Kafka offset value.
+    /// </param>
+    public TopicPartitionOffset(TopicPartition tp, Offset offset)
+        : this(tp.Topic, tp.Partition, offset)
+    {
+    }
+
+    /// <summary>
+    ///     Initializes a new TopicPartitionOffset instance.
+    /// </summary>
+    /// <param name="topic">
+    ///     A Kafka topic name.
+    /// </param>
+    /// <param name="partition">
+    ///     A Kafka partition.
+    /// </param>
+    /// <param name="offset">
+    ///     A Kafka offset value.
+    /// </param>
+    public TopicPartitionOffset(string topic, Partition partition, Offset offset)
+    {
+        Topic = topic;
+        Partition = partition;
+        Offset = offset;
+    }
+
+    /// <summary>
+    ///     Gets the Kafka topic name.
+    /// </summary>
+    public string Topic { get; }
+
+    /// <summary>
+    ///     Gets the Kafka partition.
+    /// </summary>
+    public Partition Partition { get; }
+
+    /// <summary>
+    ///     Gets the Kafka partition offset value.
+    /// </summary>
+    public Offset Offset { get; }
+
+    /// <summary>
+    ///     Gets the TopicPartition component of this TopicPartitionOffset instance.
+    /// </summary>
+    public TopicPartition TopicPartition => new(Topic, Partition);
+
+    /// <summary>
+    ///     Tests whether this TopicPartitionOffset instance is equal to the specified object.
+    /// </summary>
+    /// <param name="obj">
+    ///     The object to test.
+    /// </param>
+    /// <returns>
+    ///     true if obj is a TopicPartitionOffset and all properties are equal. false otherwise.
+    /// </returns>
+    public override bool Equals(object? obj)
+    {
+        if (!(obj is TopicPartitionOffset))
+        {
+            return false;
+        }
+
+        var tp = (TopicPartitionOffset)obj;
+
+        return tp.Partition == Partition && tp.Topic == Topic && tp.Offset == Offset;
+    }
+
+    /// <summary>
+    ///     Returns a hash code for this TopicPartitionOffset.
+    /// </summary>
+    /// <returns>
+    ///     An integer that specifies a hash value for this TopicPartitionOffset.
+    /// </returns>
+    public override int GetHashCode() // x by prime number is quick and gives decent distribution.
+    {
+        return (Partition.GetHashCode() * 251 + Topic.GetHashCode()) * 251 + Offset.GetHashCode();
+    }
+
+    /// <summary>
+    ///     Tests whether TopicPartitionOffset instance a is equal to TopicPartitionOffset instance b.
+    /// </summary>
+    /// <param name="a">
+    ///     The first TopicPartitionOffset instance to compare.
+    /// </param>
+    /// <param name="b">
+    ///     The second TopicPartitionOffset instance to compare.
+    /// </param>
+    /// <returns>
+    ///     true if TopicPartitionOffset instances a and b are equal. false otherwise.
+    /// </returns>
+    public static bool operator ==(TopicPartitionOffset a, TopicPartitionOffset b)
+    {
+        if (a is null)
+        {
+            return b is null;
+        }
+
+        return a.Equals(b);
+    }
+
+    /// <summary>
+    ///     Tests whether TopicPartitionOffset instance a is not equal to TopicPartitionOffset instance b.
+    /// </summary>
+    /// <param name="a">
+    ///     The first TopicPartitionOffset instance to compare.
+    /// </param>
+    /// <param name="b">
+    ///     The second TopicPartitionOffset instance to compare.
+    /// </param>
+    /// <returns>
+    ///     true if TopicPartitionOffset instances a and b are not equal. false otherwise.
+    /// </returns>
+    public static bool operator !=(TopicPartitionOffset a, TopicPartitionOffset b)
+    {
+        return !(a == b);
+    }
+
+    /// <summary>
+    ///     Returns a string representation of the TopicPartitionOffset object.
+    /// </summary>
+    /// <returns>
+    ///     A string that represents the TopicPartitionOffset object.
+    /// </returns>
+    public override string ToString()
+    {
+        return $"{Topic} [{Partition}] @{Offset}";
+    }
+}

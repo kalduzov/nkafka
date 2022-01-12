@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="GenerateMessages">
+
+  <PropertyGroup>
+    <PackageTags>Kafka</PackageTags>
+    <PackageId>NKafka</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FastEnum" Version="1.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Clients\Producer\Producer.Logging.cs">
+      <DependentUpon>Producer.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\StatusCodesMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>StatusCodesMessages.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\ExceptionMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ExceptionMessages.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\StatusCodesMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>StatusCodesMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\ExceptionMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ExceptionMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Messages" />
+  </ItemGroup>
+
+  <UsingTask TaskName="NKafka.BuildTasks.MessagesGeneratorTask" AssemblyFile="..\NKafka.BuildTasks\bin\$(Configuration)\$(TargetFramework)\NKafka.BuildTasks.dll" />
+
+  <Target Name="GenerateMessages">
+    <MessagesGeneratorTask SolutionDirectory="$(SolutionDir)" OutputDirectory="Messages" TestsMessageProject="NKafka.Tests" />
+  </Target>
+
+</Project>

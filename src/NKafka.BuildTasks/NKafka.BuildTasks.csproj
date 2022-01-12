@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="ClearBin">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.2.0"/>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.2.0"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NKafka.MessageGenerator\NKafka.MessageGenerator.csproj"/>
+  </ItemGroup>
+
+  <Target Name="ClearBin">
+    <Exec Command="$(SolutionDir)\tools\filelockremover\bin\$(Configuration)\net6.0\FileLockRemover.exe $(ProjectDir)$(OutDir)NKafka.BuildTasks.dll" ContinueOnError="true"/>
+  </Target>
+
+</Project>

@@ -59,6 +59,14 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version0)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class OffsetDeleteResponseTopicMessage: Message
@@ -92,6 +100,14 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetDeleteResponsePartitionMessage: Message
@@ -125,6 +141,14 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

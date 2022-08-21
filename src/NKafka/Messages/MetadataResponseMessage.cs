@@ -74,6 +74,22 @@ public partial class MetadataResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version9)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version9)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class MetadataResponseBrokerMessage: Message
@@ -117,6 +133,22 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class MetadataResponseTopicMessage: Message
@@ -170,6 +202,22 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class MetadataResponsePartitionMessage: Message
@@ -228,6 +276,22 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

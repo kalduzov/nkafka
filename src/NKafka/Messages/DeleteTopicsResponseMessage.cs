@@ -54,6 +54,14 @@ public partial class DeleteTopicsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DeletableTopicResultMessage: Message
@@ -97,6 +105,14 @@ public partial class DeleteTopicsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

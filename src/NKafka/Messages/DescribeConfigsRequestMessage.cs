@@ -58,6 +58,14 @@ public partial class DescribeConfigsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DescribeConfigsResourceMessage: Message
@@ -89,6 +97,14 @@ public partial class DescribeConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

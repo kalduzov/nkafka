@@ -58,5 +58,25 @@ public partial class FindCoordinatorRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version3)
+        {
+            if (CoordinatorKeys is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)CoordinatorKeys.Count + 1);
+                foreach (var val in CoordinatorKeys)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 }

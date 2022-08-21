@@ -78,6 +78,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class StopReplicaPartitionV0Message: Message
@@ -104,6 +128,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class StopReplicaTopicV1Message: Message
@@ -130,6 +178,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class StopReplicaTopicStateMessage: Message
@@ -156,6 +228,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class StopReplicaPartitionStateMessage: Message
@@ -187,6 +283,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

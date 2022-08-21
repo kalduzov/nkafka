@@ -64,6 +64,34 @@ public partial class ListTransactionsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version0)
+        {
+            if (UnknownStateFilters is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)UnknownStateFilters.Count + 1);
+                foreach (var val in UnknownStateFilters)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version0)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class TransactionStateMessage: Message
@@ -102,6 +130,34 @@ public partial class ListTransactionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (Version >= ApiVersions.Version0)
+            {
+                if (UnknownStateFilters is null)
+                {
+                    writer.WriteVarUInt(0);
+                    Size += 4;
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)UnknownStateFilters.Count + 1);
+                    foreach (var val in UnknownStateFilters)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
+            }
+            else
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

@@ -54,6 +54,14 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DescribeConfigsResultMessage: Message
@@ -102,6 +110,14 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class DescribeConfigsResourceResultMessage: Message
@@ -170,6 +186,14 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class DescribeConfigsSynonymMessage: Message
@@ -208,6 +232,14 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

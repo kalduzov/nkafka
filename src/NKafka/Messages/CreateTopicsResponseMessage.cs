@@ -54,6 +54,14 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version5)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class CreatableTopicResultMessage: Message
@@ -117,6 +125,14 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class CreatableTopicConfigsMessage: Message
@@ -165,6 +181,14 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

@@ -54,6 +54,14 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version1)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class EntryDataMessage: Message
@@ -92,6 +100,14 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class EntityDataMessage: Message
@@ -125,6 +141,14 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

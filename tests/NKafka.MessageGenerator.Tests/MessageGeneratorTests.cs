@@ -16,12 +16,12 @@ public class MessageGeneratorTests
     public MessageGeneratorTests()
     {
         var pathToSolutions = Path.Combine("..", "..", "..", "..", "..");
-        _messageGenerator = new MessageGenerator(pathToSolutions, "message", "NKafka.Tests", NullLogger.Instance);
+        //_messageGenerator = new MessageGenerator(pathToSolutions, "message", "NKafka.Tests", NullLogger.Instance);
     }
 
     [Fact]
     public void GenerateTest()
     {
-        _messageGenerator.Generate();
+        //_messageGenerator.Generate();
     }
 }

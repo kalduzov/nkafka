@@ -54,6 +54,14 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class AlterReplicaLogDirTopicResultMessage: Message
@@ -87,6 +95,14 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class AlterReplicaLogDirPartitionResultMessage: Message
@@ -120,6 +136,14 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

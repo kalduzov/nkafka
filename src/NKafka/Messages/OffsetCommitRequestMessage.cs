@@ -73,6 +73,14 @@ public partial class OffsetCommitRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version8)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class OffsetCommitRequestTopicMessage: Message
@@ -99,6 +107,14 @@ public partial class OffsetCommitRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version8)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetCommitRequestPartitionMessage: Message
@@ -140,6 +156,14 @@ public partial class OffsetCommitRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version8)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

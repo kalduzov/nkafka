@@ -54,6 +54,14 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version1)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class WritableTxnMarkerResultMessage: Message
@@ -87,6 +95,14 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class WritableTxnMarkerTopicResultMessage: Message
@@ -120,6 +136,14 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class WritableTxnMarkerPartitionResultMessage: Message
@@ -153,6 +177,14 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

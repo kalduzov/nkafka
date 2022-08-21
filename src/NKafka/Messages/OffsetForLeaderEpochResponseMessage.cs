@@ -54,6 +54,14 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class OffsetForLeaderTopicResultMessage: Message
@@ -87,6 +95,14 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class EpochEndOffsetMessage: Message
@@ -130,6 +146,14 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

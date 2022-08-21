@@ -98,6 +98,22 @@ public partial class FetchRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version12)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version12)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class FetchTopicMessage: Message
@@ -129,6 +145,22 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class FetchPartitionMessage: Message
@@ -175,6 +207,22 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class ForgottenTopicMessage: Message
@@ -206,6 +254,22 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

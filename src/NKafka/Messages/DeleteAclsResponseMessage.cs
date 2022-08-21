@@ -54,6 +54,14 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DeleteAclsFilterResultMessage: Message
@@ -92,6 +100,14 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class DeleteAclsMatchingAclMessage: Message
@@ -160,6 +176,14 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

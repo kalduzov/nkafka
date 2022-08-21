@@ -53,6 +53,14 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version0)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class FeatureUpdateKeyMessage: Message
@@ -84,6 +92,14 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

@@ -48,5 +48,25 @@ public partial class DescribeTransactionsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version0)
+        {
+            if (TransactionalIds is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)TransactionalIds.Count + 1);
+                foreach (var val in TransactionalIds)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 }

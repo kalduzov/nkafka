@@ -63,6 +63,14 @@ public partial class MetadataRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version9)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class MetadataRequestTopicMessage: Message
@@ -89,6 +97,14 @@ public partial class MetadataRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

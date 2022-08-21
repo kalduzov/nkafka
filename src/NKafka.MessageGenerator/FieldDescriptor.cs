@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using NKafka.MessageGenerator.Converters;
+
 namespace NKafka.MessageGenerator;
 
 public class FieldDescriptor
@@ -11,16 +13,16 @@ public class FieldDescriptor
     public string Type { get; set; }
 
     [JsonPropertyName("versions")]
-    public string Versions { get; set; }
+    public Versions? Versions { get; set; }
     
     [JsonPropertyName("nullableVersions")]
-    public string? NullableVersions { get; set; }
+    public Versions? NullableVersions { get; set; }
     
     [JsonPropertyName("taggedVersions")]
-    public string? TaggedVersions { get; set; }
+    public Versions? TaggedVersions { get; set; }
     
     [JsonPropertyName("flexibleVersions")]
-    public string? FlexibleVersions { get; set; }
+    public Versions? FlexibleVersions { get; set; }
     
     [JsonPropertyName("about")]
     public string? About { get; set; }

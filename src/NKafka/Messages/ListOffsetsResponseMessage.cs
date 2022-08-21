@@ -54,6 +54,14 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class ListOffsetsTopicResponseMessage: Message
@@ -87,6 +95,14 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class ListOffsetsPartitionResponseMessage: Message
@@ -140,6 +156,14 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

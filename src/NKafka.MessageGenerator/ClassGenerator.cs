@@ -25,20 +25,22 @@ using NKafka.Protocol;
 
 namespace NKafka.MessageGenerator;
 
-public class ClassGenerator: IClassGenerator
+public class ClassGenerator: Generator, IClassGenerator
 {
     private readonly ApiDescriptor _descriptor;
-    private int _indent = 0;
+    private readonly IWriteMethodGenerator _writeMethodGenerator;
+    private readonly IReadMethodGenerator _readMethodGenerator;
     private const string _MESSAGE_SUFFIX = "Message";
     private const string _CLASS_TEMPLATE = "public partial class {0}: {1}\r\n{{\r\n{2}}}";
     private const string _EMPTY_CLASS_TEMPLATE = "public partial class {0}\r\n{{\r\n}}";
 
-    private readonly Dictionary<int, string> _indents = new();
     private readonly Dictionary<string, List<FieldDescriptor>> _internalClasses;
 
-    public ClassGenerator(ApiDescriptor descriptor)
+    public ClassGenerator(ApiDescriptor descriptor, IWriteMethodGenerator writeMethodGenerator, IReadMethodGenerator readMethodGenerator)
     {
         _descriptor = descriptor;
+        _writeMethodGenerator = writeMethodGenerator;
+        _readMethodGenerator = readMethodGenerator;
         _internalClasses = GetAllInternalClasses(descriptor.Fields);
     }
 
@@ -117,7 +119,7 @@ public class ClassGenerator: IClassGenerator
         foreach (var complexClass in _internalClasses)
         {
             var className = $"{complexClass.Key}Message";
-            
+
             builder
                 .AppendLine($"{Indent}public class {className}: Message")
                 .AppendLine($"{Indent}{{");
@@ -149,6 +151,11 @@ public class ClassGenerator: IClassGenerator
 
         builder.AppendLine($"{Indent}public override void Write(BufferWriter writer, ApiVersions version)");
         builder.AppendLine($"{Indent}{{");
+
+        IncrementIndent();
+        var writeBody = _writeMethodGenerator.Generate(IndentValue);
+        builder.Append(writeBody);
+        DecrementIndent();
 
         // if (fields is not null)
         // {
@@ -195,6 +202,12 @@ public class ClassGenerator: IClassGenerator
         IncrementIndent();
         builder.AppendLine($"{Indent}public override void Read(BufferReader reader, ApiVersions version)");
         builder.AppendLine($"{Indent}{{");
+
+        IncrementIndent();
+        var readBody = _readMethodGenerator.Generate(IndentValue);
+        builder.Append(readBody);
+        DecrementIndent();
+
         builder.AppendLine($"{Indent}}}");
         DecrementIndent();
 
@@ -240,7 +253,6 @@ public class ClassGenerator: IClassGenerator
         IncrementIndent();
         var builder = new StringBuilder();
 
-        var validVersions = GetSetVersions(apiDescriptor.ValidVersions);
         var apiKey = (ApiKeys)apiDescriptor.ApiKey;
 
         switch (apiDescriptor.Type)
@@ -259,8 +271,8 @@ public class ClassGenerator: IClassGenerator
                 }
 
                 IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{validVersions.Min()};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{validVersions.Max()};");
+                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
+                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
                 DecrementIndent();
 
                 builder.AppendLine($"{Indent}}}");
@@ -274,8 +286,8 @@ public class ClassGenerator: IClassGenerator
                 builder.AppendLine($"{Indent}{{");
 
                 IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{validVersions.Min()};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{validVersions.Max()};");
+                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
+                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
                 DecrementIndent();
 
                 builder.AppendLine($"{Indent}}}");
@@ -291,8 +303,8 @@ public class ClassGenerator: IClassGenerator
                 builder.AppendLine($"{Indent}{{");
 
                 IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{validVersions.Min()};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{validVersions.Max()};");
+                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
+                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
                 DecrementIndent();
 
                 builder.AppendLine($"{Indent}}}");
@@ -430,40 +442,6 @@ public class ClassGenerator: IClassGenerator
         }
 
         return set;
-    }
-
-    private string Indent
-    {
-        get
-        {
-            {
-                if (_indents.TryGetValue(_indent, out var result))
-                {
-                    return result;
-                }
-
-                result = string.Empty;
-
-                for (var i = 0; i < _indent; i++)
-                {
-                    result += " ";
-                }
-
-                _indents.TryAdd(_indent, result);
-
-                return result;
-            }
-        }
-    }
-
-    private void IncrementIndent()
-    {
-        _indent += 4;
-    }
-
-    private void DecrementIndent()
-    {
-        _indent -= 4;
     }
 
     private static Dictionary<string, List<FieldDescriptor>> GetAllInternalClasses(List<FieldDescriptor> fields)

@@ -48,5 +48,25 @@ public partial class DeleteGroupsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version2)
+        {
+            if (GroupsNames is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)GroupsNames.Count + 1);
+                foreach (var val in GroupsNames)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 }

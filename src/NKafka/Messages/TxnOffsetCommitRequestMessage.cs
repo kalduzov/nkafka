@@ -83,6 +83,14 @@ public partial class TxnOffsetCommitRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class TxnOffsetCommitRequestTopicMessage: Message
@@ -109,6 +117,14 @@ public partial class TxnOffsetCommitRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class TxnOffsetCommitRequestPartitionMessage: Message
@@ -145,6 +161,14 @@ public partial class TxnOffsetCommitRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

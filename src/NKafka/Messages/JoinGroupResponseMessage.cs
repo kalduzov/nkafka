@@ -84,6 +84,14 @@ public partial class JoinGroupResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class JoinGroupResponseMemberMessage: Message
@@ -122,6 +130,14 @@ public partial class JoinGroupResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

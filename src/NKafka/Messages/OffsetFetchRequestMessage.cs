@@ -63,6 +63,22 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class OffsetFetchRequestTopicMessage: Message
@@ -89,6 +105,22 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchRequestGroupMessage: Message
@@ -115,6 +147,22 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchRequestTopicsMessage: Message
@@ -141,6 +189,22 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

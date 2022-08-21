@@ -48,5 +48,25 @@ public partial class ListGroupsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version3)
+        {
+            if (StatesFilter is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)StatesFilter.Count + 1);
+                foreach (var val in StatesFilter)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 }

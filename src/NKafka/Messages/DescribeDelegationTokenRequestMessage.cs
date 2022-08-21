@@ -48,6 +48,14 @@ public partial class DescribeDelegationTokenRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version2)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DescribeDelegationTokenOwnerMessage: Message
@@ -74,6 +82,14 @@ public partial class DescribeDelegationTokenRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version2)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

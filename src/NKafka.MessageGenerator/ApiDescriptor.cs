@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
+using NKafka.MessageGenerator.Converters;
+
 namespace NKafka.MessageGenerator;
 
 /// <summary>
@@ -29,10 +31,10 @@ public class ApiDescriptor
     public string Name { get; set; }
 
     [JsonPropertyName("validVersions")]
-    public string ValidVersions { get; set; }
+    public Versions ValidVersions { get; set; }
 
     [JsonPropertyName("flexibleVersions")]
-    public string FlexibleVersions { get; set; }
+    public Versions FlexibleVersions { get; set; }
 
     [JsonPropertyName("fields")]
     public List<FieldDescriptor> Fields { get; set; }

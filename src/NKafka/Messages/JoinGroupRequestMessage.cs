@@ -78,6 +78,14 @@ public partial class JoinGroupRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class JoinGroupRequestProtocolMessage: Message
@@ -104,6 +112,14 @@ public partial class JoinGroupRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

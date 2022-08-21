@@ -54,6 +54,14 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version5)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class DescribedGroupMessage: Message
@@ -112,6 +120,14 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class DescribedGroupMemberMessage: Message
@@ -165,6 +181,14 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

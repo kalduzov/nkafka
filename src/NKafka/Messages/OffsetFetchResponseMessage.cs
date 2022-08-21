@@ -64,6 +64,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class OffsetFetchResponseTopicMessage: Message
@@ -97,6 +113,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchResponsePartitionMessage: Message
@@ -145,6 +177,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchResponseGroupMessage: Message
@@ -183,6 +231,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchResponseTopicsMessage: Message
@@ -216,6 +280,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class OffsetFetchResponsePartitionsMessage: Message
@@ -264,6 +344,22 @@ public partial class OffsetFetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version6)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

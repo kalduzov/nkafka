@@ -58,6 +58,14 @@ public partial class CreateTopicsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version5)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class CreatableTopicMessage: Message
@@ -99,6 +107,14 @@ public partial class CreateTopicsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class CreatableReplicaAssignmentMessage: Message
@@ -125,6 +141,14 @@ public partial class CreateTopicsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class CreateableTopicConfigMessage: Message
@@ -151,6 +175,14 @@ public partial class CreateTopicsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version5)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

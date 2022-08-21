@@ -53,6 +53,14 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version0)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class ReassignableTopicMessage: Message
@@ -79,6 +87,14 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class ReassignablePartitionMessage: Message
@@ -105,6 +121,14 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

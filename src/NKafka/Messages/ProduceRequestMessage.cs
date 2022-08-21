@@ -63,6 +63,14 @@ public partial class ProduceRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version9)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class TopicProduceDataMessage: Message
@@ -89,6 +97,14 @@ public partial class ProduceRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class PartitionProduceDataMessage: Message
@@ -115,6 +131,14 @@ public partial class ProduceRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

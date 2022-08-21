@@ -78,6 +78,30 @@ public partial class LeaderAndIsrRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class LeaderAndIsrPartitionStateMessage: Message
@@ -95,6 +119,30 @@ public partial class LeaderAndIsrRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class LeaderAndIsrTopicStateMessage: Message
@@ -126,6 +174,30 @@ public partial class LeaderAndIsrRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class LeaderAndIsrLiveLeaderMessage: Message
@@ -157,6 +229,30 @@ public partial class LeaderAndIsrRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
 }

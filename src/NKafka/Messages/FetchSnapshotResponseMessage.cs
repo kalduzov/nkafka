@@ -59,6 +59,14 @@ public partial class FetchSnapshotResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version0)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class TopicSnapshotMessage: Message
@@ -92,6 +100,14 @@ public partial class FetchSnapshotResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class PartitionSnapshotMessage: Message
@@ -150,6 +166,14 @@ public partial class FetchSnapshotResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class SnapshotIdMessage: Message
@@ -183,6 +207,14 @@ public partial class FetchSnapshotResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class LeaderIdAndEpochMessage: Message
@@ -216,6 +248,14 @@ public partial class FetchSnapshotResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version0)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

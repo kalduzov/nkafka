@@ -64,6 +64,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version12)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class FetchableTopicResponseMessage: Message
@@ -102,6 +110,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class PartitionDataMessage: Message
@@ -180,6 +196,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class EpochEndOffsetMessage: Message
@@ -213,6 +237,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class LeaderIdAndEpochMessage: Message
@@ -246,6 +278,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class SnapshotIdMessage: Message
@@ -279,6 +319,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class AbortedTransactionMessage: Message
@@ -312,6 +360,14 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version12)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

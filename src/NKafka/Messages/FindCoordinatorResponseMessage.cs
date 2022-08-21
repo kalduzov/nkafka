@@ -79,6 +79,14 @@ public partial class FindCoordinatorResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class CoordinatorMessage: Message
@@ -132,6 +140,14 @@ public partial class FindCoordinatorResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

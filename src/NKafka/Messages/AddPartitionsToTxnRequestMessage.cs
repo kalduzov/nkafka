@@ -63,6 +63,14 @@ public partial class AddPartitionsToTxnRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class AddPartitionsToTxnTopicMessage: Message
@@ -89,6 +97,14 @@ public partial class AddPartitionsToTxnRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

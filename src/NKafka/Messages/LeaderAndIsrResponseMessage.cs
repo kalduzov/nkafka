@@ -64,6 +64,22 @@ public partial class LeaderAndIsrResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class LeaderAndIsrPartitionErrorMessage: Message
@@ -88,6 +104,22 @@ public partial class LeaderAndIsrResponseMessage: ResponseMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class LeaderAndIsrTopicErrorMessage: Message
@@ -121,6 +153,22 @@ public partial class LeaderAndIsrResponseMessage: ResponseMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version4)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
 }

@@ -59,5 +59,25 @@ public partial class SaslHandshakeResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        if (Version >= ApiVersions.Version0)
+        {
+            if (Mechanisms is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)Mechanisms.Count + 1);
+                foreach (var val in Mechanisms)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 }

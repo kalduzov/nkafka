@@ -25,6 +25,7 @@ public class MessagesGeneratorTask: Task
     public override bool Execute()
     {
         const string messageSuffix = "Message";
+
         // Log.LogMessage(MessageImportance.High, $"Solution {SolutionDirectory} output {OutputDirectory}");
         // Log.LogMessage(MessageImportance.High, "Start messages generator");
 
@@ -77,7 +78,9 @@ public class MessagesGeneratorTask: Task
     private static IMessageGenerator BuildMessageGenerator(ApiDescriptor apiDescriptor)
     {
         var headerGenerator = new HeaderGenerator("NKafka.Messages");
-        var classGenerator = new ClassGenerator(apiDescriptor);
+        var readMethodGenerator = new ReadMethodGenerator(apiDescriptor);
+        var writeMethodGenerator = new WriteMethodGenerator(apiDescriptor);
+        var classGenerator = new ClassGenerator(apiDescriptor, writeMethodGenerator, readMethodGenerator);
 
         return new MessageGenerator.MessageGenerator(apiDescriptor, headerGenerator, classGenerator);
     }

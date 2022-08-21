@@ -55,6 +55,14 @@ public partial class ProduceResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version9)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class TopicProduceResponseMessage: Message
@@ -88,6 +96,14 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class PartitionProduceResponseMessage: Message
@@ -146,6 +162,14 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class BatchIndexAndErrorMessageMessage: Message
@@ -179,6 +203,14 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version9)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

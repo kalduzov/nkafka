@@ -74,6 +74,30 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version3)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class ApiVersionMessage: Message
@@ -112,6 +136,30 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class SupportedFeatureKeyMessage: Message
@@ -150,6 +198,30 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class FinalizedFeatureKeyMessage: Message
@@ -188,6 +260,30 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            //flexible version
+            if (Version >= ApiVersions.Version3)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

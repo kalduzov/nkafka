@@ -73,6 +73,30 @@ public partial class UpdateMetadataRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        //flexible version
+        if (Version >= ApiVersions.Version6)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class UpdateMetadataPartitionStateMessage: Message
@@ -90,6 +114,30 @@ public partial class UpdateMetadataRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class UpdateMetadataTopicStateMessage: Message
@@ -121,6 +169,30 @@ public partial class UpdateMetadataRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class UpdateMetadataBrokerMessage: Message
@@ -162,6 +234,30 @@ public partial class UpdateMetadataRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
         public class UpdateMetadataEndpointMessage: Message
@@ -198,6 +294,30 @@ public partial class UpdateMetadataRequestMessage: RequestMessage
 
             public override void Write(BufferWriter writer, ApiVersions version)
             {
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
+                //flexible version
+                if (Version >= ApiVersions.Version6)
+                {
+                }
+                else //no flexible version
+                {
+                }
+
             }
         }
 }

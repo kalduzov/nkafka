@@ -58,6 +58,34 @@ public partial class DeleteTopicsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version4)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
+        if (Version >= ApiVersions.Version4)
+        {
+            if (TopicNames is null)
+            {
+                writer.WriteVarUInt(0);
+                Size += 4;
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)TopicNames.Count + 1);
+                foreach (var val in TopicNames)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
+        }
+        else
+        {
+        }
+
     }
 
     public class DeleteTopicStateMessage: Message
@@ -84,6 +112,34 @@ public partial class DeleteTopicsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version4)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
+            if (Version >= ApiVersions.Version4)
+            {
+                if (TopicNames is null)
+                {
+                    writer.WriteVarUInt(0);
+                    Size += 4;
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)TopicNames.Count + 1);
+                    foreach (var val in TopicNames)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
+            }
+            else
+            {
+            }
+
         }
     }
 }

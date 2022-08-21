@@ -53,6 +53,14 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
+        //flexible version
+        if (Version >= ApiVersions.Version1)
+        {
+        }
+        else //no flexible version
+        {
+        }
+
     }
 
     public class AlterConfigsResourceMessage: Message
@@ -84,6 +92,14 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
     public class AlterableConfigMessage: Message
@@ -115,6 +131,14 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
+            //flexible version
+            if (Version >= ApiVersions.Version1)
+            {
+            }
+            else //no flexible version
+            {
+            }
+
         }
     }
 }

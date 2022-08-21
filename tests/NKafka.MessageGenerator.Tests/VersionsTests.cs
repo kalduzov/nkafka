@@ -41,4 +41,18 @@ public class VersionsTests
         versions.Highest.Should().Be(highest);
         versions.Lowest.Should().Be(lowest);
     }
+
+    [Theory]
+    [InlineData("1-4", "1-2", "3-4")]
+    [InlineData("3+", "4+", "3")]
+    [InlineData("4+", "3+", "none")]
+    [InlineData("1-5", "2-4", null)]
+    public void SubtractTests(string oneString, string twoString, string resultString)
+    {
+        var one = Versions.Parse(oneString);
+        var two = Versions.Parse(twoString);
+        var result = one! - two!;
+
+        result.Should().Be(Versions.Parse(resultString));
+    }
 }

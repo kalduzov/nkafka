@@ -26,8 +26,10 @@ using NKafka.MessageGenerator.Converters;
 namespace NKafka.MessageGenerator;
 
 [JsonConverter(typeof(VersionsJsonConverter))]
-public sealed class Versions
+public sealed class Versions: IEquatable<Versions>
 {
+    public static readonly Versions All = new(0, short.MaxValue);
+
     public static readonly Versions None = new();
 
     public const string NONE_STRING = "none";
@@ -48,8 +50,9 @@ public sealed class Versions
     }
 
     public Versions()
-        : this(0, -1)
     {
+        Lowest = 0;
+        Highest = -1;
     }
 
     public static Versions? Parse(string input, Versions? defaultVersions = null!)
@@ -92,6 +95,85 @@ public sealed class Versions
             var highest = short.Parse(trimmedInput[(dashIndex + 1)..]);
 
             return new Versions(lowest, highest);
+        }
+    }
+
+    public Versions Intersect(Versions other)
+    {
+        var newLowest = Lowest > other.Lowest ? Lowest : other.Lowest;
+        var newHighest = Highest < other.Highest ? Highest : other.Highest;
+
+        if (newLowest > newHighest)
+        {
+            return Versions.None;
+        }
+
+        return new Versions(newLowest, newHighest);
+    }
+
+    public static Versions operator -(Versions one, Versions two)
+    {
+        if (two.Lowest <= one.Lowest)
+        {
+            if (two.Highest >= one.Highest)
+            {
+                return None;
+            }
+
+            return two.Highest < one.Lowest ? one : new Versions((short)(two.Highest + 1), one.Highest);
+        }
+
+        if (two.Highest < one.Highest)
+        {
+            return null!;
+        }
+
+        var newHighest = two.Lowest - 1;
+
+        if (newHighest < 0)
+        {
+            return one;
+        }
+
+        return newHighest < one.Highest ? new Versions(one.Lowest, (short)newHighest) : one;
+    }
+
+    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+    /// <param name="other">An object to compare with this object.</param>
+    /// <returns>
+    /// <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <see langword="false" />.</returns>
+    public bool Equals(Versions? other)
+    {
+        if (ReferenceEquals(null, other))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Lowest == other.Lowest
+               && Highest == other.Highest;
+    }
+
+    /// <summary>Determines whether the specified object is equal to the current object.</summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns>
+    /// <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is Versions other && Equals(other);
+    }
+
+    /// <summary>Serves as the default hash function.</summary>
+    /// <returns>A hash code for the current object.</returns>
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            return (Lowest.GetHashCode() * 397) ^ Highest.GetHashCode();
         }
     }
 }

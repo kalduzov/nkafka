@@ -1,9 +1,8 @@
-using System.Resources;
+using System.Text;
 
-using Microsoft.Build.Utilities;
-using Microsoft.Extensions.Logging.Abstractions;
+using FluentAssertions;
 
-using NKafka.BuildTasks;
+using Moq;
 
 using Xunit;
 
@@ -11,17 +10,41 @@ namespace NKafka.MessageGenerator.Tests;
 
 public class MessageGeneratorTests
 {
-    private readonly MessageGenerator _messageGenerator;
-
-    public MessageGeneratorTests()
-    {
-        var pathToSolutions = Path.Combine("..", "..", "..", "..", "..");
-        //_messageGenerator = new MessageGenerator(pathToSolutions, "message", "NKafka.Tests", NullLogger.Instance);
-    }
-
     [Fact]
     public void GenerateTest()
     {
-        //_messageGenerator.Generate();
+        var descriptor = new ApiDescriptor
+        {
+            Listeners = new List<string>
+            {
+                "zkBroker",
+                "broker"
+            },
+            ApiKey = 25,
+            Name = "AddOffsetsToTxnRequest",
+            Type = ApiMessageType.Request,
+            ValidVersions = Versions.Parse("0-3")!,
+            FlexibleVersions = Versions.Parse("3+")!,
+            Fields = new List<FieldDescriptor>
+            {
+                new()
+                {
+                    Name = "TransactionalId",
+                    About = "The transactional id corresponding to the transaction.",
+                    Type = IFieldType.Parse("string"),
+                    Versions = Versions.Parse("0+"),
+                    EntityType = "transactionalId"
+                }
+            }
+        };
+
+        var headerGeneratorMock = new Mock<IHeaderGenerator>();
+        headerGeneratorMock.Setup(x => x.Generate()).Returns(new StringBuilder());
+        var classGeneratorMock = new Mock<IClassGenerator>();
+        classGeneratorMock.Setup(x => x.Generate()).Returns(new StringBuilder());
+
+        var messageGenerator = new MessageGenerator(descriptor, headerGeneratorMock.Object, classGeneratorMock.Object);
+        var result = messageGenerator.Generate();
+        result.ToString().Should().NotBeEmpty();
     }
 }

@@ -1,7 +1,5 @@
 using System.Text.Json.Serialization;
 
-using NKafka.MessageGenerator.Converters;
-
 namespace NKafka.MessageGenerator;
 
 public class FieldDescriptor
@@ -10,7 +8,7 @@ public class FieldDescriptor
     public string Name { get; set; }
 
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public IFieldType Type { get; set; }
 
     [JsonPropertyName("versions")]
     public Versions? Versions { get; set; }
@@ -48,3 +46,4 @@ public class FieldDescriptor
     [JsonPropertyName("fields")]
     public List<FieldDescriptor> Fields { get; set; }
 }
+

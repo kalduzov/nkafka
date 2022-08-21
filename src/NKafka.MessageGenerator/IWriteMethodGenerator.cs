@@ -25,5 +25,5 @@ namespace NKafka.MessageGenerator;
 
 public interface IWriteMethodGenerator
 {
-    StringBuilder Generate(int startIndent = Generator.DEFAULT_INDENT);
+    StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = Generator.DEFAULT_INDENT);
 }

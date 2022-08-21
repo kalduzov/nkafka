@@ -32,13 +32,13 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         _descriptor = descriptor;
     }
 
-    public StringBuilder Generate(int startIndent = DEFAULT_INDENT)
+    public StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = DEFAULT_INDENT)
     {
         IndentValue = startIndent;
 
         var builder = new StringBuilder();
 
-        foreach (var field in _descriptor.Fields)
+        foreach (var field in fields)
         {
             var fieldWriteCode = GenerateSerializeField(field, _descriptor.FlexibleVersions);
             builder.Append(fieldWriteCode);
@@ -51,13 +51,11 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
     {
         var builder = new StringBuilder();
 
-        if (field.Type.StartsWith("[]")) //array type
+        if (field.Type.IsArray) //array type
         {
-            var type = field.Type[2..];
-
-            if (IsSimpleType(type))
+            if (!field.Type.IsStruct)
             {
-                var arrayOfSimpleType = GenerateArrayOfSimpleType(flexibleVersions.Lowest, field.Name, type);
+                var arrayOfSimpleType = GenerateArrayOfSimpleType(flexibleVersions.Lowest, field.Name, field.Type);
                 builder.Append(arrayOfSimpleType);
             }
             else
@@ -70,7 +68,7 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         }
         else //single type
         {
-            if (IsSimpleType(field.Type))
+            if (!field.Type.IsStruct)
             {
                 var simpleType = GenerateSimpleType(field, flexibleVersions);
                 builder.Append(simpleType);
@@ -84,14 +82,14 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
     {
         var builder = new StringBuilder();
 
-        if (field.Type is "byte" or "bool") //no flexible
-        {
-        }
+        // if (field.Type is "byte" or "bool") //no flexible
+        // {
+        // }
 
         return builder;
     }
 
-    private StringBuilder GenerateArrayOfSimpleType(short minFlexibleVersion, string name, string type)
+    private StringBuilder GenerateArrayOfSimpleType(short minFlexibleVersion, string name, IFieldType type)
     {
         var builder = new StringBuilder();
 
@@ -99,17 +97,26 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         builder.AppendLine($"{Indent}{{");
 
         IncrementIndent();
-        builder.AppendLine($"{Indent}if ({name} is null)");
-        builder.AppendLine($"{Indent}{{");
 
-        IncrementIndent();
-        builder.AppendLine($"{Indent}writer.WriteVarUInt(0);");
-        builder.AppendLine($"{Indent}Size += 4;");
-        DecrementIndent();
+        if (type.CanBeNull)
+        {
+            builder.AppendLine($"{Indent}if ({name} is null)");
+            builder.AppendLine($"{Indent}{{");
 
-        builder.AppendLine($"{Indent}}}");
-        builder.AppendLine($"{Indent}else");
-        builder.AppendLine($"{Indent}{{");
+            IncrementIndent();
+            builder.AppendLine($"{Indent}writer.WriteVarUInt(0);");
+
+            if (_descriptor.Type == ApiMessageType.Request)
+            {
+                builder.AppendLine($"{Indent}Size += {type.Size};");
+            }
+
+            DecrementIndent();
+
+            builder.AppendLine($"{Indent}}}");
+            builder.AppendLine($"{Indent}else");
+            builder.AppendLine($"{Indent}{{");
+        }
 
         IncrementIndent();
         builder.AppendLine($"{Indent}writer.WriteVarUInt((uint){name}.Count + 1);");
@@ -178,46 +185,5 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         builder.AppendLine($"{Indent}}}");
 
         return builder;
-    }
-
-    private static IEnumerable<short> GetSetVersions(string versionString, short maxVersion = -1)
-    {
-        const short currentMaxVersion = 12;
-
-        var set = new HashSet<short>();
-
-        var vs = versionString.Split('-');
-
-        short startIndex = 0;
-        short endIndex = 0;
-
-        switch (vs.Length)
-        {
-            case 2:
-                startIndex = short.Parse(vs[0]);
-                endIndex = maxVersion == -1 ? short.Parse(vs[1]) : maxVersion;
-
-                break;
-            case 1:
-                if (versionString.EndsWith("+"))
-                {
-                    startIndex = short.Parse(versionString.TrimEnd('+'));
-                    endIndex = maxVersion == -1 ? currentMaxVersion : maxVersion;
-                }
-
-                break;
-        }
-
-        for (var i = startIndex; i <= endIndex; i++)
-        {
-            set.Add(i);
-        }
-
-        return set;
-    }
-
-    private static bool IsSimpleType(string type)
-    {
-        return type is "int8" or "int16" or "int32" or "int64" or "uint16" or "uint32" or "string" or "float64" or "bool" or "uuid";
     }
 }

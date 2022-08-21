@@ -1,7 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 
-using NKafka.MessageGenerator.Converters;
-
 namespace NKafka.MessageGenerator;
 
 /// <summary>

@@ -19,25 +19,21 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
+using FluentAssertions;
 
-namespace NKafka.MessageGenerator;
+using Xunit;
 
-public class ReadMethodGenerator: Generator, IReadMethodGenerator
+namespace NKafka.MessageGenerator.Tests;
+
+public class FieldTypeTests
 {
-    private readonly ApiDescriptor _descriptor;
-
-    public ReadMethodGenerator(ApiDescriptor descriptor)
+    [Theory]
+    [InlineData("bool", typeof(IFieldType.BoolFieldType), "bool")]
+    [InlineData("string", typeof(IFieldType.StringFieldType), "string")]
+    public void ParseTest(string value, Type result, string clrType)
     {
-        _descriptor = descriptor;
-    }
-
-    public StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = DEFAULT_INDENT)
-    {
-        IndentValue = startIndent;
-
-        var builder = new StringBuilder();
-
-        return builder;
+        var parseType = IFieldType.Parse(value);
+        parseType.Should().BeOfType(result);
+        parseType.ClrName.Should().Be(clrType);
     }
 }

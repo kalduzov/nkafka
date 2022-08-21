@@ -34,7 +34,7 @@ public class ClassGenerator: Generator, IClassGenerator
     private const string _CLASS_TEMPLATE = "public partial class {0}: {1}\r\n{{\r\n{2}}}";
     private const string _EMPTY_CLASS_TEMPLATE = "public partial class {0}\r\n{{\r\n}}";
 
-    private readonly Dictionary<string, List<FieldDescriptor>> _internalClasses;
+    private readonly Dictionary<IFieldType, List<FieldDescriptor>> _internalClasses;
 
     public ClassGenerator(ApiDescriptor descriptor, IWriteMethodGenerator writeMethodGenerator, IReadMethodGenerator readMethodGenerator)
     {
@@ -91,11 +91,11 @@ public class ClassGenerator: Generator, IClassGenerator
         builder.Append(ctor);
         builder.AppendLine();
 
-        var readMethod = GenerateReadMethod(descriptor);
+        var readMethod = GenerateReadMethod(descriptor.Fields);
         builder.Append(readMethod);
         builder.AppendLine();
 
-        var writeMethod = GenerateWriteMethod(descriptor);
+        var writeMethod = GenerateWriteMethod(descriptor.Fields);
         builder.Append(writeMethod);
 
         if (!_internalClasses.Any())
@@ -116,15 +116,15 @@ public class ClassGenerator: Generator, IClassGenerator
 
         IncrementIndent();
 
-        foreach (var complexClass in _internalClasses)
+        foreach (var @class in _internalClasses)
         {
-            var className = $"{complexClass.Key}Message";
+            var className = $"{@class.Key.ClrName}";
 
             builder
                 .AppendLine($"{Indent}public class {className}: Message")
                 .AppendLine($"{Indent}{{");
 
-            var fields = GenerateProperties(complexClass.Value, ApiMessageType.None);
+            var fields = GenerateProperties(@class.Value, ApiMessageType.None);
             builder.Append(fields);
             builder.AppendLine();
 
@@ -132,11 +132,11 @@ public class ClassGenerator: Generator, IClassGenerator
             builder.Append(constructor);
             builder.AppendLine();
 
-            var decodeMethod = GenerateReadMethod(_descriptor);
+            var decodeMethod = GenerateReadMethod(@class.Value);
             builder.Append(decodeMethod);
             builder.AppendLine();
 
-            var writeMethod = GenerateWriteMethod(_descriptor);
+            var writeMethod = GenerateWriteMethod(@class.Value);
             builder.Append(writeMethod);
             builder.AppendLine($"{Indent}}}");
         }
@@ -144,7 +144,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateWriteMethod(ApiDescriptor descriptor)
+    private StringBuilder GenerateWriteMethod(List<FieldDescriptor> fields)
     {
         IncrementIndent();
         var builder = new StringBuilder();
@@ -153,7 +153,7 @@ public class ClassGenerator: Generator, IClassGenerator
         builder.AppendLine($"{Indent}{{");
 
         IncrementIndent();
-        var writeBody = _writeMethodGenerator.Generate(IndentValue);
+        var writeBody = _writeMethodGenerator.Generate(fields, IndentValue);
         builder.Append(writeBody);
         DecrementIndent();
 
@@ -195,7 +195,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateReadMethod(ApiDescriptor descriptor)
+    private StringBuilder GenerateReadMethod(List<FieldDescriptor> fields)
     {
         var builder = new StringBuilder();
 
@@ -204,7 +204,7 @@ public class ClassGenerator: Generator, IClassGenerator
         builder.AppendLine($"{Indent}{{");
 
         IncrementIndent();
-        var readBody = _readMethodGenerator.Generate(IndentValue);
+        var readBody = _readMethodGenerator.Generate(fields, IndentValue);
         builder.Append(readBody);
         DecrementIndent();
 
@@ -219,7 +219,7 @@ public class ClassGenerator: Generator, IClassGenerator
         IncrementIndent();
         var builder = new StringBuilder();
 
-        if (fields is null || fields.Count == 0)
+        if (fields.Count == 0)
         {
             return builder;
         }
@@ -326,12 +326,12 @@ public class ClassGenerator: Generator, IClassGenerator
         builder.AppendLine($"{Indent}/// {field.About}");
         builder.AppendLine($"{Indent}/// </summary>");
 
-        var fieldType = GeneratePropertyType(field.Type);
+        var clrFullType = GetClrType(field);
 
         var nullableMarker = NullableMarkerIfNeeded(field);
-        builder.Append($"{Indent}public {fieldType}{nullableMarker} {field.Name} {{ get; set; }}");
+        builder.Append($"{Indent}public {clrFullType}{nullableMarker} {field.Name} {{ get; set; }}");
 
-        var defaultValue = GetDefaultValue(field.Default, field.Ignorable, field.Type, fieldType);
+        var defaultValue = GetDefaultValue(field.Default, field.Ignorable, field.Type);
 
         if (!string.IsNullOrWhiteSpace(defaultValue))
         {
@@ -339,6 +339,21 @@ public class ClassGenerator: Generator, IClassGenerator
         }
 
         return builder;
+    }
+
+    private string GetClrType(FieldDescriptor field)
+    {
+        if (!field.Type.IsArray)
+        {
+            return field.Type.ClrName;
+        }
+
+        if (field.MapKey ?? false)
+        {
+            return $"IReadOnlyDictionary<{field.Type.ClrName}>"; //todo тут должен быть словарь
+        }
+
+        return $"IReadOnlyCollection<{field.Type.ClrName}>";
     }
 
     private static string NullableMarkerIfNeeded(FieldDescriptor field)
@@ -349,128 +364,28 @@ public class ClassGenerator: Generator, IClassGenerator
             : string.Empty;
     }
 
-    private static string GetDefaultValue(string? @default, bool? ignorable, string type, string fieldType)
+    private static string GetDefaultValue(string? @default, bool? ignorable, IFieldType type)
     {
         return @default;
     }
 
-    private static bool IsSimpleType(string type)
+    private static Dictionary<IFieldType, List<FieldDescriptor>> GetAllInternalClasses(List<FieldDescriptor> fields)
     {
-        return type is "int8" or "int16" or "int32" or "int64" or "uint16" or "uint32" or "string" or "float64" or "bool" or "uuid";
-    }
+        var result = new Dictionary<IFieldType, List<FieldDescriptor>>();
 
-    private static string GeneratePropertyType(string fieldType)
-    {
-        if (fieldType == "bytes")
-        {
-            return "byte[]";
-        }
-
-        if (fieldType == "records")
-        {
-            return "RecordBatch";
-        }
-
-        if (fieldType.StartsWith("[]"))
-        {
-            var typeName = fieldType[2..];
-
-            if (IsSimpleType(typeName))
-            {
-                typeName = MapTypeToClrType(typeName);
-            }
-            else
-            {
-                typeName += "Message";
-            }
-
-            return $"IReadOnlyCollection<{typeName}>";
-        }
-
-        return IsSimpleType(fieldType) ? MapTypeToClrType(fieldType) : $"{fieldType}Message";
-    }
-
-    private static string MapTypeToClrType(string type)
-    {
-        return type switch
-        {
-            "int8" => "sbyte",
-            "int16" => "short",
-            "int32" => "int",
-            "int64" => "long",
-            "uint16" => "ushort",
-            "uint32" => "uint",
-            "string" => "string",
-            "float64" => "double",
-            "bool" => "bool",
-            "uuid" => "Guid",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
-    }
-
-    private static HashSet<short> GetSetVersions(string versionString, short maxVersion = -1)
-    {
-        const short currentMaxVersion = 12;
-
-        var set = new HashSet<short>();
-
-        var vs = versionString.Split('-');
-
-        short startIndex = 0;
-        short endIndex = 0;
-
-        switch (vs.Length)
-        {
-            case 2:
-                startIndex = short.Parse(vs[0]);
-                endIndex = maxVersion == -1 ? short.Parse(vs[1]) : maxVersion;
-
-                break;
-            case 1:
-                if (versionString.EndsWith("+"))
-                {
-                    startIndex = short.Parse(versionString.TrimEnd('+'));
-                    endIndex = maxVersion == -1 ? currentMaxVersion : maxVersion;
-                }
-
-                break;
-        }
-
-        for (var i = startIndex; i <= endIndex; i++)
-        {
-            set.Add(i);
-        }
-
-        return set;
-    }
-
-    private static Dictionary<string, List<FieldDescriptor>> GetAllInternalClasses(List<FieldDescriptor> fields)
-    {
-        var result = new Dictionary<string, List<FieldDescriptor>>();
-
-        if (fields is null || fields.Count == 0)
+        if (fields.Count == 0)
         {
             return result;
         }
 
         foreach (var field in fields)
         {
-            var type = field.Type;
-
-            if (type is "bytes" or "records")
+            if (!field.Type.IsStruct && !field.Type.IsStructArray)
             {
                 continue;
             }
 
-            if (field.Type.Contains("[]"))
-            {
-                type = field.Type[2..];
-            }
-
-            if (!IsSimpleType(type))
-            {
-                result.TryAdd(type, field.Fields);
-            }
+            result.TryAdd(field.Type, field.Fields);
 
             var res = GetAllInternalClasses(field.Fields);
 

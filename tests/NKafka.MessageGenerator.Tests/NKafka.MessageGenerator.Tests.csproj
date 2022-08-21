@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NKafka.BuildTasks\NKafka.BuildTasks.csproj" />
     <ProjectReference Include="..\..\src\NKafka.MessageGenerator\NKafka.MessageGenerator.csproj" />
   </ItemGroup>
 

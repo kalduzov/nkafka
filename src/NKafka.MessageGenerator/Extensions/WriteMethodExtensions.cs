@@ -19,25 +19,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
+namespace NKafka.MessageGenerator.Extensions;
 
-namespace NKafka.MessageGenerator;
-
-public class ReadMethodGenerator: Generator, IReadMethodGenerator
+internal static class WriteMethodExtensions
 {
-    private readonly ApiDescriptor _descriptor;
-
-    public ReadMethodGenerator(ApiDescriptor descriptor)
-    {
-        _descriptor = descriptor;
-    }
-
-    public StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = DEFAULT_INDENT)
-    {
-        IndentValue = startIndent;
-
-        var builder = new StringBuilder();
-
-        return builder;
-    }
+    
 }

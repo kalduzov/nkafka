@@ -53,11 +53,22 @@ public partial class AlterConfigsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
         if (Version >= ApiVersions.Version2)
         {
+            if (Resources is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)Resources.Count + 1);
+                foreach (var val in Resources)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
@@ -92,11 +103,22 @@ public partial class AlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
             if (Version >= ApiVersions.Version2)
             {
+                if (Configs is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)Configs.Count + 1);
+                    foreach (var val in Configs)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
             }
-            else //no flexible version
+            else
             {
             }
 
@@ -126,14 +148,6 @@ public partial class AlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

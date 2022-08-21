@@ -53,11 +53,22 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
         if (Version >= ApiVersions.Version1)
         {
+            if (Entries is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)Entries.Count + 1);
+                foreach (var val in Entries)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
@@ -87,11 +98,41 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
             if (Version >= ApiVersions.Version1)
             {
+                if (Entity is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)Entity.Count + 1);
+                    foreach (var val in Entity)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
             }
-            else //no flexible version
+            else
+            {
+            }
+
+            if (Version >= ApiVersions.Version1)
+            {
+                if (Ops is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)Ops.Count + 1);
+                    foreach (var val in Ops)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
+            }
+            else
             {
             }
 
@@ -121,14 +162,6 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class OpDataMessage: Message
@@ -160,14 +193,6 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

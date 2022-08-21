@@ -48,11 +48,22 @@ public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
         if (Version >= ApiVersions.Version2)
         {
+            if (Dirs is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)Dirs.Count + 1);
+                foreach (var val in Dirs)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
@@ -82,11 +93,22 @@ public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
             if (Version >= ApiVersions.Version2)
             {
+                if (Topics is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)Topics.Count + 1);
+                    foreach (var val in Topics)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
             }
-            else //no flexible version
+            else
             {
             }
 
@@ -116,11 +138,22 @@ public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
             if (Version >= ApiVersions.Version2)
             {
+                if (Partitions is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt((uint)Partitions.Count + 1);
+                    foreach (var val in Partitions)
+                    {
+                        writer.WriteVarInt(val);
+                    }
+                }
             }
-            else //no flexible version
+            else
             {
             }
 

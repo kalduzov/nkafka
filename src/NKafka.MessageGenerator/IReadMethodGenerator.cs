@@ -24,6 +24,6 @@ using System.Text;
 namespace NKafka.MessageGenerator;
 
 public interface IReadMethodGenerator
-{ 
-    StringBuilder Generate(int startIndent = Generator.DEFAULT_INDENT);
+{
+    StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = Generator.DEFAULT_INDENT);
 }

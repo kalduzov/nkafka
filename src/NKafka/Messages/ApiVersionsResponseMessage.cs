@@ -74,27 +74,60 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
         if (Version >= ApiVersions.Version3)
         {
+            if (ApiKeys is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)ApiKeys.Count + 1);
+                foreach (var val in ApiKeys)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
-        //flexible version
         if (Version >= ApiVersions.Version3)
         {
+            if (SupportedFeatures is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)SupportedFeatures.Count + 1);
+                foreach (var val in SupportedFeatures)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
-        //flexible version
         if (Version >= ApiVersions.Version3)
         {
+            if (FinalizedFeatures is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt((uint)FinalizedFeatures.Count + 1);
+                foreach (var val in FinalizedFeatures)
+                {
+                    writer.WriteVarInt(val);
+                }
+            }
         }
-        else //no flexible version
+        else
         {
         }
 
@@ -136,30 +169,6 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class SupportedFeatureKeyMessage: Message
@@ -198,30 +207,6 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class FinalizedFeatureKeyMessage: Message
@@ -260,30 +245,6 @@ public partial class ApiVersionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Microsoft.Build.Framework;
 
 using NKafka.MessageGenerator;
+using NKafka.MessageGenerator.Specifications;
 
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Task = Microsoft.Build.Utilities.Task;
@@ -44,7 +45,7 @@ public class MessagesGeneratorTask: Task
 
                 switch (apiDescriptor.Type)
                 {
-                    case ApiMessageType.Request or ApiMessageType.Response:
+                    case MessageType.Request or MessageType.Response:
                     {
                         var messageGenerator = BuildMessageGenerator(apiDescriptor);
                         var result = messageGenerator.Generate();
@@ -75,14 +76,14 @@ public class MessagesGeneratorTask: Task
         File.WriteAllText(path, result.ToString(), Encoding.UTF8);
     }
 
-    private static IMessageGenerator BuildMessageGenerator(ApiDescriptor apiDescriptor)
+    private static IMessageGenerator BuildMessageGenerator(MessageSpecification messageSpecification)
     {
         var headerGenerator = new HeaderGenerator("NKafka.Messages");
-        var readMethodGenerator = new ReadMethodGenerator(apiDescriptor);
-        var writeMethodGenerator = new WriteMethodGenerator(apiDescriptor);
-        var classGenerator = new ClassGenerator(apiDescriptor, writeMethodGenerator, readMethodGenerator);
+        var readMethodGenerator = new ReadMethodGenerator(messageSpecification);
+        var writeMethodGenerator = new WriteMethodGenerator(messageSpecification);
+        var classGenerator = new ClassGenerator(messageSpecification, writeMethodGenerator, readMethodGenerator);
 
-        return new MessageGenerator.MessageGenerator(apiDescriptor, headerGenerator, classGenerator);
+        return new MessageGenerator.MessageGenerator(messageSpecification, headerGenerator, classGenerator);
     }
 
     private IEnumerable<string> GetFileResources()
@@ -92,7 +93,7 @@ public class MessagesGeneratorTask: Task
         return Directory.GetFiles(pathToResources, "*.json");
     }
 
-    private static ApiDescriptor GetApiDescriptor(string fileName)
+    private static MessageSpecification GetApiDescriptor(string fileName)
     {
         var str = string.Empty;
 
@@ -113,7 +114,7 @@ public class MessagesGeneratorTask: Task
 
         try
         {
-            return JsonSerializer.Deserialize<ApiDescriptor>(
+            return JsonSerializer.Deserialize<MessageSpecification>(
                 str,
                 new JsonSerializerOptions
                 {

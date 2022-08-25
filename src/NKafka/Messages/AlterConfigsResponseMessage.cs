@@ -54,25 +54,6 @@ public partial class AlterConfigsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version2)
-        {
-            if (Responses is null)
-            {
-                writer.WriteVarUInt(0);
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Responses.Count + 1);
-                foreach (var val in Responses)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 
     public class AlterConfigsResourceResponseMessage: Message

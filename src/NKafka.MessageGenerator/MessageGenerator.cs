@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.Logging;
 
+using NKafka.MessageGenerator.Specifications;
+
 namespace NKafka.MessageGenerator;
 
 /// <summary>
@@ -11,7 +13,7 @@ public class MessageGenerator: IMessageGenerator
 {
     private const string _MESSAGE_SUFFIX = "Message";
 
-    private readonly ApiDescriptor _apiDescriptor;
+    private readonly MessageSpecification _messageSpecification;
     private readonly IHeaderGenerator _headerGenerator;
     private readonly IClassGenerator _classGenerator;
     private readonly string _solutionDirectory;
@@ -22,13 +24,13 @@ public class MessageGenerator: IMessageGenerator
 
     public string ClassName { get; }
 
-    public MessageGenerator(ApiDescriptor apiDescriptor, IHeaderGenerator headerGenerator, IClassGenerator classGenerator)
+    public MessageGenerator(MessageSpecification messageSpecification, IHeaderGenerator headerGenerator, IClassGenerator classGenerator)
     {
-        _apiDescriptor = apiDescriptor;
+        _messageSpecification = messageSpecification;
         _headerGenerator = headerGenerator;
         _classGenerator = classGenerator;
 
-        ClassName = $"{apiDescriptor.Name}{_MESSAGE_SUFFIX}";
+        ClassName = $"{messageSpecification.Name}{_MESSAGE_SUFFIX}";
     }
 
     public StringBuilder Generate()

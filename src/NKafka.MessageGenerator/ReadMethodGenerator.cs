@@ -21,18 +21,20 @@
 
 using System.Text;
 
+using NKafka.MessageGenerator.Specifications;
+
 namespace NKafka.MessageGenerator;
 
 public class ReadMethodGenerator: Generator, IReadMethodGenerator
 {
-    private readonly ApiDescriptor _descriptor;
+    private readonly MessageSpecification _descriptor;
 
-    public ReadMethodGenerator(ApiDescriptor descriptor)
+    public ReadMethodGenerator(MessageSpecification descriptor)
     {
         _descriptor = descriptor;
     }
 
-    public StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = DEFAULT_INDENT)
+    public StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = DEFAULT_INDENT)
     {
         IndentValue = startIndent;
 

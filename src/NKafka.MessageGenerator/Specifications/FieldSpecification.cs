@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace NKafka.MessageGenerator;
+namespace NKafka.MessageGenerator.Specifications;
 
-public class FieldDescriptor
+public class FieldSpecification
 {
     [JsonPropertyName("name")]
     public string Name { get; set; }
@@ -12,16 +12,16 @@ public class FieldDescriptor
 
     [JsonPropertyName("versions")]
     public Versions? Versions { get; set; }
-    
+
     [JsonPropertyName("nullableVersions")]
     public Versions? NullableVersions { get; set; }
-    
+
     [JsonPropertyName("taggedVersions")]
     public Versions? TaggedVersions { get; set; }
-    
+
     [JsonPropertyName("flexibleVersions")]
     public Versions? FlexibleVersions { get; set; }
-    
+
     [JsonPropertyName("about")]
     public string? About { get; set; }
 
@@ -32,10 +32,10 @@ public class FieldDescriptor
     public bool? Ignorable { get; set; }
 
     [JsonPropertyName("entityType")]
-    public string EntityType { get; set; }
+    public EntityType EntityType { get; set; }
 
     [JsonPropertyName("mapKey")]
-    public bool? MapKey { get; set; }
+    public bool MapKey { get; set; }
 
     [JsonPropertyName("tag")]
     public int? Tag { get; set; }
@@ -44,6 +44,5 @@ public class FieldDescriptor
     public bool? ZeroCopy { get; set; }
 
     [JsonPropertyName("fields")]
-    public List<FieldDescriptor> Fields { get; set; }
+    public List<FieldSpecification> Fields { get; set; }
 }
-

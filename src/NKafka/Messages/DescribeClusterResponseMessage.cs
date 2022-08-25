@@ -79,14 +79,6 @@ public partial class DescribeClusterResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class DescribeClusterBrokerMessage: Message
@@ -130,14 +122,6 @@ public partial class DescribeClusterResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -54,25 +54,6 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version1)
-        {
-            if (Entries is null)
-            {
-                writer.WriteVarUInt(0);
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Entries.Count + 1);
-                foreach (var val in Entries)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 
     public class EntryDataMessage: Message
@@ -111,25 +92,6 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            if (Version >= ApiVersions.Version1)
-            {
-                if (Entity is null)
-                {
-                    writer.WriteVarUInt(0);
-                }
-                else
-                {
-                    writer.WriteVarUInt((uint)Entity.Count + 1);
-                    foreach (var val in Entity)
-                    {
-                        writer.WriteVarInt(val);
-                    }
-                }
-            }
-            else
-            {
-            }
-
         }
     }
     public class EntityDataMessage: Message

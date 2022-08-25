@@ -11,42 +11,31 @@
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 // 
-//      https://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 // 
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
-// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
-using NKafka.Protocol;
-using NKafka.Protocol.Extensions;
-using NKafka.Protocol.Records;
-using System.Text;
+namespace NKafka.MessageGenerator.Specifications;
 
-namespace NKafka.Messages;
-
-public partial class DeleteGroupsRequestMessage: RequestMessage
+public class StructSpecification
 {
-    /// <summary>
-    /// The group names to delete.
-    /// </summary>
-    public IReadOnlyCollection<string> GroupsNames { get; set; }
+    public string Name { get; }
 
-    public DeleteGroupsRequestMessage()
-    {
-        ApiKey = ApiKeys.DeleteGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
+    public Versions Versions { get; }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
+    public IReadOnlyCollection<FieldSpecification> Fields { get; }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    public bool HasKeys { get; }
+
+    public StructSpecification(string name, Versions validVersions, IReadOnlyCollection<FieldSpecification> fields)
     {
+        Name = name;
+        Versions = validVersions;
+        Fields = fields;
+        HasKeys = fields.Any(f => f.MapKey);
     }
 }

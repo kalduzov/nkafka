@@ -53,25 +53,5 @@ public partial class DescribeGroupsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version5)
-        {
-            if (Groups is null)
-            {
-                writer.WriteVarUInt(0);
-                Size += 4;
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Groups.Count + 1);
-                foreach (var val in Groups)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 }

@@ -23,7 +23,7 @@ using System.Text.Json.Serialization;
 
 using NKafka.MessageGenerator.Converters;
 
-namespace NKafka.MessageGenerator;
+namespace NKafka.MessageGenerator.Specifications;
 
 [JsonConverter(typeof(FieldTypeJsonConverter))]
 public interface IFieldType
@@ -95,14 +95,14 @@ public interface IFieldType
 
                 if (elementTypeString.Length == 0)
                 {
-                    throw new ArgumentException($"Can't parse array type {value}.  No element type found.");
+                    throw new ArgumentException($"Can't parse array type {value}. No element type found.");
                 }
 
                 var elementType = Parse(elementTypeString);
 
                 if (elementType.IsArray)
                 {
-                    throw new ArgumentException("Can't have an array of arrays.  Use an array of structs containing an array instead.");
+                    throw new ArgumentException("Can't have an array of arrays. Use an array of structs containing an array instead.");
                 }
 
                 return new ArrayType(elementType);
@@ -126,7 +126,7 @@ public interface IFieldType
         public const string NAME = "bytes";
         public static readonly BytesFieldType Instance = new();
 
-        public string ClrName => "bytes[]";
+        public string ClrName => "byte[]";
 
         public bool SerializationIsDifferentInFlexibleVersions => true;
 

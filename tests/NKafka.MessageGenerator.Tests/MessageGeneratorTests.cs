@@ -4,6 +4,8 @@ using FluentAssertions;
 
 using Moq;
 
+using NKafka.MessageGenerator.Specifications;
+
 using Xunit;
 
 namespace NKafka.MessageGenerator.Tests;
@@ -13,19 +15,18 @@ public class MessageGeneratorTests
     [Fact]
     public void GenerateTest()
     {
-        var descriptor = new ApiDescriptor
-        {
-            Listeners = new List<string>
+        var descriptor = new MessageSpecification(
+            25,
+            MessageType.Request,
+            new List<RequestListenerType>
             {
-                "zkBroker",
-                "broker"
+                RequestListenerType.ZkBroker,
+                RequestListenerType.Broker
             },
-            ApiKey = 25,
-            Name = "AddOffsetsToTxnRequest",
-            Type = ApiMessageType.Request,
-            ValidVersions = Versions.Parse("0-3")!,
-            FlexibleVersions = Versions.Parse("3+")!,
-            Fields = new List<FieldDescriptor>
+            "AddOffsetsToTxnRequest",
+            Versions.Parse("0-3")!,
+            Versions.Parse("3+")!,
+            new List<FieldSpecification>
             {
                 new()
                 {
@@ -33,10 +34,9 @@ public class MessageGeneratorTests
                     About = "The transactional id corresponding to the transaction.",
                     Type = IFieldType.Parse("string"),
                     Versions = Versions.Parse("0+"),
-                    EntityType = "transactionalId"
+                    EntityType = EntityType.TransactionalId
                 }
-            }
-        };
+            });
 
         var headerGeneratorMock = new Mock<IHeaderGenerator>();
         headerGeneratorMock.Setup(x => x.Generate()).Returns(new StringBuilder());

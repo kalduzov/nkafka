@@ -22,6 +22,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using NKafka.MessageGenerator.Specifications;
+
 namespace NKafka.MessageGenerator.Converters;
 
 internal class FieldTypeJsonConverter: JsonConverter<IFieldType>

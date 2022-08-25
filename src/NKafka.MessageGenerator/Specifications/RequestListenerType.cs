@@ -11,42 +11,28 @@
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 // 
-//      https://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 // 
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
-// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
-using NKafka.Protocol;
-using NKafka.Protocol.Extensions;
-using NKafka.Protocol.Records;
-using System.Text;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
-namespace NKafka.Messages;
+namespace NKafka.MessageGenerator.Specifications;
 
-public partial class DeleteGroupsRequestMessage: RequestMessage
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum RequestListenerType
 {
-    /// <summary>
-    /// The group names to delete.
-    /// </summary>
-    public IReadOnlyCollection<string> GroupsNames { get; set; }
+    [EnumMember(Value = "zkBroker")]
+    ZkBroker,
 
-    public DeleteGroupsRequestMessage()
-    {
-        ApiKey = ApiKeys.DeleteGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
+    [EnumMember(Value = "broker")]
+    Broker,
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
+    [EnumMember(Value = "controller")]
+    Controller,
 }

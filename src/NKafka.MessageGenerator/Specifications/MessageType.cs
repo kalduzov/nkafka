@@ -18,35 +18,20 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
-// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
-using NKafka.Protocol;
-using NKafka.Protocol.Extensions;
-using NKafka.Protocol.Records;
-using System.Text;
+namespace NKafka.MessageGenerator.Specifications;
 
-namespace NKafka.Messages;
-
-public partial class DeleteGroupsRequestMessage: RequestMessage
+public enum MessageType
 {
-    /// <summary>
-    /// The group names to delete.
-    /// </summary>
-    public IReadOnlyCollection<string> GroupsNames { get; set; }
+    None,
+    
+    Request,
 
-    public DeleteGroupsRequestMessage()
-    {
-        ApiKey = ApiKeys.DeleteGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
+    Response,
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
+    Header,
 
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
+    Metadata,
+
+    Data,
 }

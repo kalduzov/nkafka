@@ -64,25 +64,6 @@ public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version0)
-        {
-            if (Responses is null)
-            {
-                writer.WriteVarUInt(0);
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Responses.Count + 1);
-                foreach (var val in Responses)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 
     public class ReassignableTopicResponseMessage: Message
@@ -116,25 +97,6 @@ public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            if (Version >= ApiVersions.Version0)
-            {
-                if (Partitions is null)
-                {
-                    writer.WriteVarUInt(0);
-                }
-                else
-                {
-                    writer.WriteVarUInt((uint)Partitions.Count + 1);
-                    foreach (var val in Partitions)
-                    {
-                        writer.WriteVarInt(val);
-                    }
-                }
-            }
-            else
-            {
-            }
-
         }
     }
     public class ReassignablePartitionResponseMessage: Message

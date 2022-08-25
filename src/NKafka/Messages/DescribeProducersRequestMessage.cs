@@ -48,14 +48,6 @@ public partial class DescribeProducersRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class TopicRequestMessage: Message
@@ -82,14 +74,6 @@ public partial class DescribeProducersRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

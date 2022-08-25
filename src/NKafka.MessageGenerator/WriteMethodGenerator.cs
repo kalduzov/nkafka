@@ -21,18 +21,20 @@
 
 using System.Text;
 
+using NKafka.MessageGenerator.Specifications;
+
 namespace NKafka.MessageGenerator;
 
 public class WriteMethodGenerator: Generator, IWriteMethodGenerator
 {
-    private readonly ApiDescriptor _descriptor;
+    private readonly MessageSpecification _descriptor;
 
-    public WriteMethodGenerator(ApiDescriptor descriptor)
+    public WriteMethodGenerator(MessageSpecification descriptor)
     {
         _descriptor = descriptor;
     }
 
-    public StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = DEFAULT_INDENT)
+    public StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = DEFAULT_INDENT)
     {
         IndentValue = startIndent;
 
@@ -40,45 +42,45 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
 
         foreach (var field in fields)
         {
-            var fieldWriteCode = GenerateSerializeField(field, _descriptor.FlexibleVersions);
+            var fieldWriteCode = GenerateSerializeField(field);
             builder.Append(fieldWriteCode);
         }
 
         return builder;
     }
 
-    private StringBuilder GenerateSerializeField(FieldDescriptor field, Versions flexibleVersions)
+    private StringBuilder GenerateSerializeField(FieldSpecification field)
     {
         var builder = new StringBuilder();
 
-        if (field.Type.IsArray) //array type
-        {
-            if (!field.Type.IsStruct)
-            {
-                var arrayOfSimpleType = GenerateArrayOfSimpleType(flexibleVersions.Lowest, field.Name, field.Type);
-                builder.Append(arrayOfSimpleType);
-            }
-            else
-            {
-                var arrayOfComplexType = GenerateArrayOfComplexType(flexibleVersions.Lowest, field);
-                builder.Append(arrayOfComplexType);
-            }
-
-            builder.AppendLine();
-        }
-        else //single type
-        {
-            if (!field.Type.IsStruct)
-            {
-                var simpleType = GenerateSimpleType(field, flexibleVersions);
-                builder.Append(simpleType);
-            }
-        }
+        // if (field.Type.IsArray) //array type
+        // {
+        //     if (!field.Type.IsStruct)
+        //     {
+        //         var arrayOfSimpleType = GenerateArrayOfSimpleType(_descriptor.FlexibleVersions.Lowest, field.Name, field.Type);
+        //         builder.Append(arrayOfSimpleType);
+        //     }
+        //     else
+        //     {
+        //         var arrayOfComplexType = GenerateArrayOfComplexType(_descriptor.FlexibleVersions.Lowest, field);
+        //         builder.Append(arrayOfComplexType);
+        //     }
+        //
+        //     builder.AppendLine();
+        // }
+        // else //single type
+        // {
+        //     if (!field.Type.IsStruct)
+        //     {
+        //         var simpleType = GenerateSimpleType(field, _descriptor.FlexibleVersions);
+        //         builder.Append(simpleType);
+        //     }
+        // }
 
         return builder;
     }
 
-    private StringBuilder GenerateSimpleType(FieldDescriptor field, Versions minFlexibleVersion)
+    private StringBuilder GenerateSimpleType(FieldSpecification field, Versions minFlexibleVersion)
     {
         var builder = new StringBuilder();
 
@@ -93,55 +95,55 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
     {
         var builder = new StringBuilder();
 
-        builder.AppendLine($"{Indent}if (Version >= ApiVersions.Version{minFlexibleVersion})");
-        builder.AppendLine($"{Indent}{{");
-
-        IncrementIndent();
-
-        if (type.CanBeNull)
-        {
-            builder.AppendLine($"{Indent}if ({name} is null)");
-            builder.AppendLine($"{Indent}{{");
-
-            IncrementIndent();
-            builder.AppendLine($"{Indent}writer.WriteVarUInt(0);");
-
-            if (_descriptor.Type == ApiMessageType.Request)
-            {
-                builder.AppendLine($"{Indent}Size += {type.Size};");
-            }
-
-            DecrementIndent();
-
-            builder.AppendLine($"{Indent}}}");
-            builder.AppendLine($"{Indent}else");
-            builder.AppendLine($"{Indent}{{");
-        }
-
-        IncrementIndent();
-        builder.AppendLine($"{Indent}writer.WriteVarUInt((uint){name}.Count + 1);");
-        builder.AppendLine($"{Indent}foreach (var val in {name})");
-        builder.AppendLine($"{Indent}{{");
-
-        IncrementIndent();
-        builder.AppendLine($"{Indent}writer.WriteVarInt(val);");
-        DecrementIndent();
-
-        builder.AppendLine($"{Indent}}}");
-        DecrementIndent();
-
-        builder.AppendLine($"{Indent}}}");
-        DecrementIndent();
-
-        builder.AppendLine($"{Indent}}}");
-        builder.AppendLine($"{Indent}else");
-        builder.AppendLine($"{Indent}{{");
-        builder.AppendLine($"{Indent}}}");
+        // builder.AppendLine($"{Indent}if (Version >= ApiVersions.Version{minFlexibleVersion})");
+        // builder.AppendLine($"{Indent}{{");
+        //
+        // IncrementIndent();
+        //
+        // if (type.CanBeNull)
+        // {
+        //     builder.AppendLine($"{Indent}if ({name} is null)");
+        //     builder.AppendLine($"{Indent}{{");
+        //
+        //     IncrementIndent();
+        //     builder.AppendLine($"{Indent}writer.WriteVarUInt(0);");
+        //
+        //     // if (_descriptor.Type == MessageType.Request)
+        //     // {
+        //     //     builder.AppendLine($"{Indent}Size += {type.Size};");
+        //     // }
+        //
+        //     DecrementIndent();
+        //
+        //     builder.AppendLine($"{Indent}}}");
+        //     builder.AppendLine($"{Indent}else");
+        //     builder.AppendLine($"{Indent}{{");
+        // }
+        //
+        // IncrementIndent();
+        // builder.AppendLine($"{Indent}writer.WriteVarUInt((uint){name}.Count + 1);");
+        // builder.AppendLine($"{Indent}foreach (var val in {name})");
+        // builder.AppendLine($"{Indent}{{");
+        //
+        // IncrementIndent();
+        // builder.AppendLine($"{Indent}writer.WriteVarInt(val);");
+        // DecrementIndent();
+        //
+        // builder.AppendLine($"{Indent}}}");
+        // DecrementIndent();
+        //
+        // builder.AppendLine($"{Indent}}}");
+        // DecrementIndent();
+        //
+        // builder.AppendLine($"{Indent}}}");
+        // builder.AppendLine($"{Indent}else");
+        // builder.AppendLine($"{Indent}{{");
+        // builder.AppendLine($"{Indent}}}");
 
         return builder;
     }
 
-    private StringBuilder GenerateArrayOfComplexType(short minFlexibleVersion, FieldDescriptor field)
+    private StringBuilder GenerateArrayOfComplexType(short minFlexibleVersion, FieldSpecification field)
     {
         var builder = new StringBuilder();
 

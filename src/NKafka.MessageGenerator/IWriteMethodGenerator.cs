@@ -21,9 +21,11 @@
 
 using System.Text;
 
+using NKafka.MessageGenerator.Specifications;
+
 namespace NKafka.MessageGenerator;
 
 public interface IWriteMethodGenerator
 {
-    StringBuilder Generate(List<FieldDescriptor> fields, int startIndent = Generator.DEFAULT_INDENT);
+    StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = Generator.DEFAULT_INDENT);
 }

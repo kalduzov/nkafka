@@ -48,14 +48,6 @@ public partial class DeleteAclsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class DeleteAclsFilterMessage: Message
@@ -107,14 +99,6 @@ public partial class DeleteAclsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

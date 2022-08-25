@@ -54,14 +54,6 @@ public partial class DescribeLogDirsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class DescribeLogDirsResultMessage: Message
@@ -100,14 +92,6 @@ public partial class DescribeLogDirsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class DescribeLogDirsTopicMessage: Message
@@ -141,14 +125,6 @@ public partial class DescribeLogDirsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class DescribeLogDirsPartitionMessage: Message
@@ -192,14 +168,6 @@ public partial class DescribeLogDirsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

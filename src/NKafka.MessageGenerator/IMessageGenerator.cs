@@ -13,11 +13,11 @@ public interface IMessageGenerator
     // /// <summary>
     // /// Generate *.cs class base from message api description 
     // /// </summary>
-    // StringBuilder GenerateMessage(string className, ApiDescriptor apiDescriptor);
+    // StringBuilder GenerateMessage(string className, MessageSpecification apiDescriptor);
     //
     // /// <summary>
     // /// Generate *Tests.cs class base from message api description 
     // /// </summary>
-    // StringBuilder GenerateMessageTests(string className, ApiDescriptor apiDescriptor);
+    // StringBuilder GenerateMessageTests(string className, MessageSpecification apiDescriptor);
     string ClassName { get; }
 }

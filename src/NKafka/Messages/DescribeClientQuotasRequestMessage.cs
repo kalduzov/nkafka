@@ -53,14 +53,6 @@ public partial class DescribeClientQuotasRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version1)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class ComponentDataMessage: Message
@@ -92,14 +84,6 @@ public partial class DescribeClientQuotasRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

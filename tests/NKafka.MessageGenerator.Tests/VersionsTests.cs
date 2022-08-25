@@ -21,6 +21,8 @@
 
 using FluentAssertions;
 
+using NKafka.MessageGenerator.Specifications;
+
 using Xunit;
 
 namespace NKafka.MessageGenerator.Tests;

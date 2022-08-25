@@ -73,22 +73,6 @@ public partial class BrokerRegistrationRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class ListenerMessage: Message
@@ -125,22 +109,6 @@ public partial class BrokerRegistrationRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class FeatureMessage: Message
@@ -172,22 +140,6 @@ public partial class BrokerRegistrationRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

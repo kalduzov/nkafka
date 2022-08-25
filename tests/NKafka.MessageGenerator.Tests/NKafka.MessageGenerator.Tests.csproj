@@ -4,4 +4,13 @@
     <ProjectReference Include="..\..\src\NKafka.MessageGenerator\NKafka.MessageGenerator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\MetadataRequest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\MetadataResponse.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

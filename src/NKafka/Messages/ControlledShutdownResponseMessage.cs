@@ -59,14 +59,6 @@ public partial class ControlledShutdownResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version3)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class RemainingPartitionMessage: Message
@@ -100,14 +92,6 @@ public partial class ControlledShutdownResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

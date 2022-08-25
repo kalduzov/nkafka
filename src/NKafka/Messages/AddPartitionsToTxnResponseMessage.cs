@@ -54,25 +54,6 @@ public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version3)
-        {
-            if (Results is null)
-            {
-                writer.WriteVarUInt(0);
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Results.Count + 1);
-                foreach (var val in Results)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 
     public class AddPartitionsToTxnTopicResultMessage: Message
@@ -106,25 +87,6 @@ public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            if (Version >= ApiVersions.Version3)
-            {
-                if (Results is null)
-                {
-                    writer.WriteVarUInt(0);
-                }
-                else
-                {
-                    writer.WriteVarUInt((uint)Results.Count + 1);
-                    foreach (var val in Results)
-                    {
-                        writer.WriteVarInt(val);
-                    }
-                }
-            }
-            else
-            {
-            }
-
         }
     }
     public class AddPartitionsToTxnPartitionResultMessage: Message

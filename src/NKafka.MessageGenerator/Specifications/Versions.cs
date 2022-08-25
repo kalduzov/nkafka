@@ -23,7 +23,7 @@ using System.Text.Json.Serialization;
 
 using NKafka.MessageGenerator.Converters;
 
-namespace NKafka.MessageGenerator;
+namespace NKafka.MessageGenerator.Specifications;
 
 [JsonConverter(typeof(VersionsJsonConverter))]
 public sealed class Versions: IEquatable<Versions>

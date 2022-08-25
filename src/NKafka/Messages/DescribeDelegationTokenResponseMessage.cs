@@ -60,14 +60,6 @@ public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class DescribedDelegationTokenMessage: Message
@@ -131,14 +123,6 @@ public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class DescribedDelegationTokenRenewerMessage: Message
@@ -172,14 +156,6 @@ public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

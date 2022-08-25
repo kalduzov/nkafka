@@ -21,22 +21,22 @@
 
 using System.Text;
 
+using NKafka.MessageGenerator.Specifications;
 using NKafka.Protocol;
 
 namespace NKafka.MessageGenerator;
 
 public class ClassGenerator: Generator, IClassGenerator
 {
-    private readonly ApiDescriptor _descriptor;
+    private readonly MessageSpecification _descriptor;
     private readonly IWriteMethodGenerator _writeMethodGenerator;
     private readonly IReadMethodGenerator _readMethodGenerator;
-    private const string _MESSAGE_SUFFIX = "Message";
     private const string _CLASS_TEMPLATE = "public partial class {0}: {1}\r\n{{\r\n{2}}}";
     private const string _EMPTY_CLASS_TEMPLATE = "public partial class {0}\r\n{{\r\n}}";
 
-    private readonly Dictionary<IFieldType, List<FieldDescriptor>> _internalClasses;
+    private readonly Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> _internalClasses;
 
-    public ClassGenerator(ApiDescriptor descriptor, IWriteMethodGenerator writeMethodGenerator, IReadMethodGenerator readMethodGenerator)
+    public ClassGenerator(MessageSpecification descriptor, IWriteMethodGenerator writeMethodGenerator, IReadMethodGenerator readMethodGenerator)
     {
         _descriptor = descriptor;
         _writeMethodGenerator = writeMethodGenerator;
@@ -46,17 +46,11 @@ public class ClassGenerator: Generator, IClassGenerator
 
     public StringBuilder Generate()
     {
-        switch (_descriptor.Type)
+        return _descriptor.Type switch
         {
-            case ApiMessageType.Request or ApiMessageType.Response:
-            {
-                var className = $"{_descriptor.Name}{_MESSAGE_SUFFIX}";
-
-                return GenerateRequestResponseMessage(className);
-            }
-            default:
-                return GenerateEmptyClass();
-        }
+            MessageType.Request or MessageType.Response => GenerateRequestResponseMessage(_descriptor.ClassName),
+            _ => GenerateEmptyClass()
+        };
     }
 
     private StringBuilder GenerateEmptyClass()
@@ -72,14 +66,14 @@ public class ClassGenerator: Generator, IClassGenerator
     {
         var builder = new StringBuilder();
 
-        var baseClassName = _descriptor.Type + _MESSAGE_SUFFIX;
+        var baseClassName = _descriptor.Type + "Message";
         var body = GenerateBody(className, _descriptor);
         builder.AppendFormat(_CLASS_TEMPLATE, className, baseClassName, body);
 
         return builder;
     }
 
-    private StringBuilder GenerateBody(string className, ApiDescriptor descriptor)
+    private StringBuilder GenerateBody(string className, MessageSpecification descriptor)
     {
         var builder = new StringBuilder();
 
@@ -124,7 +118,7 @@ public class ClassGenerator: Generator, IClassGenerator
                 .AppendLine($"{Indent}public class {className}: Message")
                 .AppendLine($"{Indent}{{");
 
-            var fields = GenerateProperties(@class.Value, ApiMessageType.None);
+            var fields = GenerateProperties(@class.Value, MessageType.None);
             builder.Append(fields);
             builder.AppendLine();
 
@@ -144,7 +138,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateWriteMethod(List<FieldDescriptor> fields)
+    private StringBuilder GenerateWriteMethod(IReadOnlyCollection<FieldSpecification> fields)
     {
         IncrementIndent();
         var builder = new StringBuilder();
@@ -173,7 +167,7 @@ public class ClassGenerator: Generator, IClassGenerator
 
         // builder.AppendFormat(
         //     "  internal {0}Message Build{0}(ReadOnlySpan<byte> span, ApiVersions apiVersion, int responseLength)",
-        //     apiDescriptor.Name);
+        //     messageSpecification.Name);
         //
         // builder.AppendLine();
         // builder.AppendLine("  {");
@@ -181,10 +175,10 @@ public class ClassGenerator: Generator, IClassGenerator
         //
         // builder.AppendLine();
         //
-        // var validVersions = GetSetVersions(apiDescriptor.ValidVersions);
-        // var flexibleVersions = GetSetVersions(apiDescriptor.FlexibleVersions, validVersions.Max());
+        // var validVersions = GetSetVersions(messageSpecification.ValidVersions);
+        // var flexibleVersions = GetSetVersions(messageSpecification.FlexibleVersions, validVersions.Max());
         //
-        // foreach (var fieldDescriptor in apiDescriptor.Fields)
+        // foreach (var fieldDescriptor in messageSpecification.Fields)
         // {
         //     var fieldDecode = GenerateDecodeField(fieldDescriptor, flexibleVersions, validVersions);
         //     builder.Append(fieldDecode);
@@ -195,7 +189,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateReadMethod(List<FieldDescriptor> fields)
+    private StringBuilder GenerateReadMethod(IReadOnlyCollection<FieldSpecification> fields)
     {
         var builder = new StringBuilder();
 
@@ -214,7 +208,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateProperties(List<FieldDescriptor> fields, ApiMessageType messageType)
+    private StringBuilder GenerateProperties(IReadOnlyCollection<FieldSpecification> fields, MessageType messageType)
     {
         IncrementIndent();
         var builder = new StringBuilder();
@@ -228,13 +222,13 @@ public class ClassGenerator: Generator, IClassGenerator
 
         foreach (var fieldDescriptor in fields)
         {
-            if (messageType == ApiMessageType.Response && fieldDescriptor.Name == "ThrottleTimeMs")
+            if (messageType == MessageType.Response && fieldDescriptor.Name == "ThrottleTimeMs")
             {
                 continue; //Данное поле есть в базовом классе
             }
 
-            var field = GenerateField(fieldDescriptor);
-            builder.Append(field);
+            var property = GenerateProperty(fieldDescriptor);
+            builder.Append(property);
             builder.AppendLine();
 
             if (fieldDescriptor != lastField)
@@ -248,16 +242,16 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateCtor(string className, ApiDescriptor apiDescriptor, bool isSubclass = false)
+    private StringBuilder GenerateCtor(string className, MessageSpecification messageSpecification, bool isSubclass = false)
     {
         IncrementIndent();
         var builder = new StringBuilder();
 
-        var apiKey = (ApiKeys)apiDescriptor.ApiKey;
+        var apiKey = (ApiKeys)messageSpecification.ApiKey;
 
-        switch (apiDescriptor.Type)
+        switch (messageSpecification.Type)
         {
-            case ApiMessageType.Request:
+            case MessageType.Request:
             {
                 builder.Append($"{Indent}public {className}()");
                 builder.AppendLine();
@@ -279,7 +273,7 @@ public class ClassGenerator: Generator, IClassGenerator
 
                 break;
             }
-            case ApiMessageType.Response:
+            case MessageType.Response:
             {
                 builder.Append($"{Indent}public {className}()");
                 builder.AppendLine();
@@ -318,7 +312,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private StringBuilder GenerateField(FieldDescriptor field)
+    private StringBuilder GenerateProperty(FieldSpecification field)
     {
         var builder = new StringBuilder();
 
@@ -341,14 +335,14 @@ public class ClassGenerator: Generator, IClassGenerator
         return builder;
     }
 
-    private string GetClrType(FieldDescriptor field)
+    private string GetClrType(FieldSpecification field)
     {
         if (!field.Type.IsArray)
         {
             return field.Type.ClrName;
         }
 
-        if (field.MapKey ?? false)
+        if (field.MapKey)
         {
             return $"IReadOnlyDictionary<{field.Type.ClrName}>"; //todo тут должен быть словарь
         }
@@ -356,7 +350,7 @@ public class ClassGenerator: Generator, IClassGenerator
         return $"IReadOnlyCollection<{field.Type.ClrName}>";
     }
 
-    private static string NullableMarkerIfNeeded(FieldDescriptor field)
+    private static string NullableMarkerIfNeeded(FieldSpecification field)
     {
         return field.Ignorable.HasValue && field.Ignorable.Value
                || field.Default is not null && field.Default.Equals("null", StringComparison.OrdinalIgnoreCase)
@@ -369,9 +363,10 @@ public class ClassGenerator: Generator, IClassGenerator
         return @default;
     }
 
-    private static Dictionary<IFieldType, List<FieldDescriptor>> GetAllInternalClasses(List<FieldDescriptor> fields)
+    private static Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> GetAllInternalClasses(
+        IReadOnlyCollection<FieldSpecification> fields)
     {
-        var result = new Dictionary<IFieldType, List<FieldDescriptor>>();
+        var result = new Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>>();
 
         if (fields.Count == 0)
         {

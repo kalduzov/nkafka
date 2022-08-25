@@ -53,25 +53,6 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        if (Version >= ApiVersions.Version0)
-        {
-            if (Topics is null)
-            {
-                writer.WriteVarUInt(0);
-            }
-            else
-            {
-                writer.WriteVarUInt((uint)Topics.Count + 1);
-                foreach (var val in Topics)
-                {
-                    writer.WriteVarInt(val);
-                }
-            }
-        }
-        else
-        {
-        }
-
     }
 
     public class ReassignableTopicMessage: Message
@@ -98,25 +79,6 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            if (Version >= ApiVersions.Version0)
-            {
-                if (Partitions is null)
-                {
-                    writer.WriteVarUInt(0);
-                }
-                else
-                {
-                    writer.WriteVarUInt((uint)Partitions.Count + 1);
-                    foreach (var val in Partitions)
-                    {
-                        writer.WriteVarInt(val);
-                    }
-                }
-            }
-            else
-            {
-            }
-
         }
     }
     public class ReassignablePartitionMessage: Message
@@ -143,25 +105,6 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            if (Version >= ApiVersions.Version0)
-            {
-                if (Replicas is null)
-                {
-                    writer.WriteVarUInt(0);
-                }
-                else
-                {
-                    writer.WriteVarUInt((uint)Replicas.Count + 1);
-                    foreach (var val in Replicas)
-                    {
-                        writer.WriteVarInt(val);
-                    }
-                }
-            }
-            else
-            {
-            }
-
         }
     }
 }

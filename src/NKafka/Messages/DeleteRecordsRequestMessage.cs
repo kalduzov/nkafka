@@ -53,14 +53,6 @@ public partial class DeleteRecordsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class DeleteRecordsTopicMessage: Message
@@ -87,14 +79,6 @@ public partial class DeleteRecordsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class DeleteRecordsPartitionMessage: Message
@@ -121,14 +105,6 @@ public partial class DeleteRecordsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -58,14 +58,6 @@ public partial class CreatePartitionsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class CreatePartitionsTopicMessage: Message
@@ -97,14 +89,6 @@ public partial class CreatePartitionsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
     public class CreatePartitionsAssignmentMessage: Message
@@ -126,14 +110,6 @@ public partial class CreatePartitionsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

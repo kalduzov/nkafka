@@ -25,6 +25,8 @@ using FluentAssertions;
 
 using Moq;
 
+using NKafka.MessageGenerator.Specifications;
+
 using Xunit;
 
 namespace NKafka.MessageGenerator.Tests;
@@ -32,21 +34,20 @@ namespace NKafka.MessageGenerator.Tests;
 public class ClassGeneratorTests
 {
     [Fact]
-    public void GenerateTest()
+    public void GenerateRequestTest()
     {
-        var descriptor = new ApiDescriptor
-        {
-            Listeners = new List<string>
+        var descriptor = new MessageSpecification(
+            24,
+            MessageType.Request,
+            new List<RequestListenerType>
             {
-                "zkBroker",
-                "broker"
+                RequestListenerType.ZkBroker,
+                RequestListenerType.Broker
             },
-            ApiKey = 24,
-            Name = "AddPartitionsToTxnRequest",
-            Type = ApiMessageType.Request,
-            ValidVersions = Versions.Parse("0-3")!,
-            FlexibleVersions = Versions.Parse("3+")!,
-            Fields = new List<FieldDescriptor>
+            "AddPartitionsToTxnRequest",
+            Versions.Parse("0-3")!,
+            Versions.Parse("3+")!,
+            new List<FieldSpecification>
             {
                 new()
                 {
@@ -54,7 +55,7 @@ public class ClassGeneratorTests
                     About = "The transactional id corresponding to the transaction.",
                     Type = IFieldType.Parse("string"),
                     Versions = Versions.Parse("0+"),
-                    EntityType = "transactionalId"
+                    EntityType = EntityType.TransactionalId
                 },
                 new()
                 {
@@ -62,7 +63,7 @@ public class ClassGeneratorTests
                     About = "The partitions to add to the transaction.",
                     Type = IFieldType.Parse("[]AddPartitionsToTxnTopic"),
                     Versions = Versions.Parse("0+"),
-                    Fields = new List<FieldDescriptor>
+                    Fields = new List<FieldSpecification>
                     {
                         new()
                         {
@@ -70,7 +71,7 @@ public class ClassGeneratorTests
                             Type = IFieldType.Parse("string"),
                             Versions = Versions.Parse("0+"),
                             MapKey = true,
-                            EntityType = "topicName",
+                            EntityType = EntityType.TopicName,
                             About = "The name of the topic."
                         },
                         new()
@@ -82,18 +83,60 @@ public class ClassGeneratorTests
                         }
                     }
                 }
-            }
-        };
+            });
 
         var writeMock = new Mock<IWriteMethodGenerator>();
-        writeMock.Setup(x => x.Generate(It.IsAny<List<FieldDescriptor>>(), It.IsAny<int>())).Returns(new StringBuilder());
+        writeMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
 
         var readMock = new Mock<IReadMethodGenerator>();
-        readMock.Setup(x => x.Generate(It.IsAny<List<FieldDescriptor>>(), It.IsAny<int>())).Returns(new StringBuilder());
+        readMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
 
         var classGenerator = new ClassGenerator(descriptor, writeMock.Object, readMock.Object);
         var result = classGenerator.Generate();
 
         result.ToString().Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public void GenerateResponseTest()
+    {
+        var descriptor = new MessageSpecification(
+            17,
+            MessageType.Response,
+            new List<RequestListenerType>
+            {
+                Capacity = 0
+            },
+            "SaslHandshakeResponse",
+            Versions.Parse("0-1")!,
+            Versions.Parse("none")!,
+            new List<FieldSpecification>
+            {
+                new()
+                {
+                    Name = "ErrorCode",
+                    About = "The error code, or 0 if there was no error.",
+                    Type = IFieldType.Parse("int16"),
+                    Versions = Versions.Parse("0+")
+                },
+                new()
+                {
+                    Name = "Mechanisms",
+                    Type = IFieldType.Parse("[]string"),
+                    Versions = Versions.Parse("0+"),
+                    About = "The mechanisms enabled in the server."
+                }
+            });
+
+        var writeMock = new Mock<IWriteMethodGenerator>();
+        writeMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
+
+        var readMock = new Mock<IReadMethodGenerator>();
+        readMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
+
+        var classGenerator = new ClassGenerator(descriptor, writeMock.Object, readMock.Object);
+        var result = classGenerator.Generate().ToString();
+
+        result.Should().NotBeEmpty();
     }
 }

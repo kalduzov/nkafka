@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class StopReplicaRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class StopReplicaRequestMessage: RequestMessage
 {
     /// <summary>
     /// The controller id.
     /// </summary>
-    public int ControllerId { get; set; }
+    public int ControllerId { get; set; } = 0;
 
     /// <summary>
     /// The controller epoch.
     /// </summary>
-    public int ControllerEpoch { get; set; }
+    public int ControllerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The broker epoch.
@@ -48,25 +53,34 @@ public partial class StopReplicaRequestMessage: RequestMessage
     /// <summary>
     /// Whether these partitions should be deleted.
     /// </summary>
-    public bool DeletePartitions { get; set; }
+    public bool DeletePartitions { get; set; } = false;
 
     /// <summary>
     /// The partitions to stop.
     /// </summary>
-    public IReadOnlyCollection<StopReplicaPartitionV0Message> UngroupedPartitions { get; set; }
+    public List<StopReplicaPartitionV0> UngroupedPartitions { get; set; } = new();
 
     /// <summary>
     /// The topics to stop.
     /// </summary>
-    public IReadOnlyCollection<StopReplicaTopicV1Message> Topics { get; set; }
+    public List<StopReplicaTopicV1> Topics { get; set; } = new();
 
     /// <summary>
     /// Each topic.
     /// </summary>
-    public IReadOnlyCollection<StopReplicaTopicStateMessage> TopicStates { get; set; }
+    public List<StopReplicaTopicState> TopicStates { get; set; } = new();
 
     public StopReplicaRequestMessage()
     {
+        ApiKey = ApiKeys.StopReplica;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public StopReplicaRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.StopReplica;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
@@ -78,46 +92,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class StopReplicaPartitionV0Message: Message
+    public class StopReplicaPartitionV0: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
-        public StopReplicaPartitionV0Message()
+        public StopReplicaPartitionV0()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public StopReplicaPartitionV0(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -128,46 +126,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class StopReplicaTopicV1Message: Message
+    public class StopReplicaTopicV1: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public IReadOnlyCollection<int> PartitionIndexes { get; set; }
+        public List<int> PartitionIndexes { get; set; } = new();
 
-        public StopReplicaTopicV1Message()
+        public StopReplicaTopicV1()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public StopReplicaTopicV1(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -178,46 +160,30 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class StopReplicaTopicStateMessage: Message
+    public class StopReplicaTopicState: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// The state of each partition
         /// </summary>
-        public IReadOnlyCollection<StopReplicaPartitionStateMessage> PartitionStates { get; set; }
+        public List<StopReplicaPartitionState> PartitionStates { get; set; } = new();
 
-        public StopReplicaTopicStateMessage()
+        public StopReplicaTopicState()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public StopReplicaTopicState(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -228,38 +194,14 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class StopReplicaPartitionStateMessage: Message
+    public class StopReplicaPartitionState: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch.
@@ -269,10 +211,18 @@ public partial class StopReplicaRequestMessage: RequestMessage
         /// <summary>
         /// Whether this partition should be deleted.
         /// </summary>
-        public bool DeletePartition { get; set; }
+        public bool DeletePartition { get; set; } = false;
 
-        public StopReplicaPartitionStateMessage()
+        public StopReplicaPartitionState()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public StopReplicaPartitionState(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -283,30 +233,6 @@ public partial class StopReplicaRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

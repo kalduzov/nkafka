@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class OffsetDeleteRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class OffsetDeleteRequestMessage: RequestMessage
 {
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     /// <summary>
     /// The topics to delete offsets for
     /// </summary>
-    public IReadOnlyCollection<OffsetDeleteRequestTopicMessage> Topics { get; set; }
+    public List<OffsetDeleteRequestTopic> Topics { get; set; } = new();
 
     public OffsetDeleteRequestMessage()
     {
+        ApiKey = ApiKeys.OffsetDelete;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public OffsetDeleteRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.OffsetDelete;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -53,30 +67,30 @@ public partial class OffsetDeleteRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OffsetDeleteRequestTopicMessage: Message
+    public class OffsetDeleteRequestTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition to delete offsets for.
         /// </summary>
-        public IReadOnlyCollection<OffsetDeleteRequestPartitionMessage> Partitions { get; set; }
+        public List<OffsetDeleteRequestPartition> Partitions { get; set; } = new();
 
-        public OffsetDeleteRequestTopicMessage()
+        public OffsetDeleteRequestTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public OffsetDeleteRequestTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -87,25 +101,25 @@ public partial class OffsetDeleteRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OffsetDeleteRequestPartitionMessage: Message
+    public class OffsetDeleteRequestPartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
-        public OffsetDeleteRequestPartitionMessage()
+        public OffsetDeleteRequestPartition()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public OffsetDeleteRequestPartition(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -116,14 +130,6 @@ public partial class OffsetDeleteRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

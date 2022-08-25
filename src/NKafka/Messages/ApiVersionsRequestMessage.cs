@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ApiVersionsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ApiVersionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The name of the client.
     /// </summary>
-    public string? ClientSoftwareName { get; set; }
+    public string? ClientSoftwareName { get; set; } = null!;
 
     /// <summary>
     /// The version of the client.
     /// </summary>
-    public string? ClientSoftwareVersion { get; set; }
+    public string? ClientSoftwareVersion { get; set; } = null!;
 
     public ApiVersionsRequestMessage()
     {
+        ApiKey = ApiKeys.ApiVersions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public ApiVersionsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.ApiVersions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;

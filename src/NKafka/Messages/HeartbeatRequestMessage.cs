@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class HeartbeatRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class HeartbeatRequestMessage: RequestMessage
 {
     /// <summary>
     /// The group id.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     /// <summary>
     /// The generation of the group.
     /// </summary>
-    public int GenerationId { get; set; }
+    public int GenerationId { get; set; } = 0;
 
     /// <summary>
     /// The member ID.
     /// </summary>
-    public string MemberId { get; set; }
+    public string MemberId { get; set; } = null!;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = "null";
 
     public HeartbeatRequestMessage()
     {
+        ApiKey = ApiKeys.Heartbeat;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public HeartbeatRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Heartbeat;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;

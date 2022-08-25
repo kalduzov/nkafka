@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public IReadOnlyCollection<AlterReplicaLogDirTopicResultMessage> Results { get; set; }
+    public List<AlterReplicaLogDirTopicResult> Results { get; set; } = new();
 
     public AlterReplicaLogDirsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
     public AlterReplicaLogDirsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -56,27 +62,28 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
     {
     }
 
-    public class AlterReplicaLogDirTopicResultMessage: Message
+    public class AlterReplicaLogDirTopicResult: Message
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// The results for each partition.
         /// </summary>
-        public IReadOnlyCollection<AlterReplicaLogDirPartitionResultMessage> Partitions { get; set; }
+        public List<AlterReplicaLogDirPartitionResult> Partitions { get; set; } = new();
 
-        public AlterReplicaLogDirTopicResultMessage()
+        public AlterReplicaLogDirTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
@@ -89,27 +96,28 @@ public partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
         {
         }
     }
-    public class AlterReplicaLogDirPartitionResultMessage: Message
+    public class AlterReplicaLogDirPartitionResult: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public AlterReplicaLogDirPartitionResultMessage()
+        public AlterReplicaLogDirPartitionResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirPartitionResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }

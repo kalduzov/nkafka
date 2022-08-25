@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class JoinGroupRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class JoinGroupRequestMessage: RequestMessage
 {
     /// <summary>
     /// The group identifier.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     /// <summary>
     /// The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds.
     /// </summary>
-    public int SessionTimeoutMs { get; set; }
+    public int SessionTimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// The maximum time in milliseconds that the coordinator will wait for each member to rejoin when rebalancing the group.
@@ -48,28 +53,42 @@ public partial class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The member id assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; }
+    public string MemberId { get; set; } = null!;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = "null";
 
     /// <summary>
     /// The unique name the for class of protocols implemented by the group we want to join.
     /// </summary>
-    public string ProtocolType { get; set; }
+    public string ProtocolType { get; set; } = null!;
 
     /// <summary>
     /// The list of protocols that the member supports.
     /// </summary>
-    public IReadOnlyCollection<JoinGroupRequestProtocolMessage> Protocols { get; set; }
+    public List<JoinGroupRequestProtocol> Protocols { get; set; } = new();
+
+    /// <summary>
+    /// The reason why the member (re-)joins the group.
+    /// </summary>
+    public string? Reason { get; set; } = "null";
 
     public JoinGroupRequestMessage()
     {
         ApiKey = ApiKeys.JoinGroup;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version7;
+        HighestSupportedVersion = ApiVersions.Version9;
+    }
+
+    public JoinGroupRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.JoinGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version9;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -78,32 +97,32 @@ public partial class JoinGroupRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version6)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class JoinGroupRequestProtocolMessage: Message
+    public class JoinGroupRequestProtocol: Message
     {
         /// <summary>
         /// The protocol name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The protocol metadata.
         /// </summary>
-        public byte[] Metadata { get; set; }
+        public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
-        public JoinGroupRequestProtocolMessage()
+        public JoinGroupRequestProtocol()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
+            HighestSupportedVersion = ApiVersions.Version9;
+        }
+
+        public JoinGroupRequestProtocol(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -112,14 +131,6 @@ public partial class JoinGroupRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

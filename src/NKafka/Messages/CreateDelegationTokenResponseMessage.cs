@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,60 +32,72 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreateDelegationTokenResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreateDelegationTokenResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error, or zero if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The principal type of the token owner.
     /// </summary>
-    public string PrincipalType { get; set; }
+    public string PrincipalType { get; set; } = null!;
 
     /// <summary>
     /// The name of the token owner.
     /// </summary>
-    public string PrincipalName { get; set; }
+    public string PrincipalName { get; set; } = null!;
+
+    /// <summary>
+    /// The principal type of the requester of the token.
+    /// </summary>
+    public string TokenRequesterPrincipalType { get; set; } = null!;
+
+    /// <summary>
+    /// The principal type of the requester of the token.
+    /// </summary>
+    public string TokenRequesterPrincipalName { get; set; } = null!;
 
     /// <summary>
     /// When this token was generated.
     /// </summary>
-    public long IssueTimestampMs { get; set; }
+    public long IssueTimestampMs { get; set; } = 0;
 
     /// <summary>
     /// When this token expires.
     /// </summary>
-    public long ExpiryTimestampMs { get; set; }
+    public long ExpiryTimestampMs { get; set; } = 0;
 
     /// <summary>
     /// The maximum lifetime of this token.
     /// </summary>
-    public long MaxTimestampMs { get; set; }
+    public long MaxTimestampMs { get; set; } = 0;
 
     /// <summary>
     /// The token UUID.
     /// </summary>
-    public string TokenId { get; set; }
+    public string TokenId { get; set; } = null!;
 
     /// <summary>
     /// HMAC of the delegation token.
     /// </summary>
-    public byte[] Hmac { get; set; }
+    public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
 
     public CreateDelegationTokenResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public CreateDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)

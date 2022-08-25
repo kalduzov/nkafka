@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,25 +32,35 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ListOffsetsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ListOffsetsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID of the requestor, or -1 if this request is being made by a normal consumer.
     /// </summary>
-    public int ReplicaId { get; set; }
+    public int ReplicaId { get; set; } = 0;
 
     /// <summary>
     /// This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records
     /// </summary>
-    public sbyte IsolationLevel { get; set; }
+    public sbyte IsolationLevel { get; set; } = 0;
 
     /// <summary>
     /// Each topic in the request.
     /// </summary>
-    public IReadOnlyCollection<ListOffsetsTopicMessage> Topics { get; set; }
+    public List<ListOffsetsTopic> Topics { get; set; } = new();
 
     public ListOffsetsRequestMessage()
     {
+        ApiKey = ApiKeys.ListOffsets;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public ListOffsetsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.ListOffsets;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version7;
@@ -58,30 +72,30 @@ public partial class ListOffsetsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version6)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class ListOffsetsTopicMessage: Message
+    public class ListOffsetsTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition in the request.
         /// </summary>
-        public IReadOnlyCollection<ListOffsetsPartitionMessage> Partitions { get; set; }
+        public List<ListOffsetsPartition> Partitions { get; set; } = new();
 
-        public ListOffsetsTopicMessage()
+        public ListOffsetsTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public ListOffsetsTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -92,22 +106,14 @@ public partial class ListOffsetsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class ListOffsetsPartitionMessage: Message
+    public class ListOffsetsPartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The current leader epoch.
@@ -117,15 +123,23 @@ public partial class ListOffsetsRequestMessage: RequestMessage
         /// <summary>
         /// The current timestamp.
         /// </summary>
-        public long Timestamp { get; set; }
+        public long Timestamp { get; set; } = 0;
 
         /// <summary>
         /// The maximum number of offsets to report.
         /// </summary>
         public int MaxNumOffsets { get; set; } = 1;
 
-        public ListOffsetsPartitionMessage()
+        public ListOffsetsPartition()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public ListOffsetsPartition(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -136,14 +150,6 @@ public partial class ListOffsetsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

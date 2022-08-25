@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,25 +32,35 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DeleteTopicsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DeleteTopicsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The name or topic ID of the topic
     /// </summary>
-    public IReadOnlyCollection<DeleteTopicStateMessage> Topics { get; set; }
+    public List<DeleteTopicState> Topics { get; set; } = new();
 
     /// <summary>
     /// The names of the topics to delete
     /// </summary>
-    public IReadOnlyCollection<string>? TopicNames { get; set; }
+    public List<string>? TopicNames { get; set; } = new();
 
     /// <summary>
     /// The length of time in milliseconds to wait for the deletions to complete.
     /// </summary>
-    public int TimeoutMs { get; set; }
+    public int TimeoutMs { get; set; } = 0;
 
     public DeleteTopicsRequestMessage()
     {
+        ApiKey = ApiKeys.DeleteTopics;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version6;
+    }
+
+    public DeleteTopicsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.DeleteTopics;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
@@ -60,20 +74,28 @@ public partial class DeleteTopicsRequestMessage: RequestMessage
     {
     }
 
-    public class DeleteTopicStateMessage: Message
+    public class DeleteTopicState: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string? Name { get; set; } = null;
+        public string? Name { get; set; } = "null";
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid TopicId { get; set; }
+        public Guid TopicId { get; set; } = Guid.Empty;
 
-        public DeleteTopicStateMessage()
+        public DeleteTopicState()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
+        }
+
+        public DeleteTopicState(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version6;
         }

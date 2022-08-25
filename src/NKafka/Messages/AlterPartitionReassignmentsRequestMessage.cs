@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,7 +32,8 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The time in ms to wait for the request to complete.
@@ -38,10 +43,19 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The topics to reassign.
     /// </summary>
-    public IReadOnlyCollection<ReassignableTopicMessage> Topics { get; set; }
+    public List<ReassignableTopic> Topics { get; set; } = new();
 
     public AlterPartitionReassignmentsRequestMessage()
     {
+        ApiKey = ApiKeys.AlterPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AlterPartitionReassignmentsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AlterPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -55,20 +69,28 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
     {
     }
 
-    public class ReassignableTopicMessage: Message
+    public class ReassignableTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partitions to reassign.
         /// </summary>
-        public IReadOnlyCollection<ReassignablePartitionMessage> Partitions { get; set; }
+        public List<ReassignablePartition> Partitions { get; set; } = new();
 
-        public ReassignableTopicMessage()
+        public ReassignableTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public ReassignableTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -81,20 +103,28 @@ public partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
         {
         }
     }
-    public class ReassignablePartitionMessage: Message
+    public class ReassignablePartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The replicas to place the partitions on, or null to cancel a pending reassignment for this partition.
         /// </summary>
-        public IReadOnlyCollection<int>? Replicas { get; set; } = null;
+        public List<int>? Replicas { get; set; } = null;
 
-        public ReassignablePartitionMessage()
+        public ReassignablePartition()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public ReassignablePartition(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

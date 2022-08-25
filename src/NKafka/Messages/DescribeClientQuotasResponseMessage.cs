@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeClientQuotasResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeClientQuotasResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or `0` if the quota description succeeded.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or `null` if the quota description succeeded.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// A result entry.
     /// </summary>
-    public IReadOnlyCollection<EntryDataMessage> Entries { get; set; }
+    public List<EntryData> Entries { get; set; } = new();
 
     public DescribeClientQuotasResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class DescribeClientQuotasResponseMessage: ResponseMessage
     public DescribeClientQuotasResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -66,27 +72,28 @@ public partial class DescribeClientQuotasResponseMessage: ResponseMessage
     {
     }
 
-    public class EntryDataMessage: Message
+    public class EntryData: Message
     {
         /// <summary>
         /// The quota entity description.
         /// </summary>
-        public IReadOnlyCollection<EntityDataMessage> Entity { get; set; }
+        public List<EntityData> Entity { get; set; } = new();
 
         /// <summary>
         /// The quota values for the entity.
         /// </summary>
-        public IReadOnlyCollection<ValueDataMessage> Values { get; set; }
+        public List<ValueData> Values { get; set; } = new();
 
-        public EntryDataMessage()
+        public EntryData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntryDataMessage(BufferReader reader, ApiVersions version)
+        public EntryData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -99,27 +106,28 @@ public partial class DescribeClientQuotasResponseMessage: ResponseMessage
         {
         }
     }
-    public class EntityDataMessage: Message
+    public class EntityData: Message
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; }
+        public string EntityType { get; set; } = null!;
 
         /// <summary>
         /// The entity name, or null if the default.
         /// </summary>
-        public string EntityName { get; set; }
+        public string EntityName { get; set; } = null!;
 
-        public EntityDataMessage()
+        public EntityData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntityDataMessage(BufferReader reader, ApiVersions version)
+        public EntityData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -132,27 +140,28 @@ public partial class DescribeClientQuotasResponseMessage: ResponseMessage
         {
         }
     }
-    public class ValueDataMessage: Message
+    public class ValueData: Message
     {
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// The quota configuration value.
         /// </summary>
-        public double Value { get; set; }
+        public double Value { get; set; } = 0;
 
-        public ValueDataMessage()
+        public ValueData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public ValueDataMessage(BufferReader reader, ApiVersions version)
+        public ValueData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }

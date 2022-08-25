@@ -23,5 +23,5 @@ namespace NKafka.MessageGenerator.Extensions;
 
 internal static class WriteMethodExtensions
 {
-    
+
 }

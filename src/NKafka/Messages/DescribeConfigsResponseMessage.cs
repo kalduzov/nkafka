@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeConfigsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each resource.
     /// </summary>
-    public IReadOnlyCollection<DescribeConfigsResultMessage> Results { get; set; }
+    public List<DescribeConfigsResult> Results { get; set; } = new();
 
     public DescribeConfigsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
     public DescribeConfigsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
@@ -56,42 +62,43 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeConfigsResultMessage: Message
+    public class DescribeConfigsResult: Message
     {
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if we were able to successfully describe the configurations.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// Each listed configuration.
         /// </summary>
-        public IReadOnlyCollection<DescribeConfigsResourceResultMessage> Configs { get; set; }
+        public List<DescribeConfigsResourceResult> Configs { get; set; } = new();
 
-        public DescribeConfigsResultMessage()
+        public DescribeConfigsResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -104,27 +111,27 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeConfigsResourceResultMessage: Message
+    public class DescribeConfigsResourceResult: Message
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
         /// <summary>
         /// True if the configuration is read-only.
         /// </summary>
-        public bool ReadOnly { get; set; }
+        public bool ReadOnly { get; set; } = false;
 
         /// <summary>
         /// True if the configuration is not set.
         /// </summary>
-        public bool IsDefault { get; set; }
+        public bool IsDefault { get; set; } = false;
 
         /// <summary>
         /// The configuration source.
@@ -134,12 +141,12 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// True if this configuration is sensitive.
         /// </summary>
-        public bool IsSensitive { get; set; }
+        public bool IsSensitive { get; set; } = false;
 
         /// <summary>
         /// The synonyms for this configuration key.
         /// </summary>
-        public IReadOnlyCollection<DescribeConfigsSynonymMessage>? Synonyms { get; set; }
+        public List<DescribeConfigsSynonym>? Synonyms { get; set; } = new();
 
         /// <summary>
         /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
@@ -149,17 +156,18 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The configuration documentation.
         /// </summary>
-        public string? Documentation { get; set; }
+        public string? Documentation { get; set; } = null!;
 
-        public DescribeConfigsResourceResultMessage()
+        public DescribeConfigsResourceResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResourceResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -172,32 +180,33 @@ public partial class DescribeConfigsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeConfigsSynonymMessage: Message
+    public class DescribeConfigsSynonym: Message
     {
         /// <summary>
         /// The synonym name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The synonym value.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
         /// <summary>
         /// The synonym source.
         /// </summary>
-        public sbyte Source { get; set; }
+        public sbyte Source { get; set; } = 0;
 
-        public DescribeConfigsSynonymMessage()
+        public DescribeConfigsSynonym()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsSynonym(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }

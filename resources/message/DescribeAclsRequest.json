@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,12 +15,13 @@
 
 {
   "apiKey": 29,
-  "type": "Request",
+  "type": "request",
   "listeners": ["zkBroker", "broker", "controller"],
   "name": "DescribeAclsRequest",
   // Version 1 adds resource pattern type.
   // Version 2 enables flexible versions.
-  "validVersions": "0-2",
+  // Version 3 adds user resource type.
+  "validVersions": "0-3",
   "flexibleVersions": "2+",
   "fields": [
     { "name": "ResourceTypeFilter", "type": "int8", "versions": "0+",

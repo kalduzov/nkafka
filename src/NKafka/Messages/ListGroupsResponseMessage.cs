@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ListGroupsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ListGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// Each group in the response.
     /// </summary>
-    public IReadOnlyCollection<ListedGroupMessage> Groups { get; set; }
+    public List<ListedGroup> Groups { get; set; } = new();
 
     public ListGroupsResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class ListGroupsResponseMessage: ResponseMessage
     public ListGroupsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
@@ -59,42 +65,35 @@ public partial class ListGroupsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version3)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class ListedGroupMessage: Message
+    public class ListedGroup: Message
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string GroupId { get; set; }
+        public string GroupId { get; set; } = null!;
 
         /// <summary>
         /// The group protocol type.
         /// </summary>
-        public string ProtocolType { get; set; }
+        public string ProtocolType { get; set; } = null!;
 
         /// <summary>
         /// The group state name.
         /// </summary>
-        public string? GroupState { get; set; }
+        public string? GroupState { get; set; } = null!;
 
-        public ListedGroupMessage()
+        public ListedGroup()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public ListedGroupMessage(BufferReader reader, ApiVersions version)
+        public ListedGroup(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -105,14 +104,6 @@ public partial class ListGroupsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

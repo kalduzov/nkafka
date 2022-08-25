@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,27 +32,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class SyncGroupResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class SyncGroupResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The group protocol type.
     /// </summary>
-    public string? ProtocolType { get; set; } = null;
+    public string? ProtocolType { get; set; } = "null";
 
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string? ProtocolName { get; set; } = null;
+    public string? ProtocolName { get; set; } = "null";
 
     /// <summary>
     /// The member assignment.
     /// </summary>
-    public byte[] Assignment { get; set; }
+    public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
     public SyncGroupResponseMessage()
     {
@@ -59,6 +64,7 @@ public partial class SyncGroupResponseMessage: ResponseMessage
     public SyncGroupResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }

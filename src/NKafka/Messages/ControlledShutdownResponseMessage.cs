@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ControlledShutdownResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
-    public IReadOnlyCollection<RemainingPartitionMessage> RemainingPartitions { get; set; }
+    public List<RemainingPartition> RemainingPartitions { get; set; } = new();
 
     public ControlledShutdownResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class ControlledShutdownResponseMessage: ResponseMessage
     public ControlledShutdownResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -61,27 +67,28 @@ public partial class ControlledShutdownResponseMessage: ResponseMessage
     {
     }
 
-    public class RemainingPartitionMessage: Message
+    public class RemainingPartition: Message
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// The index of the partition.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
-        public RemainingPartitionMessage()
+        public RemainingPartition()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public RemainingPartitionMessage(BufferReader reader, ApiVersions version)
+        public RemainingPartition(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }

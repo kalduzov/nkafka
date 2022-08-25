@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,7 +32,8 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
@@ -38,10 +43,19 @@ public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
     /// <summary>
     /// Each topic to get offsets for.
     /// </summary>
-    public IReadOnlyCollection<OffsetForLeaderTopicMessage> Topics { get; set; }
+    public List<OffsetForLeaderTopic> Topics { get; set; } = new();
 
     public OffsetForLeaderEpochRequestMessage()
     {
+        ApiKey = ApiKeys.OffsetForLeaderEpoch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public OffsetForLeaderEpochRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.OffsetForLeaderEpoch;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
@@ -53,30 +67,30 @@ public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version4)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OffsetForLeaderTopicMessage: Message
+    public class OffsetForLeaderTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; }
+        public string Topic { get; set; } = null!;
 
         /// <summary>
         /// Each partition to get offsets for.
         /// </summary>
-        public IReadOnlyCollection<OffsetForLeaderPartitionMessage> Partitions { get; set; }
+        public List<OffsetForLeaderPartition> Partitions { get; set; } = new();
 
-        public OffsetForLeaderTopicMessage()
+        public OffsetForLeaderTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
+        }
+
+        public OffsetForLeaderTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -87,22 +101,14 @@ public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OffsetForLeaderPartitionMessage: Message
+    public class OffsetForLeaderPartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int Partition { get; set; }
+        public int Partition { get; set; } = 0;
 
         /// <summary>
         /// An epoch used to fence consumers/replicas with old metadata. If the epoch provided by the client is larger than the current epoch known to the broker, then the UNKNOWN_LEADER_EPOCH error code will be returned. If the provided epoch is smaller, then the FENCED_LEADER_EPOCH error code will be returned.
@@ -112,10 +118,18 @@ public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
         /// <summary>
         /// The epoch to look up an offset for.
         /// </summary>
-        public int LeaderEpoch { get; set; }
+        public int LeaderEpoch { get; set; } = 0;
 
-        public OffsetForLeaderPartitionMessage()
+        public OffsetForLeaderPartition()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
+        }
+
+        public OffsetForLeaderPartition(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -126,14 +140,6 @@ public partial class OffsetForLeaderEpochRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

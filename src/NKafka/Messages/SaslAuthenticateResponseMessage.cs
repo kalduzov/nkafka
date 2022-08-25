@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class SaslAuthenticateResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class SaslAuthenticateResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
     /// </summary>
-    public byte[] AuthBytes { get; set; }
+    public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
@@ -59,6 +64,7 @@ public partial class SaslAuthenticateResponseMessage: ResponseMessage
     public SaslAuthenticateResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }

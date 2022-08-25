@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic we fetched offsets for.
     /// </summary>
-    public IReadOnlyCollection<OffsetForLeaderTopicResultMessage> Topics { get; set; }
+    public List<OffsetForLeaderTopicResult> Topics { get; set; } = new();
 
     public OffsetForLeaderEpochResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
     public OffsetForLeaderEpochResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
@@ -54,37 +60,30 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version4)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OffsetForLeaderTopicResultMessage: Message
+    public class OffsetForLeaderTopicResult: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; }
+        public string Topic { get; set; } = null!;
 
         /// <summary>
         /// Each partition in the topic we fetched offsets for.
         /// </summary>
-        public IReadOnlyCollection<EpochEndOffsetMessage> Partitions { get; set; }
+        public List<EpochEndOffset> Partitions { get; set; } = new();
 
-        public OffsetForLeaderTopicResultMessage()
+        public OffsetForLeaderTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public OffsetForLeaderTopicResultMessage(BufferReader reader, ApiVersions version)
+        public OffsetForLeaderTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -95,27 +94,19 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class EpochEndOffsetMessage: Message
+    public class EpochEndOffset: Message
     {
         /// <summary>
         /// The error code 0, or if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int Partition { get; set; }
+        public int Partition { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch of the partition.
@@ -127,15 +118,16 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
-        public EpochEndOffsetMessage()
+        public EpochEndOffset()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
+        public EpochEndOffset(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -146,14 +138,6 @@ public partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

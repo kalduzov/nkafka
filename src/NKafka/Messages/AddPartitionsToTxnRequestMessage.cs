@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AddPartitionsToTxnRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AddPartitionsToTxnRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; }
+    public string TransactionalId { get; set; } = null!;
 
     /// <summary>
     /// Current producer id in use by the transactional id.
     /// </summary>
-    public long ProducerId { get; set; }
+    public long ProducerId { get; set; } = 0;
 
     /// <summary>
     /// Current epoch associated with the producer id.
     /// </summary>
-    public short ProducerEpoch { get; set; }
+    public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The partitions to add to the transaction.
     /// </summary>
-    public IReadOnlyCollection<AddPartitionsToTxnTopicMessage> Topics { get; set; }
+    public List<AddPartitionsToTxnTopic> Topics { get; set; } = new();
 
     public AddPartitionsToTxnRequestMessage()
     {
+        ApiKey = ApiKeys.AddPartitionsToTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public AddPartitionsToTxnRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AddPartitionsToTxn;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
@@ -65,20 +79,28 @@ public partial class AddPartitionsToTxnRequestMessage: RequestMessage
     {
     }
 
-    public class AddPartitionsToTxnTopicMessage: Message
+    public class AddPartitionsToTxnTopic: Message
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partition indexes to add to the transaction
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public AddPartitionsToTxnTopicMessage()
+        public AddPartitionsToTxnTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public AddPartitionsToTxnTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }

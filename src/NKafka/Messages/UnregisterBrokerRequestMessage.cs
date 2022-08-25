@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class UnregisterBrokerRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class UnregisterBrokerRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID to unregister.
     /// </summary>
-    public int BrokerId { get; set; }
+    public int BrokerId { get; set; } = 0;
 
     public UnregisterBrokerRequestMessage()
     {
+        ApiKey = ApiKeys.UnregisterBroker;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public UnregisterBrokerRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.UnregisterBroker;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;

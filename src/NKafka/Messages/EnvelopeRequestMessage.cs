@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,25 +32,35 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class EnvelopeRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class EnvelopeRequestMessage: RequestMessage
 {
     /// <summary>
     /// The embedded request header and data.
     /// </summary>
-    public byte[] RequestData { get; set; }
+    public byte[] RequestData { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// Value of the initial client principal when the request is redirected by a broker.
     /// </summary>
-    public byte[] RequestPrincipal { get; set; }
+    public byte[] RequestPrincipal { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The original client's address in bytes.
     /// </summary>
-    public byte[] ClientHostAddress { get; set; }
+    public byte[] ClientHostAddress { get; set; } = Array.Empty<byte>();
 
     public EnvelopeRequestMessage()
     {
+        ApiKey = ApiKeys.Envelope;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public EnvelopeRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Envelope;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;

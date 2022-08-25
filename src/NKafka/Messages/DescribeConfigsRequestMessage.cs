@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeConfigsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The resources whose configurations we want to describe.
     /// </summary>
-    public IReadOnlyCollection<DescribeConfigsResourceMessage> Resources { get; set; }
+    public List<DescribeConfigsResource> Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should include all synonyms.
@@ -52,6 +57,15 @@ public partial class DescribeConfigsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
+    public DescribeConfigsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
     public override void Read(BufferReader reader, ApiVersions version)
     {
     }
@@ -60,25 +74,33 @@ public partial class DescribeConfigsRequestMessage: RequestMessage
     {
     }
 
-    public class DescribeConfigsResourceMessage: Message
+    public class DescribeConfigsResource: Message
     {
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// The configuration keys to list, or null to list all configuration keys.
         /// </summary>
-        public IReadOnlyCollection<string> ConfigurationKeys { get; set; }
+        public List<string> ConfigurationKeys { get; set; } = new();
 
-        public DescribeConfigsResourceMessage()
+        public DescribeConfigsResource()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
+        }
+
+        public DescribeConfigsResource(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }

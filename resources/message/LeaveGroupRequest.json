@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,7 @@
 
 {
   "apiKey": 13,
-  "type": "Request",
+  "type": "request",
   "listeners": ["zkBroker", "broker"],
   "name": "LeaveGroupRequest",
   // Version 1 and 2 are the same as version 0.
@@ -23,7 +23,9 @@
   // Version 3 defines batch processing scheme with group.instance.id + member.id for identity
   //
   // Version 4 is the first flexible version.
-  "validVersions": "0-4",
+  //
+  // Version 5 adds the Reason field (KIP-800).
+  "validVersions": "0-5",
   "flexibleVersions": "4+",
   "fields": [
     { "name": "GroupId", "type": "string", "versions": "0+", "entityType": "groupId",
@@ -36,7 +38,10 @@
         "about": "The member ID to remove from the group." },
       { "name": "GroupInstanceId", "type": "string",
         "versions": "3+", "nullableVersions": "3+", "default": "null",
-        "about": "The group instance ID to remove from the group." }
+        "about": "The group instance ID to remove from the group." },
+      { "name": "Reason", "type": "string",
+        "versions": "5+", "nullableVersions": "5+", "default": "null", "ignorable": true,
+        "about": "The reason why the member left the group." }
     ]}
   ]
 }

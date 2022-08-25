@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeClusterRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeClusterRequestMessage: RequestMessage
 {
     /// <summary>
     /// Whether to include cluster authorized operations.
     /// </summary>
-    public bool IncludeClusterAuthorizedOperations { get; set; }
+    public bool IncludeClusterAuthorizedOperations { get; set; } = false;
 
     public DescribeClusterRequestMessage()
     {
+        ApiKey = ApiKeys.DescribeCluster;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeClusterRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.DescribeCluster;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;

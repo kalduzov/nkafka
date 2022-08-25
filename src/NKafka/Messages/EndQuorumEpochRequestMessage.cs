@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class EndQuorumEpochRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public string? ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = "null";
 
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+    public List<TopicData> Topics { get; set; } = new();
 
     public EndQuorumEpochRequestMessage()
     {
+        ApiKey = ApiKeys.EndQuorumEpoch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public EndQuorumEpochRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.EndQuorumEpoch;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -53,30 +67,30 @@ public partial class EndQuorumEpochRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public TopicData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -87,40 +101,40 @@ public partial class EndQuorumEpochRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The current leader ID that is resigning
         /// </summary>
-        public int LeaderId { get; set; }
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The current epoch
         /// </summary>
-        public int LeaderEpoch { get; set; }
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// A sorted list of preferred successors to start the election
         /// </summary>
-        public IReadOnlyCollection<int> PreferredSuccessors { get; set; }
+        public List<int> PreferredSuccessors { get; set; } = new();
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public PartitionData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -131,14 +145,6 @@ public partial class EndQuorumEpochRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

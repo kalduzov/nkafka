@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,27 +32,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class FetchRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class FetchRequestMessage: RequestMessage
 {
     /// <summary>
     /// The clusterId if known. This is used to validate metadata fetches prior to broker registration.
     /// </summary>
-    public string? ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = "null";
 
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
     /// </summary>
-    public int ReplicaId { get; set; }
+    public int ReplicaId { get; set; } = 0;
 
     /// <summary>
     /// The maximum time in milliseconds to wait for the response.
     /// </summary>
-    public int MaxWaitMs { get; set; }
+    public int MaxWaitMs { get; set; } = 0;
 
     /// <summary>
     /// The minimum bytes to accumulate in the response.
     /// </summary>
-    public int MinBytes { get; set; }
+    public int MinBytes { get; set; } = 0;
 
     /// <summary>
     /// The maximum bytes to fetch.  See KIP-74 for cases where this limit may not be honored.
@@ -73,20 +78,29 @@ public partial class FetchRequestMessage: RequestMessage
     /// <summary>
     /// The topics to fetch.
     /// </summary>
-    public IReadOnlyCollection<FetchTopicMessage> Topics { get; set; }
+    public List<FetchTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// In an incremental fetch request, the partitions to remove.
     /// </summary>
-    public IReadOnlyCollection<ForgottenTopicMessage> ForgottenTopicsData { get; set; }
+    public List<ForgottenTopic> ForgottenTopicsData { get; set; } = new();
 
     /// <summary>
     /// Rack ID of the consumer making this request
     /// </summary>
-    public string? RackId { get; set; }
+    public string? RackId { get; set; } = null!;
 
     public FetchRequestMessage()
     {
+        ApiKey = ApiKeys.Fetch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version13;
+    }
+
+    public FetchRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Fetch;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version13;
@@ -98,43 +112,35 @@ public partial class FetchRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version12)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version12)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class FetchTopicMessage: Message
+    public class FetchTopic: Message
     {
         /// <summary>
         /// The name of the topic to fetch.
         /// </summary>
-        public string? Topic { get; set; }
+        public string? Topic { get; set; } = null!;
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The partitions to fetch.
         /// </summary>
-        public IReadOnlyCollection<FetchPartitionMessage> Partitions { get; set; }
+        public List<FetchPartition> Partitions { get; set; } = new();
 
-        public FetchTopicMessage()
+        public FetchTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
+        }
+
+        public FetchTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -145,30 +151,14 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class FetchPartitionMessage: Message
+    public class FetchPartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int Partition { get; set; }
+        public int Partition { get; set; } = 0;
 
         /// <summary>
         /// The current leader epoch of the partition.
@@ -178,7 +168,7 @@ public partial class FetchRequestMessage: RequestMessage
         /// <summary>
         /// The message offset.
         /// </summary>
-        public long FetchOffset { get; set; }
+        public long FetchOffset { get; set; } = 0;
 
         /// <summary>
         /// The epoch of the last fetched record or -1 if there is none
@@ -193,10 +183,18 @@ public partial class FetchRequestMessage: RequestMessage
         /// <summary>
         /// The maximum bytes to fetch from this partition.  See KIP-74 for cases where this limit may not be honored.
         /// </summary>
-        public int PartitionMaxBytes { get; set; }
+        public int PartitionMaxBytes { get; set; } = 0;
 
-        public FetchPartitionMessage()
+        public FetchPartition()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
+        }
+
+        public FetchPartition(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -207,43 +205,35 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class ForgottenTopicMessage: Message
+    public class ForgottenTopic: Message
     {
         /// <summary>
-        /// The partition name.
+        /// The topic name.
         /// </summary>
-        public string? Topic { get; set; }
+        public string? Topic { get; set; } = null!;
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The partitions indexes to forget.
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public ForgottenTopicMessage()
+        public ForgottenTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
+        }
+
+        public ForgottenTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -254,22 +244,6 @@ public partial class FetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class TxnOffsetCommitResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class TxnOffsetCommitResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public IReadOnlyCollection<TxnOffsetCommitResponseTopicMessage> Topics { get; set; }
+    public List<TxnOffsetCommitResponseTopic> Topics { get; set; } = new();
 
     public TxnOffsetCommitResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class TxnOffsetCommitResponseMessage: ResponseMessage
     public TxnOffsetCommitResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -54,37 +60,30 @@ public partial class TxnOffsetCommitResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version3)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TxnOffsetCommitResponseTopicMessage: Message
+    public class TxnOffsetCommitResponseTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public IReadOnlyCollection<TxnOffsetCommitResponsePartitionMessage> Partitions { get; set; }
+        public List<TxnOffsetCommitResponsePartition> Partitions { get; set; } = new();
 
-        public TxnOffsetCommitResponseTopicMessage()
+        public TxnOffsetCommitResponseTopic()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public TxnOffsetCommitResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitResponseTopic(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -95,37 +94,30 @@ public partial class TxnOffsetCommitResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class TxnOffsetCommitResponsePartitionMessage: Message
+    public class TxnOffsetCommitResponsePartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public TxnOffsetCommitResponsePartitionMessage()
+        public TxnOffsetCommitResponsePartition()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public TxnOffsetCommitResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitResponsePartition(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -136,14 +128,6 @@ public partial class TxnOffsetCommitResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

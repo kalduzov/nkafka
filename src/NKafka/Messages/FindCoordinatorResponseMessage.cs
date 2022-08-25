@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,37 +32,38 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class FindCoordinatorResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string? ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// The node id.
     /// </summary>
-    public int NodeId { get; set; }
+    public int NodeId { get; set; } = 0;
 
     /// <summary>
     /// The host name.
     /// </summary>
-    public string Host { get; set; }
+    public string Host { get; set; } = null!;
 
     /// <summary>
     /// The port.
     /// </summary>
-    public int Port { get; set; }
+    public int Port { get; set; } = 0;
 
     /// <summary>
     /// Each coordinator result in the response
     /// </summary>
-    public IReadOnlyCollection<CoordinatorMessage> Coordinators { get; set; }
+    public List<Coordinator> Coordinators { get; set; } = new();
 
     public FindCoordinatorResponseMessage()
     {
@@ -69,6 +74,7 @@ public partial class FindCoordinatorResponseMessage: ResponseMessage
     public FindCoordinatorResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
@@ -79,57 +85,50 @@ public partial class FindCoordinatorResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version3)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class CoordinatorMessage: Message
+    public class Coordinator: Message
     {
         /// <summary>
         /// The coordinator key.
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// The node id.
         /// </summary>
-        public int NodeId { get; set; }
+        public int NodeId { get; set; } = 0;
 
         /// <summary>
         /// The host name.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The port.
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string? ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; } = null!;
 
-        public CoordinatorMessage()
+        public Coordinator()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public CoordinatorMessage(BufferReader reader, ApiVersions version)
+        public Coordinator(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
@@ -140,14 +139,6 @@ public partial class FindCoordinatorResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version3)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

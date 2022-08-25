@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeTransactionsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TransactionStateMessage> TransactionStates { get; set; }
+    public List<TransactionState> TransactionStates { get; set; } = new();
 
     public DescribeTransactionsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DescribeTransactionsResponseMessage: ResponseMessage
     public DescribeTransactionsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -54,67 +60,60 @@ public partial class DescribeTransactionsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TransactionStateMessage: Message
+    public class TransactionState: Message
     {
         /// <summary>
         /// 
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionalId { get; set; }
+        public string TransactionalId { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionState { get; set; }
+        public string TransactionState { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public int TransactionTimeoutMs { get; set; }
+        public int TransactionTimeoutMs { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public long TransactionStartTimeMs { get; set; }
+        public long TransactionStartTimeMs { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public long ProducerId { get; set; }
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public short ProducerEpoch { get; set; }
+        public short ProducerEpoch { get; set; } = 0;
 
         /// <summary>
         /// The set of partitions included in the current transaction (if active). When a transaction is preparing to commit or abort, this will include only partitions which do not have markers.
         /// </summary>
-        public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+        public List<TopicData> Topics { get; set; } = new();
 
-        public TransactionStateMessage()
+        public TransactionState()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TransactionStateMessage(BufferReader reader, ApiVersions version)
+        public TransactionState(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -125,37 +124,30 @@ public partial class DescribeTransactionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// 
         /// </summary>
-        public string Topic { get; set; }
+        public string Topic { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -166,14 +158,6 @@ public partial class DescribeTransactionsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class BrokerHeartbeatRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class BrokerHeartbeatRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID.
     /// </summary>
-    public int BrokerId { get; set; }
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The broker epoch.
@@ -43,20 +48,29 @@ public partial class BrokerHeartbeatRequestMessage: RequestMessage
     /// <summary>
     /// The highest metadata offset which the broker has reached.
     /// </summary>
-    public long CurrentMetadataOffset { get; set; }
+    public long CurrentMetadataOffset { get; set; } = 0;
 
     /// <summary>
     /// True if the broker wants to be fenced, false otherwise.
     /// </summary>
-    public bool WantFence { get; set; }
+    public bool WantFence { get; set; } = false;
 
     /// <summary>
     /// True if the broker wants to be shut down, false otherwise.
     /// </summary>
-    public bool WantShutDown { get; set; }
+    public bool WantShutDown { get; set; } = false;
 
     public BrokerHeartbeatRequestMessage()
     {
+        ApiKey = ApiKeys.BrokerHeartbeat;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public BrokerHeartbeatRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.BrokerHeartbeat;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;

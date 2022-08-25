@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ElectLeadersRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ElectLeadersRequestMessage: RequestMessage
 {
     /// <summary>
     /// Type of elections to conduct for the partition. A value of '0' elects the preferred replica. A value of '1' elects the first live replica if there are no in-sync replica.
     /// </summary>
-    public sbyte ElectionType { get; set; }
+    public sbyte ElectionType { get; set; } = 0;
 
     /// <summary>
     /// The topic partitions to elect leaders.
     /// </summary>
-    public IReadOnlyCollection<TopicPartitionsMessage> TopicPartitions { get; set; }
+    public List<TopicPartitions> TopicPartitions { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the election to complete.
@@ -52,36 +57,45 @@ public partial class ElectLeadersRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
+    public ElectLeadersRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ElectLeaders;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
     public override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicPartitionsMessage: Message
+    public class TopicPartitions: Message
     {
         /// <summary>
         /// The name of a topic.
         /// </summary>
-        public string Topic { get; set; }
+        public string Topic { get; set; } = null!;
 
         /// <summary>
         /// The partitions of this topic whose leader should be elected.
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public TopicPartitionsMessage()
+        public TopicPartitions()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version2;
+        }
+
+        public TopicPartitions(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
@@ -92,14 +106,6 @@ public partial class ElectLeadersRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

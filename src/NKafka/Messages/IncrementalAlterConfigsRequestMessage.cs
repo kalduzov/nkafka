@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The incremental updates for each resource.
     /// </summary>
-    public IReadOnlyCollection<AlterConfigsResourceMessage> Resources { get; set; }
+    public List<AlterConfigsResource> Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should validate the request, but not change the configurations.
     /// </summary>
-    public bool ValidateOnly { get; set; }
+    public bool ValidateOnly { get; set; } = false;
 
     public IncrementalAlterConfigsRequestMessage()
     {
+        ApiKey = ApiKeys.IncrementalAlterConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public IncrementalAlterConfigsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.IncrementalAlterConfigs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
@@ -53,35 +67,35 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version1)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class AlterConfigsResourceMessage: Message
+    public class AlterConfigsResource: Message
     {
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// The configurations.
         /// </summary>
-        public IReadOnlyCollection<AlterableConfigMessage> Configs { get; set; }
+        public List<AlterableConfig> Configs { get; set; } = new();
 
-        public AlterConfigsResourceMessage()
+        public AlterConfigsResource()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
+        }
+
+        public AlterConfigsResource(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -92,35 +106,35 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class AlterableConfigMessage: Message
+    public class AlterableConfig: Message
     {
         /// <summary>
         /// The configuration key name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The type (Set, Delete, Append, Subtract) of operation.
         /// </summary>
-        public sbyte ConfigOperation { get; set; }
+        public sbyte ConfigOperation { get; set; } = 0;
 
         /// <summary>
         /// The value to set for the configuration key.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
-        public AlterableConfigMessage()
+        public AlterableConfig()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
+        }
+
+        public AlterableConfig(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -131,14 +145,6 @@ public partial class IncrementalAlterConfigsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

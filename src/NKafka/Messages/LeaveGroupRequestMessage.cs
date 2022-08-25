@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,28 +32,38 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class LeaveGroupRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class LeaveGroupRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the group to leave.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     /// <summary>
     /// The member ID to remove from the group.
     /// </summary>
-    public string MemberId { get; set; }
+    public string MemberId { get; set; } = null!;
 
     /// <summary>
     /// List of leaving member identities.
     /// </summary>
-    public IReadOnlyCollection<MemberIdentityMessage> Members { get; set; }
+    public List<MemberIdentity> Members { get; set; } = new();
 
     public LeaveGroupRequestMessage()
     {
         ApiKey = ApiKeys.LeaveGroup;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
+
+    public LeaveGroupRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.LeaveGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -58,32 +72,37 @@ public partial class LeaveGroupRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version4)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class MemberIdentityMessage: Message
+    public class MemberIdentity: Message
     {
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
-        public string MemberId { get; set; }
+        public string MemberId { get; set; } = null!;
 
         /// <summary>
         /// The group instance ID to remove from the group.
         /// </summary>
-        public string? GroupInstanceId { get; set; } = null;
+        public string? GroupInstanceId { get; set; } = "null";
 
-        public MemberIdentityMessage()
+        /// <summary>
+        /// The reason why the member left the group.
+        /// </summary>
+        public string? Reason { get; set; } = "null";
+
+        public MemberIdentity()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
+            HighestSupportedVersion = ApiVersions.Version5;
+        }
+
+        public MemberIdentity(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -92,14 +111,6 @@ public partial class LeaveGroupRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

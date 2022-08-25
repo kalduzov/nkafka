@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class StopReplicaResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class StopReplicaResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no top-level error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The responses for each partition.
     /// </summary>
-    public IReadOnlyCollection<StopReplicaPartitionErrorMessage> PartitionErrors { get; set; }
+    public List<StopReplicaPartitionError> PartitionErrors { get; set; } = new();
 
     public StopReplicaResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class StopReplicaResponseMessage: ResponseMessage
     public StopReplicaResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -59,42 +65,35 @@ public partial class StopReplicaResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version2)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class StopReplicaPartitionErrorMessage: Message
+    public class StopReplicaPartitionError: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no partition error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public StopReplicaPartitionErrorMessage()
+        public StopReplicaPartitionError()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaPartitionErrorMessage(BufferReader reader, ApiVersions version)
+        public StopReplicaPartitionError(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -105,14 +104,6 @@ public partial class StopReplicaResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version2)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

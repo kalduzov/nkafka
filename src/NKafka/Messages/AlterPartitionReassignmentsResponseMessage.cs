@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// The responses to topics to reassign.
     /// </summary>
-    public IReadOnlyCollection<ReassignableTopicResponseMessage> Responses { get; set; }
+    public List<ReassignableTopicResponse> Responses { get; set; } = new();
 
     public AlterPartitionReassignmentsResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
     public AlterPartitionReassignmentsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -66,27 +72,28 @@ public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
     {
     }
 
-    public class ReassignableTopicResponseMessage: Message
+    public class ReassignableTopicResponse: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The responses to partitions to reassign
         /// </summary>
-        public IReadOnlyCollection<ReassignablePartitionResponseMessage> Partitions { get; set; }
+        public List<ReassignablePartitionResponse> Partitions { get; set; } = new();
 
-        public ReassignableTopicResponseMessage()
+        public ReassignableTopicResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ReassignableTopicResponseMessage(BufferReader reader, ApiVersions version)
+        public ReassignableTopicResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -99,32 +106,33 @@ public partial class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         {
         }
     }
-    public class ReassignablePartitionResponseMessage: Message
+    public class ReassignablePartitionResponse: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code for this partition, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message for this partition, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
-        public ReassignablePartitionResponseMessage()
+        public ReassignablePartitionResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ReassignablePartitionResponseMessage(BufferReader reader, ApiVersions version)
+        public ReassignablePartitionResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

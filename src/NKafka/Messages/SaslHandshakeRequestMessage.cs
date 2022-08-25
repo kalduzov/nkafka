@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class SaslHandshakeRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class SaslHandshakeRequestMessage: RequestMessage
 {
     /// <summary>
     /// The SASL mechanism chosen by the client.
     /// </summary>
-    public string Mechanism { get; set; }
+    public string Mechanism { get; set; } = null!;
 
     public SaslHandshakeRequestMessage()
     {
+        ApiKey = ApiKeys.SaslHandshake;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public SaslHandshakeRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.SaslHandshake;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;

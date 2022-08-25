@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The alterations to make for each directory.
     /// </summary>
-    public IReadOnlyCollection<AlterReplicaLogDirMessage> Dirs { get; set; }
+    public List<AlterReplicaLogDir> Dirs { get; set; } = new();
 
     public AlterReplicaLogDirsRequestMessage()
     {
+        ApiKey = ApiKeys.AlterReplicaLogDirs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public AlterReplicaLogDirsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AlterReplicaLogDirs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
@@ -50,20 +64,28 @@ public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
     {
     }
 
-    public class AlterReplicaLogDirMessage: Message
+    public class AlterReplicaLogDir: Message
     {
         /// <summary>
         /// The absolute directory path.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; set; } = null!;
 
         /// <summary>
         /// The topics to add to the directory.
         /// </summary>
-        public IReadOnlyCollection<AlterReplicaLogDirTopicMessage> Topics { get; set; }
+        public List<AlterReplicaLogDirTopic> Topics { get; set; } = new();
 
-        public AlterReplicaLogDirMessage()
+        public AlterReplicaLogDir()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version2;
+        }
+
+        public AlterReplicaLogDir(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
@@ -76,20 +98,28 @@ public partial class AlterReplicaLogDirsRequestMessage: RequestMessage
         {
         }
     }
-    public class AlterReplicaLogDirTopicMessage: Message
+    public class AlterReplicaLogDirTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public AlterReplicaLogDirTopicMessage()
+        public AlterReplicaLogDirTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version2;
+        }
+
+        public AlterReplicaLogDirTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }

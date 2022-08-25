@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
     /// </summary>
-    public IReadOnlyCollection<AlterUserScramCredentialsResultMessage> Results { get; set; }
+    public List<AlterUserScramCredentialsResult> Results { get; set; } = new();
 
     public AlterUserScramCredentialsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
     public AlterUserScramCredentialsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -56,32 +62,33 @@ public partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
     {
     }
 
-    public class AlterUserScramCredentialsResultMessage: Message
+    public class AlterUserScramCredentialsResult: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string User { get; set; }
+        public string User { get; set; } = null!;
 
         /// <summary>
         /// The error code.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, if any.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
-        public AlterUserScramCredentialsResultMessage()
+        public AlterUserScramCredentialsResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
+        public AlterUserScramCredentialsResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

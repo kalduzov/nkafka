@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,40 +32,50 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class BrokerRegistrationRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID.
     /// </summary>
-    public int BrokerId { get; set; }
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The cluster id of the broker process.
     /// </summary>
-    public string ClusterId { get; set; }
+    public string ClusterId { get; set; } = null!;
 
     /// <summary>
     /// The incarnation id of the broker process.
     /// </summary>
-    public Guid IncarnationId { get; set; }
+    public Guid IncarnationId { get; set; } = Guid.Empty;
 
     /// <summary>
     /// The listeners of this broker
     /// </summary>
-    public IReadOnlyCollection<ListenerMessage> Listeners { get; set; }
+    public List<Listener> Listeners { get; set; } = new();
 
     /// <summary>
     /// The features on this broker
     /// </summary>
-    public IReadOnlyCollection<FeatureMessage> Features { get; set; }
+    public List<Feature> Features { get; set; } = new();
 
     /// <summary>
     /// The rack which this broker is in.
     /// </summary>
-    public string Rack { get; set; }
+    public string Rack { get; set; } = null!;
 
     public BrokerRegistrationRequestMessage()
     {
+        ApiKey = ApiKeys.BrokerRegistration;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public BrokerRegistrationRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.BrokerRegistration;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -75,30 +89,38 @@ public partial class BrokerRegistrationRequestMessage: RequestMessage
     {
     }
 
-    public class ListenerMessage: Message
+    public class Listener: Message
     {
         /// <summary>
         /// The name of the endpoint.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The hostname.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The port.
         /// </summary>
-        public ushort Port { get; set; }
+        public ushort Port { get; set; } = 0;
 
         /// <summary>
         /// The security protocol.
         /// </summary>
-        public short SecurityProtocol { get; set; }
+        public short SecurityProtocol { get; set; } = 0;
 
-        public ListenerMessage()
+        public Listener()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public Listener(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -111,25 +133,33 @@ public partial class BrokerRegistrationRequestMessage: RequestMessage
         {
         }
     }
-    public class FeatureMessage: Message
+    public class Feature: Message
     {
         /// <summary>
         /// The feature name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The minimum supported feature level.
         /// </summary>
-        public short MinSupportedVersion { get; set; }
+        public short MinSupportedVersion { get; set; } = 0;
 
         /// <summary>
         /// The maximum supported feature level.
         /// </summary>
-        public short MaxSupportedVersion { get; set; }
+        public short MaxSupportedVersion { get; set; } = 0;
 
-        public FeatureMessage()
+        public Feature()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public Feature(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

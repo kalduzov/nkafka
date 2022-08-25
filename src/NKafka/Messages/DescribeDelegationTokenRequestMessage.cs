@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,18 +32,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeDelegationTokenRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
-    public IReadOnlyCollection<DescribeDelegationTokenOwnerMessage> Owners { get; set; }
+    public List<DescribeDelegationTokenOwner> Owners { get; set; } = new();
 
     public DescribeDelegationTokenRequestMessage()
     {
         ApiKey = ApiKeys.DescribeDelegationToken;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -50,22 +64,30 @@ public partial class DescribeDelegationTokenRequestMessage: RequestMessage
     {
     }
 
-    public class DescribeDelegationTokenOwnerMessage: Message
+    public class DescribeDelegationTokenOwner: Message
     {
         /// <summary>
         /// The owner principal type.
         /// </summary>
-        public string PrincipalType { get; set; }
+        public string PrincipalType { get; set; } = null!;
 
         /// <summary>
         /// The owner principal name.
         /// </summary>
-        public string PrincipalName { get; set; }
+        public string PrincipalName { get; set; } = null!;
 
-        public DescribeDelegationTokenOwnerMessage()
+        public DescribeDelegationTokenOwner()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public DescribeDelegationTokenOwner(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

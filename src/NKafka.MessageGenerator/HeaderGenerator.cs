@@ -46,7 +46,11 @@ public class HeaderGenerator: IHeaderGenerator
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
-// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.";
+// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
+
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global";
 
     private readonly string _namespaceName;
     private readonly SortedSet<string> usings = new();

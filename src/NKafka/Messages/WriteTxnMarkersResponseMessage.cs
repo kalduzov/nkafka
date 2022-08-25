@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class WriteTxnMarkersResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for writing makers.
     /// </summary>
-    public IReadOnlyCollection<WritableTxnMarkerResultMessage> Markers { get; set; }
+    public List<WritableTxnMarkerResult> Markers { get; set; } = new();
 
     public WriteTxnMarkersResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
     public WriteTxnMarkersResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -54,37 +60,30 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version1)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class WritableTxnMarkerResultMessage: Message
+    public class WritableTxnMarkerResult: Message
     {
         /// <summary>
         /// The current producer ID in use by the transactional ID.
         /// </summary>
-        public long ProducerId { get; set; }
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The results by topic.
         /// </summary>
-        public IReadOnlyCollection<WritableTxnMarkerTopicResultMessage> Topics { get; set; }
+        public List<WritableTxnMarkerTopicResult> Topics { get; set; } = new();
 
-        public WritableTxnMarkerResultMessage()
+        public WritableTxnMarkerResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerResultMessage(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -95,37 +94,30 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class WritableTxnMarkerTopicResultMessage: Message
+    public class WritableTxnMarkerTopicResult: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The results by partition.
         /// </summary>
-        public IReadOnlyCollection<WritableTxnMarkerPartitionResultMessage> Partitions { get; set; }
+        public List<WritableTxnMarkerPartitionResult> Partitions { get; set; } = new();
 
-        public WritableTxnMarkerTopicResultMessage()
+        public WritableTxnMarkerTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerTopicResultMessage(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -136,37 +128,30 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class WritableTxnMarkerPartitionResultMessage: Message
+    public class WritableTxnMarkerPartitionResult: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public WritableTxnMarkerPartitionResultMessage()
+        public WritableTxnMarkerPartitionResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerPartitionResultMessage(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerPartitionResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -177,14 +162,6 @@ public partial class WriteTxnMarkersResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version1)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

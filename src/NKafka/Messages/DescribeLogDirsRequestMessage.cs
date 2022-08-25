@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,18 +32,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeLogDirsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeLogDirsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
-    public IReadOnlyCollection<DescribableLogDirTopicMessage> Topics { get; set; }
+    public List<DescribableLogDirTopic> Topics { get; set; } = new();
 
     public DescribeLogDirsRequestMessage()
     {
         ApiKey = ApiKeys.DescribeLogDirs;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public DescribeLogDirsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeLogDirs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -50,22 +64,30 @@ public partial class DescribeLogDirsRequestMessage: RequestMessage
     {
     }
 
-    public class DescribableLogDirTopicMessage: Message
+    public class DescribableLogDirTopic: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Topic { get; set; }
+        public string Topic { get; set; } = null!;
 
         /// <summary>
-        /// The partition indxes.
+        /// The partition indexes.
         /// </summary>
-        public IReadOnlyCollection<int> Partitions { get; set; }
+        public List<int> Partitions { get; set; } = new();
 
-        public DescribableLogDirTopicMessage()
+        public DescribableLogDirTopic()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version4;
+        }
+
+        public DescribableLogDirTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,34 +32,36 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class UpdateFeaturesResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class UpdateFeaturesResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or `0` if there was no top-level error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// Results for each feature update.
     /// </summary>
-    public IReadOnlyCollection<UpdatableFeatureResultMessage> Results { get; set; }
+    public List<UpdatableFeatureResult> Results { get; set; } = new();
 
     public UpdateFeaturesResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public UpdateFeaturesResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -64,44 +70,37 @@ public partial class UpdateFeaturesResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class UpdatableFeatureResultMessage: Message
+    public class UpdatableFeatureResult: Message
     {
         /// <summary>
         /// The name of the finalized feature.
         /// </summary>
-        public string Feature { get; set; }
+        public string Feature { get; set; } = null!;
 
         /// <summary>
         /// The feature update error code or `0` if the feature update succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The feature update error, or `null` if the feature update succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
-        public UpdatableFeatureResultMessage()
+        public UpdatableFeatureResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public UpdatableFeatureResultMessage(BufferReader reader, ApiVersions version)
+        public UpdatableFeatureResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -110,14 +109,6 @@ public partial class UpdateFeaturesResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

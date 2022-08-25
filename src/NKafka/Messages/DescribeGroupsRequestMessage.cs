@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeGroupsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeGroupsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The names of the groups to describe
     /// </summary>
-    public IReadOnlyCollection<string> Groups { get; set; }
+    public List<string> Groups { get; set; } = new();
 
     /// <summary>
     /// Whether to include authorized operations.
     /// </summary>
-    public bool IncludeAuthorizedOperations { get; set; }
+    public bool IncludeAuthorizedOperations { get; set; } = false;
 
     public DescribeGroupsRequestMessage()
     {
+        ApiKey = ApiKeys.DescribeGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
+
+    public DescribeGroupsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.DescribeGroups;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;

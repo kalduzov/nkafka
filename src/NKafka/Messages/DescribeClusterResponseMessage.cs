@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeClusterResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeClusterResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string? ErrorMessage { get; set; } = null;
+    public string? ErrorMessage { get; set; } = "null";
 
     /// <summary>
     /// The cluster ID that responding broker belongs to.
     /// </summary>
-    public string ClusterId { get; set; }
+    public string ClusterId { get; set; } = null!;
 
     /// <summary>
     /// The ID of the controller broker.
@@ -53,7 +58,7 @@ public partial class DescribeClusterResponseMessage: ResponseMessage
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public IReadOnlyCollection<DescribeClusterBrokerMessage> Brokers { get; set; }
+    public List<DescribeClusterBroker> Brokers { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.
@@ -69,6 +74,7 @@ public partial class DescribeClusterResponseMessage: ResponseMessage
     public DescribeClusterResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -81,37 +87,38 @@ public partial class DescribeClusterResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeClusterBrokerMessage: Message
+    public class DescribeClusterBroker: Message
     {
         /// <summary>
         /// The broker ID.
         /// </summary>
-        public int BrokerId { get; set; }
+        public int BrokerId { get; set; } = 0;
 
         /// <summary>
         /// The broker hostname.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The broker port.
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; set; } = 0;
 
         /// <summary>
         /// The rack of the broker, or null if it has not been assigned to a rack.
         /// </summary>
-        public string? Rack { get; set; } = null;
+        public string? Rack { get; set; } = "null";
 
-        public DescribeClusterBrokerMessage()
+        public DescribeClusterBroker()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public DescribeClusterBrokerMessage(BufferReader reader, ApiVersions version)
+        public DescribeClusterBroker(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

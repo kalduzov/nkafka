@@ -43,15 +43,14 @@ public abstract class Message
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand.
     /// </summary>
-    public IReadOnlyCollection<TaggedField>? UnknownTaggedFields { get; set; }
+    public List<TaggedField>? UnknownTaggedFields { get; set; }
 
-    public Message()
+    protected Message()
     {
     }
 
-    public Message(BufferReader reader, ApiVersions version)
+    protected Message(BufferReader reader, ApiVersions version)
     {
-        Read(reader, version);
     }
 
     /// <summary>

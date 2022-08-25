@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,7 +32,8 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ListPartitionReassignmentsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ListPartitionReassignmentsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The time in ms to wait for the request to complete.
@@ -38,10 +43,19 @@ public partial class ListPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The topics to list partition reassignments for, or null to list everything.
     /// </summary>
-    public IReadOnlyCollection<ListPartitionReassignmentsTopicsMessage>? Topics { get; set; } = null;
+    public List<ListPartitionReassignmentsTopics>? Topics { get; set; } = null;
 
     public ListPartitionReassignmentsRequestMessage()
     {
+        ApiKey = ApiKeys.ListPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public ListPartitionReassignmentsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.ListPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -53,30 +67,30 @@ public partial class ListPartitionReassignmentsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class ListPartitionReassignmentsTopicsMessage: Message
+    public class ListPartitionReassignmentsTopics: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partitions to list partition reassignments for.
         /// </summary>
-        public IReadOnlyCollection<int> PartitionIndexes { get; set; }
+        public List<int> PartitionIndexes { get; set; } = new();
 
-        public ListPartitionReassignmentsTopicsMessage()
+        public ListPartitionReassignmentsTopics()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public ListPartitionReassignmentsTopics(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -87,14 +101,6 @@ public partial class ListPartitionReassignmentsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

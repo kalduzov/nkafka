@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class OffsetDeleteResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public IReadOnlyCollection<OffsetDeleteResponseTopicMessage> Topics { get; set; }
+    public List<OffsetDeleteResponseTopic> Topics { get; set; } = new();
 
     public OffsetDeleteResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
     public OffsetDeleteResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -59,37 +65,30 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OffsetDeleteResponseTopicMessage: Message
+    public class OffsetDeleteResponseTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public IReadOnlyCollection<OffsetDeleteResponsePartitionMessage> Partitions { get; set; }
+        public List<OffsetDeleteResponsePartition> Partitions { get; set; } = new();
 
-        public OffsetDeleteResponseTopicMessage()
+        public OffsetDeleteResponseTopic()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponseTopic(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -100,37 +99,30 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OffsetDeleteResponsePartitionMessage: Message
+    public class OffsetDeleteResponsePartition: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public OffsetDeleteResponsePartitionMessage()
+        public OffsetDeleteResponsePartition()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponsePartition(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -141,14 +133,6 @@ public partial class OffsetDeleteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

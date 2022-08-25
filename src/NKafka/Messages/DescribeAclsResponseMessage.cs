@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,34 +32,36 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeAclsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeAclsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// Each Resource that is referenced in an ACL.
     /// </summary>
-    public IReadOnlyCollection<DescribeAclsResourceMessage> Resources { get; set; }
+    public List<DescribeAclsResource> Resources { get; set; } = new();
 
     public DescribeAclsResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DescribeAclsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -66,17 +72,17 @@ public partial class DescribeAclsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeAclsResourceMessage: Message
+    public class DescribeAclsResource: Message
     {
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// The resource pattern type.
@@ -86,19 +92,20 @@ public partial class DescribeAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The ACLs.
         /// </summary>
-        public IReadOnlyCollection<AclDescriptionMessage> Acls { get; set; }
+        public List<AclDescription> Acls { get; set; } = new();
 
-        public DescribeAclsResourceMessage()
+        public DescribeAclsResource()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribeAclsResourceMessage(BufferReader reader, ApiVersions version)
+        public DescribeAclsResource(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -109,39 +116,40 @@ public partial class DescribeAclsResponseMessage: ResponseMessage
         {
         }
     }
-    public class AclDescriptionMessage: Message
+    public class AclDescription: Message
     {
         /// <summary>
         /// The ACL principal.
         /// </summary>
-        public string Principal { get; set; }
+        public string Principal { get; set; } = null!;
 
         /// <summary>
         /// The ACL host.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The ACL operation.
         /// </summary>
-        public sbyte Operation { get; set; }
+        public sbyte Operation { get; set; } = 0;
 
         /// <summary>
         /// The ACL permission type.
         /// </summary>
-        public sbyte PermissionType { get; set; }
+        public sbyte PermissionType { get; set; } = 0;
 
-        public AclDescriptionMessage()
+        public AclDescription()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AclDescriptionMessage(BufferReader reader, ApiVersions version)
+        public AclDescription(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

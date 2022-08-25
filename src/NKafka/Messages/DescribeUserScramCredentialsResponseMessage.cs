@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeUserScramCredentialsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The message-level error code, 0 except for user authorization or infrastructure issues.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The message-level error message, if any.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// The results for descriptions, one per user.
     /// </summary>
-    public IReadOnlyCollection<DescribeUserScramCredentialsResultMessage> Results { get; set; }
+    public List<DescribeUserScramCredentialsResult> Results { get; set; } = new();
 
     public DescribeUserScramCredentialsResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class DescribeUserScramCredentialsResponseMessage: ResponseMessag
     public DescribeUserScramCredentialsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -64,47 +70,40 @@ public partial class DescribeUserScramCredentialsResponseMessage: ResponseMessag
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class DescribeUserScramCredentialsResultMessage: Message
+    public class DescribeUserScramCredentialsResult: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string User { get; set; }
+        public string User { get; set; } = null!;
 
         /// <summary>
         /// The user-level error code.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The user-level error message, if any.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The mechanism and related information associated with the user's SCRAM credentials.
         /// </summary>
-        public IReadOnlyCollection<CredentialInfoMessage> CredentialInfos { get; set; }
+        public List<CredentialInfo> CredentialInfos { get; set; } = new();
 
-        public DescribeUserScramCredentialsResultMessage()
+        public DescribeUserScramCredentialsResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public DescribeUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeUserScramCredentialsResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -115,37 +114,30 @@ public partial class DescribeUserScramCredentialsResponseMessage: ResponseMessag
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class CredentialInfoMessage: Message
+    public class CredentialInfo: Message
     {
         /// <summary>
         /// The SCRAM mechanism.
         /// </summary>
-        public sbyte Mechanism { get; set; }
+        public sbyte Mechanism { get; set; } = 0;
 
         /// <summary>
         /// The number of iterations used in the SCRAM credential.
         /// </summary>
-        public int Iterations { get; set; }
+        public int Iterations { get; set; } = 0;
 
-        public CredentialInfoMessage()
+        public CredentialInfo()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public CredentialInfoMessage(BufferReader reader, ApiVersions version)
+        public CredentialInfo(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -156,14 +148,6 @@ public partial class DescribeUserScramCredentialsResponseMessage: ResponseMessag
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

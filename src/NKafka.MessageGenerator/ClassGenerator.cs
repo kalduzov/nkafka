@@ -31,8 +31,11 @@ public class ClassGenerator: Generator, IClassGenerator
     private readonly MessageSpecification _descriptor;
     private readonly IWriteMethodGenerator _writeMethodGenerator;
     private readonly IReadMethodGenerator _readMethodGenerator;
-    private const string _CLASS_TEMPLATE = "public partial class {0}: {1}\r\n{{\r\n{2}}}";
-    private const string _EMPTY_CLASS_TEMPLATE = "public partial class {0}\r\n{{\r\n}}";
+
+    private const string _CLASS_TEMPLATE =
+        "// ReSharper disable once PartialTypeWithSinglePart\r\npublic sealed partial class {0}: {1}\r\n{{\r\n{2}}}";
+
+    private const string _EMPTY_CLASS_TEMPLATE = "// ReSharper disable once PartialTypeWithSinglePart\r\npublic sealed partial class {0}\r\n{{\r\n}}";
 
     private readonly Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> _internalClasses;
 
@@ -249,63 +252,48 @@ public class ClassGenerator: Generator, IClassGenerator
 
         var apiKey = (ApiKeys)messageSpecification.ApiKey;
 
-        switch (messageSpecification.Type)
+        builder.Append($"{Indent}public {className}()");
+        builder.AppendLine();
+        builder.AppendLine($"{Indent}{{");
+
+        if (messageSpecification.Type == MessageType.Request && !isSubclass)
         {
-            case MessageType.Request:
-            {
-                builder.Append($"{Indent}public {className}()");
-                builder.AppendLine();
-                builder.AppendLine($"{Indent}{{");
-
-                if (!isSubclass)
-                {
-                    IncrementIndent();
-                    builder.AppendLine($"{Indent}ApiKey = ApiKeys.{apiKey};");
-                    DecrementIndent();
-                }
-
-                IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
-                DecrementIndent();
-
-                builder.AppendLine($"{Indent}}}");
-
-                break;
-            }
-            case MessageType.Response:
-            {
-                builder.Append($"{Indent}public {className}()");
-                builder.AppendLine();
-                builder.AppendLine($"{Indent}{{");
-
-                IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
-                DecrementIndent();
-
-                builder.AppendLine($"{Indent}}}");
-                builder.AppendLine();
-
-                builder.AppendLine($"{Indent}public {className}(BufferReader reader, ApiVersions version)");
-
-                IncrementIndent();
-                builder.Append($"{Indent}: base(reader, version)");
-                DecrementIndent();
-
-                builder.AppendLine();
-                builder.AppendLine($"{Indent}{{");
-
-                IncrementIndent();
-                builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
-                builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
-                DecrementIndent();
-
-                builder.AppendLine($"{Indent}}}");
-
-                break;
-            }
+            IncrementIndent();
+            builder.AppendLine($"{Indent}ApiKey = ApiKeys.{apiKey};");
+            DecrementIndent();
         }
+
+        IncrementIndent();
+        builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
+        builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
+        DecrementIndent();
+
+        builder.AppendLine($"{Indent}}}");
+
+        builder.AppendLine();
+
+        builder.AppendLine($"{Indent}public {className}(BufferReader reader, ApiVersions version)");
+
+        IncrementIndent();
+        builder.Append($"{Indent}: base(reader, version)");
+        DecrementIndent();
+
+        builder.AppendLine();
+        builder.AppendLine($"{Indent}{{");
+
+        IncrementIndent();
+        builder.AppendLine($"{Indent}Read(reader, version);");
+
+        if (messageSpecification.Type == MessageType.Request && !isSubclass)
+        {
+            builder.AppendLine($"{Indent}ApiKey = ApiKeys.{apiKey};");
+        }
+
+        builder.AppendLine($"{Indent}LowestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Lowest};");
+        builder.AppendLine($"{Indent}HighestSupportedVersion = ApiVersions.Version{_descriptor.ValidVersions.Highest};");
+        DecrementIndent();
+
+        builder.AppendLine($"{Indent}}}");
 
         DecrementIndent();
 
@@ -320,17 +308,13 @@ public class ClassGenerator: Generator, IClassGenerator
         builder.AppendLine($"{Indent}/// {field.About}");
         builder.AppendLine($"{Indent}/// </summary>");
 
-        var clrFullType = GetClrType(field);
+        var type = GetClrType(field);
 
         var nullableMarker = NullableMarkerIfNeeded(field);
-        builder.Append($"{Indent}public {clrFullType}{nullableMarker} {field.Name} {{ get; set; }}");
 
-        var defaultValue = GetDefaultValue(field.Default, field.Ignorable, field.Type);
+        var defaultValue = GetDefaultValue(field);
 
-        if (!string.IsNullOrWhiteSpace(defaultValue))
-        {
-            builder.Append($" = {defaultValue};");
-        }
+        builder.Append($"{Indent}public {type}{nullableMarker} {field.Name} {{ get; set; }} = {defaultValue};");
 
         return builder;
     }
@@ -344,10 +328,10 @@ public class ClassGenerator: Generator, IClassGenerator
 
         if (field.MapKey)
         {
-            return $"IReadOnlyDictionary<{field.Type.ClrName}>"; //todo тут должен быть словарь
+            return $"Dictionary<{field.Type.ClrName}>"; //todo тут должен быть словарь
         }
 
-        return $"IReadOnlyCollection<{field.Type.ClrName}>";
+        return $"List<{field.Type.ClrName}>";
     }
 
     private static string NullableMarkerIfNeeded(FieldSpecification field)
@@ -358,15 +342,73 @@ public class ClassGenerator: Generator, IClassGenerator
             : string.Empty;
     }
 
-    private static string GetDefaultValue(string? @default, bool? ignorable, IFieldType type)
+    private static string GetDefaultValue(FieldSpecification field)
     {
-        return @default;
+        if (!string.IsNullOrEmpty(field.Default))
+        {
+            return field.Type switch
+            {
+                IFieldType.StringFieldType => $"\"{field.Default!}\"",
+                _ => field.Default!
+            };
+        }
+
+        switch (field.Type)
+        {
+            case IFieldType.BoolFieldType:
+                return "false";
+            case IFieldType.StringFieldType:
+                return "null!";
+            case IFieldType.BytesFieldType:
+                return "Array.Empty<byte>()";
+            case IFieldType.Float64FieldType:
+            case IFieldType.Int8FieldType:
+            case IFieldType.Int16FieldType:
+            case IFieldType.Int32FieldType:
+            case IFieldType.Int64FieldType:
+            case IFieldType.UInt16FieldType:
+            case IFieldType.UInt32FieldType:
+                return "0";
+            case IFieldType.UuidFieldType:
+                return "Guid.Empty";
+            case IFieldType.ArrayType:
+            case IFieldType.StructType:
+            case IFieldType.RecordsFieldType:
+                return "new()";
+        }
+
+        // if (field.Type.IsArray && field.Type.IsRecords)
+        // {
+        //     if (!field.MapKey)
+        //     {
+        //         return $"new List<{field.Type.ClrName}>(0)";
+        //     }
+        //
+        //     var keyFieldType = field.Fields.First(x => x.MapKey).Type.ClrName;
+        //
+        //     return $"new Dictionary<{keyFieldType},{field.Type.ClrName}>(0)";
+        // }
+        //
+        // if (field.Type.IsStruct)
+        // {
+        //     return "new()";
+        // }
+
+        return field.Type switch
+        {
+            IFieldType.StringFieldType => $"\"{field.Default!}\"",
+            _ => field.Default!
+        };
     }
 
-    private static Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> GetAllInternalClasses(
-        IReadOnlyCollection<FieldSpecification> fields)
+    private Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> GetAllInternalClasses(IReadOnlyCollection<FieldSpecification> fields)
     {
         var result = new Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>>();
+
+        if (fields is null)
+        {
+            return result;
+        }
 
         if (fields.Count == 0)
         {

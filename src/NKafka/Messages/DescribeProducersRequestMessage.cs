@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeProducersRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeProducersRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicRequestMessage> Topics { get; set; }
+    public List<TopicRequest> Topics { get; set; } = new();
 
     public DescribeProducersRequestMessage()
     {
+        ApiKey = ApiKeys.DescribeProducers;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeProducersRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.DescribeProducers;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -50,20 +64,28 @@ public partial class DescribeProducersRequestMessage: RequestMessage
     {
     }
 
-    public class TopicRequestMessage: Message
+    public class TopicRequest: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The indexes of the partitions to list producers for.
         /// </summary>
-        public IReadOnlyCollection<int> PartitionIndexes { get; set; }
+        public List<int> PartitionIndexes { get; set; } = new();
 
-        public TopicRequestMessage()
+        public TopicRequest()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public TopicRequest(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

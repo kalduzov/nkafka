@@ -37,6 +37,12 @@ public record MessageSpecification
     [JsonPropertyName("fields")]
     public IReadOnlyCollection<FieldSpecification> Fields { get; }
 
+    /// <summary>
+    /// Внутренние структуры данных
+    /// </summary>
+    [JsonPropertyName("commonStructs")]
+    public IReadOnlyCollection<StructSpecification>? CommonStructs { get; }
+
     [JsonIgnore]
     public string ClassName
     {
@@ -52,6 +58,7 @@ public record MessageSpecification
         }
     }
 
+    [JsonIgnore]
     public StructSpecification Struct { get; }
 
     [JsonConstructor]
@@ -62,7 +69,8 @@ public record MessageSpecification
         string name,
         Versions validVersions,
         Versions flexibleVersions,
-        IReadOnlyCollection<FieldSpecification> fields)
+        IReadOnlyCollection<FieldSpecification> fields,
+        IReadOnlyCollection<StructSpecification>? commonStructs = null)
     {
         ApiKey = apiKey;
         Type = type;
@@ -72,5 +80,6 @@ public record MessageSpecification
         Listeners = listeners;
         Fields = fields;
         Struct = new StructSpecification(name, validVersions, fields);
+        CommonStructs = commonStructs ?? ArraySegment<StructSpecification>.Empty;
     }
 }

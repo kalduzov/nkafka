@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeAclsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeAclsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The resource type.
     /// </summary>
-    public sbyte ResourceTypeFilter { get; set; }
+    public sbyte ResourceTypeFilter { get; set; } = 0;
 
     /// <summary>
     /// The resource name, or null to match any resource name.
     /// </summary>
-    public string ResourceNameFilter { get; set; }
+    public string ResourceNameFilter { get; set; } = null!;
 
     /// <summary>
     /// The resource pattern to match.
@@ -48,28 +53,37 @@ public partial class DescribeAclsRequestMessage: RequestMessage
     /// <summary>
     /// The principal to match, or null to match any principal.
     /// </summary>
-    public string PrincipalFilter { get; set; }
+    public string PrincipalFilter { get; set; } = null!;
 
     /// <summary>
     /// The host to match, or null to match any host.
     /// </summary>
-    public string HostFilter { get; set; }
+    public string HostFilter { get; set; } = null!;
 
     /// <summary>
     /// The operation to match.
     /// </summary>
-    public sbyte Operation { get; set; }
+    public sbyte Operation { get; set; } = 0;
 
     /// <summary>
     /// The permission type to match.
     /// </summary>
-    public sbyte PermissionType { get; set; }
+    public sbyte PermissionType { get; set; } = 0;
 
     public DescribeAclsRequestMessage()
     {
         ApiKey = ApiKeys.DescribeAcls;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeAclsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)

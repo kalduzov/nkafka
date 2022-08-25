@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,11 +15,12 @@
 
 {
   "apiKey": 41,
-  "type": "Response",
+  "type": "response",
   "name": "DescribeDelegationTokenResponse",
   // Starting in version 1, on quota violation, brokers send out responses before throttling.
   // Version 2 adds flexible version support
-  "validVersions": "0-2",
+  // Version 3 adds token requester details
+  "validVersions": "0-3",
   "flexibleVersions": "2+",
   "fields": [
     { "name": "ErrorCode", "type": "int16", "versions": "0+",
@@ -30,6 +31,10 @@
         "about": "The token principal type." },
       { "name": "PrincipalName", "type": "string", "versions": "0+",
         "about": "The token principal name." },
+      { "name": "TokenRequesterPrincipalType", "type": "string", "versions": "3+",
+        "about": "The principal type of the requester of the token." },
+      { "name": "TokenRequesterPrincipalName", "type": "string", "versions": "3+",
+        "about": "The principal type of the requester of the token." },
       { "name": "IssueTimestamp", "type": "int64", "versions": "0+",
         "about": "The token issue timestamp in milliseconds." },
       { "name": "ExpiryTimestamp", "type": "int64", "versions": "0+",

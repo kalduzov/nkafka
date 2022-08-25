@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class EndTxnRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class EndTxnRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the transaction to end.
     /// </summary>
-    public string TransactionalId { get; set; }
+    public string TransactionalId { get; set; } = null!;
 
     /// <summary>
     /// The producer ID.
     /// </summary>
-    public long ProducerId { get; set; }
+    public long ProducerId { get; set; } = 0;
 
     /// <summary>
     /// The current epoch associated with the producer.
     /// </summary>
-    public short ProducerEpoch { get; set; }
+    public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// True if the transaction was committed, false if it was aborted.
     /// </summary>
-    public bool Committed { get; set; }
+    public bool Committed { get; set; } = false;
 
     public EndTxnRequestMessage()
     {
+        ApiKey = ApiKeys.EndTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public EndTxnRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.EndTxn;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;

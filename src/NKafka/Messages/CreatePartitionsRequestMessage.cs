@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,25 +32,35 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreatePartitionsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreatePartitionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to create new partitions inside.
     /// </summary>
-    public IReadOnlyCollection<CreatePartitionsTopicMessage> Topics { get; set; }
+    public List<CreatePartitionsTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the partitions to be created.
     /// </summary>
-    public int TimeoutMs { get; set; }
+    public int TimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// If true, then validate the request, but don't actually increase the number of partitions.
     /// </summary>
-    public bool ValidateOnly { get; set; }
+    public bool ValidateOnly { get; set; } = false;
 
     public CreatePartitionsRequestMessage()
     {
+        ApiKey = ApiKeys.CreatePartitions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public CreatePartitionsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.CreatePartitions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
@@ -60,25 +74,33 @@ public partial class CreatePartitionsRequestMessage: RequestMessage
     {
     }
 
-    public class CreatePartitionsTopicMessage: Message
+    public class CreatePartitionsTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The new partition count.
         /// </summary>
-        public int Count { get; set; }
+        public int Count { get; set; } = 0;
 
         /// <summary>
         /// The new partition assignments.
         /// </summary>
-        public IReadOnlyCollection<CreatePartitionsAssignmentMessage> Assignments { get; set; }
+        public List<CreatePartitionsAssignment> Assignments { get; set; } = new();
 
-        public CreatePartitionsTopicMessage()
+        public CreatePartitionsTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public CreatePartitionsTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -91,15 +113,23 @@ public partial class CreatePartitionsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreatePartitionsAssignmentMessage: Message
+    public class CreatePartitionsAssignment: Message
     {
         /// <summary>
         /// The assigned broker IDs.
         /// </summary>
-        public IReadOnlyCollection<int> BrokerIds { get; set; }
+        public List<int> BrokerIds { get; set; } = new();
 
-        public CreatePartitionsAssignmentMessage()
+        public CreatePartitionsAssignment()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public CreatePartitionsAssignment(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }

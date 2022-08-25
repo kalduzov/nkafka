@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterClientQuotasRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
 {
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public IReadOnlyCollection<EntryDataMessage> Entries { get; set; }
+    public List<EntryData> Entries { get; set; } = new();
 
     /// <summary>
     /// Whether the alteration should be validated, but not performed.
     /// </summary>
-    public bool ValidateOnly { get; set; }
+    public bool ValidateOnly { get; set; } = false;
 
     public AlterClientQuotasRequestMessage()
     {
+        ApiKey = ApiKeys.AlterClientQuotas;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public AlterClientQuotasRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AlterClientQuotas;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
@@ -55,20 +69,28 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
     {
     }
 
-    public class EntryDataMessage: Message
+    public class EntryData: Message
     {
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
-        public IReadOnlyCollection<EntityDataMessage> Entity { get; set; }
+        public List<EntityData> Entity { get; set; } = new();
 
         /// <summary>
         /// An individual quota configuration entry to alter.
         /// </summary>
-        public IReadOnlyCollection<OpDataMessage> Ops { get; set; }
+        public List<OpData> Ops { get; set; } = new();
 
-        public EntryDataMessage()
+        public EntryData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
+        }
+
+        public EntryData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -81,20 +103,28 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
         {
         }
     }
-    public class EntityDataMessage: Message
+    public class EntityData: Message
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; }
+        public string EntityType { get; set; } = null!;
 
         /// <summary>
         /// The name of the entity, or null if the default.
         /// </summary>
-        public string EntityName { get; set; }
+        public string EntityName { get; set; } = null!;
 
-        public EntityDataMessage()
+        public EntityData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
+        }
+
+        public EntityData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -107,25 +137,33 @@ public partial class AlterClientQuotasRequestMessage: RequestMessage
         {
         }
     }
-    public class OpDataMessage: Message
+    public class OpData: Message
     {
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         /// <summary>
         /// The value to set, otherwise ignored if the value is to be removed.
         /// </summary>
-        public double Value { get; set; }
+        public double Value { get; set; } = 0;
 
         /// <summary>
         /// Whether the quota configuration value should be removed, otherwise set.
         /// </summary>
-        public bool Remove { get; set; }
+        public bool Remove { get; set; } = false;
 
-        public OpDataMessage()
+        public OpData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version1;
+        }
+
+        public OpData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }

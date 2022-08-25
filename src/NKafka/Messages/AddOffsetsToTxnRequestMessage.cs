@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AddOffsetsToTxnRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AddOffsetsToTxnRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; }
+    public string TransactionalId { get; set; } = null!;
 
     /// <summary>
     /// Current producer id in use by the transactional id.
     /// </summary>
-    public long ProducerId { get; set; }
+    public long ProducerId { get; set; } = 0;
 
     /// <summary>
     /// Current epoch associated with the producer id.
     /// </summary>
-    public short ProducerEpoch { get; set; }
+    public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     public AddOffsetsToTxnRequestMessage()
     {
+        ApiKey = ApiKeys.AddOffsetsToTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public AddOffsetsToTxnRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AddOffsetsToTxn;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;

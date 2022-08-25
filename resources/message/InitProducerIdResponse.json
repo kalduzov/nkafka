@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,7 @@
 
 {
   "apiKey": 22,
-  "type": "Response",
+  "type": "response",
   "name": "InitProducerIdResponse",
   // Starting in version 1, on quota violation, brokers send out responses before throttling.
   //
@@ -32,7 +32,7 @@
     { "name": "ErrorCode", "type": "int16", "versions": "0+",
       "about": "The error code, or 0 if there was no error." },
     { "name": "ProducerId", "type": "int64", "versions": "0+", "entityType": "producerId",
-      "default": "-1", "about": "The current producer id." },
+      "default": -1, "about": "The current producer id." },
     { "name": "ProducerEpoch", "type": "int16", "versions": "0+",
       "about": "The current epoch associated with the producer id." }
   ]

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterIsrResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterIsrResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+    public List<TopicData> Topics { get; set; } = new();
 
     public AlterIsrResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class AlterIsrResponseMessage: ResponseMessage
     public AlterIsrResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -61,27 +67,28 @@ public partial class AlterIsrResponseMessage: ResponseMessage
     {
     }
 
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// The name of the topic
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -94,47 +101,48 @@ public partial class AlterIsrResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition level error code
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The broker ID of the leader.
         /// </summary>
-        public int LeaderId { get; set; }
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch.
         /// </summary>
-        public int LeaderEpoch { get; set; }
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// The in-sync replica IDs.
         /// </summary>
-        public IReadOnlyCollection<int> Isr { get; set; }
+        public List<int> Isr { get; set; } = new();
 
         /// <summary>
         /// The current ISR version.
         /// </summary>
-        public int CurrentIsrVersion { get; set; }
+        public int CurrentIsrVersion { get; set; } = 0;
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

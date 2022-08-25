@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class VoteRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class VoteRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public string? ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = "null";
 
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+    public List<TopicData> Topics { get; set; } = new();
 
     public VoteRequestMessage()
     {
+        ApiKey = ApiKeys.Vote;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public VoteRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Vote;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -53,30 +67,30 @@ public partial class VoteRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public TopicData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -87,45 +101,45 @@ public partial class VoteRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The bumped epoch of the candidate sending the request
         /// </summary>
-        public int CandidateEpoch { get; set; }
+        public int CandidateEpoch { get; set; } = 0;
 
         /// <summary>
         /// The ID of the voter sending the request
         /// </summary>
-        public int CandidateId { get; set; }
+        public int CandidateId { get; set; } = 0;
 
         /// <summary>
         /// The epoch of the last record written to the metadata log
         /// </summary>
-        public int LastOffsetEpoch { get; set; }
+        public int LastOffsetEpoch { get; set; } = 0;
 
         /// <summary>
         /// The offset of the last record written to the metadata log
         /// </summary>
-        public long LastOffset { get; set; }
+        public long LastOffset { get; set; } = 0;
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public PartitionData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -136,14 +150,6 @@ public partial class VoteRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class SaslAuthenticateRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class SaslAuthenticateRequestMessage: RequestMessage
 {
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
     /// </summary>
-    public byte[] AuthBytes { get; set; }
+    public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
     public SaslAuthenticateRequestMessage()
     {
+        ApiKey = ApiKeys.SaslAuthenticate;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public SaslAuthenticateRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.SaslAuthenticate;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;

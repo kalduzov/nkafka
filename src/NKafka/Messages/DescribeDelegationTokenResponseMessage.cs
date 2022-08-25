@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,32 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The tokens.
     /// </summary>
-    public IReadOnlyCollection<DescribedDelegationTokenMessage> Tokens { get; set; }
+    public List<DescribedDelegationToken> Tokens { get; set; } = new();
 
 
     public DescribeDelegationTokenResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DescribeDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -62,59 +68,70 @@ public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribedDelegationTokenMessage: Message
+    public class DescribedDelegationToken: Message
     {
         /// <summary>
         /// The token principal type.
         /// </summary>
-        public string PrincipalType { get; set; }
+        public string PrincipalType { get; set; } = null!;
 
         /// <summary>
         /// The token principal name.
         /// </summary>
-        public string PrincipalName { get; set; }
+        public string PrincipalName { get; set; } = null!;
+
+        /// <summary>
+        /// The principal type of the requester of the token.
+        /// </summary>
+        public string TokenRequesterPrincipalType { get; set; } = null!;
+
+        /// <summary>
+        /// The principal type of the requester of the token.
+        /// </summary>
+        public string TokenRequesterPrincipalName { get; set; } = null!;
 
         /// <summary>
         /// The token issue timestamp in milliseconds.
         /// </summary>
-        public long IssueTimestamp { get; set; }
+        public long IssueTimestamp { get; set; } = 0;
 
         /// <summary>
         /// The token expiry timestamp in milliseconds.
         /// </summary>
-        public long ExpiryTimestamp { get; set; }
+        public long ExpiryTimestamp { get; set; } = 0;
 
         /// <summary>
         /// The token maximum timestamp length in milliseconds.
         /// </summary>
-        public long MaxTimestamp { get; set; }
+        public long MaxTimestamp { get; set; } = 0;
 
         /// <summary>
         /// The token ID.
         /// </summary>
-        public string TokenId { get; set; }
+        public string TokenId { get; set; } = null!;
 
         /// <summary>
         /// The token HMAC.
         /// </summary>
-        public byte[] Hmac { get; set; }
+        public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
         /// <summary>
         /// Those who are able to renew this token before it expires.
         /// </summary>
-        public IReadOnlyCollection<DescribedDelegationTokenRenewerMessage> Renewers { get; set; }
+        public List<DescribedDelegationTokenRenewer> Renewers { get; set; } = new();
 
-        public DescribedDelegationTokenMessage()
+        public DescribedDelegationToken()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribedDelegationTokenMessage(BufferReader reader, ApiVersions version)
+        public DescribedDelegationToken(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -125,29 +142,30 @@ public partial class DescribeDelegationTokenResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribedDelegationTokenRenewerMessage: Message
+    public class DescribedDelegationTokenRenewer: Message
     {
         /// <summary>
         /// The renewer principal type
         /// </summary>
-        public string PrincipalType { get; set; }
+        public string PrincipalType { get; set; } = null!;
 
         /// <summary>
         /// The renewer principal name
         /// </summary>
-        public string PrincipalName { get; set; }
+        public string PrincipalName { get; set; } = null!;
 
-        public DescribedDelegationTokenRenewerMessage()
+        public DescribedDelegationTokenRenewer()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribedDelegationTokenRenewerMessage(BufferReader reader, ApiVersions version)
+        public DescribedDelegationTokenRenewer(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

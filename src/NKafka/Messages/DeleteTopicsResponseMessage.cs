@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DeleteTopicsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DeleteTopicsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic we tried to delete.
     /// </summary>
-    public IReadOnlyCollection<DeletableTopicResultMessage> Responses { get; set; }
+    public List<DeletableTopicResult> Responses { get; set; } = new();
 
     public DeleteTopicsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DeleteTopicsResponseMessage: ResponseMessage
     public DeleteTopicsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
     }
@@ -56,37 +62,38 @@ public partial class DeleteTopicsResponseMessage: ResponseMessage
     {
     }
 
-    public class DeletableTopicResultMessage: Message
+    public class DeletableTopicResult: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// the unique topic ID
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The deletion error, or 0 if the deletion succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string? ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = "null";
 
-        public DeletableTopicResultMessage()
+        public DeletableTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public DeletableTopicResultMessage(BufferReader reader, ApiVersions version)
+        public DeletableTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version6;
         }

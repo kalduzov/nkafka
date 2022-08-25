@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class VoteResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class VoteResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level error code.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+    public List<TopicData> Topics { get; set; } = new();
 
     public VoteResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class VoteResponseMessage: ResponseMessage
     public VoteResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -59,37 +65,30 @@ public partial class VoteResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; }
+        public string TopicName { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -100,52 +99,45 @@ public partial class VoteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
         /// </summary>
-        public int LeaderId { get; set; }
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The latest known leader epoch
         /// </summary>
-        public int LeaderEpoch { get; set; }
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// True if the vote was granted and false otherwise
         /// </summary>
-        public bool VoteGranted { get; set; }
+        public bool VoteGranted { get; set; } = false;
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -156,14 +148,6 @@ public partial class VoteResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

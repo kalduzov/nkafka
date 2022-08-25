@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AllocateProducerIdsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AllocateProducerIdsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The first producer ID in this range, inclusive
     /// </summary>
-    public long ProducerIdStart { get; set; }
+    public long ProducerIdStart { get; set; } = 0;
 
     /// <summary>
     /// The number of producer IDs in this range
     /// </summary>
-    public int ProducerIdLen { get; set; }
+    public int ProducerIdLen { get; set; } = 0;
 
     public AllocateProducerIdsResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class AllocateProducerIdsResponseMessage: ResponseMessage
     public AllocateProducerIdsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }

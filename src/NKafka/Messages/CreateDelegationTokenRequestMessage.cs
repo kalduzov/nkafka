@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,23 +32,43 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreateDelegationTokenRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreateDelegationTokenRequestMessage: RequestMessage
 {
+    /// <summary>
+    /// The principal type of the owner of the token. If it's null it defaults to the token request principal.
+    /// </summary>
+    public string OwnerPrincipalType { get; set; } = null!;
+
+    /// <summary>
+    /// The principal name of the owner of the token. If it's null it defaults to the token request principal.
+    /// </summary>
+    public string OwnerPrincipalName { get; set; } = null!;
+
     /// <summary>
     /// A list of those who are allowed to renew this token before it expires.
     /// </summary>
-    public IReadOnlyCollection<CreatableRenewersMessage> Renewers { get; set; }
+    public List<CreatableRenewers> Renewers { get; set; } = new();
 
     /// <summary>
     /// The maximum lifetime of the token in milliseconds, or -1 to use the server side default.
     /// </summary>
-    public long MaxLifetimeMs { get; set; }
+    public long MaxLifetimeMs { get; set; } = 0;
 
     public CreateDelegationTokenRequestMessage()
     {
         ApiKey = ApiKeys.CreateDelegationToken;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public CreateDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -55,22 +79,30 @@ public partial class CreateDelegationTokenRequestMessage: RequestMessage
     {
     }
 
-    public class CreatableRenewersMessage: Message
+    public class CreatableRenewers: Message
     {
         /// <summary>
         /// The type of the Kafka principal.
         /// </summary>
-        public string PrincipalType { get; set; }
+        public string PrincipalType { get; set; } = null!;
 
         /// <summary>
         /// The name of the Kafka principal.
         /// </summary>
-        public string PrincipalName { get; set; }
+        public string PrincipalName { get; set; } = null!;
 
-        public CreatableRenewersMessage()
+        public CreatableRenewers()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public CreatableRenewers(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,18 +32,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreateAclsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreateAclsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ACLs that we want to create.
     /// </summary>
-    public IReadOnlyCollection<AclCreationMessage> Creations { get; set; }
+    public List<AclCreation> Creations { get; set; } = new();
 
     public CreateAclsRequestMessage()
     {
         ApiKey = ApiKeys.CreateAcls;
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public CreateAclsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -50,17 +64,17 @@ public partial class CreateAclsRequestMessage: RequestMessage
     {
     }
 
-    public class AclCreationMessage: Message
+    public class AclCreation: Message
     {
         /// <summary>
         /// The type of the resource.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name for the ACL.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// The pattern type for the ACL.
@@ -70,27 +84,35 @@ public partial class CreateAclsRequestMessage: RequestMessage
         /// <summary>
         /// The principal for the ACL.
         /// </summary>
-        public string Principal { get; set; }
+        public string Principal { get; set; } = null!;
 
         /// <summary>
         /// The host for the ACL.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The operation type for the ACL (read, write, etc.).
         /// </summary>
-        public sbyte Operation { get; set; }
+        public sbyte Operation { get; set; } = 0;
 
         /// <summary>
         /// The permission type for the ACL (allow, deny, etc.).
         /// </summary>
-        public sbyte PermissionType { get; set; }
+        public sbyte PermissionType { get; set; } = 0;
 
-        public AclCreationMessage()
+        public AclCreation()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
+        }
+
+        public AclCreation(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

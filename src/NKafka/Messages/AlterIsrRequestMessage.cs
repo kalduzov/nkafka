@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterIsrRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterIsrRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the requesting broker
     /// </summary>
-    public int BrokerId { get; set; }
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The epoch of the requesting broker
@@ -43,10 +48,19 @@ public partial class AlterIsrRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<TopicDataMessage> Topics { get; set; }
+    public List<TopicData> Topics { get; set; } = new();
 
     public AlterIsrRequestMessage()
     {
+        ApiKey = ApiKeys.AlterIsr;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AlterIsrRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AlterIsr;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -60,20 +74,28 @@ public partial class AlterIsrRequestMessage: RequestMessage
     {
     }
 
-    public class TopicDataMessage: Message
+    public class TopicData: Message
     {
         /// <summary>
         /// The name of the topic to alter ISRs for
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public TopicDataMessage()
+        public TopicData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public TopicData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -86,30 +108,38 @@ public partial class AlterIsrRequestMessage: RequestMessage
         {
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch of this partition
         /// </summary>
-        public int LeaderEpoch { get; set; }
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// The ISR for this partition
         /// </summary>
-        public IReadOnlyCollection<int> NewIsr { get; set; }
+        public List<int> NewIsr { get; set; } = new();
 
         /// <summary>
         /// The expected version of ISR which is being updated
         /// </summary>
-        public int CurrentIsrVersion { get; set; }
+        public int CurrentIsrVersion { get; set; } = 0;
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public PartitionData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

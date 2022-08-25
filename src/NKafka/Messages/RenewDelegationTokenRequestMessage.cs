@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class RenewDelegationTokenRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class RenewDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// The HMAC of the delegation token to be renewed.
     /// </summary>
-    public byte[] Hmac { get; set; }
+    public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The renewal time period in milliseconds.
     /// </summary>
-    public long RenewPeriodMs { get; set; }
+    public long RenewPeriodMs { get; set; } = 0;
 
     public RenewDelegationTokenRequestMessage()
     {
+        ApiKey = ApiKeys.RenewDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public RenewDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.RenewDelegationToken;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;

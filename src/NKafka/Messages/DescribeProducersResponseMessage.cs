@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeProducersResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeProducersResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public IReadOnlyCollection<TopicResponseMessage> Topics { get; set; }
+    public List<TopicResponse> Topics { get; set; } = new();
 
     public DescribeProducersResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DescribeProducersResponseMessage: ResponseMessage
     public DescribeProducersResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -56,27 +62,28 @@ public partial class DescribeProducersResponseMessage: ResponseMessage
     {
     }
 
-    public class TopicResponseMessage: Message
+    public class TopicResponse: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public IReadOnlyCollection<PartitionResponseMessage> Partitions { get; set; }
+        public List<PartitionResponse> Partitions { get; set; } = new();
 
-        public TopicResponseMessage()
+        public TopicResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicResponseMessage(BufferReader reader, ApiVersions version)
+        public TopicResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -89,37 +96,38 @@ public partial class DescribeProducersResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionResponseMessage: Message
+    public class PartitionResponse: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The partition error message, which may be null if no additional details are available
         /// </summary>
-        public string? ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = "null";
 
         /// <summary>
         /// 
         /// </summary>
-        public IReadOnlyCollection<ProducerStateMessage> ActiveProducers { get; set; }
+        public List<ProducerState> ActiveProducers { get; set; } = new();
 
-        public PartitionResponseMessage()
+        public PartitionResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public PartitionResponseMessage(BufferReader reader, ApiVersions version)
+        public PartitionResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -132,17 +140,17 @@ public partial class DescribeProducersResponseMessage: ResponseMessage
         {
         }
     }
-    public class ProducerStateMessage: Message
+    public class ProducerState: Message
     {
         /// <summary>
         /// 
         /// </summary>
-        public long ProducerId { get; set; }
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public int ProducerEpoch { get; set; }
+        public int ProducerEpoch { get; set; } = 0;
 
         /// <summary>
         /// 
@@ -157,22 +165,23 @@ public partial class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public int CoordinatorEpoch { get; set; }
+        public int CoordinatorEpoch { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
         public long CurrentTxnStartOffset { get; set; } = -1;
 
-        public ProducerStateMessage()
+        public ProducerState()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ProducerStateMessage(BufferReader reader, ApiVersions version)
+        public ProducerState(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }

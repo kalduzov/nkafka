@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,15 +32,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeUserScramCredentialsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeUserScramCredentialsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The users to describe, or null/empty to describe all users.
     /// </summary>
-    public IReadOnlyCollection<UserNameMessage> Users { get; set; }
+    public List<UserName> Users { get; set; } = new();
 
     public DescribeUserScramCredentialsRequestMessage()
     {
+        ApiKey = ApiKeys.DescribeUserScramCredentials;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeUserScramCredentialsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.DescribeUserScramCredentials;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
@@ -48,25 +62,25 @@ public partial class DescribeUserScramCredentialsRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class UserNameMessage: Message
+    public class UserName: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public UserNameMessage()
+        public UserName()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public UserName(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -77,14 +91,6 @@ public partial class DescribeUserScramCredentialsRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

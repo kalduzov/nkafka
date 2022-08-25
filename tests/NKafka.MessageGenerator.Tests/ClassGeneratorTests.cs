@@ -139,4 +139,24 @@ public class ClassGeneratorTests
 
         result.Should().NotBeEmpty();
     }
+
+    [Theory]
+    [InlineData("data\\DescribeQuorumResponse.json")]
+    [InlineData("data\\MetadataRequest.json")]
+    [InlineData("data\\MetadataResponse.json")]
+    public async Task GenerateTest(string fileName)
+    {
+        var specification = await JsonParseTests.GetMessageSpecification(fileName);
+        
+        var writeMock = new Mock<IWriteMethodGenerator>();
+        writeMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
+
+        var readMock = new Mock<IReadMethodGenerator>();
+        readMock.Setup(x => x.Generate(It.IsAny<List<FieldSpecification>>(), It.IsAny<int>())).Returns(new StringBuilder());
+
+        var classGenerator = new ClassGenerator(specification, writeMock.Object, readMock.Object);
+        var result = classGenerator.Generate().ToString();
+
+        result.Should().NotBeEmpty();
+    }
 }

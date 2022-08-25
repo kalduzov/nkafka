@@ -27,8 +27,8 @@ public class MessagesGeneratorTask: Task
     {
         const string messageSuffix = "Message";
 
-        // Log.LogMessage(MessageImportance.High, $"Solution {SolutionDirectory} output {OutputDirectory}");
-        // Log.LogMessage(MessageImportance.High, "Start messages generator");
+        Log.LogMessage(MessageImportance.High, $"Solution {SolutionDirectory} output {OutputDirectory}");
+        Log.LogMessage(MessageImportance.High, "Start messages generator");
 
         var files = GetFileResources();
 
@@ -41,29 +41,36 @@ public class MessagesGeneratorTask: Task
                     continue;
                 }
 
-                var apiDescriptor = GetApiDescriptor(fileName);
-
-                switch (apiDescriptor.Type)
+                try
                 {
-                    case MessageType.Request or MessageType.Response:
-                    {
-                        var messageGenerator = BuildMessageGenerator(apiDescriptor);
-                        var result = messageGenerator.Generate();
-                        var classFileName = $"{messageGenerator.ClassName}.cs";
-                        WriteContentToFile(classFileName, result);
+                    var apiDescriptor = GetApiDescriptor(fileName);
 
-                        break;
+                    switch (apiDescriptor.Type)
+                    {
+                        case MessageType.Request or MessageType.Response:
+                        {
+                            var messageGenerator = BuildMessageGenerator(apiDescriptor);
+                            var result = messageGenerator.Generate();
+                            var classFileName = $"{messageGenerator.ClassName}.cs";
+                            WriteContentToFile(classFileName, result);
+
+                            break;
+                        }
                     }
+                }
+                catch (Exception exc)
+                {
+                    Log.LogError($"Не удалось обработать файл {fileName}. {exc.StackTrace}");
                 }
             }
         }
         catch (Exception exc)
         {
-            //Log.LogError(exc.Message);
+            Log.LogErrorFromException(exc, true, true, null);
         }
         finally
         {
-            //Log.LogMessage(MessageImportance.High, "Finish messages generator");
+            Log.LogMessage(MessageImportance.High, "Finish messages generator");
         }
 
         return true;

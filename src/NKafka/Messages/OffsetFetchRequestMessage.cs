@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class OffsetFetchRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class OffsetFetchRequestMessage: RequestMessage
 {
     /// <summary>
     /// The group to fetch offsets for.
     /// </summary>
-    public string GroupId { get; set; }
+    public string GroupId { get; set; } = null!;
 
     /// <summary>
     /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
     /// </summary>
-    public IReadOnlyCollection<OffsetFetchRequestTopicMessage> Topics { get; set; }
+    public List<OffsetFetchRequestTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// Each group we would like to fetch offsets for
     /// </summary>
-    public IReadOnlyCollection<OffsetFetchRequestGroupMessage> Groups { get; set; }
+    public List<OffsetFetchRequestGroup> Groups { get; set; } = new();
 
     /// <summary>
     /// Whether broker should hold on returning unstable offsets but set a retriable error code for the partitions.
@@ -57,44 +62,45 @@ public partial class OffsetFetchRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version8;
     }
 
+    public OffsetFetchRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.OffsetFetch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version8;
+    }
+
     public override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version6)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version6)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OffsetFetchRequestTopicMessage: Message
+    public class OffsetFetchRequestTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public IReadOnlyCollection<int> PartitionIndexes { get; set; }
+        public List<int> PartitionIndexes { get; set; } = new();
 
-        public OffsetFetchRequestTopicMessage()
+        public OffsetFetchRequestTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version8;
+        }
+
+        public OffsetFetchRequestTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
@@ -105,38 +111,30 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OffsetFetchRequestGroupMessage: Message
+    public class OffsetFetchRequestGroup: Message
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; }
+        public string groupId { get; set; } = null!;
 
         /// <summary>
         /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
         /// </summary>
-        public IReadOnlyCollection<OffsetFetchRequestTopicsMessage> Topics { get; set; }
+        public List<OffsetFetchRequestTopics> Topics { get; set; } = new();
 
-        public OffsetFetchRequestGroupMessage()
+        public OffsetFetchRequestGroup()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version8;
+        }
+
+        public OffsetFetchRequestGroup(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
@@ -147,38 +145,30 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OffsetFetchRequestTopicsMessage: Message
+    public class OffsetFetchRequestTopics: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public IReadOnlyCollection<int> PartitionIndexes { get; set; }
+        public List<int> PartitionIndexes { get; set; } = new();
 
-        public OffsetFetchRequestTopicsMessage()
+        public OffsetFetchRequestTopics()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version8;
+        }
+
+        public OffsetFetchRequestTopics(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
@@ -189,22 +179,6 @@ public partial class OffsetFetchRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

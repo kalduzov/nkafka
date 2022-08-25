@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ProduceResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ProduceResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each produce response
     /// </summary>
-    public IReadOnlyCollection<TopicProduceResponseMessage> Responses { get; set; }
+    public List<TopicProduceResponse> Responses { get; set; } = new();
 
 
     public ProduceResponseMessage()
@@ -45,6 +50,7 @@ public partial class ProduceResponseMessage: ResponseMessage
     public ProduceResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
     }
@@ -55,37 +61,30 @@ public partial class ProduceResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version9)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicProduceResponseMessage: Message
+    public class TopicProduceResponse: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition that we produced to within the topic.
         /// </summary>
-        public IReadOnlyCollection<PartitionProduceResponseMessage> PartitionResponses { get; set; }
+        public List<PartitionProduceResponse> PartitionResponses { get; set; } = new();
 
-        public TopicProduceResponseMessage()
+        public TopicProduceResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public TopicProduceResponseMessage(BufferReader reader, ApiVersions version)
+        public TopicProduceResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
@@ -96,32 +95,24 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionProduceResponseMessage: Message
+    public class PartitionProduceResponse: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int Index { get; set; }
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The base offset.
         /// </summary>
-        public long BaseOffset { get; set; }
+        public long BaseOffset { get; set; } = 0;
 
         /// <summary>
         /// The timestamp returned by broker after appending the messages. If CreateTime is used for the topic, the timestamp will be -1.  If LogAppendTime is used for the topic, the timestamp will be the broker local time when the messages are appended.
@@ -136,22 +127,23 @@ public partial class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The batch indices of records that caused the batch to be dropped
         /// </summary>
-        public IReadOnlyCollection<BatchIndexAndErrorMessageMessage>? RecordErrors { get; set; }
+        public List<BatchIndexAndErrorMessage>? RecordErrors { get; set; } = new();
 
         /// <summary>
         /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
         /// </summary>
-        public string? ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = "null";
 
-        public PartitionProduceResponseMessage()
+        public PartitionProduceResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public PartitionProduceResponseMessage(BufferReader reader, ApiVersions version)
+        public PartitionProduceResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
@@ -162,37 +154,30 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class BatchIndexAndErrorMessageMessage: Message
+    public class BatchIndexAndErrorMessage: Message
     {
         /// <summary>
         /// The batch index of the record that cause the batch to be dropped
         /// </summary>
-        public int BatchIndex { get; set; }
+        public int BatchIndex { get; set; } = 0;
 
         /// <summary>
         /// The error message of the record that caused the batch to be dropped
         /// </summary>
-        public string? BatchIndexErrorMessage { get; set; } = null;
+        public string? BatchIndexErrorMessage { get; set; } = "null";
 
-        public BatchIndexAndErrorMessageMessage()
+        public BatchIndexAndErrorMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersions version)
+        public BatchIndexAndErrorMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
@@ -203,14 +188,6 @@ public partial class ProduceResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

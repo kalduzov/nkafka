@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,30 +32,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ProduceRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ProduceRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional ID, or null if the producer is not transactional.
     /// </summary>
-    public string? TransactionalId { get; set; } = null;
+    public string? TransactionalId { get; set; } = "null";
 
     /// <summary>
     /// The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments, 1 for only the leader and -1 for the full ISR.
     /// </summary>
-    public short Acks { get; set; }
+    public short Acks { get; set; } = 0;
 
     /// <summary>
     /// The timeout to await a response in milliseconds.
     /// </summary>
-    public int TimeoutMs { get; set; }
+    public int TimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// Each topic to produce to.
     /// </summary>
-    public IReadOnlyCollection<TopicProduceDataMessage> TopicData { get; set; }
+    public List<TopicProduceData> TopicData { get; set; } = new();
 
     public ProduceRequestMessage()
     {
+        ApiKey = ApiKeys.Produce;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version9;
+    }
+
+    public ProduceRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Produce;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
@@ -63,30 +77,30 @@ public partial class ProduceRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version9)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class TopicProduceDataMessage: Message
+    public class TopicProduceData: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition to produce to.
         /// </summary>
-        public IReadOnlyCollection<PartitionProduceDataMessage> PartitionData { get; set; }
+        public List<PartitionProduceData> PartitionData { get; set; } = new();
 
-        public TopicProduceDataMessage()
+        public TopicProduceData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version9;
+        }
+
+        public TopicProduceData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
@@ -97,30 +111,30 @@ public partial class ProduceRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionProduceDataMessage: Message
+    public class PartitionProduceData: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int Index { get; set; }
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The record data to be produced.
         /// </summary>
-        public RecordBatch Records { get; set; }
+        public RecordBatch Records { get; set; } = new();
 
-        public PartitionProduceDataMessage()
+        public PartitionProduceData()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version9;
+        }
+
+        public PartitionProduceData(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
@@ -131,14 +145,6 @@ public partial class ProduceRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

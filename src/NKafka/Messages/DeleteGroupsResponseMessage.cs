@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DeleteGroupsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DeleteGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The deletion results
     /// </summary>
-    public IReadOnlyCollection<DeletableGroupResultMessage> Results { get; set; }
+    public List<DeletableGroupResult> Results { get; set; } = new();
 
     public DeleteGroupsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DeleteGroupsResponseMessage: ResponseMessage
     public DeleteGroupsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -56,27 +62,28 @@ public partial class DeleteGroupsResponseMessage: ResponseMessage
     {
     }
 
-    public class DeletableGroupResultMessage: Message
+    public class DeletableGroupResult: Message
     {
         /// <summary>
         /// The group id
         /// </summary>
-        public string GroupId { get; set; }
+        public string GroupId { get; set; } = null!;
 
         /// <summary>
         /// The deletion error, or 0 if the deletion succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public DeletableGroupResultMessage()
+        public DeletableGroupResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public DeletableGroupResultMessage(BufferReader reader, ApiVersions version)
+        public DeletableGroupResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }

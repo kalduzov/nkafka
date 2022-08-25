@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,7 +32,8 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class EnvelopeResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class EnvelopeResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The embedded response header and data.
@@ -38,7 +43,7 @@ public partial class EnvelopeResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     public EnvelopeResponseMessage()
     {
@@ -49,6 +54,7 @@ public partial class EnvelopeResponseMessage: ResponseMessage
     public EnvelopeResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }

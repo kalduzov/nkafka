@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,29 +32,31 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class LeaveGroupResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class LeaveGroupResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// List of leaving member responses.
     /// </summary>
-    public IReadOnlyCollection<MemberResponseMessage> Members { get; set; }
+    public List<MemberResponse> Members { get; set; } = new();
 
     public LeaveGroupResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
+        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public LeaveGroupResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
+        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -59,44 +65,37 @@ public partial class LeaveGroupResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version4)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class MemberResponseMessage: Message
+    public class MemberResponse: Message
     {
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
-        public string MemberId { get; set; }
+        public string MemberId { get; set; } = null!;
 
         /// <summary>
         /// The group instance ID to remove from the group.
         /// </summary>
-        public string GroupInstanceId { get; set; }
+        public string GroupInstanceId { get; set; } = null!;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public MemberResponseMessage()
+        public MemberResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public MemberResponseMessage(BufferReader reader, ApiVersions version)
+        public MemberResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -105,14 +104,6 @@ public partial class LeaveGroupResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version4)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

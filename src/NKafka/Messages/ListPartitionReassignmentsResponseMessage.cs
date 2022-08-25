@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,22 +32,23 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error
     /// </summary>
-    public short ErrorCode { get; set; }
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; } = null!;
 
     /// <summary>
     /// The ongoing reassignments for each topic.
     /// </summary>
-    public IReadOnlyCollection<OngoingTopicReassignmentMessage> Topics { get; set; }
+    public List<OngoingTopicReassignment> Topics { get; set; } = new();
 
     public ListPartitionReassignmentsResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
     public ListPartitionReassignmentsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -64,37 +70,30 @@ public partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class OngoingTopicReassignmentMessage: Message
+    public class OngoingTopicReassignment: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The ongoing reassignments for each partition.
         /// </summary>
-        public IReadOnlyCollection<OngoingPartitionReassignmentMessage> Partitions { get; set; }
+        public List<OngoingPartitionReassignment> Partitions { get; set; } = new();
 
-        public OngoingTopicReassignmentMessage()
+        public OngoingTopicReassignment()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OngoingTopicReassignmentMessage(BufferReader reader, ApiVersions version)
+        public OngoingTopicReassignment(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -105,47 +104,40 @@ public partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class OngoingPartitionReassignmentMessage: Message
+    public class OngoingPartitionReassignment: Message
     {
         /// <summary>
         /// The index of the partition.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The current replica set.
         /// </summary>
-        public IReadOnlyCollection<int> Replicas { get; set; }
+        public List<int> Replicas { get; set; } = new();
 
         /// <summary>
         /// The set of replicas we are currently adding.
         /// </summary>
-        public IReadOnlyCollection<int> AddingReplicas { get; set; }
+        public List<int> AddingReplicas { get; set; } = new();
 
         /// <summary>
         /// The set of replicas we are currently removing.
         /// </summary>
-        public IReadOnlyCollection<int> RemovingReplicas { get; set; }
+        public List<int> RemovingReplicas { get; set; } = new();
 
-        public OngoingPartitionReassignmentMessage()
+        public OngoingPartitionReassignment()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OngoingPartitionReassignmentMessage(BufferReader reader, ApiVersions version)
+        public OngoingPartitionReassignment(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
@@ -156,14 +148,6 @@ public partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

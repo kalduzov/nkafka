@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreateTopicsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreateTopicsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Results for each topic we tried to create.
     /// </summary>
-    public IReadOnlyCollection<CreatableTopicResultMessage> Topics { get; set; }
+    public List<CreatableTopicResult> Topics { get; set; } = new();
 
     public CreateTopicsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
     public CreateTopicsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version7;
     }
@@ -56,32 +62,32 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
     {
     }
 
-    public class CreatableTopicResultMessage: Message
+    public class CreatableTopicResult: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string? ErrorMessage { get; set; }
+        public string? ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// Optional topic config error returned if configs are not returned in the response.
         /// </summary>
-        public short? TopicConfigErrorCode { get; set; }
+        public short? TopicConfigErrorCode { get; set; } = 0;
 
         /// <summary>
         /// Number of partitions of the topic.
@@ -96,17 +102,18 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
         /// <summary>
         /// Configuration of the topic.
         /// </summary>
-        public IReadOnlyCollection<CreatableTopicConfigsMessage>? Configs { get; set; }
+        public List<CreatableTopicConfigs>? Configs { get; set; } = new();
 
-        public CreatableTopicResultMessage()
+        public CreatableTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableTopicResultMessage(BufferReader reader, ApiVersions version)
+        public CreatableTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -119,22 +126,22 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
         {
         }
     }
-    public class CreatableTopicConfigsMessage: Message
+    public class CreatableTopicConfigs: Message
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
         /// <summary>
         /// True if the configuration is read-only.
         /// </summary>
-        public bool ReadOnly { get; set; }
+        public bool ReadOnly { get; set; } = false;
 
         /// <summary>
         /// The configuration source.
@@ -144,17 +151,18 @@ public partial class CreateTopicsResponseMessage: ResponseMessage
         /// <summary>
         /// True if this configuration is sensitive.
         /// </summary>
-        public bool IsSensitive { get; set; }
+        public bool IsSensitive { get; set; } = false;
 
-        public CreatableTopicConfigsMessage()
+        public CreatableTopicConfigs()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableTopicConfigsMessage(BufferReader reader, ApiVersions version)
+        public CreatableTopicConfigs(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }

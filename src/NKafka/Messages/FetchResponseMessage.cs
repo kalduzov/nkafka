@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class FetchResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class FetchResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code.
     /// </summary>
-    public short? ErrorCode { get; set; }
+    public short? ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The fetch session ID, or 0 if this is not part of a fetch session.
@@ -43,7 +48,7 @@ public partial class FetchResponseMessage: ResponseMessage
     /// <summary>
     /// The response topics.
     /// </summary>
-    public IReadOnlyCollection<FetchableTopicResponseMessage> Responses { get; set; }
+    public List<FetchableTopicResponse> Responses { get; set; } = new();
 
     public FetchResponseMessage()
     {
@@ -54,6 +59,7 @@ public partial class FetchResponseMessage: ResponseMessage
     public FetchResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version13;
     }
@@ -64,42 +70,35 @@ public partial class FetchResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version12)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class FetchableTopicResponseMessage: Message
+    public class FetchableTopicResponse: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string? Topic { get; set; }
+        public string? Topic { get; set; } = null!;
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The topic partitions.
         /// </summary>
-        public IReadOnlyCollection<PartitionDataMessage> Partitions { get; set; }
+        public List<PartitionData> Partitions { get; set; } = new();
 
-        public FetchableTopicResponseMessage()
+        public FetchableTopicResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public FetchableTopicResponseMessage(BufferReader reader, ApiVersions version)
+        public FetchableTopicResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -110,32 +109,24 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class PartitionDataMessage: Message
+    public class PartitionData: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no fetch error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The current high water mark.
         /// </summary>
-        public long HighWatermark { get; set; }
+        public long HighWatermark { get; set; } = 0;
 
         /// <summary>
         /// The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)
@@ -150,22 +141,22 @@ public partial class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
         /// </summary>
-        public EpochEndOffsetMessage DivergingEpoch { get; set; }
+        public EpochEndOffset DivergingEpoch { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public LeaderIdAndEpochMessage CurrentLeader { get; set; }
+        public LeaderIdAndEpoch CurrentLeader { get; set; } = new();
 
         /// <summary>
         /// In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request.
         /// </summary>
-        public SnapshotIdMessage SnapshotId { get; set; }
+        public SnapshotId SnapshotId { get; set; } = new();
 
         /// <summary>
         /// The aborted transactions.
         /// </summary>
-        public IReadOnlyCollection<AbortedTransactionMessage>? AbortedTransactions { get; set; }
+        public List<AbortedTransaction>? AbortedTransactions { get; set; } = new();
 
         /// <summary>
         /// The preferred read replica for the consumer to use on its next fetch request
@@ -175,17 +166,18 @@ public partial class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The record data.
         /// </summary>
-        public RecordBatch Records { get; set; }
+        public RecordBatch Records { get; set; } = new();
 
-        public PartitionDataMessage()
+        public PartitionData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -196,17 +188,9 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class EpochEndOffsetMessage: Message
+    public class EpochEndOffset: Message
     {
         /// <summary>
         /// 
@@ -218,15 +202,16 @@ public partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
-        public EpochEndOffsetMessage()
+        public EpochEndOffset()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
+        public EpochEndOffset(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -237,17 +222,9 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class LeaderIdAndEpochMessage: Message
+    public class LeaderIdAndEpoch: Message
     {
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
@@ -259,15 +236,16 @@ public partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
-        public LeaderIdAndEpochMessage()
+        public LeaderIdAndEpoch()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public LeaderIdAndEpochMessage(BufferReader reader, ApiVersions version)
+        public LeaderIdAndEpoch(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -278,17 +256,9 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class SnapshotIdMessage: Message
+    public class SnapshotId: Message
     {
         /// <summary>
         /// 
@@ -300,15 +270,16 @@ public partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public int Epoch { get; set; } = -1;
 
-        public SnapshotIdMessage()
+        public SnapshotId()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public SnapshotIdMessage(BufferReader reader, ApiVersions version)
+        public SnapshotId(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -319,37 +290,30 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class AbortedTransactionMessage: Message
+    public class AbortedTransaction: Message
     {
         /// <summary>
         /// The producer id associated with the aborted transaction.
         /// </summary>
-        public long ProducerId { get; set; }
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The first offset in the aborted transaction.
         /// </summary>
-        public long FirstOffset { get; set; }
+        public long FirstOffset { get; set; } = 0;
 
-        public AbortedTransactionMessage()
+        public AbortedTransaction()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public AbortedTransactionMessage(BufferReader reader, ApiVersions version)
+        public AbortedTransaction(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
@@ -360,14 +324,6 @@ public partial class FetchResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version12)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

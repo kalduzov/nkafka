@@ -58,7 +58,7 @@ public class JsonParseTests
     {
     }
 
-    private static async Task<MessageSpecification> GetMessageSpecification(string fileName)
+    internal static async Task<MessageSpecification> GetMessageSpecification(string fileName)
     {
         var str = string.Empty;
 

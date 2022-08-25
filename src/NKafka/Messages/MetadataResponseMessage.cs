@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class MetadataResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class MetadataResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public IReadOnlyCollection<MetadataResponseBrokerMessage> Brokers { get; set; }
+    public List<MetadataResponseBroker> Brokers { get; set; } = new();
 
     /// <summary>
     /// The cluster ID that responding broker belongs to.
     /// </summary>
-    public string? ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = "null";
 
     /// <summary>
     /// The ID of the controller broker.
@@ -48,7 +53,7 @@ public partial class MetadataResponseMessage: ResponseMessage
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public IReadOnlyCollection<MetadataResponseTopicMessage> Topics { get; set; }
+    public List<MetadataResponseTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.
@@ -64,6 +69,7 @@ public partial class MetadataResponseMessage: ResponseMessage
     public MetadataResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version12;
     }
@@ -74,55 +80,40 @@ public partial class MetadataResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version9)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
-        //flexible version
-        if (Version >= ApiVersions.Version9)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class MetadataResponseBrokerMessage: Message
+    public class MetadataResponseBroker: Message
     {
         /// <summary>
         /// The broker ID.
         /// </summary>
-        public int NodeId { get; set; }
+        public int NodeId { get; set; } = 0;
 
         /// <summary>
         /// The broker hostname.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The broker port.
         /// </summary>
-        public int Port { get; set; }
+        public int Port { get; set; } = 0;
 
         /// <summary>
         /// The rack of the broker, or null if it has not been assigned to a rack.
         /// </summary>
-        public string? Rack { get; set; } = null;
+        public string? Rack { get; set; } = "null";
 
-        public MetadataResponseBrokerMessage()
+        public MetadataResponseBroker()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        public MetadataResponseBrokerMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponseBroker(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
@@ -133,40 +124,24 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class MetadataResponseTopicMessage: Message
+    public class MetadataResponseTopic: Message
     {
         /// <summary>
         /// The topic error, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The topic id.
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// True if the topic is internal.
@@ -176,22 +151,23 @@ public partial class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition in the topic.
         /// </summary>
-        public IReadOnlyCollection<MetadataResponsePartitionMessage> Partitions { get; set; }
+        public List<MetadataResponsePartition> Partitions { get; set; } = new();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this topic.
         /// </summary>
         public int TopicAuthorizedOperations { get; set; } = -2147483648;
 
-        public MetadataResponseTopicMessage()
+        public MetadataResponseTopic()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        public MetadataResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponseTopic(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
@@ -202,40 +178,24 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class MetadataResponsePartitionMessage: Message
+    public class MetadataResponsePartition: Message
     {
         /// <summary>
         /// The partition error, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The ID of the leader broker.
         /// </summary>
-        public int LeaderId { get; set; }
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch of this partition.
@@ -245,27 +205,28 @@ public partial class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// The set of all nodes that host this partition.
         /// </summary>
-        public IReadOnlyCollection<int> ReplicaNodes { get; set; }
+        public List<int> ReplicaNodes { get; set; } = new();
 
         /// <summary>
         /// The set of nodes that are in sync with the leader for this partition.
         /// </summary>
-        public IReadOnlyCollection<int> IsrNodes { get; set; }
+        public List<int> IsrNodes { get; set; } = new();
 
         /// <summary>
         /// The set of offline replicas of this partition.
         /// </summary>
-        public IReadOnlyCollection<int>? OfflineReplicas { get; set; }
+        public List<int>? OfflineReplicas { get; set; } = new();
 
-        public MetadataResponsePartitionMessage()
+        public MetadataResponsePartition()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        public MetadataResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponsePartition(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
@@ -276,22 +237,6 @@ public partial class MetadataResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

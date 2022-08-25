@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DescribeGroupsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each described group.
     /// </summary>
-    public IReadOnlyCollection<DescribedGroupMessage> Groups { get; set; }
+    public List<DescribedGroup> Groups { get; set; } = new();
 
     public DescribeGroupsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
     public DescribeGroupsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }
@@ -56,52 +62,53 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribedGroupMessage: Message
+    public class DescribedGroup: Message
     {
         /// <summary>
         /// The describe error, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The group ID string.
         /// </summary>
-        public string GroupId { get; set; }
+        public string GroupId { get; set; } = null!;
 
         /// <summary>
         /// The group state string, or the empty string.
         /// </summary>
-        public string GroupState { get; set; }
+        public string GroupState { get; set; } = null!;
 
         /// <summary>
         /// The group protocol type, or the empty string.
         /// </summary>
-        public string ProtocolType { get; set; }
+        public string ProtocolType { get; set; } = null!;
 
         /// <summary>
         /// The group protocol data, or the empty string.
         /// </summary>
-        public string ProtocolData { get; set; }
+        public string ProtocolData { get; set; } = null!;
 
         /// <summary>
         /// The group members.
         /// </summary>
-        public IReadOnlyCollection<DescribedGroupMemberMessage> Members { get; set; }
+        public List<DescribedGroupMember> Members { get; set; } = new();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this group.
         /// </summary>
         public int AuthorizedOperations { get; set; } = -2147483648;
 
-        public DescribedGroupMessage()
+        public DescribedGroup()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public DescribedGroupMessage(BufferReader reader, ApiVersions version)
+        public DescribedGroup(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
@@ -114,47 +121,48 @@ public partial class DescribeGroupsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribedGroupMemberMessage: Message
+    public class DescribedGroupMember: Message
     {
         /// <summary>
         /// The member ID assigned by the group coordinator.
         /// </summary>
-        public string MemberId { get; set; }
+        public string MemberId { get; set; } = null!;
 
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
         /// </summary>
-        public string? GroupInstanceId { get; set; } = null;
+        public string? GroupInstanceId { get; set; } = "null";
 
         /// <summary>
         /// The client ID used in the member's latest join group request.
         /// </summary>
-        public string ClientId { get; set; }
+        public string ClientId { get; set; } = null!;
 
         /// <summary>
         /// The client host.
         /// </summary>
-        public string ClientHost { get; set; }
+        public string ClientHost { get; set; } = null!;
 
         /// <summary>
         /// The metadata corresponding to the current group protocol in use.
         /// </summary>
-        public byte[] MemberMetadata { get; set; }
+        public byte[] MemberMetadata { get; set; } = Array.Empty<byte>();
 
         /// <summary>
         /// The current assignment provided by the group leader.
         /// </summary>
-        public byte[] MemberAssignment { get; set; }
+        public byte[] MemberAssignment { get; set; } = Array.Empty<byte>();
 
-        public DescribedGroupMemberMessage()
+        public DescribedGroupMember()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public DescribedGroupMemberMessage(BufferReader reader, ApiVersions version)
+        public DescribedGroupMember(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }

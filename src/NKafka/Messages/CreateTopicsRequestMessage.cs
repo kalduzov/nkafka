@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreateTopicsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreateTopicsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The topics to create.
     /// </summary>
-    public IReadOnlyCollection<CreatableTopicMessage> Topics { get; set; }
+    public List<CreatableTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
@@ -52,6 +57,15 @@ public partial class CreateTopicsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version7;
     }
 
+    public CreateTopicsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateTopics;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
     public override void Read(BufferReader reader, ApiVersions version)
     {
     }
@@ -60,35 +74,43 @@ public partial class CreateTopicsRequestMessage: RequestMessage
     {
     }
 
-    public class CreatableTopicMessage: Message
+    public class CreatableTopic: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The number of partitions to create in the topic, or -1 if we are either specifying a manual partition assignment or using the default partitions.
         /// </summary>
-        public int NumPartitions { get; set; }
+        public int NumPartitions { get; set; } = 0;
 
         /// <summary>
         /// The number of replicas to create for each partition in the topic, or -1 if we are either specifying a manual partition assignment or using the default replication factor.
         /// </summary>
-        public short ReplicationFactor { get; set; }
+        public short ReplicationFactor { get; set; } = 0;
 
         /// <summary>
         /// The manual partition assignment, or the empty array if we are using automatic assignment.
         /// </summary>
-        public IReadOnlyCollection<CreatableReplicaAssignmentMessage> Assignments { get; set; }
+        public List<CreatableReplicaAssignment> Assignments { get; set; } = new();
 
         /// <summary>
         /// The custom topic configurations to set.
         /// </summary>
-        public IReadOnlyCollection<CreateableTopicConfigMessage> Configs { get; set; }
+        public List<CreateableTopicConfig> Configs { get; set; } = new();
 
-        public CreatableTopicMessage()
+        public CreatableTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public CreatableTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -101,20 +123,28 @@ public partial class CreateTopicsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreatableReplicaAssignmentMessage: Message
+    public class CreatableReplicaAssignment: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The brokers to place the partition on.
         /// </summary>
-        public IReadOnlyCollection<int> BrokerIds { get; set; }
+        public List<int> BrokerIds { get; set; } = new();
 
-        public CreatableReplicaAssignmentMessage()
+        public CreatableReplicaAssignment()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public CreatableReplicaAssignment(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -127,20 +157,28 @@ public partial class CreateTopicsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreateableTopicConfigMessage: Message
+    public class CreateableTopicConfig: Message
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; set; } = null!;
 
-        public CreateableTopicConfigMessage()
+        public CreateableTopicConfig()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public CreateableTopicConfig(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }

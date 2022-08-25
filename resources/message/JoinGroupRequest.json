@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,7 @@
 
 {
   "apiKey": 11,
-  "type": "Request",
+  "type": "request",
   "listeners": ["zkBroker", "broker"],
   "name": "JoinGroupRequest",
   // Version 1 adds RebalanceTimeoutMs.
@@ -30,7 +30,11 @@
   // Version 6 is the first flexible version.
   //
   // Version 7 is the same as version 6.
-  "validVersions": "0-7",
+  //
+  // Version 8 adds the Reason field (KIP-800).
+  //
+  // Version 9 is the same as version 8.
+  "validVersions": "0-9",
   "flexibleVersions": "6+",
   "fields": [
     { "name": "GroupId", "type": "string", "versions": "0+", "entityType": "groupId",
@@ -54,6 +58,8 @@
         "about": "The protocol name." },
       { "name": "Metadata", "type": "bytes", "versions": "0+",
         "about": "The protocol metadata." }
-    ]}
+    ]},
+    { "name": "Reason", "type": "string", "versions": "8+", "nullableVersions": "8+", "default": "null", "ignorable": true,
+      "about": "The reason why the member (re-)joins the group." }
   ]
 }

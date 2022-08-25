@@ -5,7 +5,7 @@
 // (the "License"); you may not use this file except in compliance with
 // the License.  You may obtain a copy of the License at
 //
-//    https://www.apache.org/licenses/LICENSE-2.0
+//    http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,7 @@
 
 {
   "apiKey": 4,
-  "type": "Response",
+  "type": "response",
   "name": "LeaderAndIsrResponse",
   // Version 1 adds KAFKA_STORAGE_ERROR as a valid error code.
   //
@@ -25,9 +25,9 @@
   //
   // Version 4 is the first flexible version.
   //
-  // Version 5 removes TopicName and replaces it with TopicId and reorganizes 
+  // Version 5 removes TopicName and replaces it with TopicId and reorganizes
   // the partitions by topic, as described by KIP-516.
-  "validVersions": "0-5",
+  "validVersions": "0-6",
   "flexibleVersions": "4+",
   "fields": [
     { "name": "ErrorCode", "type": "int16", "versions": "0+",

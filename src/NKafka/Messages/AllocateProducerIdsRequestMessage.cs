@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AllocateProducerIdsRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AllocateProducerIdsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the requesting broker
     /// </summary>
-    public int BrokerId { get; set; }
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The epoch of the requesting broker
@@ -42,6 +47,15 @@ public partial class AllocateProducerIdsRequestMessage: RequestMessage
 
     public AllocateProducerIdsRequestMessage()
     {
+        ApiKey = ApiKeys.AllocateProducerIds;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AllocateProducerIdsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.AllocateProducerIds;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;

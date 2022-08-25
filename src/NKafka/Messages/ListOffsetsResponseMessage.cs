@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ListOffsetsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ListOffsetsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public IReadOnlyCollection<ListOffsetsTopicResponseMessage> Topics { get; set; }
+    public List<ListOffsetsTopicResponse> Topics { get; set; } = new();
 
     public ListOffsetsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
     public ListOffsetsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version7;
     }
@@ -54,37 +60,30 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version6)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class ListOffsetsTopicResponseMessage: Message
+    public class ListOffsetsTopicResponse: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public IReadOnlyCollection<ListOffsetsPartitionResponseMessage> Partitions { get; set; }
+        public List<ListOffsetsPartitionResponse> Partitions { get; set; } = new();
 
-        public ListOffsetsTopicResponseMessage()
+        public ListOffsetsTopicResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public ListOffsetsTopicResponseMessage(BufferReader reader, ApiVersions version)
+        public ListOffsetsTopicResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -95,32 +94,24 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
-    public class ListOffsetsPartitionResponseMessage: Message
+    public class ListOffsetsPartitionResponse: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The result offsets.
         /// </summary>
-        public IReadOnlyCollection<long> OldStyleOffsets { get; set; }
+        public List<long> OldStyleOffsets { get; set; } = new();
 
         /// <summary>
         /// The timestamp associated with the returned offset.
@@ -137,15 +128,16 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
-        public ListOffsetsPartitionResponseMessage()
+        public ListOffsetsPartitionResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public ListOffsetsPartitionResponseMessage(BufferReader reader, ApiVersions version)
+        public ListOffsetsPartitionResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
@@ -156,14 +148,6 @@ public partial class ListOffsetsResponseMessage: ResponseMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version6)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

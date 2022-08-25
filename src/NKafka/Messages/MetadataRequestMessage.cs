@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class MetadataRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class MetadataRequestMessage: RequestMessage
 {
     /// <summary>
     /// The topics to fetch metadata for.
     /// </summary>
-    public IReadOnlyCollection<MetadataRequestTopicMessage> Topics { get; set; }
+    public List<MetadataRequestTopic> Topics { get; set; } = new();
 
     /// <summary>
     /// If this is true, the broker may auto-create topics that we requested which do not already exist, if it is configured to do so.
@@ -43,15 +48,24 @@ public partial class MetadataRequestMessage: RequestMessage
     /// <summary>
     /// Whether to include cluster authorized operations.
     /// </summary>
-    public bool IncludeClusterAuthorizedOperations { get; set; }
+    public bool IncludeClusterAuthorizedOperations { get; set; } = false;
 
     /// <summary>
     /// Whether to include topic authorized operations.
     /// </summary>
-    public bool IncludeTopicAuthorizedOperations { get; set; }
+    public bool IncludeTopicAuthorizedOperations { get; set; } = false;
 
     public MetadataRequestMessage()
     {
+        ApiKey = ApiKeys.Metadata;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version12;
+    }
+
+    public MetadataRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.Metadata;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version12;
@@ -63,30 +77,30 @@ public partial class MetadataRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version9)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
-    public class MetadataRequestTopicMessage: Message
+    public class MetadataRequestTopic: Message
     {
         /// <summary>
         /// The topic id.
         /// </summary>
-        public Guid? TopicId { get; set; }
+        public Guid? TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
-        public MetadataRequestTopicMessage()
+        public MetadataRequestTopic()
         {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version12;
+        }
+
+        public MetadataRequestTopic(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
@@ -97,14 +111,6 @@ public partial class MetadataRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version9)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

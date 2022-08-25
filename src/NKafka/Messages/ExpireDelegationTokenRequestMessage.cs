@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,20 +32,30 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class ExpireDelegationTokenRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class ExpireDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// The HMAC of the delegation token to be expired.
     /// </summary>
-    public byte[] Hmac { get; set; }
+    public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The expiry time period in milliseconds.
     /// </summary>
-    public long ExpiryTimePeriodMs { get; set; }
+    public long ExpiryTimePeriodMs { get; set; } = 0;
 
     public ExpireDelegationTokenRequestMessage()
     {
+        ApiKey = ApiKeys.ExpireDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public ExpireDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.ExpireDelegationToken;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,17 +32,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class InitProducerIdRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class InitProducerIdRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
     /// </summary>
-    public string TransactionalId { get; set; }
+    public string TransactionalId { get; set; } = null!;
 
     /// <summary>
     /// The time in ms to wait before aborting idle transactions sent by this producer. This is only relevant if a TransactionalId has been defined.
     /// </summary>
-    public int TransactionTimeoutMs { get; set; }
+    public int TransactionTimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// The producer id. This is used to disambiguate requests if a transactional id is reused following its expiration.
@@ -52,6 +57,15 @@ public partial class InitProducerIdRequestMessage: RequestMessage
 
     public InitProducerIdRequestMessage()
     {
+        ApiKey = ApiKeys.InitProducerId;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public InitProducerIdRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
         ApiKey = ApiKeys.InitProducerId;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;

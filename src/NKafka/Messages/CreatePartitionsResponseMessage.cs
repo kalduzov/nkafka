@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class CreatePartitionsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class CreatePartitionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The partition creation results for each topic.
     /// </summary>
-    public IReadOnlyCollection<CreatePartitionsTopicResultMessage> Results { get; set; }
+    public List<CreatePartitionsTopicResult> Results { get; set; } = new();
 
     public CreatePartitionsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class CreatePartitionsResponseMessage: ResponseMessage
     public CreatePartitionsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -56,32 +62,33 @@ public partial class CreatePartitionsResponseMessage: ResponseMessage
     {
     }
 
-    public class CreatePartitionsTopicResultMessage: Message
+    public class CreatePartitionsTopicResult: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The result error, or zero if there was no error.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string? ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = "null";
 
-        public CreatePartitionsTopicResultMessage()
+        public CreatePartitionsTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public CreatePartitionsTopicResultMessage(BufferReader reader, ApiVersions version)
+        public CreatePartitionsTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }

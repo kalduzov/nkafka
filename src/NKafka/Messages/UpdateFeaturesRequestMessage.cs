@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,7 +32,8 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class UpdateFeaturesRequestMessage: RequestMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class UpdateFeaturesRequestMessage: RequestMessage
 {
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
@@ -38,7 +43,7 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
     /// <summary>
     /// The list of updates to finalized features.
     /// </summary>
-    public IReadOnlyCollection<FeatureUpdateKeyMessage> FeatureUpdates { get; set; }
+    public List<FeatureUpdateKeyMessage> FeatureUpdates { get; set; } = new();
 
     public UpdateFeaturesRequestMessage()
     {
@@ -53,14 +58,6 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
 
     public override void Write(BufferWriter writer, ApiVersions version)
     {
-        //flexible version
-        if (Version >= ApiVersions.Version0)
-        {
-        }
-        else //no flexible version
-        {
-        }
-
     }
 
     public class FeatureUpdateKeyMessage: Message
@@ -68,17 +65,17 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
         /// <summary>
         /// The name of the finalized feature to be updated.
         /// </summary>
-        public string Feature { get; set; }
+        public string Feature { get; set; } = null!;
 
         /// <summary>
         /// The new maximum version level for the finalized feature. A value >= 1 is valid. A value < 1, is special, and can be used to request the deletion of the finalized feature.
         /// </summary>
-        public short MaxVersionLevel { get; set; }
+        public short MaxVersionLevel { get; set; } = 0;
 
         /// <summary>
         /// When set to true, the finalized feature version level is allowed to be downgraded/deleted. The downgrade request will fail if the new maximum version level is a value that's not lower than the existing maximum finalized version level.
         /// </summary>
-        public bool AllowDowngrade { get; set; }
+        public bool AllowDowngrade { get; set; } = false;
 
         public FeatureUpdateKeyMessage()
         {
@@ -92,14 +89,6 @@ public partial class UpdateFeaturesRequestMessage: RequestMessage
 
         public override void Write(BufferWriter writer, ApiVersions version)
         {
-            //flexible version
-            if (Version >= ApiVersions.Version0)
-            {
-            }
-            else //no flexible version
-            {
-            }
-
         }
     }
 }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterConfigsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterConfigsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each resource.
     /// </summary>
-    public IReadOnlyCollection<AlterConfigsResourceResponseMessage> Responses { get; set; }
+    public List<AlterConfigsResourceResponse> Responses { get; set; } = new();
 
     public AlterConfigsResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class AlterConfigsResponseMessage: ResponseMessage
     public AlterConfigsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -56,37 +62,38 @@ public partial class AlterConfigsResponseMessage: ResponseMessage
     {
     }
 
-    public class AlterConfigsResourceResponseMessage: Message
+    public class AlterConfigsResourceResponse: Message
     {
         /// <summary>
         /// The resource error code.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The resource error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
-        public AlterConfigsResourceResponseMessage()
+        public AlterConfigsResourceResponse()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersions version)
+        public AlterConfigsResourceResponse(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,24 +32,26 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class DeleteAclsResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class DeleteAclsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each filter.
     /// </summary>
-    public IReadOnlyCollection<DeleteAclsFilterResultMessage> FilterResults { get; set; }
+    public List<DeleteAclsFilterResult> FilterResults { get; set; } = new();
 
     public DeleteAclsResponseMessage()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DeleteAclsResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
+        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public override void Read(BufferReader reader, ApiVersions version)
@@ -56,34 +62,35 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
     {
     }
 
-    public class DeleteAclsFilterResultMessage: Message
+    public class DeleteAclsFilterResult: Message
     {
         /// <summary>
         /// The error code, or 0 if the filter succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if the filter succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The ACLs which matched this filter.
         /// </summary>
-        public IReadOnlyCollection<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; }
+        public List<DeleteAclsMatchingAcl> MatchingAcls { get; set; } = new();
 
-        public DeleteAclsFilterResultMessage()
+        public DeleteAclsFilterResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DeleteAclsFilterResultMessage(BufferReader reader, ApiVersions version)
+        public DeleteAclsFilterResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -94,27 +101,27 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DeleteAclsMatchingAclMessage: Message
+    public class DeleteAclsMatchingAcl: Message
     {
         /// <summary>
         /// The deletion error code, or 0 if the deletion succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The deletion error message, or null if the deletion succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The ACL resource type.
         /// </summary>
-        public sbyte ResourceType { get; set; }
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The ACL resource name.
         /// </summary>
-        public string ResourceName { get; set; }
+        public string ResourceName { get; set; } = null!;
 
         /// <summary>
         /// The ACL resource pattern type.
@@ -124,34 +131,35 @@ public partial class DeleteAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The ACL principal.
         /// </summary>
-        public string Principal { get; set; }
+        public string Principal { get; set; } = null!;
 
         /// <summary>
         /// The ACL host.
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = null!;
 
         /// <summary>
         /// The ACL operation.
         /// </summary>
-        public sbyte Operation { get; set; }
+        public sbyte Operation { get; set; } = 0;
 
         /// <summary>
         /// The ACL permission type.
         /// </summary>
-        public sbyte PermissionType { get; set; }
+        public sbyte PermissionType { get; set; } = 0;
 
-        public DeleteAclsMatchingAclMessage()
+        public DeleteAclsMatchingAcl()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DeleteAclsMatchingAclMessage(BufferReader reader, ApiVersions version)
+        public DeleteAclsMatchingAcl(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)

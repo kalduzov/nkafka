@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public IReadOnlyCollection<AddPartitionsToTxnTopicResultMessage> Results { get; set; }
+    public List<AddPartitionsToTxnTopicResult> Results { get; set; } = new();
 
     public AddPartitionsToTxnResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
     public AddPartitionsToTxnResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -56,27 +62,28 @@ public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
     {
     }
 
-    public class AddPartitionsToTxnTopicResultMessage: Message
+    public class AddPartitionsToTxnTopicResult: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
 
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public IReadOnlyCollection<AddPartitionsToTxnPartitionResultMessage> Results { get; set; }
+        public List<AddPartitionsToTxnPartitionResult> Results { get; set; } = new();
 
-        public AddPartitionsToTxnTopicResultMessage()
+        public AddPartitionsToTxnTopicResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnTopicResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
@@ -89,27 +96,28 @@ public partial class AddPartitionsToTxnResponseMessage: ResponseMessage
         {
         }
     }
-    public class AddPartitionsToTxnPartitionResultMessage: Message
+    public class AddPartitionsToTxnPartitionResult: Message
     {
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public int PartitionIndex { get; set; }
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The response error code.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
-        public AddPartitionsToTxnPartitionResultMessage()
+        public AddPartitionsToTxnPartitionResult()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnPartitionResult(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }

@@ -21,6 +21,10 @@
 //
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
+
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -28,12 +32,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public partial class AlterClientQuotasResponseMessage: ResponseMessage
+// ReSharper disable once PartialTypeWithSinglePart
+public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public IReadOnlyCollection<EntryDataMessage> Entries { get; set; }
+    public List<EntryData> Entries { get; set; } = new();
 
     public AlterClientQuotasResponseMessage()
     {
@@ -44,6 +49,7 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
     public AlterClientQuotasResponseMessage(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
+        Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -56,32 +62,33 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
     {
     }
 
-    public class EntryDataMessage: Message
+    public class EntryData: Message
     {
         /// <summary>
         /// The error code, or `0` if the quota alteration succeeded.
         /// </summary>
-        public short ErrorCode { get; set; }
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or `null` if the quota alteration succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = null!;
 
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
-        public IReadOnlyCollection<EntityDataMessage> Entity { get; set; }
+        public List<EntityData> Entity { get; set; } = new();
 
-        public EntryDataMessage()
+        public EntryData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntryDataMessage(BufferReader reader, ApiVersions version)
+        public EntryData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
@@ -94,27 +101,28 @@ public partial class AlterClientQuotasResponseMessage: ResponseMessage
         {
         }
     }
-    public class EntityDataMessage: Message
+    public class EntityData: Message
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; }
+        public string EntityType { get; set; } = null!;
 
         /// <summary>
         /// The name of the entity, or null if the default.
         /// </summary>
-        public string EntityName { get; set; }
+        public string EntityName { get; set; } = null!;
 
-        public EntityDataMessage()
+        public EntityData()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntityDataMessage(BufferReader reader, ApiVersions version)
+        public EntityData(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
+            Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }

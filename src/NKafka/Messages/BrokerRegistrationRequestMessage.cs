@@ -39,32 +39,32 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
     /// <summary>
     /// The broker ID.
     /// </summary>
-    public int BrokerIdMessage { get; set; } = 0;
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The cluster id of the broker process.
     /// </summary>
-    public string ClusterIdMessage { get; set; } = "";
+    public string ClusterId { get; set; } = "";
 
     /// <summary>
     /// The incarnation id of the broker process.
     /// </summary>
-    public Guid IncarnationIdMessage { get; set; } = Guid.Empty;
+    public Guid IncarnationId { get; set; } = Guid.Empty;
 
     /// <summary>
     /// The listeners of this broker
     /// </summary>
-    public List<ListenerMessage> ListenersMessage { get; set; } = new ();
+    public ListenerCollection Listeners { get; set; } = new ();
 
     /// <summary>
     /// The features on this broker
     /// </summary>
-    public List<FeatureMessage> FeaturesMessage { get; set; } = new ();
+    public FeatureCollection Features { get; set; } = new ();
 
     /// <summary>
     /// The rack which this broker is in.
     /// </summary>
-    public string RackMessage { get; set; } = "";
+    public string Rack { get; set; } = "";
 
     public BrokerRegistrationRequestMessage()
     {
@@ -82,41 +82,40 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class ListenerMessage: Message
     {
         /// <summary>
         /// The name of the endpoint.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The hostname.
         /// </summary>
-        public Dictionary<string,> HostMessage { get; set; } = "";
+        public string Host { get; set; } = "";
 
         /// <summary>
         /// The port.
         /// </summary>
-        public Dictionary<ushort,> PortMessage { get; set; } = 0;
+        public ushort Port { get; set; } = 0;
 
         /// <summary>
         /// The security protocol.
         /// </summary>
-        public Dictionary<short,> SecurityProtocolMessage { get; set; } = 0;
+        public short SecurityProtocol { get; set; } = 0;
 
         public ListenerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ListenerMessage(BufferReader reader, ApiVersions version)
@@ -124,17 +123,20 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class ListenerCollection: HashSet<ListenerMessage>
+    {
     }
 
     public sealed class FeatureMessage: Message
@@ -142,22 +144,22 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
         /// <summary>
         /// The feature name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The minimum supported feature level.
         /// </summary>
-        public Dictionary<short,> MinSupportedVersionMessage { get; set; } = 0;
+        public short MinSupportedVersion { get; set; } = 0;
 
         /// <summary>
         /// The maximum supported feature level.
         /// </summary>
-        public Dictionary<short,> MaxSupportedVersionMessage { get; set; } = 0;
+        public short MaxSupportedVersion { get; set; } = 0;
 
         public FeatureMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public FeatureMessage(BufferReader reader, ApiVersions version)
@@ -165,16 +167,19 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class FeatureCollection: HashSet<FeatureMessage>
+    {
     }
 }

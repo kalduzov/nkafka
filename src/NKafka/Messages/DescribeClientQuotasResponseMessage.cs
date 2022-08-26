@@ -39,21 +39,20 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or `0` if the quota description succeeded.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or `null` if the quota description succeeded.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// A result entry.
     /// </summary>
-    public List<EntryDataMessage> EntriesMessage { get; set; } = new ();
+    public List<EntryDataMessage> Entries { get; set; } = new ();
 
     public DescribeClientQuotasResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeClientQuotas;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -62,36 +61,34 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeClientQuotas;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class EntryDataMessage: Message
     {
         /// <summary>
         /// The quota entity description.
         /// </summary>
-        public List<EntityDataMessage> EntityMessage { get; set; } = new ();
+        public List<EntityDataMessage> Entity { get; set; } = new ();
 
         /// <summary>
         /// The quota values for the entity.
         /// </summary>
-        public List<ValueDataMessage> ValuesMessage { get; set; } = new ();
+        public List<ValueDataMessage> Values { get; set; } = new ();
 
         public EntryDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntryDataMessage(BufferReader reader, ApiVersions version)
@@ -99,17 +96,16 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class EntityDataMessage: Message
@@ -117,17 +113,17 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityTypeMessage { get; set; } = "";
+        public string EntityType { get; set; } = "";
 
         /// <summary>
         /// The entity name, or null if the default.
         /// </summary>
-        public string EntityNameMessage { get; set; } = "";
+        public string EntityName { get; set; } = "";
 
         public EntityDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntityDataMessage(BufferReader reader, ApiVersions version)
@@ -135,17 +131,16 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class ValueDataMessage: Message
@@ -153,17 +148,17 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string KeyMessage { get; set; } = "";
+        public string Key { get; set; } = "";
 
         /// <summary>
         /// The quota configuration value.
         /// </summary>
-        public double ValueMessage { get; set; } = 0.0;
+        public double Value { get; set; } = 0.0;
 
         public ValueDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public ValueDataMessage(BufferReader reader, ApiVersions version)
@@ -171,16 +166,15 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

@@ -39,12 +39,12 @@ public sealed class ExpireDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// The HMAC of the delegation token to be expired.
     /// </summary>
-    public byte[] HmacMessage { get; set; } = Array.Empty<byte>();
+    public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The expiry time period in milliseconds.
     /// </summary>
-    public long ExpiryTimePeriodMsMessage { get; set; } = 0;
+    public long ExpiryTimePeriodMs { get; set; } = 0;
 
     public ExpireDelegationTokenRequestMessage()
     {
@@ -62,12 +62,11 @@ public sealed class ExpireDelegationTokenRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

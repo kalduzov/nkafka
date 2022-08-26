@@ -39,16 +39,15 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
-    public List<RemainingPartitionMessage> RemainingPartitionsMessage { get; set; } = new ();
+    public RemainingPartitionCollection RemainingPartitions { get; set; } = new ();
 
     public ControlledShutdownResponseMessage()
     {
-        ApiKey = ApiKeys.ControlledShutdown;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -57,36 +56,34 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ControlledShutdown;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class RemainingPartitionMessage: Message
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public Dictionary<string,> TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The index of the partition.
         /// </summary>
-        public Dictionary<int,> PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         public RemainingPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public RemainingPartitionMessage(BufferReader reader, ApiVersions version)
@@ -94,16 +91,19 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class RemainingPartitionCollection: HashSet<RemainingPartitionMessage>
+    {
     }
 }

@@ -39,16 +39,15 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The topics to fetch.
     /// </summary>
-    public List<TopicSnapshotMessage> TopicsMessage { get; set; } = new ();
+    public List<TopicSnapshotMessage> Topics { get; set; } = new ();
 
     public FetchSnapshotResponseMessage()
     {
-        ApiKey = ApiKeys.FetchSnapshot;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -57,36 +56,34 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.FetchSnapshot;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicSnapshotMessage: Message
     {
         /// <summary>
         /// The name of the topic to fetch.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The partitions to fetch.
         /// </summary>
-        public List<PartitionSnapshotMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionSnapshotMessage> Partitions { get; set; } = new ();
 
         public TopicSnapshotMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TopicSnapshotMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +91,16 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionSnapshotMessage: Message
@@ -112,42 +108,42 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int IndexMessage { get; set; } = 0;
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no fetch error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The snapshot endOffset and epoch fetched
         /// </summary>
-        public List<SnapshotId> SnapshotIdMessage { get; set; } = new ();
+        public SnapshotIdMessage SnapshotId { get; set; } = new ();
 
         /// <summary>
         /// 
         /// </summary>
-        public List<LeaderIdAndEpoch> CurrentLeaderMessage { get; set; } = new ();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
         /// <summary>
         /// The total size of the snapshot.
         /// </summary>
-        public long SizeMessage { get; set; } = 0;
+        public long Size { get; set; } = 0;
 
         /// <summary>
         /// The starting byte position within the snapshot included in the Bytes field.
         /// </summary>
-        public long PositionMessage { get; set; } = 0;
+        public long Position { get; set; } = 0;
 
         /// <summary>
         /// Snapshot data in records format which may not be aligned on an offset boundary
         /// </summary>
-        public RecordBatch UnalignedRecordsMessage { get; set; } = null;
+        public RecordBatch UnalignedRecords { get; set; } = null;
 
         public PartitionSnapshotMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public PartitionSnapshotMessage(BufferReader reader, ApiVersions version)
@@ -155,17 +151,16 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class SnapshotIdMessage: Message
@@ -173,17 +168,17 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public long EndOffsetMessage { get; set; } = 0;
+        public long EndOffset { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public int EpochMessage { get; set; } = 0;
+        public int Epoch { get; set; } = 0;
 
         public SnapshotIdMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public SnapshotIdMessage(BufferReader reader, ApiVersions version)
@@ -191,17 +186,16 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class LeaderIdAndEpochMessage: Message
@@ -209,17 +203,17 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
         /// </summary>
-        public int LeaderIdMessage { get; set; } = 0;
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The latest known leader epoch
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         public LeaderIdAndEpochMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public LeaderIdAndEpochMessage(BufferReader reader, ApiVersions version)
@@ -227,16 +221,15 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

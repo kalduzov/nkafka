@@ -39,16 +39,15 @@ public sealed class DescribeQuorumResponseMessage: ResponseMessage
     /// <summary>
     /// The top level error code.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new ();
 
     public DescribeQuorumResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeQuorum;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -57,36 +56,34 @@ public sealed class DescribeQuorumResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeQuorum;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicDataMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new ();
 
         public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public TopicDataMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +91,16 @@ public sealed class DescribeQuorumResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionDataMessage: Message
@@ -112,42 +108,42 @@ public sealed class DescribeQuorumResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
         /// </summary>
-        public int LeaderIdMessage { get; set; } = 0;
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The latest known leader epoch
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public long HighWatermarkMessage { get; set; } = 0;
+        public long HighWatermark { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public List<ReplicaStateMessage> CurrentVotersMessage { get; set; } = new ();
+        public List<ReplicaStateMessage> CurrentVoters { get; set; } = new ();
 
         /// <summary>
         /// 
         /// </summary>
-        public List<ReplicaStateMessage> ObserversMessage { get; set; } = new ();
+        public List<ReplicaStateMessage> Observers { get; set; } = new ();
 
         public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
@@ -155,62 +151,60 @@ public sealed class DescribeQuorumResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
-    public sealed class ReplicaState: Message
+    public sealed class ReplicaStateMessage: Message
     {
         /// <summary>
         /// 
         /// </summary>
-        public int ReplicaIdMessage { get; set; } = 0;
+        public int ReplicaId { get; set; } = 0;
 
         /// <summary>
         /// The last known log end offset of the follower or -1 if it is unknown
         /// </summary>
-        public long LogEndOffsetMessage { get; set; } = 0;
+        public long LogEndOffset { get; set; } = 0;
 
         /// <summary>
         /// The last known leader wall clock time time when a follower fetched from the leader. This is reported as -1 both for the current leader or if it is unknown for a voter
         /// </summary>
-        public long LastFetchTimestampMessage { get; set; } = -1;
+        public long LastFetchTimestamp { get; set; } = -1;
 
         /// <summary>
         /// The leader wall clock append time of the offset for which the follower made the most recent fetch request. This is reported as the current time for the leader and -1 if unknown for a voter
         /// </summary>
-        public long LastCaughtUpTimestampMessage { get; set; } = -1;
+        public long LastCaughtUpTimestamp { get; set; } = -1;
 
-        public ReplicaState()
+        public ReplicaStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public ReplicaState(BufferReader reader, ApiVersions version)
+        public ReplicaStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

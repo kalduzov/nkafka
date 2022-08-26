@@ -39,7 +39,7 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
-    public List<DescribeDelegationTokenOwnerMessage> OwnersMessage { get; set; } = new ();
+    public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new ();
 
     public DescribeDelegationTokenRequestMessage()
     {
@@ -57,31 +57,30 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribeDelegationTokenOwnerMessage: Message
     {
         /// <summary>
         /// The owner principal type.
         /// </summary>
-        public string PrincipalTypeMessage { get; set; } = "";
+        public string PrincipalType { get; set; } = "";
 
         /// <summary>
         /// The owner principal name.
         /// </summary>
-        public string PrincipalNameMessage { get; set; } = "";
+        public string PrincipalName { get; set; } = "";
 
         public DescribeDelegationTokenOwnerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DescribeDelegationTokenOwnerMessage(BufferReader reader, ApiVersions version)
@@ -89,16 +88,15 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

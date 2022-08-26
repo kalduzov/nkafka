@@ -39,11 +39,10 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
     /// <summary>
     /// The results for writing makers.
     /// </summary>
-    public List<WritableTxnMarkerResultMessage> MarkersMessage { get; set; } = new ();
+    public List<WritableTxnMarkerResultMessage> Markers { get; set; } = new ();
 
     public WriteTxnMarkersResponseMessage()
     {
-        ApiKey = ApiKeys.WriteTxnMarkers;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -52,36 +51,34 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.WriteTxnMarkers;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class WritableTxnMarkerResultMessage: Message
     {
         /// <summary>
         /// The current producer ID in use by the transactional ID.
         /// </summary>
-        public long ProducerIdMessage { get; set; } = 0;
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The results by topic.
         /// </summary>
-        public List<WritableTxnMarkerTopicResultMessage> TopicsMessage { get; set; } = new ();
+        public List<WritableTxnMarkerTopicResultMessage> Topics { get; set; } = new ();
 
         public WritableTxnMarkerResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerResultMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +86,16 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class WritableTxnMarkerTopicResultMessage: Message
@@ -107,17 +103,17 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The results by partition.
         /// </summary>
-        public List<WritableTxnMarkerPartitionResultMessage> PartitionsMessage { get; set; } = new ();
+        public List<WritableTxnMarkerPartitionResultMessage> Partitions { get; set; } = new ();
 
         public WritableTxnMarkerTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerTopicResultMessage(BufferReader reader, ApiVersions version)
@@ -125,17 +121,16 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class WritableTxnMarkerPartitionResultMessage: Message
@@ -143,17 +138,17 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public WritableTxnMarkerPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerPartitionResultMessage(BufferReader reader, ApiVersions version)
@@ -161,16 +156,15 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

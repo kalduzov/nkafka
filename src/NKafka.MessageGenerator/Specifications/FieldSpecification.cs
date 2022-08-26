@@ -401,6 +401,53 @@ public class FieldSpecification
         throw new ArgumentException($"Unsupported field type {Type}");
     }
 
+    internal string FieldAbstractClrType(StructRegistry structRegistry)
+    {
+        switch (Type)
+        {
+            case IFieldType.BoolFieldType:
+            case IFieldType.Int8FieldType:
+            case IFieldType.Int16FieldType:
+            case IFieldType.UInt16FieldType:
+            case IFieldType.Int32FieldType:
+            case IFieldType.UInt32FieldType:
+            case IFieldType.Int64FieldType:
+            case IFieldType.UuidFieldType:
+            case IFieldType.Float64FieldType:
+            case IFieldType.StringFieldType:
+            case IFieldType.BytesFieldType:
+            case IFieldType.RecordsFieldType:
+                return Type.ClrName;
+            case IFieldType.StructType:
+                return Type.ToString() + "Message";
+            case IFieldType.ArrayType arrayType:
+            {
+                if (structRegistry.IsStructArrayWithKeys(this))
+                {
+                    return CollectionType(arrayType.ElementType.ToString());
+                }
+
+                if (arrayType.IsStructArray)
+                {
+                    return $"List<{arrayType.ElementType.ClrName}Message>";
+                }
+                else
+                {
+                    return $"List<{arrayType.ElementType.ClrName}>";
+                }
+            }
+            default:
+            {
+                throw new Exception($"Unknown field type {Type}");
+            }
+        }
+    }
+
+    internal static string CollectionType(string baseType)
+    {
+        return baseType + "Collection";
+    }
+
     private void ValidateNullDefault()
     {
         if (!NullableVersions.Contains(Versions))

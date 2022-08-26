@@ -39,7 +39,7 @@ public sealed class DescribeClusterRequestMessage: RequestMessage
     /// <summary>
     /// Whether to include cluster authorized operations.
     /// </summary>
-    public bool IncludeClusterAuthorizedOperationsMessage { get; set; } = false;
+    public bool IncludeClusterAuthorizedOperations { get; set; } = false;
 
     public DescribeClusterRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class DescribeClusterRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

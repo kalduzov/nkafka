@@ -39,12 +39,11 @@ public sealed class ProduceResponseMessage: ResponseMessage
     /// <summary>
     /// Each produce response
     /// </summary>
-    public List<TopicProduceResponseMessage> ResponsesMessage { get; set; } = new ();
+    public TopicProduceResponseCollection Responses { get; set; } = new ();
 
 
     public ProduceResponseMessage()
     {
-        ApiKey = ApiKeys.Produce;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
     }
@@ -53,36 +52,34 @@ public sealed class ProduceResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.Produce;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicProduceResponseMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Each partition that we produced to within the topic.
         /// </summary>
-        public List<PartitionProduceResponseMessage> PartitionResponsesMessage { get; set; } = new ();
+        public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new ();
 
         public TopicProduceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public TopicProduceResponseMessage(BufferReader reader, ApiVersions version)
@@ -90,17 +87,16 @@ public sealed class ProduceResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionProduceResponseMessage: Message
@@ -108,42 +104,42 @@ public sealed class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int IndexMessage { get; set; } = 0;
+        public int Index { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The base offset.
         /// </summary>
-        public long BaseOffsetMessage { get; set; } = 0;
+        public long BaseOffset { get; set; } = 0;
 
         /// <summary>
         /// The timestamp returned by broker after appending the messages. If CreateTime is used for the topic, the timestamp will be -1.  If LogAppendTime is used for the topic, the timestamp will be the broker local time when the messages are appended.
         /// </summary>
-        public long LogAppendTimeMsMessage { get; set; } = -1;
+        public long LogAppendTimeMs { get; set; } = -1;
 
         /// <summary>
         /// The log start offset.
         /// </summary>
-        public long LogStartOffsetMessage { get; set; } = -1;
+        public long LogStartOffset { get; set; } = -1;
 
         /// <summary>
         /// The batch indices of records that caused the batch to be dropped
         /// </summary>
-        public List<BatchIndexAndErrorMessageMessage> RecordErrorsMessage { get; set; } = new ();
+        public List<BatchIndexAndErrorMessageMessage> RecordErrors { get; set; } = new ();
 
         /// <summary>
         /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
         /// </summary>
-        public string? ErrorMessageMessage { get; set; } = null;
+        public string ErrorMessage { get; set; } = null;
 
         public PartitionProduceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public PartitionProduceResponseMessage(BufferReader reader, ApiVersions version)
@@ -151,17 +147,16 @@ public sealed class ProduceResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class BatchIndexAndErrorMessageMessage: Message
@@ -169,34 +164,37 @@ public sealed class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The batch index of the record that cause the batch to be dropped
         /// </summary>
-        public int BatchIndexMessage { get; set; } = 0;
+        public int BatchIndex { get; set; } = 0;
 
         /// <summary>
         /// The error message of the record that caused the batch to be dropped
         /// </summary>
-        public string BatchIndexErrorMessageMessage { get; set; } = null;
+        public string BatchIndexErrorMessage { get; set; } = null;
 
         public BatchIndexAndErrorMessageMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version8;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version8;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class TopicProduceResponseCollection: HashSet<TopicProduceResponseMessage>
+    {
     }
 }

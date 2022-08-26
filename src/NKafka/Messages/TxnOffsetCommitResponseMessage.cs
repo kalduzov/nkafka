@@ -39,11 +39,10 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public List<TxnOffsetCommitResponseTopicMessage> TopicsMessage { get; set; } = new ();
+    public List<TxnOffsetCommitResponseTopicMessage> Topics { get; set; } = new ();
 
     public TxnOffsetCommitResponseMessage()
     {
-        ApiKey = ApiKeys.TxnOffsetCommit;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -52,36 +51,34 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.TxnOffsetCommit;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TxnOffsetCommitResponseTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public List<TxnOffsetCommitResponsePartitionMessage> PartitionsMessage { get; set; } = new ();
+        public List<TxnOffsetCommitResponsePartitionMessage> Partitions { get; set; } = new ();
 
         public TxnOffsetCommitResponseTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitResponseTopicMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +86,16 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class TxnOffsetCommitResponsePartitionMessage: Message
@@ -107,17 +103,17 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public TxnOffsetCommitResponsePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitResponsePartitionMessage(BufferReader reader, ApiVersions version)
@@ -125,16 +121,15 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

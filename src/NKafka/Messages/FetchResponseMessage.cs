@@ -39,21 +39,20 @@ public sealed class FetchResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The fetch session ID, or 0 if this is not part of a fetch session.
     /// </summary>
-    public int SessionIdMessage { get; set; } = 0;
+    public int SessionId { get; set; } = 0;
 
     /// <summary>
     /// The response topics.
     /// </summary>
-    public List<FetchableTopicResponseMessage> ResponsesMessage { get; set; } = new ();
+    public List<FetchableTopicResponseMessage> Responses { get; set; } = new ();
 
     public FetchResponseMessage()
     {
-        ApiKey = ApiKeys.Fetch;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version13;
     }
@@ -62,41 +61,39 @@ public sealed class FetchResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.Fetch;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version13;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class FetchableTopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicMessage { get; set; } = "";
+        public string Topic { get; set; } = "";
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The topic partitions.
         /// </summary>
-        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new ();
 
         public FetchableTopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public FetchableTopicResponseMessage(BufferReader reader, ApiVersions version)
@@ -104,17 +101,16 @@ public sealed class FetchResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionDataMessage: Message
@@ -122,62 +118,62 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no fetch error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The current high water mark.
         /// </summary>
-        public long HighWatermarkMessage { get; set; } = 0;
+        public long HighWatermark { get; set; } = 0;
 
         /// <summary>
         /// The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)
         /// </summary>
-        public long LastStableOffsetMessage { get; set; } = -1;
+        public long LastStableOffset { get; set; } = -1;
 
         /// <summary>
         /// The current log start offset.
         /// </summary>
-        public long LogStartOffsetMessage { get; set; } = -1;
+        public long LogStartOffset { get; set; } = -1;
 
         /// <summary>
         /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
         /// </summary>
-        public List<EpochEndOffset> DivergingEpochMessage { get; set; } = new ();
+        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new ();
 
         /// <summary>
         /// 
         /// </summary>
-        public List<LeaderIdAndEpoch> CurrentLeaderMessage { get; set; } = new ();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
         /// <summary>
         /// In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request.
         /// </summary>
-        public List<SnapshotId> SnapshotIdMessage { get; set; } = new ();
+        public SnapshotIdMessage SnapshotId { get; set; } = new ();
 
         /// <summary>
         /// The aborted transactions.
         /// </summary>
-        public List<AbortedTransactionMessage> AbortedTransactionsMessage { get; set; } = new ();
+        public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new ();
 
         /// <summary>
         /// The preferred read replica for the consumer to use on its next fetch request
         /// </summary>
-        public int PreferredReadReplicaMessage { get; set; } = -1;
+        public int PreferredReadReplica { get; set; } = -1;
 
         /// <summary>
         /// The record data.
         /// </summary>
-        public RecordBatch RecordsMessage { get; set; } = null;
+        public RecordBatch Records { get; set; } = null;
 
         public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
@@ -185,17 +181,16 @@ public sealed class FetchResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class EpochEndOffsetMessage: Message
@@ -203,35 +198,34 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public int EpochMessage { get; set; } = -1;
+        public int Epoch { get; set; } = -1;
 
         /// <summary>
         /// 
         /// </summary>
-        public long EndOffsetMessage { get; set; } = -1;
+        public long EndOffset { get; set; } = -1;
 
         public EpochEndOffsetMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class LeaderIdAndEpochMessage: Message
@@ -239,35 +233,34 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
         /// </summary>
-        public int LeaderIdMessage { get; set; } = -1;
+        public int LeaderId { get; set; } = -1;
 
         /// <summary>
         /// The latest known leader epoch
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = -1;
+        public int LeaderEpoch { get; set; } = -1;
 
         public LeaderIdAndEpochMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public LeaderIdAndEpochMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class SnapshotIdMessage: Message
@@ -275,35 +268,34 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public long EndOffsetMessage { get; set; } = -1;
+        public long EndOffset { get; set; } = -1;
 
         /// <summary>
         /// 
         /// </summary>
-        public int EpochMessage { get; set; } = -1;
+        public int Epoch { get; set; } = -1;
 
         public SnapshotIdMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public SnapshotIdMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class AbortedTransactionMessage: Message
@@ -311,34 +303,33 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The producer id associated with the aborted transaction.
         /// </summary>
-        public long ProducerIdMessage { get; set; } = 0;
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The first offset in the aborted transaction.
         /// </summary>
-        public long FirstOffsetMessage { get; set; } = 0;
+        public long FirstOffset { get; set; } = 0;
 
         public AbortedTransactionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version4;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
         public AbortedTransactionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version4;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

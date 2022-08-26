@@ -39,17 +39,17 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
     /// <summary>
     /// The name or topic ID of the topic
     /// </summary>
-    public List<DeleteTopicStateMessage> TopicsMessage { get; set; } = new ();
+    public List<DeleteTopicStateMessage> Topics { get; set; } = new ();
 
     /// <summary>
     /// The names of the topics to delete
     /// </summary>
-    public List<string> TopicNamesMessage { get; set; } = new ();
+    public List<string> TopicNames { get; set; } = new ();
 
     /// <summary>
     /// The length of time in milliseconds to wait for the deletions to complete.
     /// </summary>
-    public int TimeoutMsMessage { get; set; } = 0;
+    public int TimeoutMs { get; set; } = 0;
 
     public DeleteTopicsRequestMessage()
     {
@@ -67,48 +67,46 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DeleteTopicStateMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string NameMessage { get; set; } = null;
+        public string Name { get; set; } = null;
 
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Guid TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         public DeleteTopicStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version6;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public DeleteTopicStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version6;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

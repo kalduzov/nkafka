@@ -39,7 +39,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
     /// <summary>
     /// The alterations to make for each directory.
     /// </summary>
-    public List<AlterReplicaLogDirMessage> DirsMessage { get; set; } = new ();
+    public AlterReplicaLogDirCollection Dirs { get; set; } = new ();
 
     public AlterReplicaLogDirsRequestMessage()
     {
@@ -57,31 +57,30 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AlterReplicaLogDirMessage: Message
     {
         /// <summary>
         /// The absolute directory path.
         /// </summary>
-        public Dictionary<string,> PathMessage { get; set; } = "";
+        public string Path { get; set; } = "";
 
         /// <summary>
         /// The topics to add to the directory.
         /// </summary>
-        public List<AlterReplicaLogDirTopicMessage> TopicsMessage { get; set; } = new ();
+        public AlterReplicaLogDirTopicCollection Topics { get; set; } = new ();
 
         public AlterReplicaLogDirMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +88,16 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class AlterReplicaLogDirTopicMessage: Message
@@ -107,17 +105,17 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public List<int> PartitionsMessage { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new ();
 
         public AlterReplicaLogDirTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirTopicMessage(BufferReader reader, ApiVersions version)
@@ -125,16 +123,23 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class AlterReplicaLogDirTopicCollection: HashSet<AlterReplicaLogDirTopicMessage>
+    {
+    }
+
+    public sealed class AlterReplicaLogDirCollection: HashSet<AlterReplicaLogDirMessage>
+    {
     }
 }

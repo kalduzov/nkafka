@@ -39,11 +39,10 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each ACL creation.
     /// </summary>
-    public List<AclCreationResultMessage> ResultsMessage { get; set; } = new ();
+    public List<AclCreationResultMessage> Results { get; set; } = new ();
 
     public CreateAclsResponseMessage()
     {
-        ApiKey = ApiKeys.CreateAcls;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -52,36 +51,34 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.CreateAcls;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AclCreationResultMessage: Message
     {
         /// <summary>
         /// The result error, or zero if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         public AclCreationResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public AclCreationResultMessage(BufferReader reader, ApiVersions version)
@@ -89,16 +86,15 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

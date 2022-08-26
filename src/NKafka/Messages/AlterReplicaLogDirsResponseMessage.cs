@@ -39,11 +39,10 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AlterReplicaLogDirTopicResultMessage> ResultsMessage { get; set; } = new ();
+    public List<AlterReplicaLogDirTopicResultMessage> Results { get; set; } = new ();
 
     public AlterReplicaLogDirsResponseMessage()
     {
-        ApiKey = ApiKeys.AlterReplicaLogDirs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -52,36 +51,34 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterReplicaLogDirs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AlterReplicaLogDirTopicResultMessage: Message
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The results for each partition.
         /// </summary>
-        public List<AlterReplicaLogDirPartitionResultMessage> PartitionsMessage { get; set; } = new ();
+        public List<AlterReplicaLogDirPartitionResultMessage> Partitions { get; set; } = new ();
 
         public AlterReplicaLogDirTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +86,16 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class AlterReplicaLogDirPartitionResultMessage: Message
@@ -107,17 +103,17 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public AlterReplicaLogDirPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersions version)
@@ -125,16 +121,15 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

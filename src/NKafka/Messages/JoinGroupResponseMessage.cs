@@ -39,46 +39,45 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The generation ID of the group.
     /// </summary>
-    public int GenerationIdMessage { get; set; } = -1;
+    public int GenerationId { get; set; } = -1;
 
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string? ProtocolTypeMessage { get; set; } = null;
+    public string ProtocolType { get; set; } = null;
 
     /// <summary>
     /// The group protocol selected by the coordinator.
     /// </summary>
-    public string ProtocolNameMessage { get; set; } = "";
+    public string ProtocolName { get; set; } = "";
 
     /// <summary>
     /// The leader of the group.
     /// </summary>
-    public string LeaderMessage { get; set; } = "";
+    public string Leader { get; set; } = "";
 
     /// <summary>
     /// True if the leader must skip running the assignment.
     /// </summary>
-    public bool SkipAssignmentMessage { get; set; } = false;
+    public bool SkipAssignment { get; set; } = false;
 
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string MemberIdMessage { get; set; } = "";
+    public string MemberId { get; set; } = "";
 
     /// <summary>
     /// 
     /// </summary>
-    public List<JoinGroupResponseMemberMessage> MembersMessage { get; set; } = new ();
+    public List<JoinGroupResponseMemberMessage> Members { get; set; } = new ();
 
     public JoinGroupResponseMessage()
     {
-        ApiKey = ApiKeys.JoinGroup;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
     }
@@ -87,41 +86,39 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.JoinGroup;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version9;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class JoinGroupResponseMemberMessage: Message
     {
         /// <summary>
         /// The group member ID.
         /// </summary>
-        public string MemberIdMessage { get; set; } = "";
+        public string MemberId { get; set; } = "";
 
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
         /// </summary>
-        public string GroupInstanceIdMessage { get; set; } = null;
+        public string GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The group member metadata.
         /// </summary>
-        public byte[] MetadataMessage { get; set; } = Array.Empty<byte>();
+        public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
         public JoinGroupResponseMemberMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public JoinGroupResponseMemberMessage(BufferReader reader, ApiVersions version)
@@ -129,16 +126,15 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

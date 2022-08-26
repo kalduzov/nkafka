@@ -39,17 +39,17 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
     /// <summary>
     /// The resources whose configurations we want to describe.
     /// </summary>
-    public List<DescribeConfigsResourceMessage> ResourcesMessage { get; set; } = new ();
+    public List<DescribeConfigsResourceMessage> Resources { get; set; } = new ();
 
     /// <summary>
     /// True if we should include all synonyms.
     /// </summary>
-    public bool IncludeSynonymsMessage { get; set; } = false;
+    public bool IncludeSynonyms { get; set; } = false;
 
     /// <summary>
     /// True if we should include configuration documentation.
     /// </summary>
-    public bool IncludeDocumentationMessage { get; set; } = false;
+    public bool IncludeDocumentation { get; set; } = false;
 
     public DescribeConfigsRequestMessage()
     {
@@ -67,36 +67,35 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribeConfigsResourceMessage: Message
     {
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceTypeMessage { get; set; } = 0;
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceNameMessage { get; set; } = "";
+        public string ResourceName { get; set; } = "";
 
         /// <summary>
         /// The configuration keys to list, or null to list all configuration keys.
         /// </summary>
-        public List<string> ConfigurationKeysMessage { get; set; } = new ();
+        public List<string> ConfigurationKeys { get; set; } = new ();
 
         public DescribeConfigsResourceMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsResourceMessage(BufferReader reader, ApiVersions version)
@@ -104,16 +103,15 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

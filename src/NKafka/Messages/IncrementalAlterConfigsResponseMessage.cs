@@ -39,11 +39,10 @@ public sealed class IncrementalAlterConfigsResponseMessage: ResponseMessage
     /// <summary>
     /// The responses for each resource.
     /// </summary>
-    public List<AlterConfigsResourceResponseMessage> ResponsesMessage { get; set; } = new ();
+    public List<AlterConfigsResourceResponseMessage> Responses { get; set; } = new ();
 
     public IncrementalAlterConfigsResponseMessage()
     {
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -52,46 +51,44 @@ public sealed class IncrementalAlterConfigsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AlterConfigsResourceResponseMessage: Message
     {
         /// <summary>
         /// The resource error code.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The resource error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceTypeMessage { get; set; } = 0;
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceNameMessage { get; set; } = "";
+        public string ResourceName { get; set; } = "";
 
         public AlterConfigsResourceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersions version)
@@ -99,16 +96,15 @@ public sealed class IncrementalAlterConfigsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

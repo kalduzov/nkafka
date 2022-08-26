@@ -39,12 +39,12 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public string ClusterIdMessage { get; set; } = null;
+    public string ClusterId { get; set; } = null;
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new ();
 
     public EndQuorumEpochRequestMessage()
     {
@@ -62,31 +62,30 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicDataMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new ();
 
         public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TopicDataMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +93,16 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionDataMessage: Message
@@ -112,27 +110,27 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The current leader ID that is resigning
         /// </summary>
-        public int LeaderIdMessage { get; set; } = 0;
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The current epoch
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// A sorted list of preferred successors to start the election
         /// </summary>
-        public List<int> PreferredSuccessorsMessage { get; set; } = new ();
+        public List<int> PreferredSuccessors { get; set; } = new ();
 
         public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
@@ -140,16 +138,15 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

@@ -39,12 +39,12 @@ public sealed class RenewDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// The HMAC of the delegation token to be renewed.
     /// </summary>
-    public byte[] HmacMessage { get; set; } = Array.Empty<byte>();
+    public byte[] Hmac { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The renewal time period in milliseconds.
     /// </summary>
-    public long RenewPeriodMsMessage { get; set; } = 0;
+    public long RenewPeriodMs { get; set; } = 0;
 
     public RenewDelegationTokenRequestMessage()
     {
@@ -62,12 +62,11 @@ public sealed class RenewDelegationTokenRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

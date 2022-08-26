@@ -39,21 +39,20 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
     /// <summary>
     /// The message-level error code, 0 except for user authorization or infrastructure issues.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The message-level error message, if any.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// The results for descriptions, one per user.
     /// </summary>
-    public List<DescribeUserScramCredentialsResultMessage> ResultsMessage { get; set; } = new ();
+    public List<DescribeUserScramCredentialsResultMessage> Results { get; set; } = new ();
 
     public DescribeUserScramCredentialsResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeUserScramCredentials;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -62,46 +61,44 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeUserScramCredentials;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribeUserScramCredentialsResultMessage: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string UserMessage { get; set; } = "";
+        public string User { get; set; } = "";
 
         /// <summary>
         /// The user-level error code.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The user-level error message, if any.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         /// <summary>
         /// The mechanism and related information associated with the user's SCRAM credentials.
         /// </summary>
-        public List<CredentialInfoMessage> CredentialInfosMessage { get; set; } = new ();
+        public List<CredentialInfoMessage> CredentialInfos { get; set; } = new ();
 
         public DescribeUserScramCredentialsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public DescribeUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
@@ -109,17 +106,16 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class CredentialInfoMessage: Message
@@ -127,17 +123,17 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         /// <summary>
         /// The SCRAM mechanism.
         /// </summary>
-        public sbyte MechanismMessage { get; set; } = 0;
+        public sbyte Mechanism { get; set; } = 0;
 
         /// <summary>
         /// The number of iterations used in the SCRAM credential.
         /// </summary>
-        public int IterationsMessage { get; set; } = 0;
+        public int Iterations { get; set; } = 0;
 
         public CredentialInfoMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public CredentialInfoMessage(BufferReader reader, ApiVersions version)
@@ -145,16 +141,15 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

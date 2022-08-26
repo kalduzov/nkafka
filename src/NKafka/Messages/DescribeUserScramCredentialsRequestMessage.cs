@@ -39,7 +39,7 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
     /// <summary>
     /// The users to describe, or null/empty to describe all users.
     /// </summary>
-    public List<UserNameMessage> UsersMessage { get; set; } = new ();
+    public List<UserNameMessage> Users { get; set; } = new ();
 
     public DescribeUserScramCredentialsRequestMessage()
     {
@@ -57,26 +57,25 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class UserNameMessage: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         public UserNameMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public UserNameMessage(BufferReader reader, ApiVersions version)
@@ -84,16 +83,15 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

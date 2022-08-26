@@ -39,17 +39,17 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
     /// <summary>
     /// Each topic that we want to create new partitions inside.
     /// </summary>
-    public List<CreatePartitionsTopicMessage> TopicsMessage { get; set; } = new ();
+    public CreatePartitionsTopicCollection Topics { get; set; } = new ();
 
     /// <summary>
     /// The time in ms to wait for the partitions to be created.
     /// </summary>
-    public int TimeoutMsMessage { get; set; } = 0;
+    public int TimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// If true, then validate the request, but don't actually increase the number of partitions.
     /// </summary>
-    public bool ValidateOnlyMessage { get; set; } = false;
+    public bool ValidateOnly { get; set; } = false;
 
     public CreatePartitionsRequestMessage()
     {
@@ -67,36 +67,35 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class CreatePartitionsTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The new partition count.
         /// </summary>
-        public Dictionary<int,> CountMessage { get; set; } = 0;
+        public int Count { get; set; } = 0;
 
         /// <summary>
         /// The new partition assignments.
         /// </summary>
-        public List<CreatePartitionsAssignmentMessage> AssignmentsMessage { get; set; } = new ();
+        public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new ();
 
         public CreatePartitionsTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public CreatePartitionsTopicMessage(BufferReader reader, ApiVersions version)
@@ -104,17 +103,16 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class CreatePartitionsAssignmentMessage: Message
@@ -122,12 +120,12 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
         /// <summary>
         /// The assigned broker IDs.
         /// </summary>
-        public List<int> BrokerIdsMessage { get; set; } = new ();
+        public List<int> BrokerIds { get; set; } = new ();
 
         public CreatePartitionsAssignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public CreatePartitionsAssignmentMessage(BufferReader reader, ApiVersions version)
@@ -135,16 +133,19 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class CreatePartitionsTopicCollection: HashSet<CreatePartitionsTopicMessage>
+    {
     }
 }

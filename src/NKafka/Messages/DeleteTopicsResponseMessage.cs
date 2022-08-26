@@ -39,11 +39,10 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each topic we tried to delete.
     /// </summary>
-    public List<DeletableTopicResultMessage> ResponsesMessage { get; set; } = new ();
+    public DeletableTopicResultCollection Responses { get; set; } = new ();
 
     public DeleteTopicsResponseMessage()
     {
-        ApiKey = ApiKeys.DeleteTopics;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
     }
@@ -52,46 +51,44 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DeleteTopics;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DeletableTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// the unique topic ID
         /// </summary>
-        public Dictionary<Guid,> TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The deletion error, or 0 if the deletion succeeded.
         /// </summary>
-        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public Dictionary<string,>? ErrorMessageMessage { get; set; } = null;
+        public string ErrorMessage { get; set; } = null;
 
         public DeletableTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public DeletableTopicResultMessage(BufferReader reader, ApiVersions version)
@@ -99,16 +96,19 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class DeletableTopicResultCollection: HashSet<DeletableTopicResultMessage>
+    {
     }
 }

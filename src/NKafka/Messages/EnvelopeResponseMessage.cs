@@ -39,16 +39,15 @@ public sealed class EnvelopeResponseMessage: ResponseMessage
     /// <summary>
     /// The embedded response header and data.
     /// </summary>
-    public byte[] ResponseDataMessage { get; set; } = null;
+    public byte[] ResponseData { get; set; } = null;
 
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     public EnvelopeResponseMessage()
     {
-        ApiKey = ApiKeys.Envelope;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -57,17 +56,15 @@ public sealed class EnvelopeResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.Envelope;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

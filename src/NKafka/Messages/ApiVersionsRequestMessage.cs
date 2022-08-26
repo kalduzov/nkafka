@@ -39,12 +39,12 @@ public sealed class ApiVersionsRequestMessage: RequestMessage
     /// <summary>
     /// The name of the client.
     /// </summary>
-    public string ClientSoftwareNameMessage { get; set; } = "";
+    public string ClientSoftwareName { get; set; } = "";
 
     /// <summary>
     /// The version of the client.
     /// </summary>
-    public string ClientSoftwareVersionMessage { get; set; } = "";
+    public string ClientSoftwareVersion { get; set; } = "";
 
     public ApiVersionsRequestMessage()
     {
@@ -62,12 +62,11 @@ public sealed class ApiVersionsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

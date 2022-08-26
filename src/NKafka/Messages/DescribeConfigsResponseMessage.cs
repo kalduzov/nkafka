@@ -39,11 +39,10 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each resource.
     /// </summary>
-    public List<DescribeConfigsResultMessage> ResultsMessage { get; set; } = new ();
+    public List<DescribeConfigsResultMessage> Results { get; set; } = new ();
 
     public DescribeConfigsResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeConfigs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
@@ -52,51 +51,49 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeConfigs;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribeConfigsResultMessage: Message
     {
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if we were able to successfully describe the configurations.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         /// <summary>
         /// The resource type.
         /// </summary>
-        public sbyte ResourceTypeMessage { get; set; } = 0;
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceNameMessage { get; set; } = "";
+        public string ResourceName { get; set; } = "";
 
         /// <summary>
         /// Each listed configuration.
         /// </summary>
-        public List<DescribeConfigsResourceResultMessage> ConfigsMessage { get; set; } = new ();
+        public List<DescribeConfigsResourceResultMessage> Configs { get; set; } = new ();
 
         public DescribeConfigsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
@@ -104,17 +101,16 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class DescribeConfigsResourceResultMessage: Message
@@ -122,52 +118,52 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string ValueMessage { get; set; } = "";
+        public string Value { get; set; } = "";
 
         /// <summary>
         /// True if the configuration is read-only.
         /// </summary>
-        public bool ReadOnlyMessage { get; set; } = false;
+        public bool ReadOnly { get; set; } = false;
 
         /// <summary>
         /// True if the configuration is not set.
         /// </summary>
-        public bool IsDefaultMessage { get; set; } = false;
+        public bool IsDefault { get; set; } = false;
 
         /// <summary>
         /// The configuration source.
         /// </summary>
-        public sbyte ConfigSourceMessage { get; set; } = -1;
+        public sbyte ConfigSource { get; set; } = -1;
 
         /// <summary>
         /// True if this configuration is sensitive.
         /// </summary>
-        public bool IsSensitiveMessage { get; set; } = false;
+        public bool IsSensitive { get; set; } = false;
 
         /// <summary>
         /// The synonyms for this configuration key.
         /// </summary>
-        public List<DescribeConfigsSynonymMessage> SynonymsMessage { get; set; } = new ();
+        public List<DescribeConfigsSynonymMessage> Synonyms { get; set; } = new ();
 
         /// <summary>
         /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
         /// </summary>
-        public sbyte ConfigTypeMessage { get; set; } = 0;
+        public sbyte ConfigType { get; set; } = 0;
 
         /// <summary>
         /// The configuration documentation.
         /// </summary>
-        public string DocumentationMessage { get; set; } = "";
+        public string Documentation { get; set; } = "";
 
         public DescribeConfigsResourceResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
@@ -175,17 +171,16 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class DescribeConfigsSynonymMessage: Message
@@ -193,39 +188,38 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The synonym name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The synonym value.
         /// </summary>
-        public string ValueMessage { get; set; } = "";
+        public string Value { get; set; } = "";
 
         /// <summary>
         /// The synonym source.
         /// </summary>
-        public sbyte SourceMessage { get; set; } = 0;
+        public sbyte Source { get; set; } = 0;
 
         public DescribeConfigsSynonymMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version1;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

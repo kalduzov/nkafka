@@ -39,7 +39,7 @@ public sealed class ListGroupsRequestMessage: RequestMessage
     /// <summary>
     /// The states of the groups we want to list. If empty all groups are returned with their state.
     /// </summary>
-    public List<string> StatesFilterMessage { get; set; } = new ();
+    public List<string> StatesFilter { get; set; } = new ();
 
     public ListGroupsRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class ListGroupsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

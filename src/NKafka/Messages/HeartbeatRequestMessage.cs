@@ -39,22 +39,22 @@ public sealed class HeartbeatRequestMessage: RequestMessage
     /// <summary>
     /// The group id.
     /// </summary>
-    public string GroupIdMessage { get; set; } = "";
+    public string GroupId { get; set; } = "";
 
     /// <summary>
     /// The generation of the group.
     /// </summary>
-    public int GenerationIdMessage { get; set; } = 0;
+    public int GenerationId { get; set; } = 0;
 
     /// <summary>
     /// The member ID.
     /// </summary>
-    public string MemberIdMessage { get; set; } = "";
+    public string MemberId { get; set; } = "";
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceIdMessage { get; set; } = null;
+    public string GroupInstanceId { get; set; } = null;
 
     public HeartbeatRequestMessage()
     {
@@ -72,12 +72,11 @@ public sealed class HeartbeatRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

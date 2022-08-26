@@ -39,11 +39,10 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
     /// <summary>
     /// Each described group.
     /// </summary>
-    public List<DescribedGroupMessage> GroupsMessage { get; set; } = new ();
+    public List<DescribedGroupMessage> Groups { get; set; } = new ();
 
     public DescribeGroupsResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeGroups;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }
@@ -52,61 +51,59 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeGroups;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribedGroupMessage: Message
     {
         /// <summary>
         /// The describe error, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The group ID string.
         /// </summary>
-        public string GroupIdMessage { get; set; } = "";
+        public string GroupId { get; set; } = "";
 
         /// <summary>
         /// The group state string, or the empty string.
         /// </summary>
-        public string GroupStateMessage { get; set; } = "";
+        public string GroupState { get; set; } = "";
 
         /// <summary>
         /// The group protocol type, or the empty string.
         /// </summary>
-        public string ProtocolTypeMessage { get; set; } = "";
+        public string ProtocolType { get; set; } = "";
 
         /// <summary>
         /// The group protocol data, or the empty string.
         /// </summary>
-        public string ProtocolDataMessage { get; set; } = "";
+        public string ProtocolData { get; set; } = "";
 
         /// <summary>
         /// The group members.
         /// </summary>
-        public List<DescribedGroupMemberMessage> MembersMessage { get; set; } = new ();
+        public List<DescribedGroupMemberMessage> Members { get; set; } = new ();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this group.
         /// </summary>
-        public int AuthorizedOperationsMessage { get; set; } = -2147483648;
+        public int AuthorizedOperations { get; set; } = -2147483648;
 
         public DescribedGroupMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public DescribedGroupMessage(BufferReader reader, ApiVersions version)
@@ -114,17 +111,16 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class DescribedGroupMemberMessage: Message
@@ -132,37 +128,37 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         /// <summary>
         /// The member ID assigned by the group coordinator.
         /// </summary>
-        public string MemberIdMessage { get; set; } = "";
+        public string MemberId { get; set; } = "";
 
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
         /// </summary>
-        public string? GroupInstanceIdMessage { get; set; } = null;
+        public string GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The client ID used in the member's latest join group request.
         /// </summary>
-        public string ClientIdMessage { get; set; } = "";
+        public string ClientId { get; set; } = "";
 
         /// <summary>
         /// The client host.
         /// </summary>
-        public string ClientHostMessage { get; set; } = "";
+        public string ClientHost { get; set; } = "";
 
         /// <summary>
         /// The metadata corresponding to the current group protocol in use.
         /// </summary>
-        public byte[] MemberMetadataMessage { get; set; } = Array.Empty<byte>();
+        public byte[] MemberMetadata { get; set; } = Array.Empty<byte>();
 
         /// <summary>
         /// The current assignment provided by the group leader.
         /// </summary>
-        public byte[] MemberAssignmentMessage { get; set; } = Array.Empty<byte>();
+        public byte[] MemberAssignment { get; set; } = Array.Empty<byte>();
 
         public DescribedGroupMemberMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public DescribedGroupMemberMessage(BufferReader reader, ApiVersions version)
@@ -170,16 +166,15 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

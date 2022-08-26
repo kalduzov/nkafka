@@ -39,21 +39,20 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code, or `0` if there was no top-level error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// Results for each feature update.
     /// </summary>
-    public List<UpdatableFeatureResultMessage> ResultsMessage { get; set; } = new ();
+    public UpdatableFeatureResultCollection Results { get; set; } = new ();
 
     public UpdateFeaturesResponseMessage()
     {
-        ApiKey = ApiKeys.UpdateFeatures;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
@@ -62,41 +61,39 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.UpdateFeatures;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class UpdatableFeatureResultMessage: Message
     {
         /// <summary>
         /// The name of the finalized feature.
         /// </summary>
-        public Dictionary<string,> FeatureMessage { get; set; } = "";
+        public string Feature { get; set; } = "";
 
         /// <summary>
         /// The feature update error code or `0` if the feature update succeeded.
         /// </summary>
-        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The feature update error, or `null` if the feature update succeeded.
         /// </summary>
-        public Dictionary<string,> ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         public UpdatableFeatureResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public UpdatableFeatureResultMessage(BufferReader reader, ApiVersions version)
@@ -104,16 +101,19 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class UpdatableFeatureResultCollection: HashSet<UpdatableFeatureResultMessage>
+    {
     }
 }

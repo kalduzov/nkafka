@@ -39,17 +39,17 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
     /// <summary>
     /// Type of elections to conduct for the partition. A value of '0' elects the preferred replica. A value of '1' elects the first live replica if there are no in-sync replica.
     /// </summary>
-    public sbyte ElectionTypeMessage { get; set; } = 0;
+    public sbyte ElectionType { get; set; } = 0;
 
     /// <summary>
     /// The topic partitions to elect leaders.
     /// </summary>
-    public List<TopicPartitionsMessage> TopicPartitionsMessage { get; set; } = new ();
+    public TopicPartitionsCollection TopicPartitions { get; set; } = new ();
 
     /// <summary>
     /// The time in ms to wait for the election to complete.
     /// </summary>
-    public int TimeoutMsMessage { get; set; } = 60000;
+    public int TimeoutMs { get; set; } = 60000;
 
     public ElectLeadersRequestMessage()
     {
@@ -67,31 +67,30 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicPartitionsMessage: Message
     {
         /// <summary>
         /// The name of a topic.
         /// </summary>
-        public Dictionary<string,> TopicMessage { get; set; } = "";
+        public string Topic { get; set; } = "";
 
         /// <summary>
         /// The partitions of this topic whose leader should be elected.
         /// </summary>
-        public List<int> PartitionsMessage { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new ();
 
         public TopicPartitionsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public TopicPartitionsMessage(BufferReader reader, ApiVersions version)
@@ -99,16 +98,19 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class TopicPartitionsCollection: HashSet<TopicPartitionsMessage>
+    {
     }
 }

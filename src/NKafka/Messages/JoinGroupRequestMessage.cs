@@ -39,42 +39,42 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The group identifier.
     /// </summary>
-    public string GroupIdMessage { get; set; } = "";
+    public string GroupId { get; set; } = "";
 
     /// <summary>
     /// The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds.
     /// </summary>
-    public int SessionTimeoutMsMessage { get; set; } = 0;
+    public int SessionTimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// The maximum time in milliseconds that the coordinator will wait for each member to rejoin when rebalancing the group.
     /// </summary>
-    public int RebalanceTimeoutMsMessage { get; set; } = -1;
+    public int RebalanceTimeoutMs { get; set; } = -1;
 
     /// <summary>
     /// The member id assigned by the group coordinator.
     /// </summary>
-    public string MemberIdMessage { get; set; } = "";
+    public string MemberId { get; set; } = "";
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceIdMessage { get; set; } = null;
+    public string GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// The unique name the for class of protocols implemented by the group we want to join.
     /// </summary>
-    public string ProtocolTypeMessage { get; set; } = "";
+    public string ProtocolType { get; set; } = "";
 
     /// <summary>
     /// The list of protocols that the member supports.
     /// </summary>
-    public List<JoinGroupRequestProtocolMessage> ProtocolsMessage { get; set; } = new ();
+    public JoinGroupRequestProtocolCollection Protocols { get; set; } = new ();
 
     /// <summary>
     /// The reason why the member (re-)joins the group.
     /// </summary>
-    public string? ReasonMessage { get; set; } = null;
+    public string Reason { get; set; } = null;
 
     public JoinGroupRequestMessage()
     {
@@ -92,31 +92,30 @@ public sealed class JoinGroupRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version9;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class JoinGroupRequestProtocolMessage: Message
     {
         /// <summary>
         /// The protocol name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The protocol metadata.
         /// </summary>
-        public Dictionary<byte[],> MetadataMessage { get; set; } = Array.Empty<byte>();
+        public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
         public JoinGroupRequestProtocolMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
         public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersions version)
@@ -124,16 +123,19 @@ public sealed class JoinGroupRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class JoinGroupRequestProtocolCollection: HashSet<JoinGroupRequestProtocolMessage>
+    {
     }
 }

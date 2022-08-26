@@ -39,26 +39,25 @@ public sealed class SaslAuthenticateResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
     /// </summary>
-    public byte[] AuthBytesMessage { get; set; } = Array.Empty<byte>();
+    public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
     /// </summary>
-    public long SessionLifetimeMsMessage { get; set; } = 0;
+    public long SessionLifetimeMs { get; set; } = 0;
 
     public SaslAuthenticateResponseMessage()
     {
-        ApiKey = ApiKeys.SaslAuthenticate;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -67,17 +66,15 @@ public sealed class SaslAuthenticateResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.SaslAuthenticate;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

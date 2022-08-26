@@ -39,17 +39,17 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
     /// <summary>
     /// The topics to create.
     /// </summary>
-    public List<CreatableTopicMessage> TopicsMessage { get; set; } = new ();
+    public CreatableTopicCollection Topics { get; set; } = new ();
 
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
     /// </summary>
-    public int timeoutMsMessage { get; set; } = 60000;
+    public int timeoutMs { get; set; } = 60000;
 
     /// <summary>
     /// If true, check that the topics can be created as specified, but don't create anything.
     /// </summary>
-    public bool validateOnlyMessage { get; set; } = false;
+    public bool validateOnly { get; set; } = false;
 
     public CreateTopicsRequestMessage()
     {
@@ -67,46 +67,45 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version7;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class CreatableTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The number of partitions to create in the topic, or -1 if we are either specifying a manual partition assignment or using the default partitions.
         /// </summary>
-        public Dictionary<int,> NumPartitionsMessage { get; set; } = 0;
+        public int NumPartitions { get; set; } = 0;
 
         /// <summary>
         /// The number of replicas to create for each partition in the topic, or -1 if we are either specifying a manual partition assignment or using the default replication factor.
         /// </summary>
-        public Dictionary<short,> ReplicationFactorMessage { get; set; } = 0;
+        public short ReplicationFactor { get; set; } = 0;
 
         /// <summary>
         /// The manual partition assignment, or the empty array if we are using automatic assignment.
         /// </summary>
-        public List<CreatableReplicaAssignmentMessage> AssignmentsMessage { get; set; } = new ();
+        public CreatableReplicaAssignmentCollection Assignments { get; set; } = new ();
 
         /// <summary>
         /// The custom topic configurations to set.
         /// </summary>
-        public List<CreateableTopicConfigMessage> ConfigsMessage { get; set; } = new ();
+        public CreateableTopicConfigCollection Configs { get; set; } = new ();
 
         public CreatableTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreatableTopicMessage(BufferReader reader, ApiVersions version)
@@ -114,17 +113,16 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class CreatableReplicaAssignmentMessage: Message
@@ -132,17 +130,17 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public Dictionary<int,> PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The brokers to place the partition on.
         /// </summary>
-        public List<int> BrokerIdsMessage { get; set; } = new ();
+        public List<int> BrokerIds { get; set; } = new ();
 
         public CreatableReplicaAssignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersions version)
@@ -150,17 +148,20 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class CreatableReplicaAssignmentCollection: HashSet<CreatableReplicaAssignmentMessage>
+    {
     }
 
     public sealed class CreateableTopicConfigMessage: Message
@@ -168,17 +169,17 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public Dictionary<string,> ValueMessage { get; set; } = "";
+        public string Value { get; set; } = "";
 
         public CreateableTopicConfigMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreateableTopicConfigMessage(BufferReader reader, ApiVersions version)
@@ -186,16 +187,23 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
+    {
+    }
+
+    public sealed class CreatableTopicCollection: HashSet<CreatableTopicMessage>
+    {
     }
 }

@@ -56,10 +56,10 @@ public abstract class Message
     /// <summary>
     /// Writes out this message to the given stream.
     /// </summary>
-    public abstract void Write(BufferWriter writer, ApiVersions version);
+    internal abstract void Write(BufferWriter writer, ApiVersions version);
 
     /// <summary>
     /// Reads this message from the given BufferReader. This will overwrite all relevant fields with information from the byte buffer.
     /// </summary>
-    public abstract void Read(BufferReader reader, ApiVersions version);
+    internal abstract void Read(BufferReader reader, ApiVersions version);
 }

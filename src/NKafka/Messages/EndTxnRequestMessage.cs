@@ -39,22 +39,22 @@ public sealed class EndTxnRequestMessage: RequestMessage
     /// <summary>
     /// The ID of the transaction to end.
     /// </summary>
-    public string TransactionalIdMessage { get; set; } = "";
+    public string TransactionalId { get; set; } = "";
 
     /// <summary>
     /// The producer ID.
     /// </summary>
-    public long ProducerIdMessage { get; set; } = 0;
+    public long ProducerId { get; set; } = 0;
 
     /// <summary>
     /// The current epoch associated with the producer.
     /// </summary>
-    public short ProducerEpochMessage { get; set; } = 0;
+    public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// True if the transaction was committed, false if it was aborted.
     /// </summary>
-    public bool CommittedMessage { get; set; } = false;
+    public bool Committed { get; set; } = false;
 
     public EndTxnRequestMessage()
     {
@@ -72,12 +72,11 @@ public sealed class EndTxnRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

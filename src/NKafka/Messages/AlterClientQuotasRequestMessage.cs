@@ -39,12 +39,12 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public List<EntryDataMessage> EntriesMessage { get; set; } = new ();
+    public List<EntryDataMessage> Entries { get; set; } = new ();
 
     /// <summary>
     /// Whether the alteration should be validated, but not performed.
     /// </summary>
-    public bool ValidateOnlyMessage { get; set; } = false;
+    public bool ValidateOnly { get; set; } = false;
 
     public AlterClientQuotasRequestMessage()
     {
@@ -62,31 +62,30 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class EntryDataMessage: Message
     {
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
-        public List<EntityDataMessage> EntityMessage { get; set; } = new ();
+        public List<EntityDataMessage> Entity { get; set; } = new ();
 
         /// <summary>
         /// An individual quota configuration entry to alter.
         /// </summary>
-        public List<OpDataMessage> OpsMessage { get; set; } = new ();
+        public List<OpDataMessage> Ops { get; set; } = new ();
 
         public EntryDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntryDataMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +93,16 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class EntityDataMessage: Message
@@ -112,17 +110,17 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityTypeMessage { get; set; } = "";
+        public string EntityType { get; set; } = "";
 
         /// <summary>
         /// The name of the entity, or null if the default.
         /// </summary>
-        public string EntityNameMessage { get; set; } = "";
+        public string EntityName { get; set; } = "";
 
         public EntityDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntityDataMessage(BufferReader reader, ApiVersions version)
@@ -130,17 +128,16 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class OpDataMessage: Message
@@ -148,22 +145,22 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string KeyMessage { get; set; } = "";
+        public string Key { get; set; } = "";
 
         /// <summary>
         /// The value to set, otherwise ignored if the value is to be removed.
         /// </summary>
-        public double ValueMessage { get; set; } = 0.0;
+        public double Value { get; set; } = 0.0;
 
         /// <summary>
         /// Whether the quota configuration value should be removed, otherwise set.
         /// </summary>
-        public bool RemoveMessage { get; set; } = false;
+        public bool Remove { get; set; } = false;
 
         public OpDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public OpDataMessage(BufferReader reader, ApiVersions version)
@@ -171,16 +168,15 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

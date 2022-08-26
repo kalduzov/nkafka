@@ -39,21 +39,20 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
     /// <summary>
     /// 
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// Set of state filters provided in the request which were unknown to the transaction coordinator
     /// </summary>
-    public List<string> UnknownStateFiltersMessage { get; set; } = new ();
+    public List<string> UnknownStateFilters { get; set; } = new ();
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionStateMessage> TransactionStatesMessage { get; set; } = new ();
+    public List<TransactionStateMessage> TransactionStates { get; set; } = new ();
 
     public ListTransactionsResponseMessage()
     {
-        ApiKey = ApiKeys.ListTransactions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -62,41 +61,39 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ListTransactions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TransactionStateMessage: Message
     {
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionalIdMessage { get; set; } = "";
+        public string TransactionalId { get; set; } = "";
 
         /// <summary>
         /// 
         /// </summary>
-        public long ProducerIdMessage { get; set; } = 0;
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The current transaction state of the producer
         /// </summary>
-        public string TransactionStateMessage { get; set; } = "";
+        public string TransactionState { get; set; } = "";
 
         public TransactionStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TransactionStateMessage(BufferReader reader, ApiVersions version)
@@ -104,16 +101,15 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

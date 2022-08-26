@@ -39,27 +39,27 @@ public sealed class BrokerHeartbeatRequestMessage: RequestMessage
     /// <summary>
     /// The broker ID.
     /// </summary>
-    public int BrokerIdMessage { get; set; } = 0;
+    public int BrokerId { get; set; } = 0;
 
     /// <summary>
     /// The broker epoch.
     /// </summary>
-    public long BrokerEpochMessage { get; set; } = -1;
+    public long BrokerEpoch { get; set; } = -1;
 
     /// <summary>
     /// The highest metadata offset which the broker has reached.
     /// </summary>
-    public long CurrentMetadataOffsetMessage { get; set; } = 0;
+    public long CurrentMetadataOffset { get; set; } = 0;
 
     /// <summary>
     /// True if the broker wants to be fenced, false otherwise.
     /// </summary>
-    public bool WantFenceMessage { get; set; } = false;
+    public bool WantFence { get; set; } = false;
 
     /// <summary>
     /// True if the broker wants to be shut down, false otherwise.
     /// </summary>
-    public bool WantShutDownMessage { get; set; } = false;
+    public bool WantShutDown { get; set; } = false;
 
     public BrokerHeartbeatRequestMessage()
     {
@@ -77,12 +77,11 @@ public sealed class BrokerHeartbeatRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

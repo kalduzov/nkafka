@@ -39,7 +39,7 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
     /// <summary>
     /// The transaction markers to be written.
     /// </summary>
-    public List<WritableTxnMarkerMessage> MarkersMessage { get; set; } = new ();
+    public List<WritableTxnMarkerMessage> Markers { get; set; } = new ();
 
     public WriteTxnMarkersRequestMessage()
     {
@@ -57,46 +57,45 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class WritableTxnMarkerMessage: Message
     {
         /// <summary>
         /// The current producer ID.
         /// </summary>
-        public long ProducerIdMessage { get; set; } = 0;
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// The current epoch associated with the producer ID.
         /// </summary>
-        public short ProducerEpochMessage { get; set; } = 0;
+        public short ProducerEpoch { get; set; } = 0;
 
         /// <summary>
         /// The result of the transaction to write to the partitions (false = ABORT, true = COMMIT).
         /// </summary>
-        public bool TransactionResultMessage { get; set; } = false;
+        public bool TransactionResult { get; set; } = false;
 
         /// <summary>
         /// Each topic that we want to write transaction marker(s) for.
         /// </summary>
-        public List<WritableTxnMarkerTopicMessage> TopicsMessage { get; set; } = new ();
+        public List<WritableTxnMarkerTopicMessage> Topics { get; set; } = new ();
 
         /// <summary>
         /// Epoch associated with the transaction state partition hosted by this transaction coordinator
         /// </summary>
-        public int CoordinatorEpochMessage { get; set; } = 0;
+        public int CoordinatorEpoch { get; set; } = 0;
 
         public WritableTxnMarkerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerMessage(BufferReader reader, ApiVersions version)
@@ -104,17 +103,16 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class WritableTxnMarkerTopicMessage: Message
@@ -122,17 +120,17 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The indexes of the partitions to write transaction markers for.
         /// </summary>
-        public List<int> PartitionIndexesMessage { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new ();
 
         public WritableTxnMarkerTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerTopicMessage(BufferReader reader, ApiVersions version)
@@ -140,16 +138,15 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

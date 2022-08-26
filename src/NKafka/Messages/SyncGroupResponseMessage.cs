@@ -39,26 +39,25 @@ public sealed class SyncGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The group protocol type.
     /// </summary>
-    public string? ProtocolTypeMessage { get; set; } = null;
+    public string ProtocolType { get; set; } = null;
 
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string? ProtocolNameMessage { get; set; } = null;
+    public string ProtocolName { get; set; } = null;
 
     /// <summary>
     /// The member assignment.
     /// </summary>
-    public byte[] AssignmentMessage { get; set; } = Array.Empty<byte>();
+    public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
     public SyncGroupResponseMessage()
     {
-        ApiKey = ApiKeys.SyncGroup;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }
@@ -67,17 +66,15 @@ public sealed class SyncGroupResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.SyncGroup;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

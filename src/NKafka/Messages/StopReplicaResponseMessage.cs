@@ -39,16 +39,15 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code, or 0 if there was no top-level error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The responses for each partition.
     /// </summary>
-    public List<StopReplicaPartitionErrorMessage> PartitionErrorsMessage { get; set; } = new ();
+    public List<StopReplicaPartitionErrorMessage> PartitionErrors { get; set; } = new ();
 
     public StopReplicaResponseMessage()
     {
-        ApiKey = ApiKeys.StopReplica;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -57,41 +56,39 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.StopReplica;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class StopReplicaPartitionErrorMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no partition error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public StopReplicaPartitionErrorMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public StopReplicaPartitionErrorMessage(BufferReader reader, ApiVersions version)
@@ -99,16 +96,15 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

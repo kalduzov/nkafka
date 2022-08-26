@@ -39,7 +39,7 @@ public sealed class SaslHandshakeRequestMessage: RequestMessage
     /// <summary>
     /// The SASL mechanism chosen by the client.
     /// </summary>
-    public string MechanismMessage { get; set; } = "";
+    public string Mechanism { get; set; } = "";
 
     public SaslHandshakeRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class SaslHandshakeRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

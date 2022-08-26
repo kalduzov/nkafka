@@ -39,12 +39,12 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupIdMessage { get; set; } = "";
+    public string GroupId { get; set; } = "";
 
     /// <summary>
     /// The topics to delete offsets for
     /// </summary>
-    public List<OffsetDeleteRequestTopicMessage> TopicsMessage { get; set; } = new ();
+    public OffsetDeleteRequestTopicCollection Topics { get; set; } = new ();
 
     public OffsetDeleteRequestMessage()
     {
@@ -62,31 +62,30 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class OffsetDeleteRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Each partition to delete offsets for.
         /// </summary>
-        public List<OffsetDeleteRequestPartitionMessage> PartitionsMessage { get; set; } = new ();
+        public List<OffsetDeleteRequestPartitionMessage> Partitions { get; set; } = new ();
 
         public OffsetDeleteRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public OffsetDeleteRequestTopicMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +93,16 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class OffsetDeleteRequestPartitionMessage: Message
@@ -112,12 +110,12 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         public OffsetDeleteRequestPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public OffsetDeleteRequestPartitionMessage(BufferReader reader, ApiVersions version)
@@ -125,16 +123,19 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class OffsetDeleteRequestTopicCollection: HashSet<OffsetDeleteRequestTopicMessage>
+    {
     }
 }

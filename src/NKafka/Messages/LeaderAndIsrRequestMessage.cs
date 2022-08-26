@@ -39,37 +39,37 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
     /// <summary>
     /// The current controller ID.
     /// </summary>
-    public int ControllerIdMessage { get; set; } = 0;
+    public int ControllerId { get; set; } = 0;
 
     /// <summary>
     /// The current controller epoch.
     /// </summary>
-    public int ControllerEpochMessage { get; set; } = 0;
+    public int ControllerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The current broker epoch.
     /// </summary>
-    public long BrokerEpochMessage { get; set; } = -1;
+    public long BrokerEpoch { get; set; } = -1;
 
     /// <summary>
     /// The type that indicates whether all topics are included in the request
     /// </summary>
-    public sbyte TypeMessage { get; set; } = 0;
+    public sbyte Type { get; set; } = 0;
 
     /// <summary>
     /// The state of each partition, in a v0 or v1 message.
     /// </summary>
-    public List<LeaderAndIsrPartitionStateMessage> UngroupedPartitionStatesMessage { get; set; } = new ();
+    public List<LeaderAndIsrPartitionStateMessage> UngroupedPartitionStates { get; set; } = new ();
 
     /// <summary>
     /// Each topic.
     /// </summary>
-    public List<LeaderAndIsrTopicStateMessage> TopicStatesMessage { get; set; } = new ();
+    public List<LeaderAndIsrTopicStateMessage> TopicStates { get; set; } = new ();
 
     /// <summary>
     /// The current live leaders.
     /// </summary>
-    public List<LeaderAndIsrLiveLeaderMessage> LiveLeadersMessage { get; set; } = new ();
+    public List<LeaderAndIsrLiveLeaderMessage> LiveLeaders { get; set; } = new ();
 
     public LeaderAndIsrRequestMessage()
     {
@@ -87,54 +87,52 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class LeaderAndIsrTopicStateMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The unique topic ID.
         /// </summary>
-        public Guid TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The state of each partition
         /// </summary>
-        public List<LeaderAndIsrPartitionStateMessage> PartitionStatesMessage { get; set; } = new ();
+        public List<LeaderAndIsrPartitionStateMessage> PartitionStates { get; set; } = new ();
 
         public LeaderAndIsrTopicStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version2;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrTopicStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version2;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class LeaderAndIsrLiveLeaderMessage: Message
@@ -142,22 +140,22 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
         /// <summary>
         /// The leader's broker ID.
         /// </summary>
-        public int BrokerIdMessage { get; set; } = 0;
+        public int BrokerId { get; set; } = 0;
 
         /// <summary>
         /// The leader's hostname.
         /// </summary>
-        public string HostNameMessage { get; set; } = "";
+        public string HostName { get; set; } = "";
 
         /// <summary>
         /// The leader's port.
         /// </summary>
-        public int PortMessage { get; set; } = 0;
+        public int Port { get; set; } = 0;
 
         public LeaderAndIsrLiveLeaderMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrLiveLeaderMessage(BufferReader reader, ApiVersions version)
@@ -165,102 +163,100 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
-    public sealed class LeaderAndIsrPartitionState: Message
+    public sealed class LeaderAndIsrPartitionStateMessage: Message
     {
         /// <summary>
         /// The topic name.  This is only present in v0 or v1.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The controller epoch.
         /// </summary>
-        public int ControllerEpochMessage { get; set; } = 0;
+        public int ControllerEpoch { get; set; } = 0;
 
         /// <summary>
         /// The broker ID of the leader.
         /// </summary>
-        public int LeaderMessage { get; set; } = 0;
+        public int Leader { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch.
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// The in-sync replica IDs.
         /// </summary>
-        public List<int> IsrMessage { get; set; } = new ();
+        public List<int> Isr { get; set; } = new ();
 
         /// <summary>
         /// The current epoch for the partition. The epoch is a monotonically increasing value which is incremented after every partition change. (Since the LeaderAndIsr request is only used by the legacy controller, this corresponds to the zkVersion)
         /// </summary>
-        public int PartitionEpochMessage { get; set; } = 0;
+        public int PartitionEpoch { get; set; } = 0;
 
         /// <summary>
         /// The replica IDs.
         /// </summary>
-        public List<int> ReplicasMessage { get; set; } = new ();
+        public List<int> Replicas { get; set; } = new ();
 
         /// <summary>
         /// The replica IDs that we are adding this partition to, or null if no replicas are being added.
         /// </summary>
-        public List<int> AddingReplicasMessage { get; set; } = new ();
+        public List<int> AddingReplicas { get; set; } = new ();
 
         /// <summary>
         /// The replica IDs that we are removing this partition from, or null if no replicas are being removed.
         /// </summary>
-        public List<int> RemovingReplicasMessage { get; set; } = new ();
+        public List<int> RemovingReplicas { get; set; } = new ();
 
         /// <summary>
         /// Whether the replica should have existed on the broker or not.
         /// </summary>
-        public bool IsNewMessage { get; set; } = false;
+        public bool IsNew { get; set; } = false;
 
         /// <summary>
         /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.
         /// </summary>
-        public sbyte LeaderRecoveryStateMessage { get; set; } = 0;
+        public sbyte LeaderRecoveryState { get; set; } = 0;
 
-        public LeaderAndIsrPartitionState()
+        public LeaderAndIsrPartitionStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public LeaderAndIsrPartitionState(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrPartitionStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

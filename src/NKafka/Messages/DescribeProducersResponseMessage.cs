@@ -39,11 +39,10 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<TopicResponseMessage> TopicsMessage { get; set; } = new ();
+    public List<TopicResponseMessage> Topics { get; set; } = new ();
 
     public DescribeProducersResponseMessage()
     {
-        ApiKey = ApiKeys.DescribeProducers;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -52,36 +51,34 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeProducers;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public List<PartitionResponseMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionResponseMessage> Partitions { get; set; } = new ();
 
         public TopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TopicResponseMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +86,16 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionResponseMessage: Message
@@ -107,27 +103,27 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The partition error message, which may be null if no additional details are available
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = null;
+        public string ErrorMessage { get; set; } = null;
 
         /// <summary>
         /// 
         /// </summary>
-        public List<ProducerStateMessage> ActiveProducersMessage { get; set; } = new ();
+        public List<ProducerStateMessage> ActiveProducers { get; set; } = new ();
 
         public PartitionResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public PartitionResponseMessage(BufferReader reader, ApiVersions version)
@@ -135,17 +131,16 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class ProducerStateMessage: Message
@@ -153,37 +148,37 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public long ProducerIdMessage { get; set; } = 0;
+        public long ProducerId { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public int ProducerEpochMessage { get; set; } = 0;
+        public int ProducerEpoch { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public int LastSequenceMessage { get; set; } = -1;
+        public int LastSequence { get; set; } = -1;
 
         /// <summary>
         /// 
         /// </summary>
-        public long LastTimestampMessage { get; set; } = -1;
+        public long LastTimestamp { get; set; } = -1;
 
         /// <summary>
         /// 
         /// </summary>
-        public int CoordinatorEpochMessage { get; set; } = 0;
+        public int CoordinatorEpoch { get; set; } = 0;
 
         /// <summary>
         /// 
         /// </summary>
-        public long CurrentTxnStartOffsetMessage { get; set; } = -1;
+        public long CurrentTxnStartOffset { get; set; } = -1;
 
         public ProducerStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ProducerStateMessage(BufferReader reader, ApiVersions version)
@@ -191,16 +186,15 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

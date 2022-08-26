@@ -39,11 +39,10 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
     /// <summary>
     /// The partition creation results for each topic.
     /// </summary>
-    public List<CreatePartitionsTopicResultMessage> ResultsMessage { get; set; } = new ();
+    public List<CreatePartitionsTopicResultMessage> Results { get; set; } = new ();
 
     public CreatePartitionsResponseMessage()
     {
-        ApiKey = ApiKeys.CreatePartitions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -52,41 +51,39 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.CreatePartitions;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class CreatePartitionsTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The result error, or zero if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = null;
+        public string ErrorMessage { get; set; } = null;
 
         public CreatePartitionsTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public CreatePartitionsTopicResultMessage(BufferReader reader, ApiVersions version)
@@ -94,16 +91,15 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

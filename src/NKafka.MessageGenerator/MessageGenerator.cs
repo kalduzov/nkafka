@@ -49,27 +49,26 @@ public class MessageGenerator: IMessageGenerator
         return result;
     }
 
-    private void GenerateClass(MessageSpecification? topLevelMessage, string className, StructSpecification messageStruct, Versions parentVersions)
+    private void GenerateClass(MessageSpecification? topLevelMessage, string className, StructSpecification @struct, Versions parentVersions)
     {
         _codeBuffer.AppendLine();
         var isTopLevel = topLevelMessage is not null;
-        var isDictionaryElement = messageStruct.HasKeys;
+        var isSetElement = @struct.HasKeys;
 
-        if (isTopLevel && isDictionaryElement)
+        if (isTopLevel && isSetElement)
         {
             throw new ArgumentException("Cannot set mapKey on top level fields.");
         }
 
-        GenerateClassHeader(className, topLevelMessage?.Type);
+        GenerateClassHeader(className, isTopLevel, topLevelMessage?.Type);
         _codeBuffer.IncrementIndent();
-        GenerateProperties(messageStruct, topLevelMessage?.Type, isDictionaryElement);
+        GenerateProperties(@struct, topLevelMessage?.Type);
         _codeBuffer.AppendLine();
-        GenerateCtor(className, topLevelMessage?.ApiKey, messageStruct, isTopLevel, isDictionaryElement);
+        GenerateCtor(className, topLevelMessage, parentVersions);
         _codeBuffer.AppendLine();
-        _readMethodGenerator.Generate(className, messageStruct, parentVersions);
+        _readMethodGenerator.Generate(className, @struct, parentVersions);
         _codeBuffer.AppendLine();
-        _writeMethodGenerator.Generate(className, messageStruct, parentVersions);
-        _codeBuffer.AppendLine();
+        _writeMethodGenerator.Generate(className, @struct, parentVersions);
 
         if (!isTopLevel)
         {
@@ -77,7 +76,7 @@ public class MessageGenerator: IMessageGenerator
             _codeBuffer.AppendLine("}");
         }
 
-        GenerateSubclasses(className, messageStruct, parentVersions, isDictionaryElement);
+        GenerateSubclasses(className, @struct, parentVersions, isSetElement);
 
         if (!isTopLevel)
         {
@@ -86,14 +85,14 @@ public class MessageGenerator: IMessageGenerator
 
         foreach (var commonStruct in _structRegistry.CommonStructs)
         {
-            GenerateClass(null, commonStruct.Name, commonStruct, commonStruct.Versions);
+            GenerateClass(null, commonStruct.Name + "Message", commonStruct, parentVersions);
         }
 
         _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("}");
     }
 
-    private void GenerateSubclasses(string className, StructSpecification messageStruct, Versions parentVersions, bool isDictionaryElement)
+    private void GenerateSubclasses(string className, StructSpecification messageStruct, Versions parentVersions, bool isSetElement)
     {
         foreach (var field in messageStruct.Fields)
         {
@@ -124,37 +123,39 @@ public class MessageGenerator: IMessageGenerator
             }
         }
 
-        if (isDictionaryElement)
+        if (isSetElement)
         {
-            GenerateDictionary(className, messageStruct);
+            GenerateCollection(className, messageStruct);
         }
     }
 
-    private void GenerateDictionary(string className, StructSpecification messageStruct)
+    private void GenerateCollection(string className, StructSpecification messageStruct)
     {
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine($"public sealed class {FieldSpecification.CollectionType(messageStruct.Name)}: HashSet<{className}>");
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.AppendLine("}");
     }
 
     private void GenerateCtor(
         string className,
-        int? apiKeyValue,
-        StructSpecification messageStruct,
-        bool isTopLevel,
-        bool isDictionaryElement)
+        MessageSpecification? topLevelMessage,
+        Versions versions)
     {
         _codeBuffer.AppendLine($"public {className}()");
         _codeBuffer.AppendLine("{");
 
-        if (apiKeyValue.HasValue)
+        if (topLevelMessage is not null && topLevelMessage.Type == MessageType.Request)
         {
             _codeBuffer.IncrementIndent();
-            var apiKey = (ApiKeys)apiKeyValue;
+            var apiKey = (ApiKeys)topLevelMessage.ApiKey;
             _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
             _codeBuffer.DecrementIndent();
         }
 
         _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Lowest};");
-        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Highest};");
+        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{versions.Lowest};");
+        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{versions.Highest};");
         _codeBuffer.DecrementIndent();
 
         _codeBuffer.AppendLine("}");
@@ -170,20 +171,22 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.IncrementIndent();
         _codeBuffer.AppendLine("Read(reader, version);");
 
-        if (apiKeyValue.HasValue)
+        if (topLevelMessage is not null && topLevelMessage.Type == MessageType.Request)
         {
-            var apiKey = (ApiKeys)apiKeyValue;
+            var apiKey = (ApiKeys)topLevelMessage.ApiKey;
             _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
         }
 
-        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Lowest};");
-        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Highest};");
+        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{versions.Lowest};");
+        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{versions.Highest};");
         _codeBuffer.DecrementIndent();
 
         _codeBuffer.AppendLine("}");
     }
 
-    private void GenerateProperties(StructSpecification structSpecification, MessageType? messageType, bool isDictionaryElement)
+    private void GenerateProperties(
+        StructSpecification structSpecification,
+        MessageType? messageType)
     {
         var lastField = structSpecification.Fields.Last();
 
@@ -194,7 +197,7 @@ public class MessageGenerator: IMessageGenerator
                 continue; //Данное поле есть в базовом классе
             }
 
-            GenerateProperty(fieldDescriptor, isDictionaryElement);
+            GenerateProperty(fieldDescriptor);
 
             if (fieldDescriptor != lastField)
             {
@@ -203,55 +206,30 @@ public class MessageGenerator: IMessageGenerator
         }
     }
 
-    private void GenerateProperty(FieldSpecification field, bool isDictionaryElement)
+    private void GenerateProperty(FieldSpecification field)
     {
         _codeBuffer.AppendLine($"/// <summary>");
         _codeBuffer.AppendLine($"/// {field.About}");
         _codeBuffer.AppendLine($"/// </summary>");
 
-        var type = GetClrType(field, isDictionaryElement);
-        var nullableMarker = NullableMarkerIfNeeded(field);
-        _codeBuffer.AppendLine($"public {type}{nullableMarker} {field.Name}Message {{ get; set; }} = {field.FieldDefault()};");
+        var type = field.FieldAbstractClrType(_structRegistry);
+        _codeBuffer.AppendLine($"public {type} {field.Name} {{ get; set; }} = {field.FieldDefault()};");
     }
 
-    private static string GetClrType(FieldSpecification field, bool isDictionaryElement)
+    private void GenerateClassHeader(string className, bool isTopLevel, MessageType? messageType)
     {
-        if (field.Type.IsArray && field.Type is IFieldType.ArrayType arrayType)
+        var implementedInterfaces = new HashSet<string>();
+
+        if (isTopLevel && messageType.HasValue)
         {
-            if (field.Type.IsStructArray)
-            {
-                return $"List<{arrayType.ElementType.ClrName}Message>";
-            }
-            else
-            {
-                return $"List<{arrayType.ElementType.ClrName}>";
-            }
+            implementedInterfaces.Add(messageType + "Message");
+        }
+        else
+        {
+            implementedInterfaces.Add("Message");
         }
 
-        if (field.Type.IsStruct && field.Type is IFieldType.StructType structType)
-        {
-            return $"List<{structType.TypeName}>";
-        }
-
-        if (isDictionaryElement)
-        {
-            return $"Dictionary<{field.Type.ClrName},>"; //todo тут должен быть словарь
-        }
-
-        return $"{field.Type.ClrName}";
-    }
-
-    private static string NullableMarkerIfNeeded(FieldSpecification field)
-    {
-        return field.Ignorable && field.Default.Equals("null", StringComparison.OrdinalIgnoreCase)
-            ? "?"
-            : string.Empty;
-    }
-
-    private void GenerateClassHeader(string className, MessageType? messageType)
-    {
-        var baseClassName = messageType is null ? "Message" : messageType + "Message";
-        _codeBuffer.AppendLine($"public sealed class {className}: {baseClassName}");
+        _codeBuffer.AppendLine($"public sealed class {className}: {string.Join(", ", implementedInterfaces)}");
         _codeBuffer.AppendLine("{");
     }
 

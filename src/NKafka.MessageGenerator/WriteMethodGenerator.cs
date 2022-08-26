@@ -191,7 +191,7 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
 
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions)
     {
-        _codeBuffer.AppendLine("public override void Write(BufferWriter writer, ApiVersions version)");
+        _codeBuffer.AppendLine("internal override void Write(BufferWriter writer, ApiVersions version)");
         _codeBuffer.AppendLine("{");
         _codeBuffer.AppendLine("}");
     }

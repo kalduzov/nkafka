@@ -39,11 +39,10 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
     /// </summary>
-    public List<AlterUserScramCredentialsResultMessage> ResultsMessage { get; set; } = new ();
+    public List<AlterUserScramCredentialsResultMessage> Results { get; set; } = new ();
 
     public AlterUserScramCredentialsResponseMessage()
     {
-        ApiKey = ApiKeys.AlterUserScramCredentials;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -52,41 +51,39 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterUserScramCredentials;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AlterUserScramCredentialsResultMessage: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string UserMessage { get; set; } = "";
+        public string User { get; set; } = "";
 
         /// <summary>
         /// The error code.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, if any.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         public AlterUserScramCredentialsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
@@ -94,16 +91,15 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

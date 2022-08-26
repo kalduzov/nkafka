@@ -39,11 +39,10 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each filter.
     /// </summary>
-    public List<DeleteAclsFilterResultMessage> FilterResultsMessage { get; set; } = new ();
+    public List<DeleteAclsFilterResultMessage> FilterResults { get; set; } = new ();
 
     public DeleteAclsResponseMessage()
     {
-        ApiKey = ApiKeys.DeleteAcls;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -52,41 +51,39 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DeleteAcls;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DeleteAclsFilterResultMessage: Message
     {
         /// <summary>
         /// The error code, or 0 if the filter succeeded.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message, or null if the filter succeeded.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         /// <summary>
         /// The ACLs which matched this filter.
         /// </summary>
-        public List<DeleteAclsMatchingAclMessage> MatchingAclsMessage { get; set; } = new ();
+        public List<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; } = new ();
 
         public DeleteAclsFilterResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DeleteAclsFilterResultMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +91,16 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class DeleteAclsMatchingAclMessage: Message
@@ -112,52 +108,52 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The deletion error code, or 0 if the deletion succeeded.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The deletion error message, or null if the deletion succeeded.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         /// <summary>
         /// The ACL resource type.
         /// </summary>
-        public sbyte ResourceTypeMessage { get; set; } = 0;
+        public sbyte ResourceType { get; set; } = 0;
 
         /// <summary>
         /// The ACL resource name.
         /// </summary>
-        public string ResourceNameMessage { get; set; } = "";
+        public string ResourceName { get; set; } = "";
 
         /// <summary>
         /// The ACL resource pattern type.
         /// </summary>
-        public sbyte PatternTypeMessage { get; set; } = 3;
+        public sbyte PatternType { get; set; } = 3;
 
         /// <summary>
         /// The ACL principal.
         /// </summary>
-        public string PrincipalMessage { get; set; } = "";
+        public string Principal { get; set; } = "";
 
         /// <summary>
         /// The ACL host.
         /// </summary>
-        public string HostMessage { get; set; } = "";
+        public string Host { get; set; } = "";
 
         /// <summary>
         /// The ACL operation.
         /// </summary>
-        public sbyte OperationMessage { get; set; } = 0;
+        public sbyte Operation { get; set; } = 0;
 
         /// <summary>
         /// The ACL permission type.
         /// </summary>
-        public sbyte PermissionTypeMessage { get; set; } = 0;
+        public sbyte PermissionType { get; set; } = 0;
 
         public DeleteAclsMatchingAclMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DeleteAclsMatchingAclMessage(BufferReader reader, ApiVersions version)
@@ -165,16 +161,15 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

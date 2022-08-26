@@ -39,17 +39,17 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
     /// <summary>
     /// The ID of the group to leave.
     /// </summary>
-    public string GroupIdMessage { get; set; } = "";
+    public string GroupId { get; set; } = "";
 
     /// <summary>
     /// The member ID to remove from the group.
     /// </summary>
-    public string MemberIdMessage { get; set; } = "";
+    public string MemberId { get; set; } = "";
 
     /// <summary>
     /// List of leaving member identities.
     /// </summary>
-    public List<MemberIdentityMessage> MembersMessage { get; set; } = new ();
+    public List<MemberIdentityMessage> Members { get; set; } = new ();
 
     public LeaveGroupRequestMessage()
     {
@@ -67,53 +67,51 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class MemberIdentityMessage: Message
     {
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
-        public string MemberIdMessage { get; set; } = "";
+        public string MemberId { get; set; } = "";
 
         /// <summary>
         /// The group instance ID to remove from the group.
         /// </summary>
-        public string GroupInstanceIdMessage { get; set; } = null;
+        public string GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The reason why the member left the group.
         /// </summary>
-        public string? ReasonMessage { get; set; } = null;
+        public string Reason { get; set; } = null;
 
         public MemberIdentityMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version3;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public MemberIdentityMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version3;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

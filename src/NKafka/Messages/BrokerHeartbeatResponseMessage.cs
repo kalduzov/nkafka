@@ -39,26 +39,25 @@ public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// True if the broker has approximately caught up with the latest metadata.
     /// </summary>
-    public bool IsCaughtUpMessage { get; set; } = false;
+    public bool IsCaughtUp { get; set; } = false;
 
     /// <summary>
     /// True if the broker is fenced.
     /// </summary>
-    public bool IsFencedMessage { get; set; } = true;
+    public bool IsFenced { get; set; } = true;
 
     /// <summary>
     /// True if the broker should proceed with its shutdown.
     /// </summary>
-    public bool ShouldShutDownMessage { get; set; } = false;
+    public bool ShouldShutDown { get; set; } = false;
 
     public BrokerHeartbeatResponseMessage()
     {
-        ApiKey = ApiKeys.BrokerHeartbeat;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -67,17 +66,15 @@ public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.BrokerHeartbeat;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

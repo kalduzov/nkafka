@@ -198,7 +198,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
         Debug.WriteLine($"Message {message.ClusterId ?? "none"}");
 
-        _controllerId = message.ControllerId ?? _controllerId;
+        _controllerId = message.ControllerId;
 
         await UpdateBrokersAndReturnController(message.Brokers, message.ControllerId, token);
         UpdateTopicPartitions(message.Topics, token);
@@ -408,7 +408,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
         var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
 
-        _controllerId = response.ControllerId ?? _controllerId;
+        _controllerId = response.ControllerId;
 
         await UpdateBrokersAndReturnController(response.Brokers, response.ControllerId, token);
 

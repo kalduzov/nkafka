@@ -39,7 +39,7 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
     /// </summary>
-    public byte[] AuthBytesMessage { get; set; } = Array.Empty<byte>();
+    public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
     public SaslAuthenticateRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

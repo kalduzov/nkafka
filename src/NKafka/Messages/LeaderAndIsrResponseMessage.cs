@@ -39,21 +39,20 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// Each partition in v0 to v4 message.
     /// </summary>
-    public List<LeaderAndIsrPartitionErrorMessage> PartitionErrorsMessage { get; set; } = new ();
+    public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new ();
 
     /// <summary>
     /// Each topic
     /// </summary>
-    public List<LeaderAndIsrTopicErrorMessage> TopicsMessage { get; set; } = new ();
+    public LeaderAndIsrTopicErrorCollection Topics { get; set; } = new ();
 
     public LeaderAndIsrResponseMessage()
     {
-        ApiKey = ApiKeys.LeaderAndIsr;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
     }
@@ -62,94 +61,94 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.LeaderAndIsr;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class LeaderAndIsrTopicErrorMessage: Message
     {
         /// <summary>
         /// The unique topic ID
         /// </summary>
-        public Dictionary<Guid,> TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// Each partition.
         /// </summary>
-        public List<LeaderAndIsrPartitionErrorMessage> PartitionErrorsMessage { get; set; } = new ();
+        public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new ();
 
         public LeaderAndIsrTopicErrorMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version5;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrTopicErrorMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version5;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
-    public sealed class LeaderAndIsrPartitionError: Message
+    public sealed class LeaderAndIsrTopicErrorCollection: HashSet<LeaderAndIsrTopicErrorMessage>
+    {
+    }
+
+    public sealed class LeaderAndIsrPartitionErrorMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition error code, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
-        public LeaderAndIsrPartitionError()
+        public LeaderAndIsrPartitionErrorMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public LeaderAndIsrPartitionError(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrPartitionErrorMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

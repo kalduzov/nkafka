@@ -39,12 +39,12 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The time in ms to wait for the request to complete.
     /// </summary>
-    public int TimeoutMsMessage { get; set; } = 60000;
+    public int TimeoutMs { get; set; } = 60000;
 
     /// <summary>
     /// The topics to reassign.
     /// </summary>
-    public List<ReassignableTopicMessage> TopicsMessage { get; set; } = new ();
+    public List<ReassignableTopicMessage> Topics { get; set; } = new ();
 
     public AlterPartitionReassignmentsRequestMessage()
     {
@@ -62,31 +62,30 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class ReassignableTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The partitions to reassign.
         /// </summary>
-        public List<ReassignablePartitionMessage> PartitionsMessage { get; set; } = new ();
+        public List<ReassignablePartitionMessage> Partitions { get; set; } = new ();
 
         public ReassignableTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ReassignableTopicMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +93,16 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class ReassignablePartitionMessage: Message
@@ -112,17 +110,17 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The replicas to place the partitions on, or null to cancel a pending reassignment for this partition.
         /// </summary>
-        public List<int> ReplicasMessage { get; set; } = null;
+        public List<int> Replicas { get; set; } = null;
 
         public ReassignablePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ReassignablePartitionMessage(BufferReader reader, ApiVersions version)
@@ -130,16 +128,15 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

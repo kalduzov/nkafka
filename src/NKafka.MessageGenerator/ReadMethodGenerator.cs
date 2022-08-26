@@ -34,7 +34,7 @@ public class ReadMethodGenerator: Generator, IReadMethodGenerator
 
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions)
     {
-        _codeBuffer.AppendLine("public override void Read(BufferReader reader, ApiVersions version)");
+        _codeBuffer.AppendLine("internal override void Read(BufferReader reader, ApiVersions version)");
         _codeBuffer.AppendLine("{");
         _codeBuffer.AppendLine("}");
     }

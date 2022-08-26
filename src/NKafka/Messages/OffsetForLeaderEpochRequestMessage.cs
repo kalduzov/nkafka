@@ -39,12 +39,12 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
     /// </summary>
-    public int ReplicaIdMessage { get; set; } = -2;
+    public int ReplicaId { get; set; } = -2;
 
     /// <summary>
     /// Each topic to get offsets for.
     /// </summary>
-    public List<OffsetForLeaderTopicMessage> TopicsMessage { get; set; } = new ();
+    public OffsetForLeaderTopicCollection Topics { get; set; } = new ();
 
     public OffsetForLeaderEpochRequestMessage()
     {
@@ -62,31 +62,30 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class OffsetForLeaderTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> TopicMessage { get; set; } = "";
+        public string Topic { get; set; } = "";
 
         /// <summary>
         /// Each partition to get offsets for.
         /// </summary>
-        public List<OffsetForLeaderPartitionMessage> PartitionsMessage { get; set; } = new ();
+        public List<OffsetForLeaderPartitionMessage> Partitions { get; set; } = new ();
 
         public OffsetForLeaderTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public OffsetForLeaderTopicMessage(BufferReader reader, ApiVersions version)
@@ -94,17 +93,16 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class OffsetForLeaderPartitionMessage: Message
@@ -112,22 +110,22 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionMessage { get; set; } = 0;
+        public int Partition { get; set; } = 0;
 
         /// <summary>
         /// An epoch used to fence consumers/replicas with old metadata. If the epoch provided by the client is larger than the current epoch known to the broker, then the UNKNOWN_LEADER_EPOCH error code will be returned. If the provided epoch is smaller, then the FENCED_LEADER_EPOCH error code will be returned.
         /// </summary>
-        public int CurrentLeaderEpochMessage { get; set; } = -1;
+        public int CurrentLeaderEpoch { get; set; } = -1;
 
         /// <summary>
         /// The epoch to look up an offset for.
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         public OffsetForLeaderPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public OffsetForLeaderPartitionMessage(BufferReader reader, ApiVersions version)
@@ -135,16 +133,19 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class OffsetForLeaderTopicCollection: HashSet<OffsetForLeaderTopicMessage>
+    {
     }
 }

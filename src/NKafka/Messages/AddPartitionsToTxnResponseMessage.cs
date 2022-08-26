@@ -39,11 +39,10 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AddPartitionsToTxnTopicResultMessage> ResultsMessage { get; set; } = new ();
+    public AddPartitionsToTxnTopicResultCollection Results { get; set; } = new ();
 
     public AddPartitionsToTxnResponseMessage()
     {
-        ApiKey = ApiKeys.AddPartitionsToTxn;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
@@ -52,36 +51,34 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AddPartitionsToTxn;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class AddPartitionsToTxnTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public Dictionary<string,> NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public List<AddPartitionsToTxnPartitionResultMessage> ResultsMessage { get; set; } = new ();
+        public AddPartitionsToTxnPartitionResultCollection Results { get; set; } = new ();
 
         public AddPartitionsToTxnTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersions version)
@@ -89,17 +86,16 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class AddPartitionsToTxnPartitionResultMessage: Message
@@ -107,17 +103,17 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public Dictionary<int,> PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The response error code.
         /// </summary>
-        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public AddPartitionsToTxnPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersions version)
@@ -125,16 +121,23 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class AddPartitionsToTxnPartitionResultCollection: HashSet<AddPartitionsToTxnPartitionResultMessage>
+    {
+    }
+
+    public sealed class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
+    {
     }
 }

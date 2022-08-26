@@ -39,21 +39,20 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code, or 0 if there was no error
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// The ongoing reassignments for each topic.
     /// </summary>
-    public List<OngoingTopicReassignmentMessage> TopicsMessage { get; set; } = new ();
+    public List<OngoingTopicReassignmentMessage> Topics { get; set; } = new ();
 
     public ListPartitionReassignmentsResponseMessage()
     {
-        ApiKey = ApiKeys.ListPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -62,36 +61,34 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ListPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class OngoingTopicReassignmentMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The ongoing reassignments for each partition.
         /// </summary>
-        public List<OngoingPartitionReassignmentMessage> PartitionsMessage { get; set; } = new ();
+        public List<OngoingPartitionReassignmentMessage> Partitions { get; set; } = new ();
 
         public OngoingTopicReassignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public OngoingTopicReassignmentMessage(BufferReader reader, ApiVersions version)
@@ -99,17 +96,16 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class OngoingPartitionReassignmentMessage: Message
@@ -117,27 +113,27 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
         /// <summary>
         /// The index of the partition.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The current replica set.
         /// </summary>
-        public List<int> ReplicasMessage { get; set; } = new ();
+        public List<int> Replicas { get; set; } = new ();
 
         /// <summary>
         /// The set of replicas we are currently adding.
         /// </summary>
-        public List<int> AddingReplicasMessage { get; set; } = new ();
+        public List<int> AddingReplicas { get; set; } = new ();
 
         /// <summary>
         /// The set of replicas we are currently removing.
         /// </summary>
-        public List<int> RemovingReplicasMessage { get; set; } = new ();
+        public List<int> RemovingReplicas { get; set; } = new ();
 
         public OngoingPartitionReassignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public OngoingPartitionReassignmentMessage(BufferReader reader, ApiVersions version)
@@ -145,16 +141,15 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

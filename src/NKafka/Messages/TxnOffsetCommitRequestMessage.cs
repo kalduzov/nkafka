@@ -39,42 +39,42 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The ID of the transaction.
     /// </summary>
-    public string TransactionalIdMessage { get; set; } = "";
+    public string TransactionalId { get; set; } = "";
 
     /// <summary>
     /// The ID of the group.
     /// </summary>
-    public string GroupIdMessage { get; set; } = "";
+    public string GroupId { get; set; } = "";
 
     /// <summary>
     /// The current producer ID in use by the transactional ID.
     /// </summary>
-    public long ProducerIdMessage { get; set; } = 0;
+    public long ProducerId { get; set; } = 0;
 
     /// <summary>
     /// The current epoch associated with the producer ID.
     /// </summary>
-    public short ProducerEpochMessage { get; set; } = 0;
+    public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The generation of the consumer.
     /// </summary>
-    public int GenerationIdMessage { get; set; } = -1;
+    public int GenerationId { get; set; } = -1;
 
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string MemberIdMessage { get; set; } = "";
+    public string MemberId { get; set; } = "";
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceIdMessage { get; set; } = null;
+    public string GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// Each topic that we want to commit offsets for.
     /// </summary>
-    public List<TxnOffsetCommitRequestTopicMessage> TopicsMessage { get; set; } = new ();
+    public List<TxnOffsetCommitRequestTopicMessage> Topics { get; set; } = new ();
 
     public TxnOffsetCommitRequestMessage()
     {
@@ -92,31 +92,30 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TxnOffsetCommitRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The partitions inside the topic that we want to committ offsets for.
         /// </summary>
-        public List<TxnOffsetCommitRequestPartitionMessage> PartitionsMessage { get; set; } = new ();
+        public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new ();
 
         public TxnOffsetCommitRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
@@ -124,17 +123,16 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class TxnOffsetCommitRequestPartitionMessage: Message
@@ -142,27 +140,27 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         /// <summary>
         /// The index of the partition within the topic.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The message offset to be committed.
         /// </summary>
-        public long CommittedOffsetMessage { get; set; } = 0;
+        public long CommittedOffset { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch of the last consumed record.
         /// </summary>
-        public int CommittedLeaderEpochMessage { get; set; } = -1;
+        public int CommittedLeaderEpoch { get; set; } = -1;
 
         /// <summary>
         /// Any associated metadata the client wants to keep.
         /// </summary>
-        public string CommittedMetadataMessage { get; set; } = "";
+        public string CommittedMetadata { get; set; } = "";
 
         public TxnOffsetCommitRequestPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
@@ -170,16 +168,15 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

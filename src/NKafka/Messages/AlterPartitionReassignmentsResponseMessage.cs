@@ -39,21 +39,20 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessageMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = "";
 
     /// <summary>
     /// The responses to topics to reassign.
     /// </summary>
-    public List<ReassignableTopicResponseMessage> ResponsesMessage { get; set; } = new ();
+    public List<ReassignableTopicResponseMessage> Responses { get; set; } = new ();
 
     public AlterPartitionReassignmentsResponseMessage()
     {
-        ApiKey = ApiKeys.AlterPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -62,36 +61,34 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterPartitionReassignments;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class ReassignableTopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string NameMessage { get; set; } = "";
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// The responses to partitions to reassign
         /// </summary>
-        public List<ReassignablePartitionResponseMessage> PartitionsMessage { get; set; } = new ();
+        public List<ReassignablePartitionResponseMessage> Partitions { get; set; } = new ();
 
         public ReassignableTopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ReassignableTopicResponseMessage(BufferReader reader, ApiVersions version)
@@ -99,17 +96,16 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class ReassignablePartitionResponseMessage: Message
@@ -117,22 +113,22 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The error code for this partition, or 0 if there was no error.
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The error message for this partition, or null if there was no error.
         /// </summary>
-        public string ErrorMessageMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
 
         public ReassignablePartitionResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ReassignablePartitionResponseMessage(BufferReader reader, ApiVersions version)
@@ -140,16 +136,15 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

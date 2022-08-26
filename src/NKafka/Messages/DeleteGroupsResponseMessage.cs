@@ -39,11 +39,10 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
     /// <summary>
     /// The deletion results
     /// </summary>
-    public List<DeletableGroupResultMessage> ResultsMessage { get; set; } = new ();
+    public DeletableGroupResultCollection Results { get; set; } = new ();
 
     public DeleteGroupsResponseMessage()
     {
-        ApiKey = ApiKeys.DeleteGroups;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -52,36 +51,34 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DeleteGroups;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DeletableGroupResultMessage: Message
     {
         /// <summary>
         /// The group id
         /// </summary>
-        public Dictionary<string,> GroupIdMessage { get; set; } = "";
+        public string GroupId { get; set; } = "";
 
         /// <summary>
         /// The deletion error, or 0 if the deletion succeeded.
         /// </summary>
-        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         public DeletableGroupResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public DeletableGroupResultMessage(BufferReader reader, ApiVersions version)
@@ -89,16 +86,19 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class DeletableGroupResultCollection: HashSet<DeletableGroupResultMessage>
+    {
     }
 }

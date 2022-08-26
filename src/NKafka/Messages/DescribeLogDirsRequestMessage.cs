@@ -39,7 +39,7 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
-    public List<DescribableLogDirTopicMessage> TopicsMessage { get; set; } = new ();
+    public DescribableLogDirTopicCollection Topics { get; set; } = new ();
 
     public DescribeLogDirsRequestMessage()
     {
@@ -57,31 +57,30 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class DescribableLogDirTopicMessage: Message
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public Dictionary<string,> TopicMessage { get; set; } = "";
+        public string Topic { get; set; } = "";
 
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public List<int> PartitionsMessage { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new ();
 
         public DescribableLogDirTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribableLogDirTopicMessage(BufferReader reader, ApiVersions version)
@@ -89,16 +88,19 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+    }
 
+    public sealed class DescribableLogDirTopicCollection: HashSet<DescribableLogDirTopicMessage>
+    {
     }
 }

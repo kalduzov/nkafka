@@ -39,7 +39,7 @@ public sealed class UnregisterBrokerRequestMessage: RequestMessage
     /// <summary>
     /// The broker ID to unregister.
     /// </summary>
-    public int BrokerIdMessage { get; set; } = 0;
+    public int BrokerId { get; set; } = 0;
 
     public UnregisterBrokerRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class UnregisterBrokerRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

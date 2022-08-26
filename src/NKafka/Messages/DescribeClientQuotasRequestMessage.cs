@@ -39,12 +39,12 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
     /// <summary>
     /// Filter components to apply to quota entities.
     /// </summary>
-    public List<ComponentDataMessage> ComponentsMessage { get; set; } = new ();
+    public List<ComponentDataMessage> Components { get; set; } = new ();
 
     /// <summary>
     /// Whether the match is strict, i.e. should exclude entities with unspecified entity types.
     /// </summary>
-    public bool StrictMessage { get; set; } = false;
+    public bool Strict { get; set; } = false;
 
     public DescribeClientQuotasRequestMessage()
     {
@@ -62,36 +62,35 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class ComponentDataMessage: Message
     {
         /// <summary>
         /// The entity type that the filter component applies to.
         /// </summary>
-        public string EntityTypeMessage { get; set; } = "";
+        public string EntityType { get; set; } = "";
 
         /// <summary>
         /// How to match the entity {0 = exact name, 1 = default name, 2 = any specified name}.
         /// </summary>
-        public sbyte MatchTypeMessage { get; set; } = 0;
+        public sbyte MatchType { get; set; } = 0;
 
         /// <summary>
         /// The string to match against, or null if unused for the match type.
         /// </summary>
-        public string MatchMessage { get; set; } = "";
+        public string Match { get; set; } = "";
 
         public ComponentDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public ComponentDataMessage(BufferReader reader, ApiVersions version)
@@ -99,16 +98,15 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

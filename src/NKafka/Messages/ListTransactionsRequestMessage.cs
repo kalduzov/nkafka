@@ -39,12 +39,12 @@ public sealed class ListTransactionsRequestMessage: RequestMessage
     /// <summary>
     /// The transaction states to filter by: if empty, all transactions are returned; if non-empty, then only transactions matching one of the filtered states will be returned
     /// </summary>
-    public List<string> StateFiltersMessage { get; set; } = new ();
+    public List<string> StateFilters { get; set; } = new ();
 
     /// <summary>
     /// The producerIds to filter by: if empty, all transactions will be returned; if non-empty, only transactions which match one of the filtered producerIds will be returned
     /// </summary>
-    public List<long> ProducerIdFiltersMessage { get; set; } = new ();
+    public List<long> ProducerIdFilters { get; set; } = new ();
 
     public ListTransactionsRequestMessage()
     {
@@ -62,12 +62,11 @@ public sealed class ListTransactionsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

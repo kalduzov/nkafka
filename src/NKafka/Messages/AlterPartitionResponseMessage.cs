@@ -39,16 +39,15 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new ();
 
     public AlterPartitionResponseMessage()
     {
-        ApiKey = ApiKeys.AlterIsr;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
@@ -57,41 +56,39 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterIsr;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 
     public sealed class TopicDataMessage: Message
     {
         /// <summary>
         /// The name of the topic
         /// </summary>
-        public string TopicNameMessage { get; set; } = "";
+        public string TopicName { get; set; } = "";
 
         /// <summary>
         /// The ID of the topic
         /// </summary>
-        public Guid TopicIdMessage { get; set; } = Guid.Empty;
+        public Guid TopicId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new ();
 
         public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public TopicDataMessage(BufferReader reader, ApiVersions version)
@@ -99,17 +96,16 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 
     public sealed class PartitionDataMessage: Message
@@ -117,42 +113,42 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
         /// <summary>
         /// The partition index
         /// </summary>
-        public int PartitionIndexMessage { get; set; } = 0;
+        public int PartitionIndex { get; set; } = 0;
 
         /// <summary>
         /// The partition level error code
         /// </summary>
-        public short ErrorCodeMessage { get; set; } = 0;
+        public short ErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The broker ID of the leader.
         /// </summary>
-        public int LeaderIdMessage { get; set; } = 0;
+        public int LeaderId { get; set; } = 0;
 
         /// <summary>
         /// The leader epoch.
         /// </summary>
-        public int LeaderEpochMessage { get; set; } = 0;
+        public int LeaderEpoch { get; set; } = 0;
 
         /// <summary>
         /// The in-sync replica IDs.
         /// </summary>
-        public List<int> IsrMessage { get; set; } = new ();
+        public List<int> Isr { get; set; } = new ();
 
         /// <summary>
         /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.
         /// </summary>
-        public sbyte LeaderRecoveryStateMessage { get; set; } = 0;
+        public sbyte LeaderRecoveryState { get; set; } = 0;
 
         /// <summary>
         /// The current epoch for the partition for KRaft controllers. The current ZK version for the legacy controllers.
         /// </summary>
-        public int PartitionEpochMessage { get; set; } = 0;
+        public int PartitionEpoch { get; set; } = 0;
 
         public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
@@ -160,16 +156,15 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version32767;
+            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public override void Read(BufferReader reader, ApiVersions version)
+        internal override void Read(BufferReader reader, ApiVersions version)
         {
         }
 
-        public override void Write(BufferWriter writer, ApiVersions version)
+        internal override void Write(BufferWriter writer, ApiVersions version)
         {
         }
-
     }
 }

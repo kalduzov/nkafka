@@ -106,7 +106,8 @@ internal sealed class StructRegistry
         if (field.Type.IsArray && field.Type is IFieldType.ArrayType arrayType)
         {
             structFieldName = arrayType.ElementName;
-        } else if (field.Type.IsStruct && field.Type is IFieldType.StructType type)
+        }
+        else if (field.Type.IsStruct && field.Type is IFieldType.StructType type)
         {
             structFieldName = type.TypeName;
         }
@@ -122,7 +123,26 @@ internal sealed class StructRegistry
 
         return structInfo.Specification;
 
-
         return null;
+    }
+
+    public bool IsStructArrayWithKeys(FieldSpecification field)
+    {
+        if (field.Type is not IFieldType.ArrayType arrayType)
+        {
+            return false;
+        }
+
+        if (!arrayType.IsStructArray)
+        {
+            return false;
+        }
+
+        if (!_struct.TryGetValue(arrayType.ElementName, out var structInfo))
+        {
+            throw new Exception($"Unable to locate a specification for the structure {arrayType.ElementName}");
+        }
+
+        return structInfo.Specification.HasKeys;
     }
 }

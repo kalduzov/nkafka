@@ -39,22 +39,22 @@ public sealed class InitProducerIdRequestMessage: RequestMessage
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
     /// </summary>
-    public string TransactionalIdMessage { get; set; } = "";
+    public string TransactionalId { get; set; } = "";
 
     /// <summary>
     /// The time in ms to wait before aborting idle transactions sent by this producer. This is only relevant if a TransactionalId has been defined.
     /// </summary>
-    public int TransactionTimeoutMsMessage { get; set; } = 0;
+    public int TransactionTimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// The producer id. This is used to disambiguate requests if a transactional id is reused following its expiration.
     /// </summary>
-    public long ProducerIdMessage { get; set; } = -1;
+    public long ProducerId { get; set; } = -1;
 
     /// <summary>
     /// The producer's current epoch. This will be checked against the producer epoch on the broker, and the request will return an error if they do not match.
     /// </summary>
-    public short ProducerEpochMessage { get; set; } = -1;
+    public short ProducerEpoch { get; set; } = -1;
 
     public InitProducerIdRequestMessage()
     {
@@ -72,12 +72,11 @@ public sealed class InitProducerIdRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

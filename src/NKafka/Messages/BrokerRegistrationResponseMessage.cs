@@ -39,16 +39,15 @@ public sealed class BrokerRegistrationResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCodeMessage { get; set; } = 0;
+    public short ErrorCode { get; set; } = 0;
 
     /// <summary>
     /// The broker's assigned epoch, or -1 if none was assigned.
     /// </summary>
-    public long BrokerEpochMessage { get; set; } = -1;
+    public long BrokerEpoch { get; set; } = -1;
 
     public BrokerRegistrationResponseMessage()
     {
-        ApiKey = ApiKeys.BrokerRegistration;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
@@ -57,17 +56,15 @@ public sealed class BrokerRegistrationResponseMessage: ResponseMessage
         : base(reader, version)
     {
         Read(reader, version);
-        ApiKey = ApiKeys.BrokerRegistration;
         LowestSupportedVersion = ApiVersions.Version0;
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

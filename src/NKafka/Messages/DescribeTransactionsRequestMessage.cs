@@ -39,7 +39,7 @@ public sealed class DescribeTransactionsRequestMessage: RequestMessage
     /// <summary>
     /// Array of transactionalIds to include in describe results. If empty, then no results will be returned.
     /// </summary>
-    public List<string> TransactionalIdsMessage { get; set; } = new ();
+    public List<string> TransactionalIds { get; set; } = new ();
 
     public DescribeTransactionsRequestMessage()
     {
@@ -57,12 +57,11 @@ public sealed class DescribeTransactionsRequestMessage: RequestMessage
         HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    public override void Read(BufferReader reader, ApiVersions version)
+    internal override void Read(BufferReader reader, ApiVersions version)
     {
     }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
+    internal override void Write(BufferWriter writer, ApiVersions version)
     {
     }
-
 }

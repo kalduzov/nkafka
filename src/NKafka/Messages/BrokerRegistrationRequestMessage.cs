@@ -34,143 +34,33 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
+public sealed class BrokerRegistrationRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID.
     /// </summary>
     public int BrokerId { get; set; } = 0;
-
     /// <summary>
     /// The cluster id of the broker process.
     /// </summary>
     public string ClusterId { get; set; } = null!;
-
     /// <summary>
     /// The incarnation id of the broker process.
     /// </summary>
     public Guid IncarnationId { get; set; } = Guid.Empty;
-
     /// <summary>
     /// The listeners of this broker
     /// </summary>
     public List<ListenerMessage> Listeners { get; set; } = new();
-
     /// <summary>
     /// The features on this broker
     /// </summary>
     public List<FeatureMessage> Features { get; set; } = new();
-
     /// <summary>
     /// The rack which this broker is in.
     /// </summary>
     public string Rack { get; set; } = null!;
 
-    public BrokerRegistrationRequestMessage()
-    {
-        ApiKey = ApiKeys.BrokerRegistration;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public BrokerRegistrationRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.BrokerRegistration;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class ListenerMessage: Message
-    {
-        /// <summary>
-        /// The name of the endpoint.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The hostname.
-        /// </summary>
-        public string Host { get; set; } = null!;
-
-        /// <summary>
-        /// The port.
-        /// </summary>
-        public ushort Port { get; set; } = 0;
-
-        /// <summary>
-        /// The security protocol.
-        /// </summary>
-        public short SecurityProtocol { get; set; } = 0;
-
-        public ListenerMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public ListenerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class FeatureMessage: Message
-    {
-        /// <summary>
-        /// The feature name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The minimum supported feature level.
-        /// </summary>
-        public short MinSupportedVersion { get; set; } = 0;
-
-        /// <summary>
-        /// The maximum supported feature level.
-        /// </summary>
-        public short MaxSupportedVersion { get; set; } = 0;
-
-        public FeatureMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public FeatureMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

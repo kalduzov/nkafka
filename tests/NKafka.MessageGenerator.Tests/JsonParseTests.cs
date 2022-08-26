@@ -19,8 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 using FluentAssertions;
 
@@ -36,7 +35,7 @@ public class JsonParseTests
     public async Task ParseRequestType_Successful()
     {
         var request = await GetMessageSpecification("data/MetadataRequest.json");
-        request.Name.Should().Be("MetadataRequest");
+        request.Struct.Name.Should().Be("MetadataRequest");
         request.Type.Should().Be(MessageType.Request);
         request.Listeners.Should()
             .BeEquivalentTo(
@@ -51,11 +50,19 @@ public class JsonParseTests
         request.ValidVersions.Highest.Should().Be(12);
         request.ValidVersions.Lowest.Should().Be(0);
         request.Fields.Count.Should().Be(4);
+        request.ClassName.Should().Be("MetadataRequestMessage");
     }
 
-    [Fact]
-    public void ParseResponseType_Successful()
+    [Theory]
+    [InlineData("data\\DescribeQuorumResponse.json")]
+    [InlineData("data\\MetadataRequest.json")]
+    [InlineData("data\\MetadataResponse.json")]
+    [InlineData("data\\LeaderAndIsrResponse.json")]
+    public async Task ParseNoError_Successful(string fileName)
     {
+        var specification = await GetMessageSpecification(fileName);
+        
+        specification.ClassName.Should().NotBeNullOrWhiteSpace();
     }
 
     internal static async Task<MessageSpecification> GetMessageSpecification(string fileName)
@@ -79,15 +86,7 @@ public class JsonParseTests
 
         try
         {
-            return JsonSerializer.Deserialize<MessageSpecification>(
-                str,
-                new JsonSerializerOptions
-                {
-                    Converters =
-                    {
-                        new JsonStringEnumConverter()
-                    }
-                })!;
+            return JsonConvert.DeserializeObject<MessageSpecification>(str)!;
         }
         catch (Exception exc)
         {

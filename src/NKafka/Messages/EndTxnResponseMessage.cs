@@ -34,26 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class EndTxnResponseMessage: ResponseMessage
+public sealed class EndTxnResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
-    public EndTxnResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
-
-    public EndTxnResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -62,4 +48,5 @@ public sealed partial class EndTxnResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

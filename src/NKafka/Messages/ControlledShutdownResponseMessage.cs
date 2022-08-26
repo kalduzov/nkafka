@@ -34,72 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
+public sealed class ControlledShutdownResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top-level error code.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
     public List<RemainingPartitionMessage> RemainingPartitions { get; set; } = new();
 
-    public ControlledShutdownResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public ControlledShutdownResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class RemainingPartitionMessage: Message
-    {
-        /// <summary>
-        /// The name of the topic.
-        /// </summary>
-        public string TopicName { get; set; } = null!;
-
-        /// <summary>
-        /// The index of the partition.
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        public RemainingPartitionMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public RemainingPartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

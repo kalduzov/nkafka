@@ -19,33 +19,34 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace NKafka.MessageGenerator.Converters;
 
 public class DefaultJsonConverter: JsonConverter<string>
 {
-    /// <summary>Reads and converts the JSON to type <typeparamref name="T" />.</summary>
-    /// <param name="reader">The reader.</param>
-    /// <param name="typeToConvert">The type to convert.</param>
-    /// <param name="options">An object that specifies serialization options to use.</param>
-    /// <returns>The converted value.</returns>
-    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    /// <summary>Writes the JSON representation of the object.</summary>
+    /// <param name="writer">The <see cref="T:Newtonsoft.Json.JsonWriter" /> to write to.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="serializer">The calling serializer.</param>
+    public override void WriteJson(JsonWriter writer, string? value, JsonSerializer serializer)
     {
-        if (reader.TokenType == JsonTokenType.Number)
-        {
-            return reader.GetInt64().ToString();
-        }
-
-        return reader.GetString();
     }
 
-    /// <summary>Writes a specified value as JSON.</summary>
-    /// <param name="writer">The writer to write to.</param>
-    /// <param name="value">The value to convert to JSON.</param>
-    /// <param name="options">An object that specifies serialization options to use.</param>
-    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+    /// <summary>Reads the JSON representation of the object.</summary>
+    /// <param name="reader">The <see cref="T:Newtonsoft.Json.JsonReader" /> to read from.</param>
+    /// <param name="objectType">Type of the object.</param>
+    /// <param name="existingValue">The existing value of object being read. If there is no existing value then <c>null</c> will be used.</param>
+    /// <param name="hasExistingValue">The existing value has a value.</param>
+    /// <param name="serializer">The calling serializer.</param>
+    /// <returns>The object value.</returns>
+    public override string? ReadJson(
+        JsonReader reader,
+        Type objectType,
+        string? existingValue,
+        bool hasExistingValue,
+        JsonSerializer serializer)
     {
+        return reader.Value?.ToString();
     }
 }

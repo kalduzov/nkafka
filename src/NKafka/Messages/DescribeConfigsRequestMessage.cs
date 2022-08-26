@@ -34,84 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeConfigsRequestMessage: RequestMessage
+public sealed class DescribeConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The resources whose configurations we want to describe.
     /// </summary>
     public List<DescribeConfigsResourceMessage> Resources { get; set; } = new();
-
     /// <summary>
     /// True if we should include all synonyms.
     /// </summary>
     public bool IncludeSynonyms { get; set; } = false;
-
     /// <summary>
     /// True if we should include configuration documentation.
     /// </summary>
     public bool IncludeDocumentation { get; set; } = false;
 
-    public DescribeConfigsRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public DescribeConfigsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DescribeConfigsResourceMessage: Message
-    {
-        /// <summary>
-        /// The resource type.
-        /// </summary>
-        public sbyte ResourceType { get; set; } = 0;
-
-        /// <summary>
-        /// The resource name.
-        /// </summary>
-        public string ResourceName { get; set; } = null!;
-
-        /// <summary>
-        /// The configuration keys to list, or null to list all configuration keys.
-        /// </summary>
-        public List<string> ConfigurationKeys { get; set; } = new();
-
-        public DescribeConfigsResourceMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public DescribeConfigsResourceMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

@@ -19,11 +19,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 namespace NKafka.MessageGenerator;
 
-public class HeaderGenerator: IHeaderGenerator
+public sealed class HeaderGenerator: IHeaderGenerator
 {
     private const string _HEADER = @"//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
@@ -55,7 +53,8 @@ public class HeaderGenerator: IHeaderGenerator
 // ReSharper disable PartialTypeWithSinglePart";
 
     private readonly string _namespaceName;
-    private readonly SortedSet<string> usings = new();
+    private readonly SortedSet<string> _using = new();
+    private readonly CodeBuffer _codeBuffer;
 
     public HeaderGenerator(string namespaceName)
     {
@@ -65,30 +64,33 @@ public class HeaderGenerator: IHeaderGenerator
         }
 
         _namespaceName = namespaceName;
+        _codeBuffer = new CodeBuffer();
     }
 
     public void AppendUsing(string value)
     {
-        usings.Add(value);
+        _using.Add(value);
     }
 
-    public StringBuilder Generate()
+    public void Generate()
     {
-        var builder = new StringBuilder();
+        _codeBuffer.AppendLine(_HEADER);
+        _codeBuffer.AppendLine();
 
-        builder.AppendLine(_HEADER);
-        builder.AppendLine();
-
-        foreach (var @using in usings)
+        foreach (var @using in _using)
         {
-            builder.AppendLine($"using {@using};");
+            _codeBuffer.AppendLine($"using {@using};");
         }
 
-        builder.AppendLine();
+        _codeBuffer.AppendLine();
 
-        builder.AppendLine($"namespace {_namespaceName};");
-        builder.AppendLine();
+        _codeBuffer.AppendLine($"namespace {_namespaceName};");
+    }
 
-        return builder;
+    /// <summary>Returns a string that represents the current object.</summary>
+    /// <returns>A string that represents the current object.</returns>
+    public override string ToString()
+    {
+        return _codeBuffer.ToString();
     }
 }

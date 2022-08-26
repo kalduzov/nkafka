@@ -19,21 +19,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Xunit;
 
-using NKafka.MessageGenerator.Specifications;
+namespace NKafka.MessageGenerator.Tests;
 
-namespace NKafka.MessageGenerator.Converters;
-
-public class VersionsJsonConverter: JsonConverter<Versions>
+public class StructRegistryTests
 {
-    public override Versions? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    [Theory]
+    [InlineData("data\\DescribeQuorumResponse.json")]
+    [InlineData("data\\MetadataRequest.json")]
+    [InlineData("data\\MetadataResponse.json")]
+    [InlineData("data\\LeaderAndIsrResponse.json")]
+    public async Task Register_Successful(string fileName)
     {
-        return Versions.Parse(reader.GetString()!);
-    }
-
-    public override void Write(Utf8JsonWriter writer, Versions value, JsonSerializerOptions options)
-    {
+        var specification = await JsonParseTests.GetMessageSpecification(fileName);
+        
+        var registry = new StructRegistry();
+        
+        registry.Register(specification);
     }
 }

@@ -27,5 +27,5 @@ public interface IHeaderGenerator
 {
     void AppendUsing(string value);
 
-    StringBuilder Generate();
+    void Generate();
 }

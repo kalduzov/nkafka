@@ -34,69 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeDelegationTokenRequestMessage: RequestMessage
+public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
     public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new();
 
-    public DescribeDelegationTokenRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public DescribeDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DescribeDelegationTokenOwnerMessage: Message
-    {
-        /// <summary>
-        /// The owner principal type.
-        /// </summary>
-        public string PrincipalType { get; set; } = null!;
-
-        /// <summary>
-        /// The owner principal name.
-        /// </summary>
-        public string PrincipalName { get; set; } = null!;
-
-        public DescribeDelegationTokenOwnerMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public DescribeDelegationTokenOwnerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

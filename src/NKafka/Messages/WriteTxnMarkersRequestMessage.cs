@@ -34,118 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
+public sealed class WriteTxnMarkersRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transaction markers to be written.
     /// </summary>
     public List<WritableTxnMarkerMessage> Markers { get; set; } = new();
 
-    public WriteTxnMarkersRequestMessage()
-    {
-        ApiKey = ApiKeys.WriteTxnMarkers;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public WriteTxnMarkersRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.WriteTxnMarkers;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class WritableTxnMarkerMessage: Message
-    {
-        /// <summary>
-        /// The current producer ID.
-        /// </summary>
-        public long ProducerId { get; set; } = 0;
-
-        /// <summary>
-        /// The current epoch associated with the producer ID.
-        /// </summary>
-        public short ProducerEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The result of the transaction to write to the partitions (false = ABORT, true = COMMIT).
-        /// </summary>
-        public bool TransactionResult { get; set; } = false;
-
-        /// <summary>
-        /// Each topic that we want to write transaction marker(s) for.
-        /// </summary>
-        public List<WritableTxnMarkerTopicMessage> Topics { get; set; } = new();
-
-        /// <summary>
-        /// Epoch associated with the transaction state partition hosted by this transaction coordinator
-        /// </summary>
-        public int CoordinatorEpoch { get; set; } = 0;
-
-        public WritableTxnMarkerMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public WritableTxnMarkerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class WritableTxnMarkerTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The indexes of the partitions to write transaction markers for.
-        /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new();
-
-        public WritableTxnMarkerTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public WritableTxnMarkerTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

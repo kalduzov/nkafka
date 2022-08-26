@@ -34,41 +34,24 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class BrokerHeartbeatResponseMessage: ResponseMessage
+public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// True if the broker has approximately caught up with the latest metadata.
     /// </summary>
     public bool IsCaughtUp { get; set; } = false;
-
     /// <summary>
     /// True if the broker is fenced.
     /// </summary>
     public bool IsFenced { get; set; } = true;
-
     /// <summary>
     /// True if the broker should proceed with its shutdown.
     /// </summary>
     public bool ShouldShutDown { get; set; } = false;
-
-    public BrokerHeartbeatResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
-
-    public BrokerHeartbeatResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -77,4 +60,5 @@ public sealed partial class BrokerHeartbeatResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

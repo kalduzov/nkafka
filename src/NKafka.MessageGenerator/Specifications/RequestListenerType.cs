@@ -20,11 +20,9 @@
 //  limitations under the License.
 
 using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
 
 namespace NKafka.MessageGenerator.Specifications;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum RequestListenerType
 {
     [EnumMember(Value = "zkBroker")]

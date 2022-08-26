@@ -36,8 +36,9 @@ public sealed class HeaderGeneratorTests
     {
         var headerGenerator = new HeaderGenerator("test");
         headerGenerator.AppendUsing(usingName);
-        var result = headerGenerator.Generate();
-        result.ToString().Should().Contain($"using {usingName};");
+        headerGenerator.Generate();
+        var result = headerGenerator.ToString();
+        result.Should().Contain($"using {usingName};");
     }
     
     [Theory]
@@ -48,7 +49,8 @@ public sealed class HeaderGeneratorTests
     public void NamespaceTestSuccess(string ns)
     {
         var headerGenerator = new HeaderGenerator(ns);
-        var result = headerGenerator.Generate();
-        result.ToString().Should().Contain($"namespace {ns};");
+        headerGenerator.Generate();
+        var result = headerGenerator.ToString();
+        result.Should().Contain($"namespace {ns};");
     }
 }

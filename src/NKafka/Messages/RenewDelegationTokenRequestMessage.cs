@@ -34,39 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class RenewDelegationTokenRequestMessage: RequestMessage
+public sealed class RenewDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// The HMAC of the delegation token to be renewed.
     /// </summary>
     public byte[] Hmac { get; set; } = Array.Empty<byte>();
-
     /// <summary>
     /// The renewal time period in milliseconds.
     /// </summary>
     public long RenewPeriodMs { get; set; } = 0;
 
-    public RenewDelegationTokenRequestMessage()
-    {
-        ApiKey = ApiKeys.RenewDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public RenewDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.RenewDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

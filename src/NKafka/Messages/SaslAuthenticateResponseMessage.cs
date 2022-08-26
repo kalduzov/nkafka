@@ -34,47 +34,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class SaslAuthenticateResponseMessage: ResponseMessage
+public sealed class SaslAuthenticateResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
     public string ErrorMessage { get; set; } = null!;
-
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
     /// </summary>
     public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
-
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
     /// </summary>
     public long? SessionLifetimeMs { get; set; } = 0;
 
-    public SaslAuthenticateResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public SaslAuthenticateResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

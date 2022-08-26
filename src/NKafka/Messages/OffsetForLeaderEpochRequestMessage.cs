@@ -34,113 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
+public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
     /// </summary>
     public int? ReplicaId { get; set; } = -2;
-
     /// <summary>
     /// Each topic to get offsets for.
     /// </summary>
     public List<OffsetForLeaderTopicMessage> Topics { get; set; } = new();
 
-    public OffsetForLeaderEpochRequestMessage()
-    {
-        ApiKey = ApiKeys.OffsetForLeaderEpoch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public OffsetForLeaderEpochRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.OffsetForLeaderEpoch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class OffsetForLeaderTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Topic { get; set; } = null!;
-
-        /// <summary>
-        /// Each partition to get offsets for.
-        /// </summary>
-        public List<OffsetForLeaderPartitionMessage> Partitions { get; set; } = new();
-
-        public OffsetForLeaderTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public OffsetForLeaderTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class OffsetForLeaderPartitionMessage: Message
-    {
-        /// <summary>
-        /// The partition index.
-        /// </summary>
-        public int Partition { get; set; } = 0;
-
-        /// <summary>
-        /// An epoch used to fence consumers/replicas with old metadata. If the epoch provided by the client is larger than the current epoch known to the broker, then the UNKNOWN_LEADER_EPOCH error code will be returned. If the provided epoch is smaller, then the FENCED_LEADER_EPOCH error code will be returned.
-        /// </summary>
-        public int? CurrentLeaderEpoch { get; set; } = -1;
-
-        /// <summary>
-        /// The epoch to look up an offset for.
-        /// </summary>
-        public int LeaderEpoch { get; set; } = 0;
-
-        public OffsetForLeaderPartitionMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public OffsetForLeaderPartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

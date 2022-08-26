@@ -34,43 +34,24 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class HeartbeatRequestMessage: RequestMessage
+public sealed class HeartbeatRequestMessage: RequestMessage
 {
     /// <summary>
     /// The group id.
     /// </summary>
-    public string GroupId { get; set; } = null!;
-
+    public string GroupId { get; set; } = "";
     /// <summary>
     /// The generation of the group.
     /// </summary>
     public int GenerationId { get; set; } = 0;
-
     /// <summary>
     /// The member ID.
     /// </summary>
-    public string MemberId { get; set; } = null!;
-
+    public string MemberId { get; set; } = "";
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = "null";
-
-    public HeartbeatRequestMessage()
-    {
-        ApiKey = ApiKeys.Heartbeat;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
-
-    public HeartbeatRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.Heartbeat;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
+    public string GroupInstanceId { get; set; } = null;
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -79,4 +60,5 @@ public sealed partial class HeartbeatRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

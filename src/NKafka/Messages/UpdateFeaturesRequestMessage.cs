@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,63 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class UpdateFeaturesRequestMessage: RequestMessage
+public sealed class UpdateFeaturesRequestMessage: RequestMessage
 {
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
     /// </summary>
     public int timeoutMs { get; set; } = 60000;
-
     /// <summary>
     /// The list of updates to finalized features.
     /// </summary>
     public List<FeatureUpdateKeyMessage> FeatureUpdates { get; set; } = new();
+    /// <summary>
+    /// True if we should validate the request, but not perform the upgrade or downgrade.
+    /// </summary>
+    public bool ValidateOnly { get; set; } = False;
 
-    public UpdateFeaturesRequestMessage()
-    {
-        ApiKey = ApiKeys.UpdateFeatures;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
 
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public class FeatureUpdateKeyMessage: Message
-    {
-        /// <summary>
-        /// The name of the finalized feature to be updated.
-        /// </summary>
-        public string Feature { get; set; } = null!;
-
-        /// <summary>
-        /// The new maximum version level for the finalized feature. A value >= 1 is valid. A value < 1, is special, and can be used to request the deletion of the finalized feature.
-        /// </summary>
-        public short MaxVersionLevel { get; set; } = 0;
-
-        /// <summary>
-        /// When set to true, the finalized feature version level is allowed to be downgraded/deleted. The downgrade request will fail if the new maximum version level is a value that's not lower than the existing maximum finalized version level.
-        /// </summary>
-        public bool AllowDowngrade { get; set; } = false;
-
-        public FeatureUpdateKeyMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

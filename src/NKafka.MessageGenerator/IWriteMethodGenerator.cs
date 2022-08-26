@@ -19,13 +19,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
 public interface IWriteMethodGenerator
 {
-    StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = Generator.DEFAULT_INDENT);
+    void Generate(string className, StructSpecification structSpecification, Versions parentVersions);
 }

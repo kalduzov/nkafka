@@ -34,31 +34,16 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class UnregisterBrokerResponseMessage: ResponseMessage
+public sealed class UnregisterBrokerResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessage { get; set; } = null!;
-
-    public UnregisterBrokerResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
-
-    public UnregisterBrokerResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
+    public string ErrorMessage { get; set; } = "";
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -67,4 +52,5 @@ public sealed partial class UnregisterBrokerResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

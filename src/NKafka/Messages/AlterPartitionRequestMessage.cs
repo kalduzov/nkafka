@@ -34,133 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AlterPartitionRequestMessage: RequestMessage
+public sealed class AlterPartitionRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the requesting broker
     /// </summary>
     public int BrokerId { get; set; } = 0;
-
     /// <summary>
     /// The epoch of the requesting broker
     /// </summary>
     public long BrokerEpoch { get; set; } = -1;
-
     /// <summary>
     /// 
     /// </summary>
     public List<TopicDataMessage> Topics { get; set; } = new();
 
-    public AlterPartitionRequestMessage()
-    {
-        ApiKey = ApiKeys.AlterIsr;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public AlterPartitionRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.AlterIsr;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TopicDataMessage: Message
-    {
-        /// <summary>
-        /// The name of the topic to alter ISRs for
-        /// </summary>
-        public string? TopicName { get; set; } = null!;
-
-        /// <summary>
-        /// The ID of the topic to alter ISRs for
-        /// </summary>
-        public Guid? TopicId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new();
-
-        public TopicDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class PartitionDataMessage: Message
-    {
-        /// <summary>
-        /// The partition index
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        /// <summary>
-        /// The leader epoch of this partition
-        /// </summary>
-        public int LeaderEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The ISR for this partition
-        /// </summary>
-        public List<int> NewIsr { get; set; } = new();
-
-        /// <summary>
-        /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.
-        /// </summary>
-        public sbyte LeaderRecoveryState { get; set; } = 0;
-
-        /// <summary>
-        /// The expected epoch of the partition which is being updated. For legacy cluster this is the ZkVersion in the LeaderAndIsr request.
-        /// </summary>
-        public int PartitionEpoch { get; set; } = 0;
-
-        public PartitionDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

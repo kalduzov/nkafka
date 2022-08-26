@@ -34,118 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class IncrementalAlterConfigsRequestMessage: RequestMessage
+public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The incremental updates for each resource.
     /// </summary>
     public List<AlterConfigsResourceMessage> Resources { get; set; } = new();
-
     /// <summary>
     /// True if we should validate the request, but not change the configurations.
     /// </summary>
     public bool ValidateOnly { get; set; } = false;
 
-    public IncrementalAlterConfigsRequestMessage()
-    {
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public IncrementalAlterConfigsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class AlterConfigsResourceMessage: Message
-    {
-        /// <summary>
-        /// The resource type.
-        /// </summary>
-        public sbyte ResourceType { get; set; } = 0;
-
-        /// <summary>
-        /// The resource name.
-        /// </summary>
-        public string ResourceName { get; set; } = null!;
-
-        /// <summary>
-        /// The configurations.
-        /// </summary>
-        public List<AlterableConfigMessage> Configs { get; set; } = new();
-
-        public AlterConfigsResourceMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public AlterConfigsResourceMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class AlterableConfigMessage: Message
-    {
-        /// <summary>
-        /// The configuration key name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The type (Set, Delete, Append, Subtract) of operation.
-        /// </summary>
-        public sbyte ConfigOperation { get; set; } = 0;
-
-        /// <summary>
-        /// The value to set for the configuration key.
-        /// </summary>
-        public string Value { get; set; } = null!;
-
-        public AlterableConfigMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public AlterableConfigMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

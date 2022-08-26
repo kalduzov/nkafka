@@ -34,162 +34,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class FetchSnapshotRequestMessage: RequestMessage
+public sealed class FetchSnapshotRequestMessage: RequestMessage
 {
     /// <summary>
     /// The clusterId if known, this is used to validate metadata fetches prior to broker registration
     /// </summary>
     public string? ClusterId { get; set; } = "null";
-
     /// <summary>
     /// The broker ID of the follower
     /// </summary>
     public int ReplicaId { get; set; } = -1;
-
     /// <summary>
     /// The maximum bytes to fetch from all of the snapshots
     /// </summary>
     public int MaxBytes { get; set; } = 0x7fffffff;
-
     /// <summary>
     /// The topics to fetch
     /// </summary>
     public List<TopicSnapshotMessage> Topics { get; set; } = new();
 
-    public FetchSnapshotRequestMessage()
-    {
-        ApiKey = ApiKeys.FetchSnapshot;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public FetchSnapshotRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.FetchSnapshot;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TopicSnapshotMessage: Message
-    {
-        /// <summary>
-        /// The name of the topic to fetch
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The partitions to fetch
-        /// </summary>
-        public List<PartitionSnapshotMessage> Partitions { get; set; } = new();
-
-        public TopicSnapshotMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public TopicSnapshotMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class PartitionSnapshotMessage: Message
-    {
-        /// <summary>
-        /// The partition index
-        /// </summary>
-        public int Partition { get; set; } = 0;
-
-        /// <summary>
-        /// The current leader epoch of the partition, -1 for unknown leader epoch
-        /// </summary>
-        public int CurrentLeaderEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The snapshot endOffset and epoch to fetch
-        /// </summary>
-        public SnapshotIdMessage SnapshotId { get; set; } = new();
-
-        /// <summary>
-        /// The byte position within the snapshot to start fetching from
-        /// </summary>
-        public long Position { get; set; } = 0;
-
-        public PartitionSnapshotMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public PartitionSnapshotMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class SnapshotIdMessage: Message
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public long EndOffset { get; set; } = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Epoch { get; set; } = 0;
-
-        public SnapshotIdMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public SnapshotIdMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

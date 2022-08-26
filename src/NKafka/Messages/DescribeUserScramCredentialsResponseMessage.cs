@@ -34,121 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeUserScramCredentialsResponseMessage: ResponseMessage
+public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The message-level error code, 0 except for user authorization or infrastructure issues.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The message-level error message, if any.
     /// </summary>
     public string ErrorMessage { get; set; } = null!;
-
     /// <summary>
     /// The results for descriptions, one per user.
     /// </summary>
     public List<DescribeUserScramCredentialsResultMessage> Results { get; set; } = new();
 
-    public DescribeUserScramCredentialsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public DescribeUserScramCredentialsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DescribeUserScramCredentialsResultMessage: Message
-    {
-        /// <summary>
-        /// The user name.
-        /// </summary>
-        public string User { get; set; } = null!;
-
-        /// <summary>
-        /// The user-level error code.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The user-level error message, if any.
-        /// </summary>
-        public string ErrorMessage { get; set; } = null!;
-
-        /// <summary>
-        /// The mechanism and related information associated with the user's SCRAM credentials.
-        /// </summary>
-        public List<CredentialInfoMessage> CredentialInfos { get; set; } = new();
-
-        public DescribeUserScramCredentialsResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public DescribeUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class CredentialInfoMessage: Message
-    {
-        /// <summary>
-        /// The SCRAM mechanism.
-        /// </summary>
-        public sbyte Mechanism { get; set; } = 0;
-
-        /// <summary>
-        /// The number of iterations used in the SCRAM credential.
-        /// </summary>
-        public int Iterations { get; set; } = 0;
-
-        public CredentialInfoMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public CredentialInfoMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

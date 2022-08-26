@@ -34,43 +34,24 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class InitProducerIdRequestMessage: RequestMessage
+public sealed class InitProducerIdRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
     /// </summary>
-    public string TransactionalId { get; set; } = null!;
-
+    public string TransactionalId { get; set; } = "";
     /// <summary>
     /// The time in ms to wait before aborting idle transactions sent by this producer. This is only relevant if a TransactionalId has been defined.
     /// </summary>
     public int TransactionTimeoutMs { get; set; } = 0;
-
     /// <summary>
     /// The producer id. This is used to disambiguate requests if a transactional id is reused following its expiration.
     /// </summary>
     public long ProducerId { get; set; } = -1;
-
     /// <summary>
     /// The producer's current epoch. This will be checked against the producer epoch on the broker, and the request will return an error if they do not match.
     /// </summary>
     public short ProducerEpoch { get; set; } = -1;
-
-    public InitProducerIdRequestMessage()
-    {
-        ApiKey = ApiKeys.InitProducerId;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
-
-    public InitProducerIdRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.InitProducerId;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -79,4 +60,5 @@ public sealed partial class InitProducerIdRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

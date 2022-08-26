@@ -34,126 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AlterIsrResponseMessage: ResponseMessage
+public sealed class AlterIsrResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// 
     /// </summary>
     public List<TopicDataMessage> Topics { get; set; } = new();
 
-    public AlterIsrResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public AlterIsrResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TopicDataMessage: Message
-    {
-        /// <summary>
-        /// The name of the topic
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new();
-
-        public TopicDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class PartitionDataMessage: Message
-    {
-        /// <summary>
-        /// The partition index
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        /// <summary>
-        /// The partition level error code
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The broker ID of the leader.
-        /// </summary>
-        public int LeaderId { get; set; } = 0;
-
-        /// <summary>
-        /// The leader epoch.
-        /// </summary>
-        public int LeaderEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The in-sync replica IDs.
-        /// </summary>
-        public List<int> Isr { get; set; } = new();
-
-        /// <summary>
-        /// The current ISR version.
-        /// </summary>
-        public int CurrentIsrVersion { get; set; } = 0;
-
-        public PartitionDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

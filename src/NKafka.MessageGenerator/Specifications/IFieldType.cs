@@ -19,13 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json.Serialization;
-
-using NKafka.MessageGenerator.Converters;
-
 namespace NKafka.MessageGenerator.Specifications;
 
-[JsonConverter(typeof(FieldTypeJsonConverter))]
 public interface IFieldType
 {
     private const string _ARRAY_PREFIX = "[]";
@@ -48,11 +43,13 @@ public interface IFieldType
 
     bool IsFloat => false;
 
-    bool CanBeNull => false;
+    bool CanBeNullable => false;
 
     int? Size => null;
 
     bool IsVariableLength => !Size.HasValue;
+
+    string ToString();
 
     public static IFieldType Parse(string value)
     {
@@ -119,6 +116,13 @@ public interface IFieldType
         public string ClrName => "bool";
 
         public int? Size => 1;
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class BytesFieldType: IFieldType
@@ -132,7 +136,12 @@ public interface IFieldType
 
         public bool IsBytes => true;
 
-        public bool CanBeNull => true;
+        public bool CanBeNullable => true;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class RecordsFieldType: IFieldType
@@ -147,7 +156,12 @@ public interface IFieldType
 
         public bool IsRecords => true;
 
-        public bool CanBeNull => true;
+        public bool CanBeNullable => true;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class Int8FieldType: IFieldType
@@ -159,6 +173,13 @@ public interface IFieldType
         public string ClrName => "sbyte";
 
         public int? Size => 1;
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class Int16FieldType: IFieldType
@@ -170,6 +191,11 @@ public interface IFieldType
         public string ClrName => "short";
 
         public int? Size => 2;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class UInt16FieldType: IFieldType
@@ -181,6 +207,11 @@ public interface IFieldType
         public string ClrName => "ushort";
 
         public int? Size => 2;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class Int32FieldType: IFieldType
@@ -192,6 +223,11 @@ public interface IFieldType
         public string ClrName => "int";
 
         public int? Size => 4;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class UInt32FieldType: IFieldType
@@ -203,6 +239,11 @@ public interface IFieldType
         public string ClrName => "uint";
 
         public int? Size => 4;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class Int64FieldType: IFieldType
@@ -214,6 +255,11 @@ public interface IFieldType
         public string ClrName => "long";
 
         public int? Size => 8;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class UuidFieldType: IFieldType
@@ -225,6 +271,11 @@ public interface IFieldType
         public string ClrName => "Guid";
 
         public int? Size => 16;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class Float64FieldType: IFieldType
@@ -238,6 +289,11 @@ public interface IFieldType
         public int? Size => 8;
 
         public bool IsFloat => true;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class StringFieldType: IFieldType
@@ -252,41 +308,63 @@ public interface IFieldType
 
         public bool IsString => true;
 
-        public bool CanBeNull => true;
+        public bool CanBeNullable => true;
+
+        public override string ToString()
+        {
+            return NAME;
+        }
     }
 
     internal sealed class StructType: IFieldType
     {
+        private readonly string _type;
+
         public StructType(string type)
         {
-            ClrName = $"{type}Message";
+            _type = type;
         }
 
-        public string ClrName { get; }
+        public string ClrName => _type;
 
         public bool IsStruct => true;
 
         public bool SerializationIsDifferentInFlexibleVersions => true;
+
+        public string TypeName => _type;
+
+        public override string ToString()
+        {
+            return _type;
+        }
     }
 
     internal sealed class ArrayType: IFieldType
     {
         public IFieldType ElementType { get; }
 
-        public string ClrName { get; }
+        public string ElementName => ElementType.ToString();
+
+        public string ClrName => throw new NotSupportedException();
 
         public bool IsArray => true;
 
         public bool IsStructArray => ElementType.IsStruct;
 
-        public bool CanBeNull => true;
+        public bool CanBeNullable => true;
 
         public bool SerializationIsDifferentInFlexibleVersions => true;
 
         public ArrayType(IFieldType elementType)
         {
             ElementType = elementType;
-            ClrName = elementType.ClrName;
+        }
+
+        /// <summary>Returns a string that represents the current object.</summary>
+        /// <returns>A string that represents the current object.</returns>
+        public override string ToString()
+        {
+            return $"[]{ElementType}";
         }
     }
 }

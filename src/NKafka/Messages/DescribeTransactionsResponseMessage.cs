@@ -34,131 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
+public sealed class DescribeTransactionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// 
     /// </summary>
     public List<TransactionStateMessage> TransactionStates { get; set; } = new();
 
-    public DescribeTransactionsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public DescribeTransactionsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TransactionStateMessage: Message
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string TransactionalId { get; set; } = null!;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string TransactionState { get; set; } = null!;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int TransactionTimeoutMs { get; set; } = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public long TransactionStartTimeMs { get; set; } = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public long ProducerId { get; set; } = 0;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public short ProducerEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The set of partitions included in the current transaction (if active). When a transaction is preparing to commit or abort, this will include only partitions which do not have markers.
-        /// </summary>
-        public List<TopicDataMessage> Topics { get; set; } = new();
-
-        public TransactionStateMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public TransactionStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class TopicDataMessage: Message
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public string Topic { get; set; } = null!;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<int> Partitions { get; set; } = new();
-
-        public TopicDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

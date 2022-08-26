@@ -11,36 +11,27 @@
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 // 
-//      https://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 // 
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
-// THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
-// ReSharper disable RedundantUsingDirective
-// ReSharper disable UnusedType.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable PartialTypeWithSinglePart
+namespace NKafka.MessageGenerator;
 
-using NKafka.Protocol;
-using NKafka.Protocol.Extensions;
-using NKafka.Protocol.Records;
-using System.Text;
-
-namespace NKafka.Messages;
-
-public sealed class DescribeQuorumRequestMessage: RequestMessage
+public interface ICodeBuffer
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    internal const int DEFAULT_INDENT = 4;
+    
+    public void AppendLine(string value);
 
+    public void AppendLine();
 
+    public void Append(string value);
 
+    void IncrementIndent(int value = DEFAULT_INDENT);
+
+    void DecrementIndent(int value = DEFAULT_INDENT);
 }

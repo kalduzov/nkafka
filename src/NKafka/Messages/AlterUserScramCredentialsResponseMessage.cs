@@ -34,72 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
+public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
     /// </summary>
     public List<AlterUserScramCredentialsResultMessage> Results { get; set; } = new();
 
-    public AlterUserScramCredentialsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public AlterUserScramCredentialsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class AlterUserScramCredentialsResultMessage: Message
-    {
-        /// <summary>
-        /// The user name.
-        /// </summary>
-        public string User { get; set; } = null!;
-
-        /// <summary>
-        /// The error code.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The error message, if any.
-        /// </summary>
-        public string ErrorMessage { get; set; } = null!;
-
-        public AlterUserScramCredentialsResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

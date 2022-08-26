@@ -34,77 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DeleteTopicsResponseMessage: ResponseMessage
+public sealed class DeleteTopicsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic we tried to delete.
     /// </summary>
     public List<DeletableTopicResultMessage> Responses { get; set; } = new();
 
-    public DeleteTopicsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
-    }
 
-    public DeleteTopicsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DeletableTopicResultMessage: Message
-    {
-        /// <summary>
-        /// The topic name
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// the unique topic ID
-        /// </summary>
-        public Guid? TopicId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The deletion error, or 0 if the deletion succeeded.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The error message, or null if there was no error.
-        /// </summary>
-        public string? ErrorMessage { get; set; } = "null";
-
-        public DeletableTopicResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
-        }
-
-        public DeletableTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

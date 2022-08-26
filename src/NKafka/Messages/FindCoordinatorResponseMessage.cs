@@ -34,112 +34,33 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
+public sealed class FindCoordinatorResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
     public string? ErrorMessage { get; set; } = null!;
-
     /// <summary>
     /// The node id.
     /// </summary>
     public int NodeId { get; set; } = 0;
-
     /// <summary>
     /// The host name.
     /// </summary>
     public string Host { get; set; } = null!;
-
     /// <summary>
     /// The port.
     /// </summary>
     public int Port { get; set; } = 0;
-
     /// <summary>
     /// Each coordinator result in the response
     /// </summary>
     public List<CoordinatorMessage> Coordinators { get; set; } = new();
 
-    public FindCoordinatorResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public FindCoordinatorResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class CoordinatorMessage: Message
-    {
-        /// <summary>
-        /// The coordinator key.
-        /// </summary>
-        public string Key { get; set; } = null!;
-
-        /// <summary>
-        /// The node id.
-        /// </summary>
-        public int NodeId { get; set; } = 0;
-
-        /// <summary>
-        /// The host name.
-        /// </summary>
-        public string Host { get; set; } = null!;
-
-        /// <summary>
-        /// The port.
-        /// </summary>
-        public int Port { get; set; } = 0;
-
-        /// <summary>
-        /// The error code, or 0 if there was no error.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The error message, or null if there was no error.
-        /// </summary>
-        public string? ErrorMessage { get; set; } = null!;
-
-        public CoordinatorMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public CoordinatorMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

@@ -34,32 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class RenewDelegationTokenResponseMessage: ResponseMessage
+public sealed class RenewDelegationTokenResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The timestamp in milliseconds at which this token expires.
     /// </summary>
     public long ExpiryTimestampMs { get; set; } = 0;
 
-
-    public RenewDelegationTokenResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
-
-    public RenewDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -68,4 +53,5 @@ public sealed partial class RenewDelegationTokenResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

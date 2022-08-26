@@ -34,113 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class CreatePartitionsRequestMessage: RequestMessage
+public sealed class CreatePartitionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to create new partitions inside.
     /// </summary>
     public List<CreatePartitionsTopicMessage> Topics { get; set; } = new();
-
     /// <summary>
     /// The time in ms to wait for the partitions to be created.
     /// </summary>
     public int TimeoutMs { get; set; } = 0;
-
     /// <summary>
     /// If true, then validate the request, but don't actually increase the number of partitions.
     /// </summary>
     public bool ValidateOnly { get; set; } = false;
 
-    public CreatePartitionsRequestMessage()
-    {
-        ApiKey = ApiKeys.CreatePartitions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public CreatePartitionsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.CreatePartitions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class CreatePartitionsTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The new partition count.
-        /// </summary>
-        public int Count { get; set; } = 0;
-
-        /// <summary>
-        /// The new partition assignments.
-        /// </summary>
-        public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new();
-
-        public CreatePartitionsTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public CreatePartitionsTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class CreatePartitionsAssignmentMessage: Message
-    {
-        /// <summary>
-        /// The assigned broker IDs.
-        /// </summary>
-        public List<int> BrokerIds { get; set; } = new();
-
-        public CreatePartitionsAssignmentMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public CreatePartitionsAssignmentMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

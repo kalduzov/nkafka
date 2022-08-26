@@ -34,37 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class EnvelopeResponseMessage: ResponseMessage
+public sealed class EnvelopeResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The embedded response header and data.
     /// </summary>
     public byte[]? ResponseData { get; set; } = null;
-
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
 
-    public EnvelopeResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public EnvelopeResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

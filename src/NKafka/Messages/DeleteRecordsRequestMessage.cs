@@ -34,108 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DeleteRecordsRequestMessage: RequestMessage
+public sealed class DeleteRecordsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to delete records from.
     /// </summary>
     public List<DeleteRecordsTopicMessage> Topics { get; set; } = new();
-
     /// <summary>
     /// How long to wait for the deletion to complete, in milliseconds.
     /// </summary>
     public int TimeoutMs { get; set; } = 0;
 
-    public DeleteRecordsRequestMessage()
-    {
-        ApiKey = ApiKeys.DeleteRecords;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public DeleteRecordsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DeleteRecords;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DeleteRecordsTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// Each partition that we want to delete records from.
-        /// </summary>
-        public List<DeleteRecordsPartitionMessage> Partitions { get; set; } = new();
-
-        public DeleteRecordsTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public DeleteRecordsTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class DeleteRecordsPartitionMessage: Message
-    {
-        /// <summary>
-        /// The partition index.
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        /// <summary>
-        /// The deletion offset.
-        /// </summary>
-        public long Offset { get; set; } = 0;
-
-        public DeleteRecordsPartitionMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public DeleteRecordsPartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

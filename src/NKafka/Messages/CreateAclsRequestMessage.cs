@@ -34,94 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class CreateAclsRequestMessage: RequestMessage
+public sealed class CreateAclsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ACLs that we want to create.
     /// </summary>
     public List<AclCreationMessage> Creations { get; set; } = new();
 
-    public CreateAclsRequestMessage()
-    {
-        ApiKey = ApiKeys.CreateAcls;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public CreateAclsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.CreateAcls;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class AclCreationMessage: Message
-    {
-        /// <summary>
-        /// The type of the resource.
-        /// </summary>
-        public sbyte ResourceType { get; set; } = 0;
-
-        /// <summary>
-        /// The resource name for the ACL.
-        /// </summary>
-        public string ResourceName { get; set; } = null!;
-
-        /// <summary>
-        /// The pattern type for the ACL.
-        /// </summary>
-        public sbyte ResourcePatternType { get; set; } = 3;
-
-        /// <summary>
-        /// The principal for the ACL.
-        /// </summary>
-        public string Principal { get; set; } = null!;
-
-        /// <summary>
-        /// The host for the ACL.
-        /// </summary>
-        public string Host { get; set; } = null!;
-
-        /// <summary>
-        /// The operation type for the ACL (read, write, etc.).
-        /// </summary>
-        public sbyte Operation { get; set; } = 0;
-
-        /// <summary>
-        /// The permission type for the ACL (allow, deny, etc.).
-        /// </summary>
-        public sbyte PermissionType { get; set; } = 0;
-
-        public AclCreationMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public AclCreationMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

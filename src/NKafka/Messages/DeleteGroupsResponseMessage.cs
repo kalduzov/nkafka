@@ -34,67 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DeleteGroupsResponseMessage: ResponseMessage
+public sealed class DeleteGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The deletion results
     /// </summary>
     public List<DeletableGroupResultMessage> Results { get; set; } = new();
 
-    public DeleteGroupsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public DeleteGroupsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DeletableGroupResultMessage: Message
-    {
-        /// <summary>
-        /// The group id
-        /// </summary>
-        public string GroupId { get; set; } = null!;
-
-        /// <summary>
-        /// The deletion error, or 0 if the deletion succeeded.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        public DeletableGroupResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public DeletableGroupResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

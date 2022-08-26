@@ -32,6 +32,7 @@ public class FieldTypeTests
     [Theory]
     [InlineData("bool", typeof(IFieldType.BoolFieldType), "bool")]
     [InlineData("string", typeof(IFieldType.StringFieldType), "string")]
+    [InlineData("int32", typeof(IFieldType.Int32FieldType), "int")]
     public void ParseTest(string value, Type result, string clrType)
     {
         var parseType = IFieldType.Parse(value);

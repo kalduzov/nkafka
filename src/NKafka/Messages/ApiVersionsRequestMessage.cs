@@ -34,33 +34,16 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class ApiVersionsRequestMessage: RequestMessage
+public sealed class ApiVersionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The name of the client.
     /// </summary>
-    public string? ClientSoftwareName { get; set; } = null!;
-
+    public string ClientSoftwareName { get; set; } = "";
     /// <summary>
     /// The version of the client.
     /// </summary>
-    public string? ClientSoftwareVersion { get; set; } = null!;
-
-    public ApiVersionsRequestMessage()
-    {
-        ApiKey = ApiKeys.ApiVersions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
-
-    public ApiVersionsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.ApiVersions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
+    public string ClientSoftwareVersion { get; set; } = "";
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -69,4 +52,5 @@ public sealed partial class ApiVersionsRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

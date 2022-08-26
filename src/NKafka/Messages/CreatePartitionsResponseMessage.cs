@@ -34,72 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class CreatePartitionsResponseMessage: ResponseMessage
+public sealed class CreatePartitionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The partition creation results for each topic.
     /// </summary>
     public List<CreatePartitionsTopicResultMessage> Results { get; set; } = new();
 
-    public CreatePartitionsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public CreatePartitionsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class CreatePartitionsTopicResultMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The result error, or zero if there was no error.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The result message, or null if there was no error.
-        /// </summary>
-        public string? ErrorMessage { get; set; } = "null";
-
-        public CreatePartitionsTopicResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public CreatePartitionsTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

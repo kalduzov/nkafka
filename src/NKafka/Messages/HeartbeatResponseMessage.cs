@@ -34,26 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class HeartbeatResponseMessage: ResponseMessage
+public sealed class HeartbeatResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
-    public HeartbeatResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
-
-    public HeartbeatResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -62,4 +48,5 @@ public sealed partial class HeartbeatResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

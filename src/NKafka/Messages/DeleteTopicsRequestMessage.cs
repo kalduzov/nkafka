@@ -34,79 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DeleteTopicsRequestMessage: RequestMessage
+public sealed class DeleteTopicsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The name or topic ID of the topic
     /// </summary>
     public List<DeleteTopicStateMessage> Topics { get; set; } = new();
-
     /// <summary>
     /// The names of the topics to delete
     /// </summary>
     public List<string>? TopicNames { get; set; } = new();
-
     /// <summary>
     /// The length of time in milliseconds to wait for the deletions to complete.
     /// </summary>
     public int TimeoutMs { get; set; } = 0;
 
-    public DeleteTopicsRequestMessage()
-    {
-        ApiKey = ApiKeys.DeleteTopics;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
-    }
 
-    public DeleteTopicsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DeleteTopics;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DeleteTopicStateMessage: Message
-    {
-        /// <summary>
-        /// The topic name
-        /// </summary>
-        public string? Name { get; set; } = "null";
-
-        /// <summary>
-        /// The unique topic ID
-        /// </summary>
-        public Guid TopicId { get; set; } = Guid.Empty;
-
-        public DeleteTopicStateMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
-        }
-
-        public DeleteTopicStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

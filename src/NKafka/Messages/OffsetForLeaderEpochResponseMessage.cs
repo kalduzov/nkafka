@@ -34,111 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
+public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic we fetched offsets for.
     /// </summary>
     public List<OffsetForLeaderTopicResultMessage> Topics { get; set; } = new();
 
-    public OffsetForLeaderEpochResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public OffsetForLeaderEpochResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class OffsetForLeaderTopicResultMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Topic { get; set; } = null!;
-
-        /// <summary>
-        /// Each partition in the topic we fetched offsets for.
-        /// </summary>
-        public List<EpochEndOffsetMessage> Partitions { get; set; } = new();
-
-        public OffsetForLeaderTopicResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public OffsetForLeaderTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class EpochEndOffsetMessage: Message
-    {
-        /// <summary>
-        /// The error code 0, or if there was no error.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The partition index.
-        /// </summary>
-        public int Partition { get; set; } = 0;
-
-        /// <summary>
-        /// The leader epoch of the partition.
-        /// </summary>
-        public int? LeaderEpoch { get; set; } = -1;
-
-        /// <summary>
-        /// The end offset of the epoch.
-        /// </summary>
-        public long EndOffset { get; set; } = -1;
-
-        public EpochEndOffsetMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

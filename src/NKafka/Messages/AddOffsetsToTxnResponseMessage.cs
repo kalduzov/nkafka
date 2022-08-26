@@ -34,26 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AddOffsetsToTxnResponseMessage: ResponseMessage
+public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The response error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
-    public AddOffsetsToTxnResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
-
-    public AddOffsetsToTxnResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -62,4 +48,5 @@ public sealed partial class AddOffsetsToTxnResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

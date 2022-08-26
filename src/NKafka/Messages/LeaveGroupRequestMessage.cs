@@ -34,84 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class LeaveGroupRequestMessage: RequestMessage
+public sealed class LeaveGroupRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ID of the group to leave.
     /// </summary>
     public string GroupId { get; set; } = null!;
-
     /// <summary>
     /// The member ID to remove from the group.
     /// </summary>
     public string MemberId { get; set; } = null!;
-
     /// <summary>
     /// List of leaving member identities.
     /// </summary>
     public List<MemberIdentityMessage> Members { get; set; } = new();
 
-    public LeaveGroupRequestMessage()
-    {
-        ApiKey = ApiKeys.LeaveGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
-    }
 
-    public LeaveGroupRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.LeaveGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class MemberIdentityMessage: Message
-    {
-        /// <summary>
-        /// The member ID to remove from the group.
-        /// </summary>
-        public string MemberId { get; set; } = null!;
-
-        /// <summary>
-        /// The group instance ID to remove from the group.
-        /// </summary>
-        public string? GroupInstanceId { get; set; } = "null";
-
-        /// <summary>
-        /// The reason why the member left the group.
-        /// </summary>
-        public string? Reason { get; set; } = "null";
-
-        public MemberIdentityMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
-        }
-
-        public MemberIdentityMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

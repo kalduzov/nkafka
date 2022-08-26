@@ -34,34 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeTransactionsRequestMessage: RequestMessage
+public sealed class DescribeTransactionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Array of transactionalIds to include in describe results. If empty, then no results will be returned.
     /// </summary>
     public List<string> TransactionalIds { get; set; } = new();
 
-    public DescribeTransactionsRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeTransactions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public DescribeTransactionsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeTransactions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

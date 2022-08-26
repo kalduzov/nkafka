@@ -1,13 +1,12 @@
 ﻿using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Microsoft.Build.Framework;
+
+using Newtonsoft.Json;
 
 using NKafka.MessageGenerator;
 using NKafka.MessageGenerator.Specifications;
 
-using ILogger = Microsoft.Extensions.Logging.ILogger;
 using Task = Microsoft.Build.Utilities.Task;
 
 namespace NKafka.BuildTasks;
@@ -49,9 +48,9 @@ public class MessagesGeneratorTask: Task
                     {
                         case MessageType.Request or MessageType.Response:
                         {
-                            var messageGenerator = BuildMessageGenerator(apiDescriptor);
-                            var result = messageGenerator.Generate();
-                            var classFileName = $"{messageGenerator.ClassName}.cs";
+                            IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
+                            var result = messageGenerator.Generate(apiDescriptor);
+                            var classFileName = $"{messageGenerator.ClassName(apiDescriptor)}.cs";
                             WriteContentToFile(classFileName, result);
 
                             break;
@@ -83,16 +82,6 @@ public class MessagesGeneratorTask: Task
         File.WriteAllText(path, result.ToString(), Encoding.UTF8);
     }
 
-    private static IMessageGenerator BuildMessageGenerator(MessageSpecification messageSpecification)
-    {
-        var headerGenerator = new HeaderGenerator("NKafka.Messages");
-        var readMethodGenerator = new ReadMethodGenerator(messageSpecification);
-        var writeMethodGenerator = new WriteMethodGenerator(messageSpecification);
-        var classGenerator = new ClassGenerator(messageSpecification, writeMethodGenerator, readMethodGenerator);
-
-        return new MessageGenerator.MessageGenerator(messageSpecification, headerGenerator, classGenerator);
-    }
-
     private IEnumerable<string> GetFileResources()
     {
         var pathToResources = Path.Combine(Directory.GetCurrentDirectory(), SolutionDirectory, "resources", "message");
@@ -121,15 +110,7 @@ public class MessagesGeneratorTask: Task
 
         try
         {
-            return JsonSerializer.Deserialize<MessageSpecification>(
-                str,
-                new JsonSerializerOptions
-                {
-                    Converters =
-                    {
-                        new JsonStringEnumConverter()
-                    }
-                })!;
+            return JsonConvert.DeserializeObject<MessageSpecification>(str)!;
         }
         catch (Exception exc)
         {

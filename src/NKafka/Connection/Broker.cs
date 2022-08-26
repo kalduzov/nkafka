@@ -167,7 +167,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         var metadataRequest = new MetadataRequestMessage
         {
-            Topics = Array.Empty<MetadataRequestMessage.MetadataRequestTopic>().ToList()
+            Topics = Array.Empty<MetadataRequestMessage.MetadataRequestTopicMessage>().ToList()
         };
         var metadataResponse = await _kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(metadataRequest, true, token)
             .ConfigureAwait(false);

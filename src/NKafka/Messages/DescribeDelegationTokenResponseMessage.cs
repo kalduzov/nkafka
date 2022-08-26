@@ -34,147 +34,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMessage
+public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The tokens.
     /// </summary>
     public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new();
 
 
-    public DescribeDelegationTokenResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public DescribeDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DescribedDelegationTokenMessage: Message
-    {
-        /// <summary>
-        /// The token principal type.
-        /// </summary>
-        public string PrincipalType { get; set; } = null!;
-
-        /// <summary>
-        /// The token principal name.
-        /// </summary>
-        public string PrincipalName { get; set; } = null!;
-
-        /// <summary>
-        /// The principal type of the requester of the token.
-        /// </summary>
-        public string TokenRequesterPrincipalType { get; set; } = null!;
-
-        /// <summary>
-        /// The principal type of the requester of the token.
-        /// </summary>
-        public string TokenRequesterPrincipalName { get; set; } = null!;
-
-        /// <summary>
-        /// The token issue timestamp in milliseconds.
-        /// </summary>
-        public long IssueTimestamp { get; set; } = 0;
-
-        /// <summary>
-        /// The token expiry timestamp in milliseconds.
-        /// </summary>
-        public long ExpiryTimestamp { get; set; } = 0;
-
-        /// <summary>
-        /// The token maximum timestamp length in milliseconds.
-        /// </summary>
-        public long MaxTimestamp { get; set; } = 0;
-
-        /// <summary>
-        /// The token ID.
-        /// </summary>
-        public string TokenId { get; set; } = null!;
-
-        /// <summary>
-        /// The token HMAC.
-        /// </summary>
-        public byte[] Hmac { get; set; } = Array.Empty<byte>();
-
-        /// <summary>
-        /// Those who are able to renew this token before it expires.
-        /// </summary>
-        public List<DescribedDelegationTokenRenewerMessage> Renewers { get; set; } = new();
-
-        public DescribedDelegationTokenMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public DescribedDelegationTokenMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class DescribedDelegationTokenRenewerMessage: Message
-    {
-        /// <summary>
-        /// The renewer principal type
-        /// </summary>
-        public string PrincipalType { get; set; } = null!;
-
-        /// <summary>
-        /// The renewer principal name
-        /// </summary>
-        public string PrincipalName { get; set; } = null!;
-
-        public DescribedDelegationTokenRenewerMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public DescribedDelegationTokenRenewerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

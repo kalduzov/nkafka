@@ -34,47 +34,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class SyncGroupResponseMessage: ResponseMessage
+public sealed class SyncGroupResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The group protocol type.
     /// </summary>
     public string? ProtocolType { get; set; } = "null";
-
     /// <summary>
     /// The group protocol name.
     /// </summary>
     public string? ProtocolName { get; set; } = "null";
-
     /// <summary>
     /// The member assignment.
     /// </summary>
     public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
-    public SyncGroupResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
-    }
 
-    public SyncGroupResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

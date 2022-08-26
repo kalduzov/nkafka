@@ -19,27 +19,23 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
 public class ReadMethodGenerator: Generator, IReadMethodGenerator
 {
-    private readonly MessageSpecification _descriptor;
+    private readonly CodeBuffer _codeBuffer;
 
-    public ReadMethodGenerator(MessageSpecification descriptor)
+    public ReadMethodGenerator(CodeBuffer codeBuffer)
     {
-        _descriptor = descriptor;
+        _codeBuffer = codeBuffer;
     }
 
-    public StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = DEFAULT_INDENT)
+    public void Generate(string className, StructSpecification structSpecification, Versions parentVersions)
     {
-        IndentValue = startIndent;
-
-        var builder = new StringBuilder();
-
-        return builder;
+        _codeBuffer.AppendLine("public override void Read(BufferReader reader, ApiVersions version)");
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.AppendLine("}");
     }
 }

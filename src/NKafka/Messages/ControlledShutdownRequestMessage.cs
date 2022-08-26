@@ -34,33 +34,16 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class ControlledShutdownRequestMessage: RequestMessage
+public sealed class ControlledShutdownRequestMessage: RequestMessage
 {
     /// <summary>
     /// The id of the broker for which controlled shutdown has been requested.
     /// </summary>
     public int BrokerId { get; set; } = 0;
-
     /// <summary>
     /// The broker epoch.
     /// </summary>
-    public long? BrokerEpoch { get; set; } = -1;
-
-    public ControlledShutdownRequestMessage()
-    {
-        ApiKey = ApiKeys.ControlledShutdown;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
-
-    public ControlledShutdownRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.ControlledShutdown;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
+    public long BrokerEpoch { get; set; } = -1;
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -69,4 +52,5 @@ public sealed partial class ControlledShutdownRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

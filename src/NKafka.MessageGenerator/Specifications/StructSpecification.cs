@@ -19,29 +19,62 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json.Serialization;
+using System.Collections.Immutable;
+
+using Newtonsoft.Json;
 
 namespace NKafka.MessageGenerator.Specifications;
 
 public class StructSpecification
 {
-    [JsonPropertyName("name")]
     public string Name { get; }
 
-    [JsonPropertyName("versions")]
     public Versions Versions { get; }
 
-    [JsonPropertyName("fields")]
     public IReadOnlyCollection<FieldSpecification> Fields { get; }
 
-    [JsonIgnore]
     public bool HasKeys { get; }
 
-    public StructSpecification(string name, Versions versions, IReadOnlyCollection<FieldSpecification> fields)
+    public StructSpecification(
+        [JsonProperty("name")] string name,
+        [JsonProperty("versions")] string versions,
+        [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification>? fields)
     {
         Name = name;
-        Versions = versions;
-        Fields = fields;
-        HasKeys = fields.Any(f => f.MapKey);
+        Versions = Versions.Parse(versions, null!);
+
+        var newFields = new List<FieldSpecification>();
+
+        if (fields is not null)
+        {
+            var tags = new HashSet<int>();
+
+            foreach (var field in fields)
+            {
+                if (field.Tag.HasValue)
+                {
+                    if (tags.Contains(field.Tag.Value))
+                    {
+                        throw new ArgumentException(
+                            $"In {name}, field {field.Name} has a duplicate tag ID {field.Tag.Value}.  All tags IDs must be unique.");
+                    }
+
+                    tags.Add(field.Tag.Value);
+                }
+
+                newFields.Add(field);
+            }
+
+            for (var i = 0; i < tags.Count; i++)
+            {
+                if (!tags.Contains(i))
+                {
+                    throw new ArgumentException("In {name}, the tag IDs are not contiguous. Make use of tag {i} before using any higher tag IDs.");
+                }
+            }
+        }
+
+        Fields = newFields.ToImmutableArray();
+        HasKeys = Fields.Any(f => f.MapKey);
     }
 }

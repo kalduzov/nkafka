@@ -34,69 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeProducersRequestMessage: RequestMessage
+public sealed class DescribeProducersRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
     public List<TopicRequestMessage> Topics { get; set; } = new();
 
-    public DescribeProducersRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeProducers;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public DescribeProducersRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeProducers;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TopicRequestMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The indexes of the partitions to list producers for.
-        /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new();
-
-        public TopicRequestMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public TopicRequestMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

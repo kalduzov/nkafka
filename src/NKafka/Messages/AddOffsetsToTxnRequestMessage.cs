@@ -34,43 +34,24 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AddOffsetsToTxnRequestMessage: RequestMessage
+public sealed class AddOffsetsToTxnRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; } = null!;
-
+    public string TransactionalId { get; set; } = "";
     /// <summary>
     /// Current producer id in use by the transactional id.
     /// </summary>
     public long ProducerId { get; set; } = 0;
-
     /// <summary>
     /// Current epoch associated with the producer id.
     /// </summary>
     public short ProducerEpoch { get; set; } = 0;
-
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = null!;
-
-    public AddOffsetsToTxnRequestMessage()
-    {
-        ApiKey = ApiKeys.AddOffsetsToTxn;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
-
-    public AddOffsetsToTxnRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.AddOffsetsToTxn;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
-    }
+    public string GroupId { get; set; } = "";
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -79,4 +60,5 @@ public sealed partial class AddOffsetsToTxnRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

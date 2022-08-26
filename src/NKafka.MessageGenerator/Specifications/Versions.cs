@@ -19,13 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text.Json.Serialization;
-
-using NKafka.MessageGenerator.Converters;
-
 namespace NKafka.MessageGenerator.Specifications;
 
-[JsonConverter(typeof(VersionsJsonConverter))]
 public sealed class Versions: IEquatable<Versions>
 {
     public static readonly Versions All = new(0, short.MaxValue);
@@ -55,7 +50,7 @@ public sealed class Versions: IEquatable<Versions>
         Highest = -1;
     }
 
-    public static Versions? Parse(string input, Versions? defaultVersions = null!)
+    public static Versions Parse(string input, Versions defaultVersions)
     {
         if (string.IsNullOrEmpty(input))
         {
@@ -105,7 +100,7 @@ public sealed class Versions: IEquatable<Versions>
 
         if (newLowest > newHighest)
         {
-            return Versions.None;
+            return None;
         }
 
         return new Versions(newLowest, newHighest);
@@ -171,9 +166,40 @@ public sealed class Versions: IEquatable<Versions>
     /// <returns>A hash code for the current object.</returns>
     public override int GetHashCode()
     {
-        unchecked
+        return HashCode.Combine(Lowest, Highest);
+    }
+
+    public bool Contains(short version)
+    {
+        return version >= Lowest && version <= Highest;
+    }
+
+    public bool Contains(Versions version)
+    {
+        if (version.IsEmpty)
         {
-            return (Lowest.GetHashCode() * 397) ^ Highest.GetHashCode();
+            return true;
         }
+
+        return !(Lowest > version.Lowest || Highest < version.Highest);
+    }
+
+    public bool IsEmpty => Lowest > Highest;
+
+    /// <summary>Returns a string that represents the current object.</summary>
+    /// <returns>A string that represents the current object.</returns>
+    public override string ToString()
+    {
+        if (IsEmpty)
+        {
+            return NONE_STRING;
+        }
+
+        if (Lowest == Highest)
+        {
+            return Lowest.ToString();
+        }
+
+        return Highest == short.MaxValue ? $"{Lowest}+" : $"{Lowest}-{Highest}";
     }
 }

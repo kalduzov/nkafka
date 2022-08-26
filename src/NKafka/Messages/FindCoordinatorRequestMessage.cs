@@ -34,44 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class FindCoordinatorRequestMessage: RequestMessage
+public sealed class FindCoordinatorRequestMessage: RequestMessage
 {
     /// <summary>
     /// The coordinator key.
     /// </summary>
     public string Key { get; set; } = null!;
-
     /// <summary>
     /// The coordinator key type. (Group, transaction, etc.)
     /// </summary>
     public sbyte KeyType { get; set; } = 0;
-
     /// <summary>
     /// The coordinator keys.
     /// </summary>
     public List<string> CoordinatorKeys { get; set; } = new();
 
-    public FindCoordinatorRequestMessage()
-    {
-        ApiKey = ApiKeys.FindCoordinator;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public FindCoordinatorRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.FindCoordinator;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
 }

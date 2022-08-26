@@ -34,136 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AlterPartitionResponseMessage: ResponseMessage
+public sealed class AlterPartitionResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// 
     /// </summary>
     public List<TopicDataMessage> Topics { get; set; } = new();
 
-    public AlterPartitionResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public AlterPartitionResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class TopicDataMessage: Message
-    {
-        /// <summary>
-        /// The name of the topic
-        /// </summary>
-        public string? TopicName { get; set; } = null!;
-
-        /// <summary>
-        /// The ID of the topic
-        /// </summary>
-        public Guid? TopicId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new();
-
-        public TopicDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class PartitionDataMessage: Message
-    {
-        /// <summary>
-        /// The partition index
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        /// <summary>
-        /// The partition level error code
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The broker ID of the leader.
-        /// </summary>
-        public int LeaderId { get; set; } = 0;
-
-        /// <summary>
-        /// The leader epoch.
-        /// </summary>
-        public int LeaderEpoch { get; set; } = 0;
-
-        /// <summary>
-        /// The in-sync replica IDs.
-        /// </summary>
-        public List<int> Isr { get; set; } = new();
-
-        /// <summary>
-        /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.
-        /// </summary>
-        public sbyte? LeaderRecoveryState { get; set; } = 0;
-
-        /// <summary>
-        /// The current epoch for the partition for KRaft controllers. The current ZK version for the legacy controllers.
-        /// </summary>
-        public int PartitionEpoch { get; set; } = 0;
-
-        public PartitionDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

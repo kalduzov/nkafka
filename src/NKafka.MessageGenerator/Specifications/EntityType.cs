@@ -19,29 +19,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Runtime.Serialization;
-using System.Text.Json.Serialization;
-
 namespace NKafka.MessageGenerator.Specifications;
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum EntityType
 {
-    [EnumMember(Value = "unknown")]
     Unknown,
 
-    [EnumMember(Value = "transactionalId")]
     TransactionalId,
 
-    [EnumMember(Value = "producerId")]
     ProducerId,
 
-    [EnumMember(Value = "brokerId")]
     BrokerId,
 
-    [EnumMember(Value = "groupId")]
     GroupId,
 
-    [EnumMember(Value = "topicName")]
     TopicName
 }

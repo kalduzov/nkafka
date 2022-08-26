@@ -34,101 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetCommitResponseMessage: ResponseMessage
+public sealed class OffsetCommitResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each topic.
     /// </summary>
     public List<OffsetCommitResponseTopicMessage> Topics { get; set; } = new();
 
-    public OffsetCommitResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version8;
-    }
 
-    public OffsetCommitResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version8;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class OffsetCommitResponseTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        /// <summary>
-        /// The responses for each partition in the topic.
-        /// </summary>
-        public List<OffsetCommitResponsePartitionMessage> Partitions { get; set; } = new();
-
-        public OffsetCommitResponseTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
-        }
-
-        public OffsetCommitResponseTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class OffsetCommitResponsePartitionMessage: Message
-    {
-        /// <summary>
-        /// The partition index.
-        /// </summary>
-        public int PartitionIndex { get; set; } = 0;
-
-        /// <summary>
-        /// The error code, or 0 if there was no error.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        public OffsetCommitResponsePartitionMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
-        }
-
-        public OffsetCommitResponsePartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

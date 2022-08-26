@@ -34,84 +34,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class MetadataRequestMessage: RequestMessage
+public sealed class MetadataRequestMessage: RequestMessage
 {
     /// <summary>
     /// The topics to fetch metadata for.
     /// </summary>
     public List<MetadataRequestTopicMessage> Topics { get; set; } = new();
-
     /// <summary>
     /// If this is true, the broker may auto-create topics that we requested which do not already exist, if it is configured to do so.
     /// </summary>
     public bool AllowAutoTopicCreation { get; set; } = true;
-
     /// <summary>
     /// Whether to include cluster authorized operations.
     /// </summary>
     public bool IncludeClusterAuthorizedOperations { get; set; } = false;
-
     /// <summary>
     /// Whether to include topic authorized operations.
     /// </summary>
     public bool IncludeTopicAuthorizedOperations { get; set; } = false;
 
-    public MetadataRequestMessage()
-    {
-        ApiKey = ApiKeys.Metadata;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
-    }
 
-    public MetadataRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.Metadata;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class MetadataRequestTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic id.
-        /// </summary>
-        public Guid? TopicId { get; set; } = Guid.Empty;
-
-        /// <summary>
-        /// The topic name.
-        /// </summary>
-        public string Name { get; set; } = null!;
-
-        public MetadataRequestTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
-        }
-
-        public MetadataRequestTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

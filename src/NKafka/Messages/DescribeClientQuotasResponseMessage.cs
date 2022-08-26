@@ -34,145 +34,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeClientQuotasResponseMessage: ResponseMessage
+public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or `0` if the quota description succeeded.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The error message, or `null` if the quota description succeeded.
     /// </summary>
     public string ErrorMessage { get; set; } = null!;
-
     /// <summary>
     /// A result entry.
     /// </summary>
     public List<EntryDataMessage> Entries { get; set; } = new();
 
-    public DescribeClientQuotasResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public DescribeClientQuotasResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class EntryDataMessage: Message
-    {
-        /// <summary>
-        /// The quota entity description.
-        /// </summary>
-        public List<EntityDataMessage> Entity { get; set; } = new();
-
-        /// <summary>
-        /// The quota values for the entity.
-        /// </summary>
-        public List<ValueDataMessage> Values { get; set; } = new();
-
-        public EntryDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public EntryDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class EntityDataMessage: Message
-    {
-        /// <summary>
-        /// The entity type.
-        /// </summary>
-        public string EntityType { get; set; } = null!;
-
-        /// <summary>
-        /// The entity name, or null if the default.
-        /// </summary>
-        public string EntityName { get; set; } = null!;
-
-        public EntityDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public EntityDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class ValueDataMessage: Message
-    {
-        /// <summary>
-        /// The quota configuration key.
-        /// </summary>
-        public string Key { get; set; } = null!;
-
-        /// <summary>
-        /// The quota configuration value.
-        /// </summary>
-        public double Value { get; set; } = 0;
-
-        public ValueDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public ValueDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

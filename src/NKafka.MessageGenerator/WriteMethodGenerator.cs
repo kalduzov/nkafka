@@ -27,11 +27,11 @@ namespace NKafka.MessageGenerator;
 
 public class WriteMethodGenerator: Generator, IWriteMethodGenerator
 {
-    private readonly MessageSpecification _descriptor;
+    private readonly CodeBuffer _codeBuffer;
 
-    public WriteMethodGenerator(MessageSpecification descriptor)
+    public WriteMethodGenerator(CodeBuffer codeBuffer)
     {
-        _descriptor = descriptor;
+        _codeBuffer = codeBuffer;
     }
 
     public StringBuilder Generate(IReadOnlyCollection<FieldSpecification> fields, int startIndent = DEFAULT_INDENT)
@@ -100,7 +100,7 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         //
         // IncrementIndent();
         //
-        // if (type.CanBeNull)
+        // if (type.CanBeNullable)
         // {
         //     builder.AppendLine($"{Indent}if ({name} is null)");
         //     builder.AppendLine($"{Indent}{{");
@@ -187,5 +187,12 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
         builder.AppendLine($"{Indent}}}");
 
         return builder;
+    }
+
+    public void Generate(string className, StructSpecification structSpecification, Versions parentVersions)
+    {
+        _codeBuffer.AppendLine("public override void Write(BufferWriter writer, ApiVersions version)");
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.AppendLine("}");
     }
 }

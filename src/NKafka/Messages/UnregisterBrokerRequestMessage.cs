@@ -34,28 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class UnregisterBrokerRequestMessage: RequestMessage
+public sealed class UnregisterBrokerRequestMessage: RequestMessage
 {
     /// <summary>
     /// The broker ID to unregister.
     /// </summary>
     public int BrokerId { get; set; } = 0;
-
-    public UnregisterBrokerRequestMessage()
-    {
-        ApiKey = ApiKeys.UnregisterBroker;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
-
-    public UnregisterBrokerRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.UnregisterBroker;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -64,4 +48,5 @@ public sealed partial class UnregisterBrokerRequestMessage: RequestMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

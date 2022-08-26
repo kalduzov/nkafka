@@ -34,79 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeClientQuotasRequestMessage: RequestMessage
+public sealed class DescribeClientQuotasRequestMessage: RequestMessage
 {
     /// <summary>
     /// Filter components to apply to quota entities.
     /// </summary>
     public List<ComponentDataMessage> Components { get; set; } = new();
-
     /// <summary>
     /// Whether the match is strict, i.e. should exclude entities with unspecified entity types.
     /// </summary>
     public bool Strict { get; set; } = false;
 
-    public DescribeClientQuotasRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public DescribeClientQuotasRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class ComponentDataMessage: Message
-    {
-        /// <summary>
-        /// The entity type that the filter component applies to.
-        /// </summary>
-        public string EntityType { get; set; } = null!;
-
-        /// <summary>
-        /// How to match the entity {0 = exact name, 1 = default name, 2 = any specified name}.
-        /// </summary>
-        public sbyte MatchType { get; set; } = 0;
-
-        /// <summary>
-        /// The string to match against, or null if unused for the match type.
-        /// </summary>
-        public string Match { get; set; } = null!;
-
-        public ComponentDataMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public ComponentDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

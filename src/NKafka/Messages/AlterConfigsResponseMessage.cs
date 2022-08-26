@@ -34,77 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class AlterConfigsResponseMessage: ResponseMessage
+public sealed class AlterConfigsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each resource.
     /// </summary>
     public List<AlterConfigsResourceResponseMessage> Responses { get; set; } = new();
 
-    public AlterConfigsResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public AlterConfigsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class AlterConfigsResourceResponseMessage: Message
-    {
-        /// <summary>
-        /// The resource error code.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The resource error message, or null if there was no error.
-        /// </summary>
-        public string ErrorMessage { get; set; } = null!;
-
-        /// <summary>
-        /// The resource type.
-        /// </summary>
-        public sbyte ResourceType { get; set; } = 0;
-
-        /// <summary>
-        /// The resource name.
-        /// </summary>
-        public string ResourceName { get; set; } = null!;
-
-        public AlterConfigsResourceResponseMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

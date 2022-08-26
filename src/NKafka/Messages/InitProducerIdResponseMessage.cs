@@ -34,36 +34,20 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class InitProducerIdResponseMessage: ResponseMessage
+public sealed class InitProducerIdResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The current producer id.
     /// </summary>
     public long ProducerId { get; set; } = -1;
-
     /// <summary>
     /// The current epoch associated with the producer id.
     /// </summary>
     public short ProducerEpoch { get; set; } = 0;
-
-    public InitProducerIdResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
-
-    public InitProducerIdResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {
@@ -72,4 +56,5 @@ public sealed partial class InitProducerIdResponseMessage: ResponseMessage
     public override void Write(BufferWriter writer, ApiVersions version)
     {
     }
+
 }

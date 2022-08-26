@@ -34,111 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class ElectLeadersResponseMessage: ResponseMessage
+public sealed class ElectLeadersResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The top level response error code.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The election results, or an empty array if the requester did not have permission and the request asks for all partitions.
     /// </summary>
     public List<ReplicaElectionResultMessage> ReplicaElectionResults { get; set; } = new();
 
-    public ElectLeadersResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public ElectLeadersResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class ReplicaElectionResultMessage: Message
-    {
-        /// <summary>
-        /// The topic name
-        /// </summary>
-        public string Topic { get; set; } = null!;
-
-        /// <summary>
-        /// The results for each partition
-        /// </summary>
-        public List<PartitionResultMessage> PartitionResult { get; set; } = new();
-
-        public ReplicaElectionResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public ReplicaElectionResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
-    public sealed partial class PartitionResultMessage: Message
-    {
-        /// <summary>
-        /// The partition id
-        /// </summary>
-        public int PartitionId { get; set; } = 0;
-
-        /// <summary>
-        /// The result error, or zero if there was no error.
-        /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <summary>
-        /// The result message, or null if there was no error.
-        /// </summary>
-        public string ErrorMessage { get; set; } = null!;
-
-        public PartitionResultMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public PartitionResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

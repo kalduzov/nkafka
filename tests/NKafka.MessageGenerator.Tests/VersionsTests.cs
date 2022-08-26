@@ -51,10 +51,10 @@ public class VersionsTests
     [InlineData("1-5", "2-4", null)]
     public void SubtractTests(string oneString, string twoString, string resultString)
     {
-        var one = Versions.Parse(oneString);
-        var two = Versions.Parse(twoString);
+        var one = Versions.Parse(oneString, null!);
+        var two = Versions.Parse(twoString, null!);
         var result = one! - two!;
 
-        result.Should().Be(Versions.Parse(resultString));
+        result.Should().Be(Versions.Parse(resultString, null!));
     }
 }

@@ -241,7 +241,7 @@ public sealed class KafkaCluster: IKafkaCluster
         return brokers;
     }
 
-    private void UpdateTopicPartitions(IEnumerable<MetadataResponseMessage.MetadataResponseTopic> messageTopics, CancellationToken token)
+    private void UpdateTopicPartitions(IEnumerable<MetadataResponseMessage.MetadataResponseTopicMessage> messageTopics, CancellationToken token)
     {
         var topicsByBrokers = new Dictionary<int, IReadOnlyDictionary<string, TopicPartition>>();
 
@@ -278,7 +278,7 @@ public sealed class KafkaCluster: IKafkaCluster
     }
 
     private async ValueTask UpdateBrokersAndReturnController(
-        IEnumerable<MetadataResponseMessage.MetadataResponseBroker> incomingBrokers,
+        IEnumerable<MetadataResponseMessage.MetadataResponseBrokerMessage> incomingBrokers,
         int? controllerId,
         CancellationToken token)
     {
@@ -399,9 +399,9 @@ public sealed class KafkaCluster: IKafkaCluster
         {
             Version = ApiVersions.Version2,
             Topics = _topics.Select(
-                    t => new MetadataRequestMessage.MetadataRequestTopic
+                    t => new MetadataRequestMessage.MetadataRequestTopicMessage
                     {
-                        Name = t
+                        Name = t,
                     })
                 .ToList()
         };

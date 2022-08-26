@@ -34,107 +34,41 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class JoinGroupResponseMessage: ResponseMessage
+public sealed class JoinGroupResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
-
     /// <summary>
     /// The generation ID of the group.
     /// </summary>
     public int GenerationId { get; set; } = -1;
-
     /// <summary>
     /// The group protocol name.
     /// </summary>
     public string? ProtocolType { get; set; } = "null";
-
     /// <summary>
     /// The group protocol selected by the coordinator.
     /// </summary>
     public string ProtocolName { get; set; } = null!;
-
     /// <summary>
     /// The leader of the group.
     /// </summary>
     public string Leader { get; set; } = null!;
-
     /// <summary>
     /// True if the leader must skip running the assignment.
     /// </summary>
     public bool SkipAssignment { get; set; } = false;
-
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
     public string MemberId { get; set; } = null!;
-
     /// <summary>
     /// 
     /// </summary>
     public List<JoinGroupResponseMemberMessage> Members { get; set; } = new();
 
-    public JoinGroupResponseMessage()
-    {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version9;
-    }
 
-    public JoinGroupResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version9;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class JoinGroupResponseMemberMessage: Message
-    {
-        /// <summary>
-        /// The group member ID.
-        /// </summary>
-        public string MemberId { get; set; } = null!;
-
-        /// <summary>
-        /// The unique identifier of the consumer instance provided by end user.
-        /// </summary>
-        public string? GroupInstanceId { get; set; } = "null";
-
-        /// <summary>
-        /// The group member metadata.
-        /// </summary>
-        public byte[] Metadata { get; set; } = Array.Empty<byte>();
-
-        public JoinGroupResponseMemberMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version9;
-        }
-
-        public JoinGroupResponseMemberMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version9;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

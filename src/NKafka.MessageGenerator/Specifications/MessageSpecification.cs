@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Immutable;
+
+using Newtonsoft.Json;
 
 namespace NKafka.MessageGenerator.Specifications;
 
@@ -10,38 +12,25 @@ public record MessageSpecification
     /// <summary>
     /// Message api key 
     /// </summary>
-    [JsonPropertyName("apiKey")]
     public int ApiKey { get; }
 
     /// <summary>
     /// Message type 
     /// </summary>
-    [JsonPropertyName("type")]
     public MessageType Type { get; }
 
-    [JsonPropertyName("listeners")]
-    public IReadOnlyCollection<RequestListenerType> Listeners { get; }
+    public IReadOnlyCollection<RequestListenerType>? Listeners { get; }
 
-    /// <summary>
-    /// Message name
-    /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; }
+    public Versions ValidVersions => Struct.Versions;
 
-    [JsonPropertyName("validVersions")]
-    public Versions ValidVersions { get; }
-
-    [JsonPropertyName("flexibleVersions")]
     public Versions FlexibleVersions { get; }
 
-    [JsonPropertyName("fields")]
-    public IReadOnlyCollection<FieldSpecification> Fields { get; }
+    public IReadOnlyCollection<FieldSpecification> Fields => Struct.Fields;
 
     /// <summary>
     /// Внутренние структуры данных
     /// </summary>
-    [JsonPropertyName("commonStructs")]
-    public IReadOnlyCollection<StructSpecification>? CommonStructs { get; }
+    public IReadOnlyCollection<StructSpecification> CommonStructs { get; }
 
     [JsonIgnore]
     public string ClassName
@@ -50,10 +39,10 @@ public record MessageSpecification
         {
             return Type switch
             {
-                MessageType.Request => Name + "Message",
-                MessageType.Response => Name + "Message",
-                MessageType.Header => Name + "Message",
-                _ => Name
+                MessageType.Request => Struct.Name + "Message",
+                MessageType.Response => Struct.Name + "Message",
+                MessageType.Header => Struct.Name + "Message",
+                _ => Struct.Name
             };
         }
     }
@@ -63,23 +52,39 @@ public record MessageSpecification
 
     [JsonConstructor]
     public MessageSpecification(
-        int apiKey,
-        MessageType type,
-        IReadOnlyCollection<RequestListenerType> listeners,
-        string name,
-        Versions validVersions,
-        Versions flexibleVersions,
-        IReadOnlyCollection<FieldSpecification> fields,
-        IReadOnlyCollection<StructSpecification>? commonStructs = null)
+        [JsonProperty("apiKey")] int? apiKey,
+        [JsonProperty("type")] MessageType type,
+        [JsonProperty("listeners")] IReadOnlyCollection<RequestListenerType>? listeners,
+        [JsonProperty("name")] string name,
+        [JsonProperty("validVersions")] string validVersions,
+        [JsonProperty("flexibleVersions")] string flexibleVersions,
+        [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification> fields,
+        [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs)
     {
-        ApiKey = apiKey;
-        Type = type;
-        Name = name;
-        ValidVersions = validVersions;
-        FlexibleVersions = flexibleVersions;
-        Listeners = listeners;
-        Fields = fields;
         Struct = new StructSpecification(name, validVersions, fields);
-        CommonStructs = commonStructs ?? ArraySegment<StructSpecification>.Empty;
+        ApiKey = apiKey ?? -1;
+        Type = type;
+        CommonStructs = (commonStructs ?? Array.Empty<StructSpecification>()).ToImmutableArray();
+
+        if (string.IsNullOrWhiteSpace(flexibleVersions))
+        {
+            throw new ArgumentException("You must specify a value for flexibleVersions. Please use 0+ for all new messages.");
+        }
+
+        FlexibleVersions = Versions.Parse(flexibleVersions, Versions.None);
+
+        if (FlexibleVersions.IsEmpty && FlexibleVersions.Highest < short.MaxValue)
+        {
+            throw new ArgumentException(
+                $"Field {name} specifies flexibleVersions {FlexibleVersions}, which is not open-ended. flexibleVersions must be either none, "
+                + "or an open-ended range (that ends with a plus sign).");
+        }
+
+        if (listeners is not null && listeners.Count != 0 && type != MessageType.Request)
+        {
+            throw new ArgumentException("The `requestScope` property is only valid for messages with type `request`");
+        }
+        Listeners = listeners;
+
     }
 }

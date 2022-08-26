@@ -34,69 +34,13 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class DescribeLogDirsRequestMessage: RequestMessage
+public sealed class DescribeLogDirsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
     public List<DescribableLogDirTopicMessage> Topics { get; set; } = new();
 
-    public DescribeLogDirsRequestMessage()
-    {
-        ApiKey = ApiKeys.DescribeLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public DescribeLogDirsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-        Read(reader, version);
-        ApiKey = ApiKeys.DescribeLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
-    }
 
-    public override void Read(BufferReader reader, ApiVersions version)
-    {
-    }
-
-    public override void Write(BufferWriter writer, ApiVersions version)
-    {
-    }
-
-    public sealed partial class DescribableLogDirTopicMessage: Message
-    {
-        /// <summary>
-        /// The topic name
-        /// </summary>
-        public string Topic { get; set; } = null!;
-
-        /// <summary>
-        /// The partition indexes.
-        /// </summary>
-        public List<int> Partitions { get; set; } = new();
-
-        public DescribableLogDirTopicMessage()
-        {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public DescribableLogDirTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
-        {
-            Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
-        }
-
-        public override void Read(BufferReader reader, ApiVersions version)
-        {
-        }
-
-        public override void Write(BufferWriter writer, ApiVersions version)
-        {
-        }
-    }
 }

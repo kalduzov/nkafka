@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ProduceRequestMessage: RequestMessage
 {
     /// <summary>
@@ -53,7 +54,7 @@ public sealed partial class ProduceRequestMessage: RequestMessage
     /// <summary>
     /// Each topic to produce to.
     /// </summary>
-    public List<TopicProduceData> TopicData { get; set; } = new();
+    public List<TopicProduceDataMessage> TopicData { get; set; } = new();
 
     public ProduceRequestMessage()
     {
@@ -79,7 +80,7 @@ public sealed partial class ProduceRequestMessage: RequestMessage
     {
     }
 
-    public class TopicProduceData: Message
+    public sealed partial class TopicProduceDataMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -89,15 +90,15 @@ public sealed partial class ProduceRequestMessage: RequestMessage
         /// <summary>
         /// Each partition to produce to.
         /// </summary>
-        public List<PartitionProduceData> PartitionData { get; set; } = new();
+        public List<PartitionProduceDataMessage> PartitionData { get; set; } = new();
 
-        public TopicProduceData()
+        public TopicProduceDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public TopicProduceData(BufferReader reader, ApiVersions version)
+        public TopicProduceDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -113,7 +114,7 @@ public sealed partial class ProduceRequestMessage: RequestMessage
         {
         }
     }
-    public class PartitionProduceData: Message
+    public sealed partial class PartitionProduceDataMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -125,13 +126,13 @@ public sealed partial class ProduceRequestMessage: RequestMessage
         /// </summary>
         public RecordBatch Records { get; set; } = new();
 
-        public PartitionProduceData()
+        public PartitionProduceDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public PartitionProduceData(BufferReader reader, ApiVersions version)
+        public PartitionProduceDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

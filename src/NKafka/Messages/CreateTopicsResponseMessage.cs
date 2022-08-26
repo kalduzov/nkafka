@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreateTopicsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Results for each topic we tried to create.
     /// </summary>
-    public List<CreatableTopicResult> Topics { get; set; } = new();
+    public List<CreatableTopicResultMessage> Topics { get; set; } = new();
 
     public CreateTopicsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class CreateTopicsResponseMessage: ResponseMessage
     {
     }
 
-    public class CreatableTopicResult: Message
+    public sealed partial class CreatableTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -102,15 +103,15 @@ public sealed partial class CreateTopicsResponseMessage: ResponseMessage
         /// <summary>
         /// Configuration of the topic.
         /// </summary>
-        public List<CreatableTopicConfigs>? Configs { get; set; } = new();
+        public List<CreatableTopicConfigsMessage>? Configs { get; set; } = new();
 
-        public CreatableTopicResult()
+        public CreatableTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableTopicResult(BufferReader reader, ApiVersions version)
+        public CreatableTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -126,7 +127,7 @@ public sealed partial class CreateTopicsResponseMessage: ResponseMessage
         {
         }
     }
-    public class CreatableTopicConfigs: Message
+    public sealed partial class CreatableTopicConfigsMessage: Message
     {
         /// <summary>
         /// The configuration name.
@@ -153,13 +154,13 @@ public sealed partial class CreateTopicsResponseMessage: ResponseMessage
         /// </summary>
         public bool IsSensitive { get; set; } = false;
 
-        public CreatableTopicConfigs()
+        public CreatableTopicConfigsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableTopicConfigs(BufferReader reader, ApiVersions version)
+        public CreatableTopicConfigsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

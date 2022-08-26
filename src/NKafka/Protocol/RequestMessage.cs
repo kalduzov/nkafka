@@ -33,4 +33,13 @@ public abstract class RequestMessage: Message
     /// Size payload after call <see cref="Message.Write"/> method
     /// </summary>
     public int Size { get; protected set; }
+
+    protected RequestMessage()
+    {
+    }
+
+    protected RequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+    }
 }

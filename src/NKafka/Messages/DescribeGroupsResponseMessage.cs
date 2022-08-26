@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each described group.
     /// </summary>
-    public List<DescribedGroup> Groups { get; set; } = new();
+    public List<DescribedGroupMessage> Groups { get; set; } = new();
 
     public DescribeGroupsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribedGroup: Message
+    public sealed partial class DescribedGroupMessage: Message
     {
         /// <summary>
         /// The describe error, or 0 if there was no error.
@@ -92,20 +93,20 @@ public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
         /// <summary>
         /// The group members.
         /// </summary>
-        public List<DescribedGroupMember> Members { get; set; } = new();
+        public List<DescribedGroupMemberMessage> Members { get; set; } = new();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this group.
         /// </summary>
         public int AuthorizedOperations { get; set; } = -2147483648;
 
-        public DescribedGroup()
+        public DescribedGroupMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public DescribedGroup(BufferReader reader, ApiVersions version)
+        public DescribedGroupMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -121,7 +122,7 @@ public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribedGroupMember: Message
+    public sealed partial class DescribedGroupMemberMessage: Message
     {
         /// <summary>
         /// The member ID assigned by the group coordinator.
@@ -153,13 +154,13 @@ public sealed partial class DescribeGroupsResponseMessage: ResponseMessage
         /// </summary>
         public byte[] MemberAssignment { get; set; } = Array.Empty<byte>();
 
-        public DescribedGroupMember()
+        public DescribedGroupMemberMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public DescribedGroupMember(BufferReader reader, ApiVersions version)
+        public DescribedGroupMemberMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

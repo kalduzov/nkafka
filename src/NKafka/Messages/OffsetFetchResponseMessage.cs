@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetFetchResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses per topic.
     /// </summary>
-    public List<OffsetFetchResponseTopic> Topics { get; set; } = new();
+    public List<OffsetFetchResponseTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
@@ -48,7 +49,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
     /// <summary>
     /// The responses per group id.
     /// </summary>
-    public List<OffsetFetchResponseGroup> Groups { get; set; } = new();
+    public List<OffsetFetchResponseGroupMessage> Groups { get; set; } = new();
 
     public OffsetFetchResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
     {
     }
 
-    public class OffsetFetchResponseTopic: Message
+    public sealed partial class OffsetFetchResponseTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -82,15 +83,15 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         /// <summary>
         /// The responses per partition
         /// </summary>
-        public List<OffsetFetchResponsePartition> Partitions { get; set; } = new();
+        public List<OffsetFetchResponsePartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetFetchResponseTopic()
+        public OffsetFetchResponseTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetFetchResponseTopic(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -106,7 +107,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetFetchResponsePartition: Message
+    public sealed partial class OffsetFetchResponsePartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -133,13 +134,13 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public OffsetFetchResponsePartition()
+        public OffsetFetchResponsePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetFetchResponsePartition(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponsePartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -155,7 +156,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetFetchResponseGroup: Message
+    public sealed partial class OffsetFetchResponseGroupMessage: Message
     {
         /// <summary>
         /// The group ID.
@@ -165,20 +166,20 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         /// <summary>
         /// The responses per topic.
         /// </summary>
-        public List<OffsetFetchResponseTopics> Topics { get; set; } = new();
+        public List<OffsetFetchResponseTopicsMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// The group-level error code, or 0 if there was no error.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public OffsetFetchResponseGroup()
+        public OffsetFetchResponseGroupMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetFetchResponseGroup(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseGroupMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -194,7 +195,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetFetchResponseTopics: Message
+    public sealed partial class OffsetFetchResponseTopicsMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -204,15 +205,15 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         /// <summary>
         /// The responses per partition
         /// </summary>
-        public List<OffsetFetchResponsePartitions> Partitions { get; set; } = new();
+        public List<OffsetFetchResponsePartitionsMessage> Partitions { get; set; } = new();
 
-        public OffsetFetchResponseTopics()
+        public OffsetFetchResponseTopicsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetFetchResponseTopics(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseTopicsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -228,7 +229,7 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetFetchResponsePartitions: Message
+    public sealed partial class OffsetFetchResponsePartitionsMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -255,13 +256,13 @@ public sealed partial class OffsetFetchResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public OffsetFetchResponsePartitions()
+        public OffsetFetchResponsePartitionsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetFetchResponsePartitions(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponsePartitionsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

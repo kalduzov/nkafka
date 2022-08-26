@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The updates for each resource.
     /// </summary>
-    public List<AlterConfigsResource> Resources { get; set; } = new();
+    public List<AlterConfigsResourceMessage> Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should validate the request, but not change the configurations.
@@ -69,7 +70,7 @@ public sealed partial class AlterConfigsRequestMessage: RequestMessage
     {
     }
 
-    public class AlterConfigsResource: Message
+    public sealed partial class AlterConfigsResourceMessage: Message
     {
         /// <summary>
         /// The resource type.
@@ -84,15 +85,15 @@ public sealed partial class AlterConfigsRequestMessage: RequestMessage
         /// <summary>
         /// The configurations.
         /// </summary>
-        public List<AlterableConfig> Configs { get; set; } = new();
+        public List<AlterableConfigMessage> Configs { get; set; } = new();
 
-        public AlterConfigsResource()
+        public AlterConfigsResourceMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterConfigsResource(BufferReader reader, ApiVersions version)
+        public AlterConfigsResourceMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -108,7 +109,7 @@ public sealed partial class AlterConfigsRequestMessage: RequestMessage
         {
         }
     }
-    public class AlterableConfig: Message
+    public sealed partial class AlterableConfigMessage: Message
     {
         /// <summary>
         /// The configuration key name.
@@ -120,13 +121,13 @@ public sealed partial class AlterConfigsRequestMessage: RequestMessage
         /// </summary>
         public string Value { get; set; } = null!;
 
-        public AlterableConfig()
+        public AlterableConfigMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterableConfig(BufferReader reader, ApiVersions version)
+        public AlterableConfigMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

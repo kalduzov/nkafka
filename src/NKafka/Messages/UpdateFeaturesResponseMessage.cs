@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class UpdateFeaturesResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class UpdateFeaturesResponseMessage: ResponseMessage
     /// <summary>
     /// Results for each feature update.
     /// </summary>
-    public List<UpdatableFeatureResult> Results { get; set; } = new();
+    public List<UpdatableFeatureResultMessage> Results { get; set; } = new();
 
     public UpdateFeaturesResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class UpdateFeaturesResponseMessage: ResponseMessage
     {
     }
 
-    public class UpdatableFeatureResult: Message
+    public sealed partial class UpdatableFeatureResultMessage: Message
     {
         /// <summary>
         /// The name of the finalized feature.
@@ -89,13 +90,13 @@ public sealed partial class UpdateFeaturesResponseMessage: ResponseMessage
         /// </summary>
         public string ErrorMessage { get; set; } = null!;
 
-        public UpdatableFeatureResult()
+        public UpdatableFeatureResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public UpdatableFeatureResult(BufferReader reader, ApiVersions version)
+        public UpdatableFeatureResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

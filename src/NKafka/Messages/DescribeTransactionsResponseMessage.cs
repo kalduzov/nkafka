@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionState> TransactionStates { get; set; } = new();
+    public List<TransactionStateMessage> TransactionStates { get; set; } = new();
 
     public DescribeTransactionsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
     {
     }
 
-    public class TransactionState: Message
+    public sealed partial class TransactionStateMessage: Message
     {
         /// <summary>
         /// 
@@ -102,15 +103,15 @@ public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
         /// <summary>
         /// The set of partitions included in the current transaction (if active). When a transaction is preparing to commit or abort, this will include only partitions which do not have markers.
         /// </summary>
-        public List<TopicData> Topics { get; set; } = new();
+        public List<TopicDataMessage> Topics { get; set; } = new();
 
-        public TransactionState()
+        public TransactionStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TransactionState(BufferReader reader, ApiVersions version)
+        public TransactionStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -126,7 +127,7 @@ public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
         {
         }
     }
-    public class TopicData: Message
+    public sealed partial class TopicDataMessage: Message
     {
         /// <summary>
         /// 
@@ -138,13 +139,13 @@ public sealed partial class DescribeTransactionsResponseMessage: ResponseMessage
         /// </summary>
         public List<int> Partitions { get; set; } = new();
 
-        public TopicData()
+        public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicData(BufferReader reader, ApiVersions version)
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

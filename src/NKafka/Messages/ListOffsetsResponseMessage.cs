@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ListOffsetsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<ListOffsetsTopicResponse> Topics { get; set; } = new();
+    public List<ListOffsetsTopicResponseMessage> Topics { get; set; } = new();
 
     public ListOffsetsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class ListOffsetsResponseMessage: ResponseMessage
     {
     }
 
-    public class ListOffsetsTopicResponse: Message
+    public sealed partial class ListOffsetsTopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -72,15 +73,15 @@ public sealed partial class ListOffsetsResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public List<ListOffsetsPartitionResponse> Partitions { get; set; } = new();
+        public List<ListOffsetsPartitionResponseMessage> Partitions { get; set; } = new();
 
-        public ListOffsetsTopicResponse()
+        public ListOffsetsTopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public ListOffsetsTopicResponse(BufferReader reader, ApiVersions version)
+        public ListOffsetsTopicResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class ListOffsetsResponseMessage: ResponseMessage
         {
         }
     }
-    public class ListOffsetsPartitionResponse: Message
+    public sealed partial class ListOffsetsPartitionResponseMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -128,13 +129,13 @@ public sealed partial class ListOffsetsResponseMessage: ResponseMessage
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
-        public ListOffsetsPartitionResponse()
+        public ListOffsetsPartitionResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public ListOffsetsPartitionResponse(BufferReader reader, ApiVersions version)
+        public ListOffsetsPartitionResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

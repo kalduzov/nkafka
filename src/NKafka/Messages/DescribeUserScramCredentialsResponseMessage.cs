@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: Respons
     /// <summary>
     /// The results for descriptions, one per user.
     /// </summary>
-    public List<DescribeUserScramCredentialsResult> Results { get; set; } = new();
+    public List<DescribeUserScramCredentialsResultMessage> Results { get; set; } = new();
 
     public DescribeUserScramCredentialsResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: Respons
     {
     }
 
-    public class DescribeUserScramCredentialsResult: Message
+    public sealed partial class DescribeUserScramCredentialsResultMessage: Message
     {
         /// <summary>
         /// The user name.
@@ -92,15 +93,15 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: Respons
         /// <summary>
         /// The mechanism and related information associated with the user's SCRAM credentials.
         /// </summary>
-        public List<CredentialInfo> CredentialInfos { get; set; } = new();
+        public List<CredentialInfoMessage> CredentialInfos { get; set; } = new();
 
-        public DescribeUserScramCredentialsResult()
+        public DescribeUserScramCredentialsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public DescribeUserScramCredentialsResult(BufferReader reader, ApiVersions version)
+        public DescribeUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -116,7 +117,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: Respons
         {
         }
     }
-    public class CredentialInfo: Message
+    public sealed partial class CredentialInfoMessage: Message
     {
         /// <summary>
         /// The SCRAM mechanism.
@@ -128,13 +129,13 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: Respons
         /// </summary>
         public int Iterations { get; set; } = 0;
 
-        public CredentialInfo()
+        public CredentialInfoMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public CredentialInfo(BufferReader reader, ApiVersions version)
+        public CredentialInfoMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

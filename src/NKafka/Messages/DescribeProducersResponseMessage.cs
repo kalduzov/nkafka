@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeProducersResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<TopicResponse> Topics { get; set; } = new();
+    public List<TopicResponseMessage> Topics { get; set; } = new();
 
     public DescribeProducersResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
     {
     }
 
-    public class TopicResponse: Message
+    public sealed partial class TopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -72,15 +73,15 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public List<PartitionResponse> Partitions { get; set; } = new();
+        public List<PartitionResponseMessage> Partitions { get; set; } = new();
 
-        public TopicResponse()
+        public TopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicResponse(BufferReader reader, ApiVersions version)
+        public TopicResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionResponse: Message
+    public sealed partial class PartitionResponseMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -116,15 +117,15 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public List<ProducerState> ActiveProducers { get; set; } = new();
+        public List<ProducerStateMessage> ActiveProducers { get; set; } = new();
 
-        public PartitionResponse()
+        public PartitionResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public PartitionResponse(BufferReader reader, ApiVersions version)
+        public PartitionResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -140,7 +141,7 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
         {
         }
     }
-    public class ProducerState: Message
+    public sealed partial class ProducerStateMessage: Message
     {
         /// <summary>
         /// 
@@ -172,13 +173,13 @@ public sealed partial class DescribeProducersResponseMessage: ResponseMessage
         /// </summary>
         public long CurrentTxnStartOffset { get; set; } = -1;
 
-        public ProducerState()
+        public ProducerStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ProducerState(BufferReader reader, ApiVersions version)
+        public ProducerStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

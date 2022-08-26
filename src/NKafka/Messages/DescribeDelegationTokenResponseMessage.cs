@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMess
     /// <summary>
     /// The tokens.
     /// </summary>
-    public List<DescribedDelegationToken> Tokens { get; set; } = new();
+    public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new();
 
 
     public DescribeDelegationTokenResponseMessage()
@@ -68,7 +69,7 @@ public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMess
     {
     }
 
-    public class DescribedDelegationToken: Message
+    public sealed partial class DescribedDelegationTokenMessage: Message
     {
         /// <summary>
         /// The token principal type.
@@ -118,15 +119,15 @@ public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMess
         /// <summary>
         /// Those who are able to renew this token before it expires.
         /// </summary>
-        public List<DescribedDelegationTokenRenewer> Renewers { get; set; } = new();
+        public List<DescribedDelegationTokenRenewerMessage> Renewers { get; set; } = new();
 
-        public DescribedDelegationToken()
+        public DescribedDelegationTokenMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribedDelegationToken(BufferReader reader, ApiVersions version)
+        public DescribedDelegationTokenMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -142,7 +143,7 @@ public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMess
         {
         }
     }
-    public class DescribedDelegationTokenRenewer: Message
+    public sealed partial class DescribedDelegationTokenRenewerMessage: Message
     {
         /// <summary>
         /// The renewer principal type
@@ -154,13 +155,13 @@ public sealed partial class DescribeDelegationTokenResponseMessage: ResponseMess
         /// </summary>
         public string PrincipalName { get; set; } = null!;
 
-        public DescribedDelegationTokenRenewer()
+        public DescribedDelegationTokenRenewerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribedDelegationTokenRenewer(BufferReader reader, ApiVersions version)
+        public DescribedDelegationTokenRenewerMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

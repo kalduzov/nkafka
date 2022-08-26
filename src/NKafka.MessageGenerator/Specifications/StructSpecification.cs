@@ -19,22 +19,28 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Text.Json.Serialization;
+
 namespace NKafka.MessageGenerator.Specifications;
 
 public class StructSpecification
 {
+    [JsonPropertyName("name")]
     public string Name { get; }
 
+    [JsonPropertyName("versions")]
     public Versions Versions { get; }
 
+    [JsonPropertyName("fields")]
     public IReadOnlyCollection<FieldSpecification> Fields { get; }
 
+    [JsonIgnore]
     public bool HasKeys { get; }
 
-    public StructSpecification(string name, Versions validVersions, IReadOnlyCollection<FieldSpecification> fields)
+    public StructSpecification(string name, Versions versions, IReadOnlyCollection<FieldSpecification> fields)
     {
         Name = name;
-        Versions = validVersions;
+        Versions = versions;
         Fields = fields;
         HasKeys = fields.Any(f => f.MapKey);
     }

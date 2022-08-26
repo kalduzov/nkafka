@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMe
     /// <summary>
     /// The topics to reassign.
     /// </summary>
-    public List<ReassignableTopic> Topics { get; set; } = new();
+    public List<ReassignableTopicMessage> Topics { get; set; } = new();
 
     public AlterPartitionReassignmentsRequestMessage()
     {
@@ -69,7 +70,7 @@ public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMe
     {
     }
 
-    public class ReassignableTopic: Message
+    public sealed partial class ReassignableTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -79,15 +80,15 @@ public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMe
         /// <summary>
         /// The partitions to reassign.
         /// </summary>
-        public List<ReassignablePartition> Partitions { get; set; } = new();
+        public List<ReassignablePartitionMessage> Partitions { get; set; } = new();
 
-        public ReassignableTopic()
+        public ReassignableTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ReassignableTopic(BufferReader reader, ApiVersions version)
+        public ReassignableTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,7 +104,7 @@ public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMe
         {
         }
     }
-    public class ReassignablePartition: Message
+    public sealed partial class ReassignablePartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -115,13 +116,13 @@ public sealed partial class AlterPartitionReassignmentsRequestMessage: RequestMe
         /// </summary>
         public List<int>? Replicas { get; set; } = null;
 
-        public ReassignablePartition()
+        public ReassignablePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ReassignablePartition(BufferReader reader, ApiVersions version)
+        public ReassignablePartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

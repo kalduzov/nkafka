@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreatePartitionsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The partition creation results for each topic.
     /// </summary>
-    public List<CreatePartitionsTopicResult> Results { get; set; } = new();
+    public List<CreatePartitionsTopicResultMessage> Results { get; set; } = new();
 
     public CreatePartitionsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class CreatePartitionsResponseMessage: ResponseMessage
     {
     }
 
-    public class CreatePartitionsTopicResult: Message
+    public sealed partial class CreatePartitionsTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -79,13 +80,13 @@ public sealed partial class CreatePartitionsResponseMessage: ResponseMessage
         /// </summary>
         public string? ErrorMessage { get; set; } = "null";
 
-        public CreatePartitionsTopicResult()
+        public CreatePartitionsTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public CreatePartitionsTopicResult(BufferReader reader, ApiVersions version)
+        public CreatePartitionsTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

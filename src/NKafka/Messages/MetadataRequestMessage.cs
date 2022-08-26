@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class MetadataRequestMessage: RequestMessage
 {
     /// <summary>
     /// The topics to fetch metadata for.
     /// </summary>
-    public List<MetadataRequestTopic> Topics { get; set; } = new();
+    public List<MetadataRequestTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// If this is true, the broker may auto-create topics that we requested which do not already exist, if it is configured to do so.
@@ -79,7 +80,7 @@ public sealed partial class MetadataRequestMessage: RequestMessage
     {
     }
 
-    public class MetadataRequestTopic: Message
+    public sealed partial class MetadataRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic id.
@@ -91,13 +92,13 @@ public sealed partial class MetadataRequestMessage: RequestMessage
         /// </summary>
         public string Name { get; set; } = null!;
 
-        public MetadataRequestTopic()
+        public MetadataRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        public MetadataRequestTopic(BufferReader reader, ApiVersions version)
+        public MetadataRequestTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

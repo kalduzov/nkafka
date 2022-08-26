@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetCommitRequestMessage: RequestMessage
 {
     /// <summary>
@@ -63,7 +64,7 @@ public sealed partial class OffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The topics to commit offsets for.
     /// </summary>
-    public List<OffsetCommitRequestTopic> Topics { get; set; } = new();
+    public List<OffsetCommitRequestTopicMessage> Topics { get; set; } = new();
 
     public OffsetCommitRequestMessage()
     {
@@ -89,7 +90,7 @@ public sealed partial class OffsetCommitRequestMessage: RequestMessage
     {
     }
 
-    public class OffsetCommitRequestTopic: Message
+    public sealed partial class OffsetCommitRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -99,15 +100,15 @@ public sealed partial class OffsetCommitRequestMessage: RequestMessage
         /// <summary>
         /// Each partition to commit offsets for.
         /// </summary>
-        public List<OffsetCommitRequestPartition> Partitions { get; set; } = new();
+        public List<OffsetCommitRequestPartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetCommitRequestTopic()
+        public OffsetCommitRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetCommitRequestTopic(BufferReader reader, ApiVersions version)
+        public OffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -123,7 +124,7 @@ public sealed partial class OffsetCommitRequestMessage: RequestMessage
         {
         }
     }
-    public class OffsetCommitRequestPartition: Message
+    public sealed partial class OffsetCommitRequestPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -150,13 +151,13 @@ public sealed partial class OffsetCommitRequestMessage: RequestMessage
         /// </summary>
         public string CommittedMetadata { get; set; } = null!;
 
-        public OffsetCommitRequestPartition()
+        public OffsetCommitRequestPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetCommitRequestPartition(BufferReader reader, ApiVersions version)
+        public OffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

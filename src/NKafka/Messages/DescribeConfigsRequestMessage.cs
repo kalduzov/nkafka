@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeConfigsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The resources whose configurations we want to describe.
     /// </summary>
-    public List<DescribeConfigsResource> Resources { get; set; } = new();
+    public List<DescribeConfigsResourceMessage> Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should include all synonyms.
@@ -74,7 +75,7 @@ public sealed partial class DescribeConfigsRequestMessage: RequestMessage
     {
     }
 
-    public class DescribeConfigsResource: Message
+    public sealed partial class DescribeConfigsResourceMessage: Message
     {
         /// <summary>
         /// The resource type.
@@ -91,13 +92,13 @@ public sealed partial class DescribeConfigsRequestMessage: RequestMessage
         /// </summary>
         public List<string> ConfigurationKeys { get; set; } = new();
 
-        public DescribeConfigsResource()
+        public DescribeConfigsResourceMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsResource(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResourceMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

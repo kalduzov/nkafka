@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class StopReplicaRequestMessage: RequestMessage
 {
     /// <summary>
@@ -58,17 +59,17 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
     /// <summary>
     /// The partitions to stop.
     /// </summary>
-    public List<StopReplicaPartitionV0> UngroupedPartitions { get; set; } = new();
+    public List<StopReplicaPartitionV0Message> UngroupedPartitions { get; set; } = new();
 
     /// <summary>
     /// The topics to stop.
     /// </summary>
-    public List<StopReplicaTopicV1> Topics { get; set; } = new();
+    public List<StopReplicaTopicV1Message> Topics { get; set; } = new();
 
     /// <summary>
     /// Each topic.
     /// </summary>
-    public List<StopReplicaTopicState> TopicStates { get; set; } = new();
+    public List<StopReplicaTopicStateMessage> TopicStates { get; set; } = new();
 
     public StopReplicaRequestMessage()
     {
@@ -94,7 +95,7 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
     {
     }
 
-    public class StopReplicaPartitionV0: Message
+    public sealed partial class StopReplicaPartitionV0Message: Message
     {
         /// <summary>
         /// The topic name.
@@ -106,13 +107,13 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         /// </summary>
         public int PartitionIndex { get; set; } = 0;
 
-        public StopReplicaPartitionV0()
+        public StopReplicaPartitionV0Message()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaPartitionV0(BufferReader reader, ApiVersions version)
+        public StopReplicaPartitionV0Message(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -128,7 +129,7 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         {
         }
     }
-    public class StopReplicaTopicV1: Message
+    public sealed partial class StopReplicaTopicV1Message: Message
     {
         /// <summary>
         /// The topic name.
@@ -140,13 +141,13 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         /// </summary>
         public List<int> PartitionIndexes { get; set; } = new();
 
-        public StopReplicaTopicV1()
+        public StopReplicaTopicV1Message()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaTopicV1(BufferReader reader, ApiVersions version)
+        public StopReplicaTopicV1Message(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -162,7 +163,7 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         {
         }
     }
-    public class StopReplicaTopicState: Message
+    public sealed partial class StopReplicaTopicStateMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -172,15 +173,15 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         /// <summary>
         /// The state of each partition
         /// </summary>
-        public List<StopReplicaPartitionState> PartitionStates { get; set; } = new();
+        public List<StopReplicaPartitionStateMessage> PartitionStates { get; set; } = new();
 
-        public StopReplicaTopicState()
+        public StopReplicaTopicStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaTopicState(BufferReader reader, ApiVersions version)
+        public StopReplicaTopicStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -196,7 +197,7 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         {
         }
     }
-    public class StopReplicaPartitionState: Message
+    public sealed partial class StopReplicaPartitionStateMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -213,13 +214,13 @@ public sealed partial class StopReplicaRequestMessage: RequestMessage
         /// </summary>
         public bool DeletePartition { get; set; } = false;
 
-        public StopReplicaPartitionState()
+        public StopReplicaPartitionStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaPartitionState(BufferReader reader, ApiVersions version)
+        public StopReplicaPartitionStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

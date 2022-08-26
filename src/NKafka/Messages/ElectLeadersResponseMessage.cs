@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ElectLeadersResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class ElectLeadersResponseMessage: ResponseMessage
     /// <summary>
     /// The election results, or an empty array if the requester did not have permission and the request asks for all partitions.
     /// </summary>
-    public List<ReplicaElectionResult> ReplicaElectionResults { get; set; } = new();
+    public List<ReplicaElectionResultMessage> ReplicaElectionResults { get; set; } = new();
 
     public ElectLeadersResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class ElectLeadersResponseMessage: ResponseMessage
     {
     }
 
-    public class ReplicaElectionResult: Message
+    public sealed partial class ReplicaElectionResultMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -77,15 +78,15 @@ public sealed partial class ElectLeadersResponseMessage: ResponseMessage
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public List<PartitionResult> PartitionResult { get; set; } = new();
+        public List<PartitionResultMessage> PartitionResult { get; set; } = new();
 
-        public ReplicaElectionResult()
+        public ReplicaElectionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public ReplicaElectionResult(BufferReader reader, ApiVersions version)
+        public ReplicaElectionResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -101,7 +102,7 @@ public sealed partial class ElectLeadersResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionResult: Message
+    public sealed partial class PartitionResultMessage: Message
     {
         /// <summary>
         /// The partition id
@@ -118,13 +119,13 @@ public sealed partial class ElectLeadersResponseMessage: ResponseMessage
         /// </summary>
         public string ErrorMessage { get; set; } = null!;
 
-        public PartitionResult()
+        public PartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public PartitionResult(BufferReader reader, ApiVersions version)
+        public PartitionResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

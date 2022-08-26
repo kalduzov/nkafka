@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using NKafka.MessageGenerator.Converters;
+
 namespace NKafka.MessageGenerator.Specifications;
 
 public class FieldSpecification
@@ -26,6 +28,7 @@ public class FieldSpecification
     public string? About { get; set; }
 
     [JsonPropertyName("default")]
+    [JsonConverter(typeof(DefaultJsonConverter))]
     public string? Default { get; set; }
 
     [JsonPropertyName("ignorable")]

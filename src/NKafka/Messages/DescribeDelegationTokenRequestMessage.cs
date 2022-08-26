@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
-    public List<DescribeDelegationTokenOwner> Owners { get; set; } = new();
+    public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new();
 
     public DescribeDelegationTokenRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class DescribeDelegationTokenRequestMessage: RequestMessag
     {
     }
 
-    public class DescribeDelegationTokenOwner: Message
+    public sealed partial class DescribeDelegationTokenOwnerMessage: Message
     {
         /// <summary>
         /// The owner principal type.
@@ -76,13 +77,13 @@ public sealed partial class DescribeDelegationTokenRequestMessage: RequestMessag
         /// </summary>
         public string PrincipalName { get; set; } = null!;
 
-        public DescribeDelegationTokenOwner()
+        public DescribeDelegationTokenOwnerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribeDelegationTokenOwner(BufferReader reader, ApiVersions version)
+        public DescribeDelegationTokenOwnerMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

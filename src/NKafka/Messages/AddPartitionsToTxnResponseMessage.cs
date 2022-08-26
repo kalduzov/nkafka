@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AddPartitionsToTxnTopicResult> Results { get; set; } = new();
+    public List<AddPartitionsToTxnTopicResultMessage> Results { get; set; } = new();
 
     public AddPartitionsToTxnResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
     {
     }
 
-    public class AddPartitionsToTxnTopicResult: Message
+    public sealed partial class AddPartitionsToTxnTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -72,15 +73,15 @@ public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public List<AddPartitionsToTxnPartitionResult> Results { get; set; } = new();
+        public List<AddPartitionsToTxnPartitionResultMessage> Results { get; set; } = new();
 
-        public AddPartitionsToTxnTopicResult()
+        public AddPartitionsToTxnTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AddPartitionsToTxnTopicResult(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
         {
         }
     }
-    public class AddPartitionsToTxnPartitionResult: Message
+    public sealed partial class AddPartitionsToTxnPartitionResultMessage: Message
     {
         /// <summary>
         /// The partition indexes.
@@ -108,13 +109,13 @@ public sealed partial class AddPartitionsToTxnResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public AddPartitionsToTxnPartitionResult()
+        public AddPartitionsToTxnPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AddPartitionsToTxnPartitionResult(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

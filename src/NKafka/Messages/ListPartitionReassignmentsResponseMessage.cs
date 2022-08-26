@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseM
     /// <summary>
     /// The ongoing reassignments for each topic.
     /// </summary>
-    public List<OngoingTopicReassignment> Topics { get; set; } = new();
+    public List<OngoingTopicReassignmentMessage> Topics { get; set; } = new();
 
     public ListPartitionReassignmentsResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseM
     {
     }
 
-    public class OngoingTopicReassignment: Message
+    public sealed partial class OngoingTopicReassignmentMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -82,15 +83,15 @@ public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseM
         /// <summary>
         /// The ongoing reassignments for each partition.
         /// </summary>
-        public List<OngoingPartitionReassignment> Partitions { get; set; } = new();
+        public List<OngoingPartitionReassignmentMessage> Partitions { get; set; } = new();
 
-        public OngoingTopicReassignment()
+        public OngoingTopicReassignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OngoingTopicReassignment(BufferReader reader, ApiVersions version)
+        public OngoingTopicReassignmentMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -106,7 +107,7 @@ public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseM
         {
         }
     }
-    public class OngoingPartitionReassignment: Message
+    public sealed partial class OngoingPartitionReassignmentMessage: Message
     {
         /// <summary>
         /// The index of the partition.
@@ -128,13 +129,13 @@ public sealed partial class ListPartitionReassignmentsResponseMessage: ResponseM
         /// </summary>
         public List<int> RemovingReplicas { get; set; } = new();
 
-        public OngoingPartitionReassignment()
+        public OngoingPartitionReassignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OngoingPartitionReassignment(BufferReader reader, ApiVersions version)
+        public OngoingPartitionReassignmentMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

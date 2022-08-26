@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetCommitResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public List<OffsetCommitResponseTopic> Topics { get; set; } = new();
+    public List<OffsetCommitResponseTopicMessage> Topics { get; set; } = new();
 
     public OffsetCommitResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class OffsetCommitResponseMessage: ResponseMessage
     {
     }
 
-    public class OffsetCommitResponseTopic: Message
+    public sealed partial class OffsetCommitResponseTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -72,15 +73,15 @@ public sealed partial class OffsetCommitResponseMessage: ResponseMessage
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public List<OffsetCommitResponsePartition> Partitions { get; set; } = new();
+        public List<OffsetCommitResponsePartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetCommitResponseTopic()
+        public OffsetCommitResponseTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetCommitResponseTopic(BufferReader reader, ApiVersions version)
+        public OffsetCommitResponseTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class OffsetCommitResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetCommitResponsePartition: Message
+    public sealed partial class OffsetCommitResponsePartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -108,13 +109,13 @@ public sealed partial class OffsetCommitResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public OffsetCommitResponsePartition()
+        public OffsetCommitResponsePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        public OffsetCommitResponsePartition(BufferReader reader, ApiVersions version)
+        public OffsetCommitResponsePartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

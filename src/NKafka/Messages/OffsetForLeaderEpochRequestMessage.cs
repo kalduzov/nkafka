@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
     /// <summary>
     /// Each topic to get offsets for.
     /// </summary>
-    public List<OffsetForLeaderTopic> Topics { get; set; } = new();
+    public List<OffsetForLeaderTopicMessage> Topics { get; set; } = new();
 
     public OffsetForLeaderEpochRequestMessage()
     {
@@ -69,7 +70,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
     {
     }
 
-    public class OffsetForLeaderTopic: Message
+    public sealed partial class OffsetForLeaderTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -79,15 +80,15 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
         /// <summary>
         /// Each partition to get offsets for.
         /// </summary>
-        public List<OffsetForLeaderPartition> Partitions { get; set; } = new();
+        public List<OffsetForLeaderPartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetForLeaderTopic()
+        public OffsetForLeaderTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public OffsetForLeaderTopic(BufferReader reader, ApiVersions version)
+        public OffsetForLeaderTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,7 +104,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
         {
         }
     }
-    public class OffsetForLeaderPartition: Message
+    public sealed partial class OffsetForLeaderPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -120,13 +121,13 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: RequestMessage
         /// </summary>
         public int LeaderEpoch { get; set; } = 0;
 
-        public OffsetForLeaderPartition()
+        public OffsetForLeaderPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public OffsetForLeaderPartition(BufferReader reader, ApiVersions version)
+        public OffsetForLeaderPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeUserScramCredentialsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The users to describe, or null/empty to describe all users.
     /// </summary>
-    public List<UserName> Users { get; set; } = new();
+    public List<UserNameMessage> Users { get; set; } = new();
 
     public DescribeUserScramCredentialsRequestMessage()
     {
@@ -64,20 +65,20 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: RequestM
     {
     }
 
-    public class UserName: Message
+    public sealed partial class UserNameMessage: Message
     {
         /// <summary>
         /// The user name.
         /// </summary>
         public string Name { get; set; } = null!;
 
-        public UserName()
+        public UserNameMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public UserName(BufferReader reader, ApiVersions version)
+        public UserNameMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

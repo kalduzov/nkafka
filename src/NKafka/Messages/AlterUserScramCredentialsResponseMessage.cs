@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterUserScramCredentialsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
     /// </summary>
-    public List<AlterUserScramCredentialsResult> Results { get; set; } = new();
+    public List<AlterUserScramCredentialsResultMessage> Results { get; set; } = new();
 
     public AlterUserScramCredentialsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: ResponseMe
     {
     }
 
-    public class AlterUserScramCredentialsResult: Message
+    public sealed partial class AlterUserScramCredentialsResultMessage: Message
     {
         /// <summary>
         /// The user name.
@@ -79,13 +80,13 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: ResponseMe
         /// </summary>
         public string ErrorMessage { get; set; } = null!;
 
-        public AlterUserScramCredentialsResult()
+        public AlterUserScramCredentialsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public AlterUserScramCredentialsResult(BufferReader reader, ApiVersions version)
+        public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

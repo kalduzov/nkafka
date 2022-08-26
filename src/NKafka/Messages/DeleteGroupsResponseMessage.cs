@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DeleteGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The deletion results
     /// </summary>
-    public List<DeletableGroupResult> Results { get; set; } = new();
+    public List<DeletableGroupResultMessage> Results { get; set; } = new();
 
     public DeleteGroupsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DeleteGroupsResponseMessage: ResponseMessage
     {
     }
 
-    public class DeletableGroupResult: Message
+    public sealed partial class DeletableGroupResultMessage: Message
     {
         /// <summary>
         /// The group id
@@ -74,13 +75,13 @@ public sealed partial class DeleteGroupsResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public DeletableGroupResult()
+        public DeletableGroupResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public DeletableGroupResult(BufferReader reader, ApiVersions version)
+        public DeletableGroupResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

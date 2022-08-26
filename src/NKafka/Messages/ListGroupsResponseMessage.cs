@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ListGroupsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class ListGroupsResponseMessage: ResponseMessage
     /// <summary>
     /// Each group in the response.
     /// </summary>
-    public List<ListedGroup> Groups { get; set; } = new();
+    public List<ListedGroupMessage> Groups { get; set; } = new();
 
     public ListGroupsResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class ListGroupsResponseMessage: ResponseMessage
     {
     }
 
-    public class ListedGroup: Message
+    public sealed partial class ListedGroupMessage: Message
     {
         /// <summary>
         /// The group ID.
@@ -84,13 +85,13 @@ public sealed partial class ListGroupsResponseMessage: ResponseMessage
         /// </summary>
         public string? GroupState { get; set; } = null!;
 
-        public ListedGroup()
+        public ListedGroupMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public ListedGroup(BufferReader reader, ApiVersions version)
+        public ListedGroupMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

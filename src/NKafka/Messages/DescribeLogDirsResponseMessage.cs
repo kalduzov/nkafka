@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
     /// <summary>
     /// The log directories.
     /// </summary>
-    public List<DescribeLogDirsResult> Results { get; set; } = new();
+    public List<DescribeLogDirsResultMessage> Results { get; set; } = new();
 
     public DescribeLogDirsResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeLogDirsResult: Message
+    public sealed partial class DescribeLogDirsResultMessage: Message
     {
         /// <summary>
         /// The error code, or 0 if there was no error.
@@ -82,7 +83,7 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         /// <summary>
         /// Each topic.
         /// </summary>
-        public List<DescribeLogDirsTopic> Topics { get; set; } = new();
+        public List<DescribeLogDirsTopicMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// The total size in bytes of the volume the log directory is in.
@@ -94,13 +95,13 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         /// </summary>
         public long? UsableBytes { get; set; } = -1;
 
-        public DescribeLogDirsResult()
+        public DescribeLogDirsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeLogDirsResult(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -116,7 +117,7 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeLogDirsTopic: Message
+    public sealed partial class DescribeLogDirsTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -126,15 +127,15 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public List<DescribeLogDirsPartition> Partitions { get; set; } = new();
+        public List<DescribeLogDirsPartitionMessage> Partitions { get; set; } = new();
 
-        public DescribeLogDirsTopic()
+        public DescribeLogDirsTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeLogDirsTopic(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -150,7 +151,7 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeLogDirsPartition: Message
+    public sealed partial class DescribeLogDirsPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -172,13 +173,13 @@ public sealed partial class DescribeLogDirsResponseMessage: ResponseMessage
         /// </summary>
         public bool IsFutureKey { get; set; } = false;
 
-        public DescribeLogDirsPartition()
+        public DescribeLogDirsPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeLogDirsPartition(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

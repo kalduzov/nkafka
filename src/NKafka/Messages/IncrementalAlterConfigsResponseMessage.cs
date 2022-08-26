@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class IncrementalAlterConfigsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The responses for each resource.
     /// </summary>
-    public List<AlterConfigsResourceResponse> Responses { get; set; } = new();
+    public List<AlterConfigsResourceResponseMessage> Responses { get; set; } = new();
 
     public IncrementalAlterConfigsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: ResponseMess
     {
     }
 
-    public class AlterConfigsResourceResponse: Message
+    public sealed partial class AlterConfigsResourceResponseMessage: Message
     {
         /// <summary>
         /// The resource error code.
@@ -84,13 +85,13 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: ResponseMess
         /// </summary>
         public string ResourceName { get; set; } = null!;
 
-        public AlterConfigsResourceResponse()
+        public AlterConfigsResourceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public AlterConfigsResourceResponse(BufferReader reader, ApiVersions version)
+        public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public List<OffsetDeleteResponseTopic> Topics { get; set; } = new();
+    public List<OffsetDeleteResponseTopicMessage> Topics { get; set; } = new();
 
     public OffsetDeleteResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
     {
     }
 
-    public class OffsetDeleteResponseTopic: Message
+    public sealed partial class OffsetDeleteResponseTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -77,15 +78,15 @@ public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public List<OffsetDeleteResponsePartition> Partitions { get; set; } = new();
+        public List<OffsetDeleteResponsePartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetDeleteResponseTopic()
+        public OffsetDeleteResponseTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteResponseTopic(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponseTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -101,7 +102,7 @@ public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
         {
         }
     }
-    public class OffsetDeleteResponsePartition: Message
+    public sealed partial class OffsetDeleteResponsePartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -113,13 +114,13 @@ public sealed partial class OffsetDeleteResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public OffsetDeleteResponsePartition()
+        public OffsetDeleteResponsePartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteResponsePartition(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponsePartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

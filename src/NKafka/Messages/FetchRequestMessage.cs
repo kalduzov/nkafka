@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class FetchRequestMessage: RequestMessage
 {
     /// <summary>
@@ -78,12 +79,12 @@ public sealed partial class FetchRequestMessage: RequestMessage
     /// <summary>
     /// The topics to fetch.
     /// </summary>
-    public List<FetchTopic> Topics { get; set; } = new();
+    public List<FetchTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// In an incremental fetch request, the partitions to remove.
     /// </summary>
-    public List<ForgottenTopic> ForgottenTopicsData { get; set; } = new();
+    public List<ForgottenTopicMessage> ForgottenTopicsData { get; set; } = new();
 
     /// <summary>
     /// Rack ID of the consumer making this request
@@ -114,7 +115,7 @@ public sealed partial class FetchRequestMessage: RequestMessage
     {
     }
 
-    public class FetchTopic: Message
+    public sealed partial class FetchTopicMessage: Message
     {
         /// <summary>
         /// The name of the topic to fetch.
@@ -129,15 +130,15 @@ public sealed partial class FetchRequestMessage: RequestMessage
         /// <summary>
         /// The partitions to fetch.
         /// </summary>
-        public List<FetchPartition> Partitions { get; set; } = new();
+        public List<FetchPartitionMessage> Partitions { get; set; } = new();
 
-        public FetchTopic()
+        public FetchTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public FetchTopic(BufferReader reader, ApiVersions version)
+        public FetchTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -153,7 +154,7 @@ public sealed partial class FetchRequestMessage: RequestMessage
         {
         }
     }
-    public class FetchPartition: Message
+    public sealed partial class FetchPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -185,13 +186,13 @@ public sealed partial class FetchRequestMessage: RequestMessage
         /// </summary>
         public int PartitionMaxBytes { get; set; } = 0;
 
-        public FetchPartition()
+        public FetchPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public FetchPartition(BufferReader reader, ApiVersions version)
+        public FetchPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -207,7 +208,7 @@ public sealed partial class FetchRequestMessage: RequestMessage
         {
         }
     }
-    public class ForgottenTopic: Message
+    public sealed partial class ForgottenTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -224,13 +225,13 @@ public sealed partial class FetchRequestMessage: RequestMessage
         /// </summary>
         public List<int> Partitions { get; set; } = new();
 
-        public ForgottenTopic()
+        public ForgottenTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public ForgottenTopic(BufferReader reader, ApiVersions version)
+        public ForgottenTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each resource.
     /// </summary>
-    public List<DescribeConfigsResult> Results { get; set; } = new();
+    public List<DescribeConfigsResultMessage> Results { get; set; } = new();
 
     public DescribeConfigsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeConfigsResult: Message
+    public sealed partial class DescribeConfigsResultMessage: Message
     {
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
@@ -87,15 +88,15 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// Each listed configuration.
         /// </summary>
-        public List<DescribeConfigsResourceResult> Configs { get; set; } = new();
+        public List<DescribeConfigsResourceResultMessage> Configs { get; set; } = new();
 
-        public DescribeConfigsResult()
+        public DescribeConfigsResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsResult(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -111,7 +112,7 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeConfigsResourceResult: Message
+    public sealed partial class DescribeConfigsResourceResultMessage: Message
     {
         /// <summary>
         /// The configuration name.
@@ -146,7 +147,7 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The synonyms for this configuration key.
         /// </summary>
-        public List<DescribeConfigsSynonym>? Synonyms { get; set; } = new();
+        public List<DescribeConfigsSynonymMessage>? Synonyms { get; set; } = new();
 
         /// <summary>
         /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
@@ -158,13 +159,13 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         /// </summary>
         public string? Documentation { get; set; } = null!;
 
-        public DescribeConfigsResourceResult()
+        public DescribeConfigsResourceResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsResourceResult(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -180,7 +181,7 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DescribeConfigsSynonym: Message
+    public sealed partial class DescribeConfigsSynonymMessage: Message
     {
         /// <summary>
         /// The synonym name.
@@ -197,13 +198,13 @@ public sealed partial class DescribeConfigsResponseMessage: ResponseMessage
         /// </summary>
         public sbyte Source { get; set; } = 0;
 
-        public DescribeConfigsSynonym()
+        public DescribeConfigsSynonymMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribeConfigsSynonym(BufferReader reader, ApiVersions version)
+        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

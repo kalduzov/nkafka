@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public List<EntryData> Entries { get; set; } = new();
+    public List<EntryDataMessage> Entries { get; set; } = new();
 
     public AlterClientQuotasResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
     {
     }
 
-    public class EntryData: Message
+    public sealed partial class EntryDataMessage: Message
     {
         /// <summary>
         /// The error code, or `0` if the quota alteration succeeded.
@@ -77,15 +78,15 @@ public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
-        public List<EntityData> Entity { get; set; } = new();
+        public List<EntityDataMessage> Entity { get; set; } = new();
 
-        public EntryData()
+        public EntryDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntryData(BufferReader reader, ApiVersions version)
+        public EntryDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -101,7 +102,7 @@ public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
         {
         }
     }
-    public class EntityData: Message
+    public sealed partial class EntityDataMessage: Message
     {
         /// <summary>
         /// The entity type.
@@ -113,13 +114,13 @@ public sealed partial class AlterClientQuotasResponseMessage: ResponseMessage
         /// </summary>
         public string EntityName { get; set; } = null!;
 
-        public EntityData()
+        public EntityDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntityData(BufferReader reader, ApiVersions version)
+        public EntityDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

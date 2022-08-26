@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
 {
     /// <summary>
@@ -73,7 +74,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// Each topic that we want to commit offsets for.
     /// </summary>
-    public List<TxnOffsetCommitRequestTopic> Topics { get; set; } = new();
+    public List<TxnOffsetCommitRequestTopicMessage> Topics { get; set; } = new();
 
     public TxnOffsetCommitRequestMessage()
     {
@@ -99,7 +100,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
     {
     }
 
-    public class TxnOffsetCommitRequestTopic: Message
+    public sealed partial class TxnOffsetCommitRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -109,15 +110,15 @@ public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
         /// <summary>
         /// The partitions inside the topic that we want to committ offsets for.
         /// </summary>
-        public List<TxnOffsetCommitRequestPartition> Partitions { get; set; } = new();
+        public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new();
 
-        public TxnOffsetCommitRequestTopic()
+        public TxnOffsetCommitRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public TxnOffsetCommitRequestTopic(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -133,7 +134,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
         {
         }
     }
-    public class TxnOffsetCommitRequestPartition: Message
+    public sealed partial class TxnOffsetCommitRequestPartitionMessage: Message
     {
         /// <summary>
         /// The index of the partition within the topic.
@@ -155,13 +156,13 @@ public sealed partial class TxnOffsetCommitRequestMessage: RequestMessage
         /// </summary>
         public string CommittedMetadata { get; set; } = null!;
 
-        public TxnOffsetCommitRequestPartition()
+        public TxnOffsetCommitRequestPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public TxnOffsetCommitRequestPartition(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

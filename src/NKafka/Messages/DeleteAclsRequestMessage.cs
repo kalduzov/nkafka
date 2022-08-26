@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DeleteAclsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The filters to use when deleting ACLs.
     /// </summary>
-    public List<DeleteAclsFilter> Filters { get; set; } = new();
+    public List<DeleteAclsFilterMessage> Filters { get; set; } = new();
 
     public DeleteAclsRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class DeleteAclsRequestMessage: RequestMessage
     {
     }
 
-    public class DeleteAclsFilter: Message
+    public sealed partial class DeleteAclsFilterMessage: Message
     {
         /// <summary>
         /// The resource type.
@@ -101,13 +102,13 @@ public sealed partial class DeleteAclsRequestMessage: RequestMessage
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
-        public DeleteAclsFilter()
+        public DeleteAclsFilterMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DeleteAclsFilter(BufferReader reader, ApiVersions version)
+        public DeleteAclsFilterMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

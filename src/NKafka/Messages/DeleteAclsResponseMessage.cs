@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DeleteAclsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each filter.
     /// </summary>
-    public List<DeleteAclsFilterResult> FilterResults { get; set; } = new();
+    public List<DeleteAclsFilterResultMessage> FilterResults { get; set; } = new();
 
     public DeleteAclsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class DeleteAclsResponseMessage: ResponseMessage
     {
     }
 
-    public class DeleteAclsFilterResult: Message
+    public sealed partial class DeleteAclsFilterResultMessage: Message
     {
         /// <summary>
         /// The error code, or 0 if the filter succeeded.
@@ -77,15 +78,15 @@ public sealed partial class DeleteAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The ACLs which matched this filter.
         /// </summary>
-        public List<DeleteAclsMatchingAcl> MatchingAcls { get; set; } = new();
+        public List<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; } = new();
 
-        public DeleteAclsFilterResult()
+        public DeleteAclsFilterResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DeleteAclsFilterResult(BufferReader reader, ApiVersions version)
+        public DeleteAclsFilterResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -101,7 +102,7 @@ public sealed partial class DeleteAclsResponseMessage: ResponseMessage
         {
         }
     }
-    public class DeleteAclsMatchingAcl: Message
+    public sealed partial class DeleteAclsMatchingAclMessage: Message
     {
         /// <summary>
         /// The deletion error code, or 0 if the deletion succeeded.
@@ -148,13 +149,13 @@ public sealed partial class DeleteAclsResponseMessage: ResponseMessage
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
-        public DeleteAclsMatchingAcl()
+        public DeleteAclsMatchingAclMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DeleteAclsMatchingAcl(BufferReader reader, ApiVersions version)
+        public DeleteAclsMatchingAclMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

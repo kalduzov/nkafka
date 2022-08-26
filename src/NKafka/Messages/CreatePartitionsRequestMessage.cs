@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreatePartitionsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to create new partitions inside.
     /// </summary>
-    public List<CreatePartitionsTopic> Topics { get; set; } = new();
+    public List<CreatePartitionsTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the partitions to be created.
@@ -74,7 +75,7 @@ public sealed partial class CreatePartitionsRequestMessage: RequestMessage
     {
     }
 
-    public class CreatePartitionsTopic: Message
+    public sealed partial class CreatePartitionsTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -89,15 +90,15 @@ public sealed partial class CreatePartitionsRequestMessage: RequestMessage
         /// <summary>
         /// The new partition assignments.
         /// </summary>
-        public List<CreatePartitionsAssignment> Assignments { get; set; } = new();
+        public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new();
 
-        public CreatePartitionsTopic()
+        public CreatePartitionsTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public CreatePartitionsTopic(BufferReader reader, ApiVersions version)
+        public CreatePartitionsTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -113,20 +114,20 @@ public sealed partial class CreatePartitionsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreatePartitionsAssignment: Message
+    public sealed partial class CreatePartitionsAssignmentMessage: Message
     {
         /// <summary>
         /// The assigned broker IDs.
         /// </summary>
         public List<int> BrokerIds { get; set; } = new();
 
-        public CreatePartitionsAssignment()
+        public CreatePartitionsAssignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public CreatePartitionsAssignment(BufferReader reader, ApiVersions version)
+        public CreatePartitionsAssignmentMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

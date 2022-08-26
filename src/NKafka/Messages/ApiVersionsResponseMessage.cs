@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ApiVersionsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,12 +44,12 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
     /// <summary>
     /// The APIs supported by the broker.
     /// </summary>
-    public List<ApiVersion> ApiKeys { get; set; } = new();
+    public List<ApiVersionMessage> ApiKeys { get; set; } = new();
 
     /// <summary>
     /// Features supported by the broker.
     /// </summary>
-    public List<SupportedFeatureKey>? SupportedFeatures { get; set; } = new();
+    public List<SupportedFeatureKeyMessage>? SupportedFeatures { get; set; } = new();
 
     /// <summary>
     /// The monotonically increasing epoch for the finalized features information. Valid values are >= 0. A value of -1 is special and represents unknown epoch.
@@ -58,7 +59,7 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
     /// <summary>
     /// List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch >= 0.
     /// </summary>
-    public List<FinalizedFeatureKey>? FinalizedFeatures { get; set; } = new();
+    public List<FinalizedFeatureKeyMessage>? FinalizedFeatures { get; set; } = new();
 
     public ApiVersionsResponseMessage()
     {
@@ -82,7 +83,7 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
     {
     }
 
-    public class ApiVersion: Message
+    public sealed partial class ApiVersionMessage: Message
     {
         /// <summary>
         /// The API index.
@@ -99,13 +100,13 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
         /// </summary>
         public short MaxVersion { get; set; } = 0;
 
-        public ApiVersion()
+        public ApiVersionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public ApiVersion(BufferReader reader, ApiVersions version)
+        public ApiVersionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -121,7 +122,7 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
         {
         }
     }
-    public class SupportedFeatureKey: Message
+    public sealed partial class SupportedFeatureKeyMessage: Message
     {
         /// <summary>
         /// The name of the feature.
@@ -138,13 +139,13 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
         /// </summary>
         public short MaxVersion { get; set; } = 0;
 
-        public SupportedFeatureKey()
+        public SupportedFeatureKeyMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public SupportedFeatureKey(BufferReader reader, ApiVersions version)
+        public SupportedFeatureKeyMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -160,7 +161,7 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
         {
         }
     }
-    public class FinalizedFeatureKey: Message
+    public sealed partial class FinalizedFeatureKeyMessage: Message
     {
         /// <summary>
         /// The name of the feature.
@@ -177,13 +178,13 @@ public sealed partial class ApiVersionsResponseMessage: ResponseMessage
         /// </summary>
         public short MinVersionLevel { get; set; } = 0;
 
-        public FinalizedFeatureKey()
+        public FinalizedFeatureKeyMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public FinalizedFeatureKey(BufferReader reader, ApiVersions version)
+        public FinalizedFeatureKeyMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

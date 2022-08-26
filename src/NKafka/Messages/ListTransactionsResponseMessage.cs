@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ListTransactionsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class ListTransactionsResponseMessage: ResponseMessage
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionState> TransactionStates { get; set; } = new();
+    public List<TransactionStateMessage> TransactionStates { get; set; } = new();
 
     public ListTransactionsResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class ListTransactionsResponseMessage: ResponseMessage
     {
     }
 
-    public class TransactionState: Message
+    public sealed partial class TransactionStateMessage: Message
     {
         /// <summary>
         /// 
@@ -89,13 +90,13 @@ public sealed partial class ListTransactionsResponseMessage: ResponseMessage
         /// </summary>
         public string TransactionState { get; set; } = null!;
 
-        public TransactionState()
+        public TransactionStateMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TransactionState(BufferReader reader, ApiVersions version)
+        public TransactionStateMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

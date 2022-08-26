@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class SyncGroupRequestMessage: RequestMessage
 {
     /// <summary>
@@ -68,7 +69,7 @@ public sealed partial class SyncGroupRequestMessage: RequestMessage
     /// <summary>
     /// Each assignment.
     /// </summary>
-    public List<SyncGroupRequestAssignment> Assignments { get; set; } = new();
+    public List<SyncGroupRequestAssignmentMessage> Assignments { get; set; } = new();
 
     public SyncGroupRequestMessage()
     {
@@ -94,7 +95,7 @@ public sealed partial class SyncGroupRequestMessage: RequestMessage
     {
     }
 
-    public class SyncGroupRequestAssignment: Message
+    public sealed partial class SyncGroupRequestAssignmentMessage: Message
     {
         /// <summary>
         /// The ID of the member to assign.
@@ -106,13 +107,13 @@ public sealed partial class SyncGroupRequestMessage: RequestMessage
         /// </summary>
         public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
-        public SyncGroupRequestAssignment()
+        public SyncGroupRequestAssignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        public SyncGroupRequestAssignment(BufferReader reader, ApiVersions version)
+        public SyncGroupRequestAssignmentMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

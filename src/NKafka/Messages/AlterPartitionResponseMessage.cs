@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterPartitionResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class AlterPartitionResponseMessage: ResponseMessage
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicData> Topics { get; set; } = new();
+    public List<TopicDataMessage> Topics { get; set; } = new();
 
     public AlterPartitionResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class AlterPartitionResponseMessage: ResponseMessage
     {
     }
 
-    public class TopicData: Message
+    public sealed partial class TopicDataMessage: Message
     {
         /// <summary>
         /// The name of the topic
@@ -82,15 +83,15 @@ public sealed partial class AlterPartitionResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionData> Partitions { get; set; } = new();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
-        public TopicData()
+        public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public TopicData(BufferReader reader, ApiVersions version)
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -106,7 +107,7 @@ public sealed partial class AlterPartitionResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionData: Message
+    public sealed partial class PartitionDataMessage: Message
     {
         /// <summary>
         /// The partition index
@@ -143,13 +144,13 @@ public sealed partial class AlterPartitionResponseMessage: ResponseMessage
         /// </summary>
         public int PartitionEpoch { get; set; } = 0;
 
-        public PartitionData()
+        public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public PartitionData(BufferReader reader, ApiVersions version)
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

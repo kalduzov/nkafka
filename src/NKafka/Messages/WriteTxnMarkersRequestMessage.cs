@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
 {
     /// <summary>
     /// The transaction markers to be written.
     /// </summary>
-    public List<WritableTxnMarker> Markers { get; set; } = new();
+    public List<WritableTxnMarkerMessage> Markers { get; set; } = new();
 
     public WriteTxnMarkersRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
     {
     }
 
-    public class WritableTxnMarker: Message
+    public sealed partial class WritableTxnMarkerMessage: Message
     {
         /// <summary>
         /// The current producer ID.
@@ -84,20 +85,20 @@ public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
         /// <summary>
         /// Each topic that we want to write transaction marker(s) for.
         /// </summary>
-        public List<WritableTxnMarkerTopic> Topics { get; set; } = new();
+        public List<WritableTxnMarkerTopicMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// Epoch associated with the transaction state partition hosted by this transaction coordinator
         /// </summary>
         public int CoordinatorEpoch { get; set; } = 0;
 
-        public WritableTxnMarker()
+        public WritableTxnMarkerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarker(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -113,7 +114,7 @@ public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
         {
         }
     }
-    public class WritableTxnMarkerTopic: Message
+    public sealed partial class WritableTxnMarkerTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -125,13 +126,13 @@ public sealed partial class WriteTxnMarkersRequestMessage: RequestMessage
         /// </summary>
         public List<int> PartitionIndexes { get; set; } = new();
 
-        public WritableTxnMarkerTopic()
+        public WritableTxnMarkerTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerTopic(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

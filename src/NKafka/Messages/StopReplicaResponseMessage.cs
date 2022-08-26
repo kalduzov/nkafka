@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class StopReplicaResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class StopReplicaResponseMessage: ResponseMessage
     /// <summary>
     /// The responses for each partition.
     /// </summary>
-    public List<StopReplicaPartitionError> PartitionErrors { get; set; } = new();
+    public List<StopReplicaPartitionErrorMessage> PartitionErrors { get; set; } = new();
 
     public StopReplicaResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class StopReplicaResponseMessage: ResponseMessage
     {
     }
 
-    public class StopReplicaPartitionError: Message
+    public sealed partial class StopReplicaPartitionErrorMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -84,13 +85,13 @@ public sealed partial class StopReplicaResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public StopReplicaPartitionError()
+        public StopReplicaPartitionErrorMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public StopReplicaPartitionError(BufferReader reader, ApiVersions version)
+        public StopReplicaPartitionErrorMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

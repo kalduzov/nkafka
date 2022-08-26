@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreateDelegationTokenRequestMessage: RequestMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class CreateDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// A list of those who are allowed to renew this token before it expires.
     /// </summary>
-    public List<CreatableRenewers> Renewers { get; set; } = new();
+    public List<CreatableRenewersMessage> Renewers { get; set; } = new();
 
     /// <summary>
     /// The maximum lifetime of the token in milliseconds, or -1 to use the server side default.
@@ -79,7 +80,7 @@ public sealed partial class CreateDelegationTokenRequestMessage: RequestMessage
     {
     }
 
-    public class CreatableRenewers: Message
+    public sealed partial class CreatableRenewersMessage: Message
     {
         /// <summary>
         /// The type of the Kafka principal.
@@ -91,13 +92,13 @@ public sealed partial class CreateDelegationTokenRequestMessage: RequestMessage
         /// </summary>
         public string PrincipalName { get; set; } = null!;
 
-        public CreatableRenewers()
+        public CreatableRenewersMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public CreatableRenewers(BufferReader reader, ApiVersions version)
+        public CreatableRenewersMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

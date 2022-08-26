@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class FetchResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
     /// <summary>
     /// The response topics.
     /// </summary>
-    public List<FetchableTopicResponse> Responses { get; set; } = new();
+    public List<FetchableTopicResponseMessage> Responses { get; set; } = new();
 
     public FetchResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
     {
     }
 
-    public class FetchableTopicResponse: Message
+    public sealed partial class FetchableTopicResponseMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -87,15 +88,15 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The topic partitions.
         /// </summary>
-        public List<PartitionData> Partitions { get; set; } = new();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
-        public FetchableTopicResponse()
+        public FetchableTopicResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public FetchableTopicResponse(BufferReader reader, ApiVersions version)
+        public FetchableTopicResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -111,7 +112,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionData: Message
+    public sealed partial class PartitionDataMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -141,22 +142,22 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
         /// </summary>
-        public EpochEndOffset DivergingEpoch { get; set; } = new();
+        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public LeaderIdAndEpoch CurrentLeader { get; set; } = new();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new();
 
         /// <summary>
         /// In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request.
         /// </summary>
-        public SnapshotId SnapshotId { get; set; } = new();
+        public SnapshotIdMessage SnapshotId { get; set; } = new();
 
         /// <summary>
         /// The aborted transactions.
         /// </summary>
-        public List<AbortedTransaction>? AbortedTransactions { get; set; } = new();
+        public List<AbortedTransactionMessage>? AbortedTransactions { get; set; } = new();
 
         /// <summary>
         /// The preferred read replica for the consumer to use on its next fetch request
@@ -168,13 +169,13 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public RecordBatch Records { get; set; } = new();
 
-        public PartitionData()
+        public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public PartitionData(BufferReader reader, ApiVersions version)
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -190,7 +191,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class EpochEndOffset: Message
+    public sealed partial class EpochEndOffsetMessage: Message
     {
         /// <summary>
         /// 
@@ -202,13 +203,13 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
-        public EpochEndOffset()
+        public EpochEndOffsetMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public EpochEndOffset(BufferReader reader, ApiVersions version)
+        public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -224,7 +225,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class LeaderIdAndEpoch: Message
+    public sealed partial class LeaderIdAndEpochMessage: Message
     {
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
@@ -236,13 +237,13 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
-        public LeaderIdAndEpoch()
+        public LeaderIdAndEpochMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public LeaderIdAndEpoch(BufferReader reader, ApiVersions version)
+        public LeaderIdAndEpochMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -258,7 +259,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class SnapshotId: Message
+    public sealed partial class SnapshotIdMessage: Message
     {
         /// <summary>
         /// 
@@ -270,13 +271,13 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public int Epoch { get; set; } = -1;
 
-        public SnapshotId()
+        public SnapshotIdMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public SnapshotId(BufferReader reader, ApiVersions version)
+        public SnapshotIdMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -292,7 +293,7 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         {
         }
     }
-    public class AbortedTransaction: Message
+    public sealed partial class AbortedTransactionMessage: Message
     {
         /// <summary>
         /// The producer id associated with the aborted transaction.
@@ -304,13 +305,13 @@ public sealed partial class FetchResponseMessage: ResponseMessage
         /// </summary>
         public long FirstOffset { get; set; } = 0;
 
-        public AbortedTransaction()
+        public AbortedTransactionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version13;
         }
 
-        public AbortedTransaction(BufferReader reader, ApiVersions version)
+        public AbortedTransactionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class JoinGroupRequestMessage: RequestMessage
 {
     /// <summary>
@@ -68,7 +69,7 @@ public sealed partial class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The list of protocols that the member supports.
     /// </summary>
-    public List<JoinGroupRequestProtocol> Protocols { get; set; } = new();
+    public List<JoinGroupRequestProtocolMessage> Protocols { get; set; } = new();
 
     /// <summary>
     /// The reason why the member (re-)joins the group.
@@ -99,7 +100,7 @@ public sealed partial class JoinGroupRequestMessage: RequestMessage
     {
     }
 
-    public class JoinGroupRequestProtocol: Message
+    public sealed partial class JoinGroupRequestProtocolMessage: Message
     {
         /// <summary>
         /// The protocol name.
@@ -111,13 +112,13 @@ public sealed partial class JoinGroupRequestMessage: RequestMessage
         /// </summary>
         public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
-        public JoinGroupRequestProtocol()
+        public JoinGroupRequestProtocolMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public JoinGroupRequestProtocol(BufferReader reader, ApiVersions version)
+        public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

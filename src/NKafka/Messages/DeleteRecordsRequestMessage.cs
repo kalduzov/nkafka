@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DeleteRecordsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to delete records from.
     /// </summary>
-    public List<DeleteRecordsTopic> Topics { get; set; } = new();
+    public List<DeleteRecordsTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// How long to wait for the deletion to complete, in milliseconds.
@@ -69,7 +70,7 @@ public sealed partial class DeleteRecordsRequestMessage: RequestMessage
     {
     }
 
-    public class DeleteRecordsTopic: Message
+    public sealed partial class DeleteRecordsTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -79,15 +80,15 @@ public sealed partial class DeleteRecordsRequestMessage: RequestMessage
         /// <summary>
         /// Each partition that we want to delete records from.
         /// </summary>
-        public List<DeleteRecordsPartition> Partitions { get; set; } = new();
+        public List<DeleteRecordsPartitionMessage> Partitions { get; set; } = new();
 
-        public DeleteRecordsTopic()
+        public DeleteRecordsTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public DeleteRecordsTopic(BufferReader reader, ApiVersions version)
+        public DeleteRecordsTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,7 +104,7 @@ public sealed partial class DeleteRecordsRequestMessage: RequestMessage
         {
         }
     }
-    public class DeleteRecordsPartition: Message
+    public sealed partial class DeleteRecordsPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -115,13 +116,13 @@ public sealed partial class DeleteRecordsRequestMessage: RequestMessage
         /// </summary>
         public long Offset { get; set; } = 0;
 
-        public DeleteRecordsPartition()
+        public DeleteRecordsPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public DeleteRecordsPartition(BufferReader reader, ApiVersions version)
+        public DeleteRecordsPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeClusterResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -58,7 +59,7 @@ public sealed partial class DescribeClusterResponseMessage: ResponseMessage
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public List<DescribeClusterBroker> Brokers { get; set; } = new();
+    public List<DescribeClusterBrokerMessage> Brokers { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.
@@ -87,7 +88,7 @@ public sealed partial class DescribeClusterResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeClusterBroker: Message
+    public sealed partial class DescribeClusterBrokerMessage: Message
     {
         /// <summary>
         /// The broker ID.
@@ -109,13 +110,13 @@ public sealed partial class DescribeClusterResponseMessage: ResponseMessage
         /// </summary>
         public string? Rack { get; set; } = "null";
 
-        public DescribeClusterBroker()
+        public DescribeClusterBrokerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public DescribeClusterBroker(BufferReader reader, ApiVersions version)
+        public DescribeClusterBrokerMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

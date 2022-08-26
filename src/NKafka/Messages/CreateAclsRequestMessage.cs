@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreateAclsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The ACLs that we want to create.
     /// </summary>
-    public List<AclCreation> Creations { get; set; } = new();
+    public List<AclCreationMessage> Creations { get; set; } = new();
 
     public CreateAclsRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class CreateAclsRequestMessage: RequestMessage
     {
     }
 
-    public class AclCreation: Message
+    public sealed partial class AclCreationMessage: Message
     {
         /// <summary>
         /// The type of the resource.
@@ -101,13 +102,13 @@ public sealed partial class CreateAclsRequestMessage: RequestMessage
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
-        public AclCreation()
+        public AclCreationMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AclCreation(BufferReader reader, ApiVersions version)
+        public AclCreationMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

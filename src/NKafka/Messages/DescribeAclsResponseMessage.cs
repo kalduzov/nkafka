@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeAclsResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -48,7 +49,7 @@ public sealed partial class DescribeAclsResponseMessage: ResponseMessage
     /// <summary>
     /// Each Resource that is referenced in an ACL.
     /// </summary>
-    public List<DescribeAclsResource> Resources { get; set; } = new();
+    public List<DescribeAclsResourceMessage> Resources { get; set; } = new();
 
     public DescribeAclsResponseMessage()
     {
@@ -72,7 +73,7 @@ public sealed partial class DescribeAclsResponseMessage: ResponseMessage
     {
     }
 
-    public class DescribeAclsResource: Message
+    public sealed partial class DescribeAclsResourceMessage: Message
     {
         /// <summary>
         /// The resource type.
@@ -92,15 +93,15 @@ public sealed partial class DescribeAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The ACLs.
         /// </summary>
-        public List<AclDescription> Acls { get; set; } = new();
+        public List<AclDescriptionMessage> Acls { get; set; } = new();
 
-        public DescribeAclsResource()
+        public DescribeAclsResourceMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public DescribeAclsResource(BufferReader reader, ApiVersions version)
+        public DescribeAclsResourceMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -116,7 +117,7 @@ public sealed partial class DescribeAclsResponseMessage: ResponseMessage
         {
         }
     }
-    public class AclDescription: Message
+    public sealed partial class AclDescriptionMessage: Message
     {
         /// <summary>
         /// The ACL principal.
@@ -138,13 +139,13 @@ public sealed partial class DescribeAclsResponseMessage: ResponseMessage
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
-        public AclDescription()
+        public AclDescriptionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AclDescription(BufferReader reader, ApiVersions version)
+        public AclDescriptionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

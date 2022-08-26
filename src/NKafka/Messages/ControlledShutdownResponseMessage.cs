@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
-    public List<RemainingPartition> RemainingPartitions { get; set; } = new();
+    public List<RemainingPartitionMessage> RemainingPartitions { get; set; } = new();
 
     public ControlledShutdownResponseMessage()
     {
@@ -67,7 +68,7 @@ public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
     {
     }
 
-    public class RemainingPartition: Message
+    public sealed partial class RemainingPartitionMessage: Message
     {
         /// <summary>
         /// The name of the topic.
@@ -79,13 +80,13 @@ public sealed partial class ControlledShutdownResponseMessage: ResponseMessage
         /// </summary>
         public int PartitionIndex { get; set; } = 0;
 
-        public RemainingPartition()
+        public RemainingPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public RemainingPartition(BufferReader reader, ApiVersions version)
+        public RemainingPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

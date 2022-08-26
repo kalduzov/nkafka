@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
 {
     /// <summary>
@@ -53,12 +54,12 @@ public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
     /// <summary>
     /// The listeners of this broker
     /// </summary>
-    public List<Listener> Listeners { get; set; } = new();
+    public List<ListenerMessage> Listeners { get; set; } = new();
 
     /// <summary>
     /// The features on this broker
     /// </summary>
-    public List<Feature> Features { get; set; } = new();
+    public List<FeatureMessage> Features { get; set; } = new();
 
     /// <summary>
     /// The rack which this broker is in.
@@ -89,7 +90,7 @@ public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
     {
     }
 
-    public class Listener: Message
+    public sealed partial class ListenerMessage: Message
     {
         /// <summary>
         /// The name of the endpoint.
@@ -111,13 +112,13 @@ public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
         /// </summary>
         public short SecurityProtocol { get; set; } = 0;
 
-        public Listener()
+        public ListenerMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public Listener(BufferReader reader, ApiVersions version)
+        public ListenerMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -133,7 +134,7 @@ public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
         {
         }
     }
-    public class Feature: Message
+    public sealed partial class FeatureMessage: Message
     {
         /// <summary>
         /// The feature name.
@@ -150,13 +151,13 @@ public sealed partial class BrokerRegistrationRequestMessage: RequestMessage
         /// </summary>
         public short MaxSupportedVersion { get; set; } = 0;
 
-        public Feature()
+        public FeatureMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public Feature(BufferReader reader, ApiVersions version)
+        public FeatureMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

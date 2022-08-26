@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,18 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterUserScramCredentialsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The SCRAM credentials to remove.
     /// </summary>
-    public List<ScramCredentialDeletion> Deletions { get; set; } = new();
+    public List<ScramCredentialDeletionMessage> Deletions { get; set; } = new();
 
     /// <summary>
     /// The SCRAM credentials to update/insert.
     /// </summary>
-    public List<ScramCredentialUpsertion> Upsertions { get; set; } = new();
+    public List<ScramCredentialUpsertionMessage> Upsertions { get; set; } = new();
 
     public AlterUserScramCredentialsRequestMessage()
     {
@@ -69,7 +70,7 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: RequestMess
     {
     }
 
-    public class ScramCredentialDeletion: Message
+    public sealed partial class ScramCredentialDeletionMessage: Message
     {
         /// <summary>
         /// The user name.
@@ -81,13 +82,13 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: RequestMess
         /// </summary>
         public sbyte Mechanism { get; set; } = 0;
 
-        public ScramCredentialDeletion()
+        public ScramCredentialDeletionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ScramCredentialDeletion(BufferReader reader, ApiVersions version)
+        public ScramCredentialDeletionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,7 +104,7 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: RequestMess
         {
         }
     }
-    public class ScramCredentialUpsertion: Message
+    public sealed partial class ScramCredentialUpsertionMessage: Message
     {
         /// <summary>
         /// The user name.
@@ -130,13 +131,13 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: RequestMess
         /// </summary>
         public byte[] SaltedPassword { get; set; } = Array.Empty<byte>();
 
-        public ScramCredentialUpsertion()
+        public ScramCredentialUpsertionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ScramCredentialUpsertion(BufferReader reader, ApiVersions version)
+        public ScramCredentialUpsertionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

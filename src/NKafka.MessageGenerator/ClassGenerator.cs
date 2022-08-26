@@ -32,10 +32,9 @@ public class ClassGenerator: Generator, IClassGenerator
     private readonly IWriteMethodGenerator _writeMethodGenerator;
     private readonly IReadMethodGenerator _readMethodGenerator;
 
-    private const string _CLASS_TEMPLATE =
-        "// ReSharper disable once PartialTypeWithSinglePart\r\npublic sealed partial class {0}: {1}\r\n{{\r\n{2}}}";
+    private const string _CLASS_TEMPLATE = "public sealed partial class {0}: {1}\r\n{{\r\n{2}}}";
 
-    private const string _EMPTY_CLASS_TEMPLATE = "// ReSharper disable once PartialTypeWithSinglePart\r\npublic sealed partial class {0}\r\n{{\r\n}}";
+    private const string _EMPTY_CLASS_TEMPLATE = "public sealed partial class {0}\r\n{{\r\n}}";
 
     private readonly Dictionary<IFieldType, IReadOnlyCollection<FieldSpecification>> _internalClasses;
 
@@ -118,7 +117,7 @@ public class ClassGenerator: Generator, IClassGenerator
             var className = $"{@class.Key.ClrName}";
 
             builder
-                .AppendLine($"{Indent}public class {className}: Message")
+                .AppendLine($"{Indent}public sealed partial class {className}: Message")
                 .AppendLine($"{Indent}{{");
 
             var fields = GenerateProperties(@class.Value, MessageType.None);

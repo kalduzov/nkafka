@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
 {
     /// <summary>
@@ -63,7 +64,7 @@ public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
     /// <summary>
     /// Each coordinator result in the response
     /// </summary>
-    public List<Coordinator> Coordinators { get; set; } = new();
+    public List<CoordinatorMessage> Coordinators { get; set; } = new();
 
     public FindCoordinatorResponseMessage()
     {
@@ -87,7 +88,7 @@ public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
     {
     }
 
-    public class Coordinator: Message
+    public sealed partial class CoordinatorMessage: Message
     {
         /// <summary>
         /// The coordinator key.
@@ -119,13 +120,13 @@ public sealed partial class FindCoordinatorResponseMessage: ResponseMessage
         /// </summary>
         public string? ErrorMessage { get; set; } = null!;
 
-        public Coordinator()
+        public CoordinatorMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public Coordinator(BufferReader reader, ApiVersions version)
+        public CoordinatorMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

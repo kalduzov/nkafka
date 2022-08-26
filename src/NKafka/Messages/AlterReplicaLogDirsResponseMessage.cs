@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AlterReplicaLogDirTopicResult> Results { get; set; } = new();
+    public List<AlterReplicaLogDirTopicResultMessage> Results { get; set; } = new();
 
     public AlterReplicaLogDirsResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
     {
     }
 
-    public class AlterReplicaLogDirTopicResult: Message
+    public sealed partial class AlterReplicaLogDirTopicResultMessage: Message
     {
         /// <summary>
         /// The name of the topic.
@@ -72,15 +73,15 @@ public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
         /// <summary>
         /// The results for each partition.
         /// </summary>
-        public List<AlterReplicaLogDirPartitionResult> Partitions { get; set; } = new();
+        public List<AlterReplicaLogDirPartitionResultMessage> Partitions { get; set; } = new();
 
-        public AlterReplicaLogDirTopicResult()
+        public AlterReplicaLogDirTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDirTopicResult(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
         {
         }
     }
-    public class AlterReplicaLogDirPartitionResult: Message
+    public sealed partial class AlterReplicaLogDirPartitionResultMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -108,13 +109,13 @@ public sealed partial class AlterReplicaLogDirsResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public AlterReplicaLogDirPartitionResult()
+        public AlterReplicaLogDirPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDirPartitionResult(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeClientQuotasRequestMessage: RequestMessage
 {
     /// <summary>
     /// Filter components to apply to quota entities.
     /// </summary>
-    public List<ComponentData> Components { get; set; } = new();
+    public List<ComponentDataMessage> Components { get; set; } = new();
 
     /// <summary>
     /// Whether the match is strict, i.e. should exclude entities with unspecified entity types.
@@ -69,7 +70,7 @@ public sealed partial class DescribeClientQuotasRequestMessage: RequestMessage
     {
     }
 
-    public class ComponentData: Message
+    public sealed partial class ComponentDataMessage: Message
     {
         /// <summary>
         /// The entity type that the filter component applies to.
@@ -86,13 +87,13 @@ public sealed partial class DescribeClientQuotasRequestMessage: RequestMessage
         /// </summary>
         public string Match { get; set; } = null!;
 
-        public ComponentData()
+        public ComponentDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public ComponentData(BufferReader reader, ApiVersions version)
+        public ComponentDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ElectLeadersRequestMessage: RequestMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class ElectLeadersRequestMessage: RequestMessage
     /// <summary>
     /// The topic partitions to elect leaders.
     /// </summary>
-    public List<TopicPartitions> TopicPartitions { get; set; } = new();
+    public List<TopicPartitionsMessage> TopicPartitions { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the election to complete.
@@ -74,7 +75,7 @@ public sealed partial class ElectLeadersRequestMessage: RequestMessage
     {
     }
 
-    public class TopicPartitions: Message
+    public sealed partial class TopicPartitionsMessage: Message
     {
         /// <summary>
         /// The name of a topic.
@@ -84,15 +85,15 @@ public sealed partial class ElectLeadersRequestMessage: RequestMessage
         /// <summary>
         /// The partitions of this topic whose leader should be elected.
         /// </summary>
-        public List<int> Partitions { get; set; } = new();
+        public List<int> Partitions { get; set; } = new(0);
 
-        public TopicPartitions()
+        public TopicPartitionsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public TopicPartitions(BufferReader reader, ApiVersions version)
+        public TopicPartitionsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

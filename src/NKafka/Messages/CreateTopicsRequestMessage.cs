@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class CreateTopicsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The topics to create.
     /// </summary>
-    public List<CreatableTopic> Topics { get; set; } = new();
+    public List<CreatableTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
@@ -74,7 +75,7 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
     {
     }
 
-    public class CreatableTopic: Message
+    public sealed partial class CreatableTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -94,20 +95,20 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
         /// <summary>
         /// The manual partition assignment, or the empty array if we are using automatic assignment.
         /// </summary>
-        public List<CreatableReplicaAssignment> Assignments { get; set; } = new();
+        public List<CreatableReplicaAssignmentMessage> Assignments { get; set; } = new();
 
         /// <summary>
         /// The custom topic configurations to set.
         /// </summary>
-        public List<CreateableTopicConfig> Configs { get; set; } = new();
+        public List<CreateableTopicConfigMessage> Configs { get; set; } = new();
 
-        public CreatableTopic()
+        public CreatableTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableTopic(BufferReader reader, ApiVersions version)
+        public CreatableTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -123,7 +124,7 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreatableReplicaAssignment: Message
+    public sealed partial class CreatableReplicaAssignmentMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -135,13 +136,13 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
         /// </summary>
         public List<int> BrokerIds { get; set; } = new();
 
-        public CreatableReplicaAssignment()
+        public CreatableReplicaAssignmentMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreatableReplicaAssignment(BufferReader reader, ApiVersions version)
+        public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -157,7 +158,7 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
         {
         }
     }
-    public class CreateableTopicConfig: Message
+    public sealed partial class CreateableTopicConfigMessage: Message
     {
         /// <summary>
         /// The configuration name.
@@ -169,13 +170,13 @@ public sealed partial class CreateTopicsRequestMessage: RequestMessage
         /// </summary>
         public string Value { get; set; } = null!;
 
-        public CreateableTopicConfig()
+        public CreateableTopicConfigMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        public CreateableTopicConfig(BufferReader reader, ApiVersions version)
+        public CreateableTopicConfigMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

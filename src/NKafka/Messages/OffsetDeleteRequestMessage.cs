@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetDeleteRequestMessage: RequestMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class OffsetDeleteRequestMessage: RequestMessage
     /// <summary>
     /// The topics to delete offsets for
     /// </summary>
-    public List<OffsetDeleteRequestTopic> Topics { get; set; } = new();
+    public List<OffsetDeleteRequestTopicMessage> Topics { get; set; } = new();
 
     public OffsetDeleteRequestMessage()
     {
@@ -69,7 +70,7 @@ public sealed partial class OffsetDeleteRequestMessage: RequestMessage
     {
     }
 
-    public class OffsetDeleteRequestTopic: Message
+    public sealed partial class OffsetDeleteRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -79,15 +80,15 @@ public sealed partial class OffsetDeleteRequestMessage: RequestMessage
         /// <summary>
         /// Each partition to delete offsets for.
         /// </summary>
-        public List<OffsetDeleteRequestPartition> Partitions { get; set; } = new();
+        public List<OffsetDeleteRequestPartitionMessage> Partitions { get; set; } = new();
 
-        public OffsetDeleteRequestTopic()
+        public OffsetDeleteRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteRequestTopic(BufferReader reader, ApiVersions version)
+        public OffsetDeleteRequestTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,20 +104,20 @@ public sealed partial class OffsetDeleteRequestMessage: RequestMessage
         {
         }
     }
-    public class OffsetDeleteRequestPartition: Message
+    public sealed partial class OffsetDeleteRequestPartitionMessage: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
         public int PartitionIndex { get; set; } = 0;
 
-        public OffsetDeleteRequestPartition()
+        public OffsetDeleteRequestPartitionMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public OffsetDeleteRequestPartition(BufferReader reader, ApiVersions version)
+        public OffsetDeleteRequestPartitionMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

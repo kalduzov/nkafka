@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ListPartitionReassignmentsRequestMessage: RequestMessage
 {
     /// <summary>
@@ -43,7 +44,7 @@ public sealed partial class ListPartitionReassignmentsRequestMessage: RequestMes
     /// <summary>
     /// The topics to list partition reassignments for, or null to list everything.
     /// </summary>
-    public List<ListPartitionReassignmentsTopics>? Topics { get; set; } = null;
+    public List<ListPartitionReassignmentsTopicsMessage>? Topics { get; set; } = null;
 
     public ListPartitionReassignmentsRequestMessage()
     {
@@ -69,7 +70,7 @@ public sealed partial class ListPartitionReassignmentsRequestMessage: RequestMes
     {
     }
 
-    public class ListPartitionReassignmentsTopics: Message
+    public sealed partial class ListPartitionReassignmentsTopicsMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -81,13 +82,13 @@ public sealed partial class ListPartitionReassignmentsRequestMessage: RequestMes
         /// </summary>
         public List<int> PartitionIndexes { get; set; } = new();
 
-        public ListPartitionReassignmentsTopics()
+        public ListPartitionReassignmentsTopicsMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public ListPartitionReassignmentsTopics(BufferReader reader, ApiVersions version)
+        public ListPartitionReassignmentsTopicsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

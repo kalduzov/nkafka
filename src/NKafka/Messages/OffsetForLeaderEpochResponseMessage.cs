@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each topic we fetched offsets for.
     /// </summary>
-    public List<OffsetForLeaderTopicResult> Topics { get; set; } = new();
+    public List<OffsetForLeaderTopicResultMessage> Topics { get; set; } = new();
 
     public OffsetForLeaderEpochResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
     {
     }
 
-    public class OffsetForLeaderTopicResult: Message
+    public sealed partial class OffsetForLeaderTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -72,15 +73,15 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition in the topic we fetched offsets for.
         /// </summary>
-        public List<EpochEndOffset> Partitions { get; set; } = new();
+        public List<EpochEndOffsetMessage> Partitions { get; set; } = new();
 
-        public OffsetForLeaderTopicResult()
+        public OffsetForLeaderTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public OffsetForLeaderTopicResult(BufferReader reader, ApiVersions version)
+        public OffsetForLeaderTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
         {
         }
     }
-    public class EpochEndOffset: Message
+    public sealed partial class EpochEndOffsetMessage: Message
     {
         /// <summary>
         /// The error code 0, or if there was no error.
@@ -118,13 +119,13 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: ResponseMessage
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
-        public EpochEndOffset()
+        public EpochEndOffsetMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public EpochEndOffset(BufferReader reader, ApiVersions version)
+        public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

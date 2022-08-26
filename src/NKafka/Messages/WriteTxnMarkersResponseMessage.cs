@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
 {
     /// <summary>
     /// The results for writing makers.
     /// </summary>
-    public List<WritableTxnMarkerResult> Markers { get; set; } = new();
+    public List<WritableTxnMarkerResultMessage> Markers { get; set; } = new();
 
     public WriteTxnMarkersResponseMessage()
     {
@@ -62,7 +63,7 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
     {
     }
 
-    public class WritableTxnMarkerResult: Message
+    public sealed partial class WritableTxnMarkerResultMessage: Message
     {
         /// <summary>
         /// The current producer ID in use by the transactional ID.
@@ -72,15 +73,15 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
         /// <summary>
         /// The results by topic.
         /// </summary>
-        public List<WritableTxnMarkerTopicResult> Topics { get; set; } = new();
+        public List<WritableTxnMarkerTopicResultMessage> Topics { get; set; } = new();
 
-        public WritableTxnMarkerResult()
+        public WritableTxnMarkerResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerResult(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -96,7 +97,7 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
         {
         }
     }
-    public class WritableTxnMarkerTopicResult: Message
+    public sealed partial class WritableTxnMarkerTopicResultMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -106,15 +107,15 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
         /// <summary>
         /// The results by partition.
         /// </summary>
-        public List<WritableTxnMarkerPartitionResult> Partitions { get; set; } = new();
+        public List<WritableTxnMarkerPartitionResultMessage> Partitions { get; set; } = new();
 
-        public WritableTxnMarkerTopicResult()
+        public WritableTxnMarkerTopicResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerTopicResult(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerTopicResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -130,7 +131,7 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
         {
         }
     }
-    public class WritableTxnMarkerPartitionResult: Message
+    public sealed partial class WritableTxnMarkerPartitionResultMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -142,13 +143,13 @@ public sealed partial class WriteTxnMarkersResponseMessage: ResponseMessage
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
-        public WritableTxnMarkerPartitionResult()
+        public WritableTxnMarkerPartitionResultMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public WritableTxnMarkerPartitionResult(BufferReader reader, ApiVersions version)
+        public WritableTxnMarkerPartitionResultMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

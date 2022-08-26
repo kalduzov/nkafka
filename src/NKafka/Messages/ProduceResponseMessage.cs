@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ProduceResponseMessage: ResponseMessage
 {
     /// <summary>
     /// Each produce response
     /// </summary>
-    public List<TopicProduceResponse> Responses { get; set; } = new();
+    public List<TopicProduceResponseMessage> Responses { get; set; } = new();
 
 
     public ProduceResponseMessage()
@@ -63,7 +64,7 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
     {
     }
 
-    public class TopicProduceResponse: Message
+    public sealed partial class TopicProduceResponseMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -73,15 +74,15 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition that we produced to within the topic.
         /// </summary>
-        public List<PartitionProduceResponse> PartitionResponses { get; set; } = new();
+        public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new();
 
-        public TopicProduceResponse()
+        public TopicProduceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public TopicProduceResponse(BufferReader reader, ApiVersions version)
+        public TopicProduceResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -97,7 +98,7 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
         {
         }
     }
-    public class PartitionProduceResponse: Message
+    public sealed partial class PartitionProduceResponseMessage: Message
     {
         /// <summary>
         /// The partition index.
@@ -127,20 +128,20 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The batch indices of records that caused the batch to be dropped
         /// </summary>
-        public List<BatchIndexAndErrorMessage>? RecordErrors { get; set; } = new();
+        public List<BatchIndexAndErrorMessageMessage>? RecordErrors { get; set; } = new();
 
         /// <summary>
         /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
         /// </summary>
         public string? ErrorMessage { get; set; } = "null";
 
-        public PartitionProduceResponse()
+        public PartitionProduceResponseMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public PartitionProduceResponse(BufferReader reader, ApiVersions version)
+        public PartitionProduceResponseMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -156,7 +157,7 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
         {
         }
     }
-    public class BatchIndexAndErrorMessage: Message
+    public sealed partial class BatchIndexAndErrorMessageMessage: Message
     {
         /// <summary>
         /// The batch index of the record that cause the batch to be dropped
@@ -168,13 +169,13 @@ public sealed partial class ProduceResponseMessage: ResponseMessage
         /// </summary>
         public string? BatchIndexErrorMessage { get; set; } = "null";
 
-        public BatchIndexAndErrorMessage()
+        public BatchIndexAndErrorMessageMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version9;
         }
 
-        public BatchIndexAndErrorMessage(BufferReader reader, ApiVersions version)
+        public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

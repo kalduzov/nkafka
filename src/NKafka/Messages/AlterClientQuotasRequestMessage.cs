@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
 {
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public List<EntryData> Entries { get; set; } = new();
+    public List<EntryDataMessage> Entries { get; set; } = new();
 
     /// <summary>
     /// Whether the alteration should be validated, but not performed.
@@ -69,25 +70,25 @@ public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
     {
     }
 
-    public class EntryData: Message
+    public sealed partial class EntryDataMessage: Message
     {
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
-        public List<EntityData> Entity { get; set; } = new();
+        public List<EntityDataMessage> Entity { get; set; } = new();
 
         /// <summary>
         /// An individual quota configuration entry to alter.
         /// </summary>
-        public List<OpData> Ops { get; set; } = new();
+        public List<OpDataMessage> Ops { get; set; } = new();
 
-        public EntryData()
+        public EntryDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntryData(BufferReader reader, ApiVersions version)
+        public EntryDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -103,7 +104,7 @@ public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
         {
         }
     }
-    public class EntityData: Message
+    public sealed partial class EntityDataMessage: Message
     {
         /// <summary>
         /// The entity type.
@@ -115,13 +116,13 @@ public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
         /// </summary>
         public string EntityName { get; set; } = null!;
 
-        public EntityData()
+        public EntityDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public EntityData(BufferReader reader, ApiVersions version)
+        public EntityDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -137,7 +138,7 @@ public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
         {
         }
     }
-    public class OpData: Message
+    public sealed partial class OpDataMessage: Message
     {
         /// <summary>
         /// The quota configuration key.
@@ -154,13 +155,13 @@ public sealed partial class AlterClientQuotasRequestMessage: RequestMessage
         /// </summary>
         public bool Remove { get; set; } = false;
 
-        public OpData()
+        public OpDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        public OpData(BufferReader reader, ApiVersions version)
+        public OpDataMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

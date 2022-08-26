@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class FetchSnapshotRequestMessage: RequestMessage
 {
     /// <summary>
@@ -53,7 +54,7 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
     /// <summary>
     /// The topics to fetch
     /// </summary>
-    public List<TopicSnapshot> Topics { get; set; } = new();
+    public List<TopicSnapshotMessage> Topics { get; set; } = new();
 
     public FetchSnapshotRequestMessage()
     {
@@ -79,7 +80,7 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
     {
     }
 
-    public class TopicSnapshot: Message
+    public sealed partial class TopicSnapshotMessage: Message
     {
         /// <summary>
         /// The name of the topic to fetch
@@ -89,15 +90,15 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
         /// <summary>
         /// The partitions to fetch
         /// </summary>
-        public List<PartitionSnapshot> Partitions { get; set; } = new();
+        public List<PartitionSnapshotMessage> Partitions { get; set; } = new();
 
-        public TopicSnapshot()
+        public TopicSnapshotMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicSnapshot(BufferReader reader, ApiVersions version)
+        public TopicSnapshotMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -113,7 +114,7 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
         {
         }
     }
-    public class PartitionSnapshot: Message
+    public sealed partial class PartitionSnapshotMessage: Message
     {
         /// <summary>
         /// The partition index
@@ -128,20 +129,20 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
         /// <summary>
         /// The snapshot endOffset and epoch to fetch
         /// </summary>
-        public SnapshotId SnapshotId { get; set; } = new();
+        public SnapshotIdMessage SnapshotId { get; set; } = new();
 
         /// <summary>
         /// The byte position within the snapshot to start fetching from
         /// </summary>
         public long Position { get; set; } = 0;
 
-        public PartitionSnapshot()
+        public PartitionSnapshotMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public PartitionSnapshot(BufferReader reader, ApiVersions version)
+        public PartitionSnapshotMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -157,7 +158,7 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
         {
         }
     }
-    public class SnapshotId: Message
+    public sealed partial class SnapshotIdMessage: Message
     {
         /// <summary>
         /// 
@@ -169,13 +170,13 @@ public sealed partial class FetchSnapshotRequestMessage: RequestMessage
         /// </summary>
         public int Epoch { get; set; } = 0;
 
-        public SnapshotId()
+        public SnapshotIdMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public SnapshotId(BufferReader reader, ApiVersions version)
+        public SnapshotIdMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

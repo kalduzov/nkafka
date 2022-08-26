@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
 {
     /// <summary>
     /// The alterations to make for each directory.
     /// </summary>
-    public List<AlterReplicaLogDir> Dirs { get; set; } = new();
+    public List<AlterReplicaLogDirMessage> Dirs { get; set; } = new();
 
     public AlterReplicaLogDirsRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
     {
     }
 
-    public class AlterReplicaLogDir: Message
+    public sealed partial class AlterReplicaLogDirMessage: Message
     {
         /// <summary>
         /// The absolute directory path.
@@ -74,15 +75,15 @@ public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
         /// <summary>
         /// The topics to add to the directory.
         /// </summary>
-        public List<AlterReplicaLogDirTopic> Topics { get; set; } = new();
+        public List<AlterReplicaLogDirTopicMessage> Topics { get; set; } = new();
 
-        public AlterReplicaLogDir()
+        public AlterReplicaLogDirMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDir(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
@@ -98,7 +99,7 @@ public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
         {
         }
     }
-    public class AlterReplicaLogDirTopic: Message
+    public sealed partial class AlterReplicaLogDirTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -110,13 +111,13 @@ public sealed partial class AlterReplicaLogDirsRequestMessage: RequestMessage
         /// </summary>
         public List<int> Partitions { get; set; } = new();
 
-        public AlterReplicaLogDirTopic()
+        public AlterReplicaLogDirTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        public AlterReplicaLogDirTopic(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

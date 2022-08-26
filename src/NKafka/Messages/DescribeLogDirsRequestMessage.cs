@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeLogDirsRequestMessage: RequestMessage
 {
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
-    public List<DescribableLogDirTopic> Topics { get; set; } = new();
+    public List<DescribableLogDirTopicMessage> Topics { get; set; } = new();
 
     public DescribeLogDirsRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class DescribeLogDirsRequestMessage: RequestMessage
     {
     }
 
-    public class DescribableLogDirTopic: Message
+    public sealed partial class DescribableLogDirTopicMessage: Message
     {
         /// <summary>
         /// The topic name
@@ -76,13 +77,13 @@ public sealed partial class DescribeLogDirsRequestMessage: RequestMessage
         /// </summary>
         public List<int> Partitions { get; set; } = new();
 
-        public DescribableLogDirTopic()
+        public DescribableLogDirTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        public DescribableLogDirTopic(BufferReader reader, ApiVersions version)
+        public DescribableLogDirTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

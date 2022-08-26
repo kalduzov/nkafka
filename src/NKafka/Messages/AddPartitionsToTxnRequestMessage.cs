@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,7 +34,6 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class AddPartitionsToTxnRequestMessage: RequestMessage
 {
     /// <summary>
@@ -53,7 +54,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: RequestMessage
     /// <summary>
     /// The partitions to add to the transaction.
     /// </summary>
-    public List<AddPartitionsToTxnTopic> Topics { get; set; } = new();
+    public List<AddPartitionsToTxnTopicMessage> Topics { get; set; } = new();
 
     public AddPartitionsToTxnRequestMessage()
     {
@@ -79,7 +80,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: RequestMessage
     {
     }
 
-    public class AddPartitionsToTxnTopic: Message
+    public sealed partial class AddPartitionsToTxnTopicMessage: Message
     {
         /// <summary>
         /// The name of the topic.
@@ -91,13 +92,13 @@ public sealed partial class AddPartitionsToTxnRequestMessage: RequestMessage
         /// </summary>
         public List<int> Partitions { get; set; } = new();
 
-        public AddPartitionsToTxnTopic()
+        public AddPartitionsToTxnTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        public AddPartitionsToTxnTopic(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnTopicMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

@@ -24,6 +24,8 @@
 // ReSharper disable RedundantUsingDirective
 // ReSharper disable UnusedType.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable PartialTypeWithSinglePart
 
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
@@ -32,13 +34,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class DescribeProducersRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicRequest> Topics { get; set; } = new();
+    public List<TopicRequestMessage> Topics { get; set; } = new();
 
     public DescribeProducersRequestMessage()
     {
@@ -64,7 +65,7 @@ public sealed partial class DescribeProducersRequestMessage: RequestMessage
     {
     }
 
-    public class TopicRequest: Message
+    public sealed partial class TopicRequestMessage: Message
     {
         /// <summary>
         /// The topic name.
@@ -76,13 +77,13 @@ public sealed partial class DescribeProducersRequestMessage: RequestMessage
         /// </summary>
         public List<int> PartitionIndexes { get; set; } = new();
 
-        public TopicRequest()
+        public TopicRequestMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
             HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        public TopicRequest(BufferReader reader, ApiVersions version)
+        public TopicRequestMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);

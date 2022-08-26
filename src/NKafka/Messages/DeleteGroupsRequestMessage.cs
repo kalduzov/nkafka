@@ -39,8 +39,30 @@ public sealed class DeleteGroupsRequestMessage: RequestMessage
     /// <summary>
     /// The group names to delete.
     /// </summary>
-    public List<string> GroupsNames { get; set; } = new();
+    public List<string> GroupsNamesMessage { get; set; } = new ();
 
+    public DeleteGroupsRequestMessage()
+    {
+        ApiKey = ApiKeys.DeleteGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
 
+    public DeleteGroupsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DeleteGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

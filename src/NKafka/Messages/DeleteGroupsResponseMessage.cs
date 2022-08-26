@@ -39,8 +39,66 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
     /// <summary>
     /// The deletion results
     /// </summary>
-    public List<DeletableGroupResultMessage> Results { get; set; } = new();
+    public List<DeletableGroupResultMessage> ResultsMessage { get; set; } = new ();
+
+    public DeleteGroupsResponseMessage()
+    {
+        ApiKey = ApiKeys.DeleteGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public DeleteGroupsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DeleteGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DeletableGroupResultMessage: Message
+    {
+        /// <summary>
+        /// The group id
+        /// </summary>
+        public Dictionary<string,> GroupIdMessage { get; set; } = "";
 
+        /// <summary>
+        /// The deletion error, or 0 if the deletion succeeded.
+        /// </summary>
+        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+
+        public DeletableGroupResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DeletableGroupResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

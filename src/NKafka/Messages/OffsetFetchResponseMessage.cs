@@ -39,16 +39,255 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
     /// <summary>
     /// The responses per topic.
     /// </summary>
-    public List<OffsetFetchResponseTopicMessage> Topics { get; set; } = new();
+    public List<OffsetFetchResponseTopicMessage> TopicsMessage { get; set; } = new ();
+
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
     /// </summary>
-    public short? ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The responses per group id.
     /// </summary>
-    public List<OffsetFetchResponseGroupMessage> Groups { get; set; } = new();
+    public List<OffsetFetchResponseGroupMessage> GroupsMessage { get; set; } = new ();
+
+    public OffsetFetchResponseMessage()
+    {
+        ApiKey = ApiKeys.OffsetFetch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version8;
+    }
+
+    public OffsetFetchResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.OffsetFetch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version8;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class OffsetFetchResponseTopicMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The responses per partition
+        /// </summary>
+        public List<OffsetFetchResponsePartitionMessage> PartitionsMessage { get; set; } = new ();
+
+        public OffsetFetchResponseTopicMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public OffsetFetchResponseTopicMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetFetchResponsePartitionMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The committed message offset.
+        /// </summary>
+        public long CommittedOffsetMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The leader epoch.
+        /// </summary>
+        public int CommittedLeaderEpochMessage { get; set; } = -1;
+
+        /// <summary>
+        /// The partition metadata.
+        /// </summary>
+        public string MetadataMessage { get; set; } = "";
+
+        /// <summary>
+        /// The error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        public OffsetFetchResponsePartitionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public OffsetFetchResponsePartitionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version7;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetFetchResponseGroupMessage: Message
+    {
+        /// <summary>
+        /// The group ID.
+        /// </summary>
+        public string groupIdMessage { get; set; } = "";
+
+        /// <summary>
+        /// The responses per topic.
+        /// </summary>
+        public List<OffsetFetchResponseTopicsMessage> TopicsMessage { get; set; } = new ();
+
+        /// <summary>
+        /// The group-level error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        public OffsetFetchResponseGroupMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetFetchResponseGroupMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetFetchResponseTopicsMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The responses per partition
+        /// </summary>
+        public List<OffsetFetchResponsePartitionsMessage> PartitionsMessage { get; set; } = new ();
+
+        public OffsetFetchResponseTopicsMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetFetchResponseTopicsMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetFetchResponsePartitionsMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The committed message offset.
+        /// </summary>
+        public long CommittedOffsetMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The leader epoch.
+        /// </summary>
+        public int CommittedLeaderEpochMessage { get; set; } = -1;
+
+        /// <summary>
+        /// The partition metadata.
+        /// </summary>
+        public string MetadataMessage { get; set; } = "";
+
+        /// <summary>
+        /// The partition-level error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        public OffsetFetchResponsePartitionsMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetFetchResponsePartitionsMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

@@ -39,13 +39,148 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The tokens.
     /// </summary>
-    public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new();
+    public List<DescribedDelegationTokenMessage> TokensMessage { get; set; } = new ();
 
 
+    public DescribeDelegationTokenResponseMessage()
+    {
+        ApiKey = ApiKeys.DescribeDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DescribedDelegationTokenMessage: Message
+    {
+        /// <summary>
+        /// The token principal type.
+        /// </summary>
+        public string PrincipalTypeMessage { get; set; } = "";
+
+        /// <summary>
+        /// The token principal name.
+        /// </summary>
+        public string PrincipalNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The principal type of the requester of the token.
+        /// </summary>
+        public string TokenRequesterPrincipalTypeMessage { get; set; } = "";
+
+        /// <summary>
+        /// The principal type of the requester of the token.
+        /// </summary>
+        public string TokenRequesterPrincipalNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The token issue timestamp in milliseconds.
+        /// </summary>
+        public long IssueTimestampMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The token expiry timestamp in milliseconds.
+        /// </summary>
+        public long ExpiryTimestampMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The token maximum timestamp length in milliseconds.
+        /// </summary>
+        public long MaxTimestampMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The token ID.
+        /// </summary>
+        public string TokenIdMessage { get; set; } = "";
+
+        /// <summary>
+        /// The token HMAC.
+        /// </summary>
+        public byte[] HmacMessage { get; set; } = Array.Empty<byte>();
+
+        /// <summary>
+        /// Those who are able to renew this token before it expires.
+        /// </summary>
+        public List<DescribedDelegationTokenRenewerMessage> RenewersMessage { get; set; } = new ();
+
+        public DescribedDelegationTokenMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribedDelegationTokenMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class DescribedDelegationTokenRenewerMessage: Message
+    {
+        /// <summary>
+        /// The renewer principal type
+        /// </summary>
+        public string PrincipalTypeMessage { get; set; } = "";
+
+        /// <summary>
+        /// The renewer principal name
+        /// </summary>
+        public string PrincipalNameMessage { get; set; } = "";
+
+        public DescribedDelegationTokenRenewerMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribedDelegationTokenRenewerMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

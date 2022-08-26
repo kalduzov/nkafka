@@ -39,12 +39,117 @@ public sealed class EndQuorumEpochResponseMessage: ResponseMessage
     /// <summary>
     /// The top level error code.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+
+    public EndQuorumEpochResponseMessage()
+    {
+        ApiKey = ApiKeys.EndQuorumEpoch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public EndQuorumEpochResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.EndQuorumEpoch;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TopicDataMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+
+        public TopicDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class PartitionDataMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The ID of the current leader or -1 if the leader is unknown.
+        /// </summary>
+        public int LeaderIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The latest known leader epoch
+        /// </summary>
+        public int LeaderEpochMessage { get; set; } = 0;
+
+        public PartitionDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

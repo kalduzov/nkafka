@@ -39,12 +39,71 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error code.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
-    public List<RemainingPartitionMessage> RemainingPartitions { get; set; } = new();
+    public List<RemainingPartitionMessage> RemainingPartitionsMessage { get; set; } = new ();
+
+    public ControlledShutdownResponseMessage()
+    {
+        ApiKey = ApiKeys.ControlledShutdown;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public ControlledShutdownResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ControlledShutdown;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class RemainingPartitionMessage: Message
+    {
+        /// <summary>
+        /// The name of the topic.
+        /// </summary>
+        public Dictionary<string,> TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The index of the partition.
+        /// </summary>
+        public Dictionary<int,> PartitionIndexMessage { get; set; } = 0;
+
+        public RemainingPartitionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public RemainingPartitionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

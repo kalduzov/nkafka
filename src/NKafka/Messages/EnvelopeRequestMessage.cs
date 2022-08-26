@@ -39,16 +39,40 @@ public sealed class EnvelopeRequestMessage: RequestMessage
     /// <summary>
     /// The embedded request header and data.
     /// </summary>
-    public byte[] RequestData { get; set; } = Array.Empty<byte>();
+    public byte[] RequestDataMessage { get; set; } = new byte[0];
+
     /// <summary>
     /// Value of the initial client principal when the request is redirected by a broker.
     /// </summary>
-    public byte[] RequestPrincipal { get; set; } = Array.Empty<byte>();
+    public byte[] RequestPrincipalMessage { get; set; } = Array.Empty<byte>();
+
     /// <summary>
     /// The original client's address in bytes.
     /// </summary>
-    public byte[] ClientHostAddress { get; set; } = Array.Empty<byte>();
+    public byte[] ClientHostAddressMessage { get; set; } = Array.Empty<byte>();
 
+    public EnvelopeRequestMessage()
+    {
+        ApiKey = ApiKeys.Envelope;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
 
+    public EnvelopeRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.Envelope;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

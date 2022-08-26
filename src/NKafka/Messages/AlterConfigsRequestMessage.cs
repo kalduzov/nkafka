@@ -39,12 +39,112 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
     /// <summary>
     /// The updates for each resource.
     /// </summary>
-    public List<AlterConfigsResourceMessage> Resources { get; set; } = new();
+    public List<AlterConfigsResourceMessage> ResourcesMessage { get; set; } = new ();
+
     /// <summary>
     /// True if we should validate the request, but not change the configurations.
     /// </summary>
-    public bool ValidateOnly { get; set; } = false;
+    public bool ValidateOnlyMessage { get; set; } = false;
+
+    public AlterConfigsRequestMessage()
+    {
+        ApiKey = ApiKeys.AlterConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public AlterConfigsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class AlterConfigsResourceMessage: Message
+    {
+        /// <summary>
+        /// The resource type.
+        /// </summary>
+        public Dictionary<sbyte,> ResourceTypeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The resource name.
+        /// </summary>
+        public Dictionary<string,> ResourceNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The configurations.
+        /// </summary>
+        public List<AlterableConfigMessage> ConfigsMessage { get; set; } = new ();
+
+        public AlterConfigsResourceMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AlterConfigsResourceMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class AlterableConfigMessage: Message
+    {
+        /// <summary>
+        /// The configuration key name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The value to set for the configuration key.
+        /// </summary>
+        public Dictionary<string,> ValueMessage { get; set; } = "";
+
+        public AlterableConfigMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AlterableConfigMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

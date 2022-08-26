@@ -39,8 +39,30 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
     /// </summary>
-    public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
+    public byte[] AuthBytesMessage { get; set; } = Array.Empty<byte>();
 
+    public SaslAuthenticateRequestMessage()
+    {
+        ApiKey = ApiKeys.SaslAuthenticate;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
 
+    public SaslAuthenticateRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.SaslAuthenticate;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

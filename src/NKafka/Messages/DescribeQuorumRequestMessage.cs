@@ -39,8 +39,97 @@ public sealed class DescribeQuorumRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+
+    public DescribeQuorumRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeQuorum;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public DescribeQuorumRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeQuorum;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TopicDataMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+
+        public TopicDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class PartitionDataMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        public PartitionDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

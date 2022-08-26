@@ -39,36 +39,101 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The group identifier.
     /// </summary>
-    public string GroupId { get; set; } = null!;
+    public string GroupIdMessage { get; set; } = "";
+
     /// <summary>
     /// The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds.
     /// </summary>
-    public int SessionTimeoutMs { get; set; } = 0;
+    public int SessionTimeoutMsMessage { get; set; } = 0;
+
     /// <summary>
     /// The maximum time in milliseconds that the coordinator will wait for each member to rejoin when rebalancing the group.
     /// </summary>
-    public int? RebalanceTimeoutMs { get; set; } = -1;
+    public int RebalanceTimeoutMsMessage { get; set; } = -1;
+
     /// <summary>
     /// The member id assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; } = null!;
+    public string MemberIdMessage { get; set; } = "";
+
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = "null";
+    public string GroupInstanceIdMessage { get; set; } = null;
+
     /// <summary>
     /// The unique name the for class of protocols implemented by the group we want to join.
     /// </summary>
-    public string ProtocolType { get; set; } = null!;
+    public string ProtocolTypeMessage { get; set; } = "";
+
     /// <summary>
     /// The list of protocols that the member supports.
     /// </summary>
-    public List<JoinGroupRequestProtocolMessage> Protocols { get; set; } = new();
+    public List<JoinGroupRequestProtocolMessage> ProtocolsMessage { get; set; } = new ();
+
     /// <summary>
     /// The reason why the member (re-)joins the group.
     /// </summary>
-    public string? Reason { get; set; } = "null";
+    public string? ReasonMessage { get; set; } = null;
+
+    public JoinGroupRequestMessage()
+    {
+        ApiKey = ApiKeys.JoinGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version9;
+    }
+
+    public JoinGroupRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.JoinGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version9;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class JoinGroupRequestProtocolMessage: Message
+    {
+        /// <summary>
+        /// The protocol name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The protocol metadata.
+        /// </summary>
+        public Dictionary<byte[],> MetadataMessage { get; set; } = Array.Empty<byte>();
+
+        public JoinGroupRequestProtocolMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

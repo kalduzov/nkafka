@@ -39,8 +39,138 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
     /// <summary>
     /// The results for writing makers.
     /// </summary>
-    public List<WritableTxnMarkerResultMessage> Markers { get; set; } = new();
+    public List<WritableTxnMarkerResultMessage> MarkersMessage { get; set; } = new ();
+
+    public WriteTxnMarkersResponseMessage()
+    {
+        ApiKey = ApiKeys.WriteTxnMarkers;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public WriteTxnMarkersResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.WriteTxnMarkers;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class WritableTxnMarkerResultMessage: Message
+    {
+        /// <summary>
+        /// The current producer ID in use by the transactional ID.
+        /// </summary>
+        public long ProducerIdMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The results by topic.
+        /// </summary>
+        public List<WritableTxnMarkerTopicResultMessage> TopicsMessage { get; set; } = new ();
+
+        public WritableTxnMarkerResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public WritableTxnMarkerResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class WritableTxnMarkerTopicResultMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The results by partition.
+        /// </summary>
+        public List<WritableTxnMarkerPartitionResultMessage> PartitionsMessage { get; set; } = new ();
+
+        public WritableTxnMarkerTopicResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public WritableTxnMarkerTopicResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class WritableTxnMarkerPartitionResultMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        public WritableTxnMarkerPartitionResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public WritableTxnMarkerPartitionResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

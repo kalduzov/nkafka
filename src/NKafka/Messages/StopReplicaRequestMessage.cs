@@ -39,32 +39,209 @@ public sealed class StopReplicaRequestMessage: RequestMessage
     /// <summary>
     /// The controller id.
     /// </summary>
-    public int ControllerId { get; set; } = 0;
+    public int ControllerIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The controller epoch.
     /// </summary>
-    public int ControllerEpoch { get; set; } = 0;
+    public int ControllerEpochMessage { get; set; } = 0;
+
     /// <summary>
     /// The broker epoch.
     /// </summary>
-    public long? BrokerEpoch { get; set; } = -1;
+    public long BrokerEpochMessage { get; set; } = -1;
+
     /// <summary>
     /// Whether these partitions should be deleted.
     /// </summary>
-    public bool DeletePartitions { get; set; } = false;
+    public bool DeletePartitionsMessage { get; set; } = false;
+
     /// <summary>
     /// The partitions to stop.
     /// </summary>
-    public List<StopReplicaPartitionV0Message> UngroupedPartitions { get; set; } = new();
+    public List<StopReplicaPartitionV0Message> UngroupedPartitionsMessage { get; set; } = new ();
+
     /// <summary>
     /// The topics to stop.
     /// </summary>
-    public List<StopReplicaTopicV1Message> Topics { get; set; } = new();
+    public List<StopReplicaTopicV1Message> TopicsMessage { get; set; } = new ();
+
     /// <summary>
     /// Each topic.
     /// </summary>
-    public List<StopReplicaTopicStateMessage> TopicStates { get; set; } = new();
+    public List<StopReplicaTopicStateMessage> TopicStatesMessage { get; set; } = new ();
+
+    public StopReplicaRequestMessage()
+    {
+        ApiKey = ApiKeys.StopReplica;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public StopReplicaRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.StopReplica;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class StopReplicaPartitionV0Message: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        public StopReplicaPartitionV0Message()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public StopReplicaPartitionV0Message(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version0;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class StopReplicaTopicV1Message: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The partition indexes.
+        /// </summary>
+        public List<int> PartitionIndexesMessage { get; set; } = new ();
+
+        public StopReplicaTopicV1Message()
+        {
+            LowestSupportedVersion = ApiVersions.Version1;
+            HighestSupportedVersion = ApiVersions.Version2;
+        }
+
+        public StopReplicaTopicV1Message(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version1;
+            HighestSupportedVersion = ApiVersions.Version2;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class StopReplicaTopicStateMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The state of each partition
+        /// </summary>
+        public List<StopReplicaPartitionStateMessage> PartitionStatesMessage { get; set; } = new ();
+
+        public StopReplicaTopicStateMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version3;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public StopReplicaTopicStateMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version3;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class StopReplicaPartitionStateMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The leader epoch.
+        /// </summary>
+        public int LeaderEpochMessage { get; set; } = -1;
+
+        /// <summary>
+        /// Whether this partition should be deleted.
+        /// </summary>
+        public bool DeletePartitionMessage { get; set; } = false;
+
+        public StopReplicaPartitionStateMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version3;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public StopReplicaPartitionStateMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version3;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

@@ -39,32 +39,96 @@ public sealed class SyncGroupRequestMessage: RequestMessage
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = null!;
+    public string GroupIdMessage { get; set; } = "";
+
     /// <summary>
     /// The generation of the group.
     /// </summary>
-    public int GenerationId { get; set; } = 0;
+    public int GenerationIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The member ID assigned by the group.
     /// </summary>
-    public string MemberId { get; set; } = null!;
+    public string MemberIdMessage { get; set; } = "";
+
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = "null";
+    public string GroupInstanceIdMessage { get; set; } = null;
+
     /// <summary>
     /// The group protocol type.
     /// </summary>
-    public string? ProtocolType { get; set; } = "null";
+    public string? ProtocolTypeMessage { get; set; } = null;
+
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string? ProtocolName { get; set; } = "null";
+    public string? ProtocolNameMessage { get; set; } = null;
+
     /// <summary>
     /// Each assignment.
     /// </summary>
-    public List<SyncGroupRequestAssignmentMessage> Assignments { get; set; } = new();
+    public List<SyncGroupRequestAssignmentMessage> AssignmentsMessage { get; set; } = new ();
+
+    public SyncGroupRequestMessage()
+    {
+        ApiKey = ApiKeys.SyncGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
+
+    public SyncGroupRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.SyncGroup;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class SyncGroupRequestAssignmentMessage: Message
+    {
+        /// <summary>
+        /// The ID of the member to assign.
+        /// </summary>
+        public string MemberIdMessage { get; set; } = "";
 
+        /// <summary>
+        /// The member assignment.
+        /// </summary>
+        public byte[] AssignmentMessage { get; set; } = Array.Empty<byte>();
+
+        public SyncGroupRequestAssignmentMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public SyncGroupRequestAssignmentMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

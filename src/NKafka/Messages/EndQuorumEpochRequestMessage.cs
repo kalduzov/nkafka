@@ -34,17 +34,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
+public sealed class EndQuorumEpochRequestMessage: RequestMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public string? ClusterId { get; set; } = "null";
+    public string ClusterIdMessage { get; set; } = null;
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
 
     public EndQuorumEpochRequestMessage()
     {
@@ -70,22 +70,23 @@ public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
     {
     }
 
-    public sealed partial class TopicDataMessage: Message
+
+    public sealed class TopicDataMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = null!;
+        public string TopicNameMessage { get; set; } = "";
 
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new();
+        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
 
         public TopicDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public TopicDataMessage(BufferReader reader, ApiVersions version)
@@ -93,7 +94,7 @@ public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -103,33 +104,35 @@ public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
         public override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+
     }
-    public sealed partial class PartitionDataMessage: Message
+
+    public sealed class PartitionDataMessage: Message
     {
         /// <summary>
         /// The partition index.
         /// </summary>
-        public int PartitionIndex { get; set; } = 0;
+        public int PartitionIndexMessage { get; set; } = 0;
 
         /// <summary>
         /// The current leader ID that is resigning
         /// </summary>
-        public int LeaderId { get; set; } = 0;
+        public int LeaderIdMessage { get; set; } = 0;
 
         /// <summary>
         /// The current epoch
         /// </summary>
-        public int LeaderEpoch { get; set; } = 0;
+        public int LeaderEpochMessage { get; set; } = 0;
 
         /// <summary>
         /// A sorted list of preferred successors to start the election
         /// </summary>
-        public List<int> PreferredSuccessors { get; set; } = new();
+        public List<int> PreferredSuccessorsMessage { get; set; } = new ();
 
         public PartitionDataMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
@@ -137,7 +140,7 @@ public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -147,5 +150,6 @@ public sealed partial class EndQuorumEpochRequestMessage: RequestMessage
         public override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+
     }
 }

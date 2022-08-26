@@ -39,8 +39,147 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
     /// <summary>
     /// Results for each topic we tried to create.
     /// </summary>
-    public List<CreatableTopicResultMessage> Topics { get; set; } = new();
+    public List<CreatableTopicResultMessage> TopicsMessage { get; set; } = new ();
+
+    public CreateTopicsResponseMessage()
+    {
+        ApiKey = ApiKeys.CreateTopics;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public CreateTopicsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateTopics;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class CreatableTopicResultMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The unique topic ID
+        /// </summary>
+        public Dictionary<Guid,> TopicIdMessage { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// The error code, or 0 if there was no error.
+        /// </summary>
+        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The error message, or null if there was no error.
+        /// </summary>
+        public Dictionary<string,> ErrorMessageMessage { get; set; } = "";
+
+        /// <summary>
+        /// Optional topic config error returned if configs are not returned in the response.
+        /// </summary>
+        public Dictionary<short,> TopicConfigErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// Number of partitions of the topic.
+        /// </summary>
+        public Dictionary<int,> NumPartitionsMessage { get; set; } = -1;
+
+        /// <summary>
+        /// Replication factor of the topic.
+        /// </summary>
+        public Dictionary<short,> ReplicationFactorMessage { get; set; } = -1;
+
+        /// <summary>
+        /// Configuration of the topic.
+        /// </summary>
+        public List<CreatableTopicConfigsMessage> ConfigsMessage { get; set; } = new ();
+
+        public CreatableTopicResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public CreatableTopicResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class CreatableTopicConfigsMessage: Message
+    {
+        /// <summary>
+        /// The configuration name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The configuration value.
+        /// </summary>
+        public string ValueMessage { get; set; } = "";
+
+        /// <summary>
+        /// True if the configuration is read-only.
+        /// </summary>
+        public bool ReadOnlyMessage { get; set; } = false;
+
+        /// <summary>
+        /// The configuration source.
+        /// </summary>
+        public sbyte ConfigSourceMessage { get; set; } = -1;
+
+        /// <summary>
+        /// True if this configuration is sensitive.
+        /// </summary>
+        public bool IsSensitiveMessage { get; set; } = false;
+
+        public CreatableTopicConfigsMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version5;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public CreatableTopicConfigsMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version5;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

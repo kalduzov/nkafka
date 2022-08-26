@@ -39,11 +39,28 @@ public sealed class AllocateProducerIdsRequestMessage: RequestMessage
     /// <summary>
     /// The ID of the requesting broker
     /// </summary>
-    public int BrokerId { get; set; } = 0;
+    public int BrokerIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The epoch of the requesting broker
     /// </summary>
-    public long BrokerEpoch { get; set; } = -1;
+    public long BrokerEpochMessage { get; set; } = -1;
+
+    public AllocateProducerIdsRequestMessage()
+    {
+        ApiKey = ApiKeys.AllocateProducerIds;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AllocateProducerIdsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AllocateProducerIds;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

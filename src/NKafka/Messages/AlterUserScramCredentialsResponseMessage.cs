@@ -39,8 +39,71 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
     /// </summary>
-    public List<AlterUserScramCredentialsResultMessage> Results { get; set; } = new();
+    public List<AlterUserScramCredentialsResultMessage> ResultsMessage { get; set; } = new ();
+
+    public AlterUserScramCredentialsResponseMessage()
+    {
+        ApiKey = ApiKeys.AlterUserScramCredentials;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AlterUserScramCredentialsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterUserScramCredentials;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class AlterUserScramCredentialsResultMessage: Message
+    {
+        /// <summary>
+        /// The user name.
+        /// </summary>
+        public string UserMessage { get; set; } = "";
 
+        /// <summary>
+        /// The error code.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The error message, if any.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        public AlterUserScramCredentialsResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

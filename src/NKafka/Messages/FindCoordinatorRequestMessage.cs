@@ -39,16 +39,40 @@ public sealed class FindCoordinatorRequestMessage: RequestMessage
     /// <summary>
     /// The coordinator key.
     /// </summary>
-    public string Key { get; set; } = null!;
+    public string KeyMessage { get; set; } = "";
+
     /// <summary>
     /// The coordinator key type. (Group, transaction, etc.)
     /// </summary>
-    public sbyte KeyType { get; set; } = 0;
+    public sbyte KeyTypeMessage { get; set; } = 0;
+
     /// <summary>
     /// The coordinator keys.
     /// </summary>
-    public List<string> CoordinatorKeys { get; set; } = new();
+    public List<string> CoordinatorKeysMessage { get; set; } = new ();
 
+    public FindCoordinatorRequestMessage()
+    {
+        ApiKey = ApiKeys.FindCoordinator;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
 
+    public FindCoordinatorRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.FindCoordinator;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

@@ -39,12 +39,107 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The time in ms to wait for the request to complete.
     /// </summary>
-    public int TimeoutMs { get; set; } = 60000;
+    public int TimeoutMsMessage { get; set; } = 60000;
+
     /// <summary>
     /// The topics to reassign.
     /// </summary>
-    public List<ReassignableTopicMessage> Topics { get; set; } = new();
+    public List<ReassignableTopicMessage> TopicsMessage { get; set; } = new ();
+
+    public AlterPartitionReassignmentsRequestMessage()
+    {
+        ApiKey = ApiKeys.AlterPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AlterPartitionReassignmentsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ReassignableTopicMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The partitions to reassign.
+        /// </summary>
+        public List<ReassignablePartitionMessage> PartitionsMessage { get; set; } = new ();
+
+        public ReassignableTopicMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ReassignableTopicMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class ReassignablePartitionMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The replicas to place the partitions on, or null to cancel a pending reassignment for this partition.
+        /// </summary>
+        public List<int> ReplicasMessage { get; set; } = null;
+
+        public ReassignablePartitionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ReassignablePartitionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

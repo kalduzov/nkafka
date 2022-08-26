@@ -39,12 +39,35 @@ public sealed class DescribeGroupsRequestMessage: RequestMessage
     /// <summary>
     /// The names of the groups to describe
     /// </summary>
-    public List<string> Groups { get; set; } = new();
+    public List<string> GroupsMessage { get; set; } = new ();
+
     /// <summary>
     /// Whether to include authorized operations.
     /// </summary>
-    public bool IncludeAuthorizedOperations { get; set; } = false;
+    public bool IncludeAuthorizedOperationsMessage { get; set; } = false;
 
+    public DescribeGroupsRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
 
+    public DescribeGroupsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version5;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

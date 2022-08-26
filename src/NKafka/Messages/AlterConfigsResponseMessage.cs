@@ -39,8 +39,76 @@ public sealed class AlterConfigsResponseMessage: ResponseMessage
     /// <summary>
     /// The responses for each resource.
     /// </summary>
-    public List<AlterConfigsResourceResponseMessage> Responses { get; set; } = new();
+    public List<AlterConfigsResourceResponseMessage> ResponsesMessage { get; set; } = new ();
+
+    public AlterConfigsResponseMessage()
+    {
+        ApiKey = ApiKeys.AlterConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public AlterConfigsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class AlterConfigsResourceResponseMessage: Message
+    {
+        /// <summary>
+        /// The resource error code.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The resource error message, or null if there was no error.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        /// <summary>
+        /// The resource type.
+        /// </summary>
+        public sbyte ResourceTypeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The resource name.
+        /// </summary>
+        public string ResourceNameMessage { get; set; } = "";
+
+        public AlterConfigsResourceResponseMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

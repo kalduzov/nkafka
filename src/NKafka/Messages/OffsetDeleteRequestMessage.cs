@@ -39,12 +39,102 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = null!;
+    public string GroupIdMessage { get; set; } = "";
+
     /// <summary>
     /// The topics to delete offsets for
     /// </summary>
-    public List<OffsetDeleteRequestTopicMessage> Topics { get; set; } = new();
+    public List<OffsetDeleteRequestTopicMessage> TopicsMessage { get; set; } = new ();
+
+    public OffsetDeleteRequestMessage()
+    {
+        ApiKey = ApiKeys.OffsetDelete;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public OffsetDeleteRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.OffsetDelete;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class OffsetDeleteRequestTopicMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// Each partition to delete offsets for.
+        /// </summary>
+        public List<OffsetDeleteRequestPartitionMessage> PartitionsMessage { get; set; } = new ();
+
+        public OffsetDeleteRequestTopicMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetDeleteRequestTopicMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetDeleteRequestPartitionMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        public OffsetDeleteRequestPartitionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetDeleteRequestPartitionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

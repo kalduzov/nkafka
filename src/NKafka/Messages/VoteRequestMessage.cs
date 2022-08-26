@@ -39,12 +39,122 @@ public sealed class VoteRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public string? ClusterId { get; set; } = "null";
+    public string ClusterIdMessage { get; set; } = null;
+
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+
+    public VoteRequestMessage()
+    {
+        ApiKey = ApiKeys.Vote;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public VoteRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.Vote;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TopicDataMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+
+        public TopicDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class PartitionDataMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The bumped epoch of the candidate sending the request
+        /// </summary>
+        public int CandidateEpochMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The ID of the voter sending the request
+        /// </summary>
+        public int CandidateIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The epoch of the last record written to the metadata log
+        /// </summary>
+        public int LastOffsetEpochMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The offset of the last record written to the metadata log
+        /// </summary>
+        public long LastOffsetMessage { get; set; } = 0;
+
+        public PartitionDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

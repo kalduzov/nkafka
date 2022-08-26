@@ -39,11 +39,28 @@ public sealed class ControlledShutdownRequestMessage: RequestMessage
     /// <summary>
     /// The id of the broker for which controlled shutdown has been requested.
     /// </summary>
-    public int BrokerId { get; set; } = 0;
+    public int BrokerIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The broker epoch.
     /// </summary>
-    public long BrokerEpoch { get; set; } = -1;
+    public long BrokerEpochMessage { get; set; } = -1;
+
+    public ControlledShutdownRequestMessage()
+    {
+        ApiKey = ApiKeys.ControlledShutdown;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public ControlledShutdownRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ControlledShutdown;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

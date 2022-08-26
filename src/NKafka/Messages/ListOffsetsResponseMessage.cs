@@ -39,8 +39,122 @@ public sealed class ListOffsetsResponseMessage: ResponseMessage
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<ListOffsetsTopicResponseMessage> Topics { get; set; } = new();
+    public List<ListOffsetsTopicResponseMessage> TopicsMessage { get; set; } = new ();
+
+    public ListOffsetsResponseMessage()
+    {
+        ApiKey = ApiKeys.ListOffsets;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public ListOffsetsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ListOffsets;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ListOffsetsTopicResponseMessage: Message
+    {
+        /// <summary>
+        /// The topic name
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// Each partition in the response.
+        /// </summary>
+        public List<ListOffsetsPartitionResponseMessage> PartitionsMessage { get; set; } = new ();
+
+        public ListOffsetsTopicResponseMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ListOffsetsTopicResponseMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class ListOffsetsPartitionResponseMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The partition error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The result offsets.
+        /// </summary>
+        public List<long> OldStyleOffsetsMessage { get; set; } = new ();
+
+        /// <summary>
+        /// The timestamp associated with the returned offset.
+        /// </summary>
+        public long TimestampMessage { get; set; } = -1;
+
+        /// <summary>
+        /// The returned offset.
+        /// </summary>
+        public long OffsetMessage { get; set; } = -1;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int LeaderEpochMessage { get; set; } = -1;
+
+        public ListOffsetsPartitionResponseMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ListOffsetsPartitionResponseMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

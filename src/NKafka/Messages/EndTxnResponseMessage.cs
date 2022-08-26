@@ -39,7 +39,23 @@ public sealed class EndTxnResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
+    public EndTxnResponseMessage()
+    {
+        ApiKey = ApiKeys.EndTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public EndTxnResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.EndTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

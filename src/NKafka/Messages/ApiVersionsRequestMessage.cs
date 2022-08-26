@@ -39,11 +39,28 @@ public sealed class ApiVersionsRequestMessage: RequestMessage
     /// <summary>
     /// The name of the client.
     /// </summary>
-    public string ClientSoftwareName { get; set; } = "";
+    public string ClientSoftwareNameMessage { get; set; } = "";
+
     /// <summary>
     /// The version of the client.
     /// </summary>
-    public string ClientSoftwareVersion { get; set; } = "";
+    public string ClientSoftwareVersionMessage { get; set; } = "";
+
+    public ApiVersionsRequestMessage()
+    {
+        ApiKey = ApiKeys.ApiVersions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public ApiVersionsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ApiVersions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

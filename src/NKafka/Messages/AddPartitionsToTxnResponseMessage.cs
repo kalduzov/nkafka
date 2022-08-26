@@ -30,7 +30,6 @@
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-
 using System.Text;
 
 namespace NKafka.Messages;
@@ -40,5 +39,102 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AddPartitionsToTxnTopicResultMessage> Results { get; set; } = new();
+    public List<AddPartitionsToTxnTopicResultMessage> ResultsMessage { get; set; } = new ();
+
+    public AddPartitionsToTxnResponseMessage()
+    {
+        ApiKey = ApiKeys.AddPartitionsToTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public AddPartitionsToTxnResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AddPartitionsToTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
+
+
+    public sealed class AddPartitionsToTxnTopicResultMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The results for each partition
+        /// </summary>
+        public List<AddPartitionsToTxnPartitionResultMessage> ResultsMessage { get; set; } = new ();
+
+        public AddPartitionsToTxnTopicResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class AddPartitionsToTxnPartitionResultMessage: Message
+    {
+        /// <summary>
+        /// The partition indexes.
+        /// </summary>
+        public Dictionary<int,> PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The response error code.
+        /// </summary>
+        public Dictionary<short,> ErrorCodeMessage { get; set; } = 0;
+
+        public AddPartitionsToTxnPartitionResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

@@ -39,8 +39,66 @@ public sealed class DescribeProducersRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicRequestMessage> Topics { get; set; } = new();
+    public List<TopicRequestMessage> TopicsMessage { get; set; } = new ();
+
+    public DescribeProducersRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeProducers;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeProducersRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeProducers;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TopicRequestMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The indexes of the partitions to list producers for.
+        /// </summary>
+        public List<int> PartitionIndexesMessage { get; set; } = new ();
+
+        public TopicRequestMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicRequestMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

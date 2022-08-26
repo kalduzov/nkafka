@@ -39,16 +39,132 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = null!;
+    public string ErrorMessageMessage { get; set; } = "";
+
     /// <summary>
     /// Each Resource that is referenced in an ACL.
     /// </summary>
-    public List<DescribeAclsResourceMessage> Resources { get; set; } = new();
+    public List<DescribeAclsResourceMessage> ResourcesMessage { get; set; } = new ();
+
+    public DescribeAclsResponseMessage()
+    {
+        ApiKey = ApiKeys.DescribeAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeAclsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DescribeAclsResourceMessage: Message
+    {
+        /// <summary>
+        /// The resource type.
+        /// </summary>
+        public sbyte ResourceTypeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The resource name.
+        /// </summary>
+        public string ResourceNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The resource pattern type.
+        /// </summary>
+        public sbyte PatternTypeMessage { get; set; } = 3;
+
+        /// <summary>
+        /// The ACLs.
+        /// </summary>
+        public List<AclDescriptionMessage> AclsMessage { get; set; } = new ();
+
+        public DescribeAclsResourceMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribeAclsResourceMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class AclDescriptionMessage: Message
+    {
+        /// <summary>
+        /// The ACL principal.
+        /// </summary>
+        public string PrincipalMessage { get; set; } = "";
+
+        /// <summary>
+        /// The ACL host.
+        /// </summary>
+        public string HostMessage { get; set; } = "";
+
+        /// <summary>
+        /// The ACL operation.
+        /// </summary>
+        public sbyte OperationMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The ACL permission type.
+        /// </summary>
+        public sbyte PermissionTypeMessage { get; set; } = 0;
+
+        public AclDescriptionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public AclDescriptionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

@@ -39,8 +39,193 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
     /// <summary>
     /// The results for each resource.
     /// </summary>
-    public List<DescribeConfigsResultMessage> Results { get; set; } = new();
+    public List<DescribeConfigsResultMessage> ResultsMessage { get; set; } = new ();
+
+    public DescribeConfigsResponseMessage()
+    {
+        ApiKey = ApiKeys.DescribeConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public DescribeConfigsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeConfigs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DescribeConfigsResultMessage: Message
+    {
+        /// <summary>
+        /// The error code, or 0 if we were able to successfully describe the configurations.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The error message, or null if we were able to successfully describe the configurations.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        /// <summary>
+        /// The resource type.
+        /// </summary>
+        public sbyte ResourceTypeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The resource name.
+        /// </summary>
+        public string ResourceNameMessage { get; set; } = "";
+
+        /// <summary>
+        /// Each listed configuration.
+        /// </summary>
+        public List<DescribeConfigsResourceResultMessage> ConfigsMessage { get; set; } = new ();
+
+        public DescribeConfigsResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class DescribeConfigsResourceResultMessage: Message
+    {
+        /// <summary>
+        /// The configuration name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The configuration value.
+        /// </summary>
+        public string ValueMessage { get; set; } = "";
+
+        /// <summary>
+        /// True if the configuration is read-only.
+        /// </summary>
+        public bool ReadOnlyMessage { get; set; } = false;
+
+        /// <summary>
+        /// True if the configuration is not set.
+        /// </summary>
+        public bool IsDefaultMessage { get; set; } = false;
+
+        /// <summary>
+        /// The configuration source.
+        /// </summary>
+        public sbyte ConfigSourceMessage { get; set; } = -1;
+
+        /// <summary>
+        /// True if this configuration is sensitive.
+        /// </summary>
+        public bool IsSensitiveMessage { get; set; } = false;
+
+        /// <summary>
+        /// The synonyms for this configuration key.
+        /// </summary>
+        public List<DescribeConfigsSynonymMessage> SynonymsMessage { get; set; } = new ();
+
+        /// <summary>
+        /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
+        /// </summary>
+        public sbyte ConfigTypeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The configuration documentation.
+        /// </summary>
+        public string DocumentationMessage { get; set; } = "";
+
+        public DescribeConfigsResourceResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class DescribeConfigsSynonymMessage: Message
+    {
+        /// <summary>
+        /// The synonym name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The synonym value.
+        /// </summary>
+        public string ValueMessage { get; set; } = "";
+
+        /// <summary>
+        /// The synonym source.
+        /// </summary>
+        public sbyte SourceMessage { get; set; } = 0;
+
+        public DescribeConfigsSynonymMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version1;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version1;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

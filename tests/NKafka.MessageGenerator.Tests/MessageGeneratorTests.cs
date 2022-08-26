@@ -8,6 +8,26 @@ namespace NKafka.MessageGenerator.Tests;
 
 public class MessageGeneratorTests
 {
+    [Theory]
+    [InlineData("data\\DescribeQuorumResponse.json")]
+    [InlineData("data\\MetadataRequest.json")]
+    [InlineData("data\\MetadataResponse.json")]
+    [InlineData("data\\LeaderAndIsrResponse.json")]
+    [InlineData("data\\AlterUserScramCredentialsRequest.json")]
+    [InlineData("data\\BeginQuorumEpochRequest.json")]
+    [InlineData("data\\FetchRequest.json")]
+    [InlineData("data\\ConsumerProtocolAssignment.json")]
+    [InlineData("data\\RequestHeader.json")]
+    public async Task GenerateTest_Successful(string fileName)
+    {
+        var specification = await JsonParseTests.GetMessageSpecification(fileName);
+
+        var messageGenerator = new MessageGenerator("test");
+        var result = messageGenerator.Generate(specification);
+        
+        result.ToString().Should().NotBeEmpty();
+    }
+
     [Fact]
     public void GenerateTest()
     {

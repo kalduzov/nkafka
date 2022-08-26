@@ -39,19 +39,38 @@ public sealed class EndTxnRequestMessage: RequestMessage
     /// <summary>
     /// The ID of the transaction to end.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalIdMessage { get; set; } = "";
+
     /// <summary>
     /// The producer ID.
     /// </summary>
-    public long ProducerId { get; set; } = 0;
+    public long ProducerIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The current epoch associated with the producer.
     /// </summary>
-    public short ProducerEpoch { get; set; } = 0;
+    public short ProducerEpochMessage { get; set; } = 0;
+
     /// <summary>
     /// True if the transaction was committed, false if it was aborted.
     /// </summary>
-    public bool Committed { get; set; } = false;
+    public bool CommittedMessage { get; set; } = false;
+
+    public EndTxnRequestMessage()
+    {
+        ApiKey = ApiKeys.EndTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public EndTxnRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.EndTxn;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

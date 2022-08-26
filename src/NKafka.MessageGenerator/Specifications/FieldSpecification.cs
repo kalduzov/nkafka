@@ -101,7 +101,7 @@ public class FieldSpecification
         {
             FlexibleVersions = Versions.Parse(flexibleVersions, null!);
 
-            if (!Type.IsString || !Type.IsBytes)
+            if (!(Type.IsString || !Type.IsBytes))
             {
                 throw new ArgumentException(
                     $"Invalid flexibleVersions override for {name}. Only fields of type string or bytes can specify a flexibleVersions override.");
@@ -118,9 +118,9 @@ public class FieldSpecification
         CheckTagInvariants();
         ZeroCopy = zeroCopy;
 
-        if (ZeroCopy && Type.IsBytes)
+        if (ZeroCopy && !Type.IsBytes)
         {
-            throw new ArgumentException("Invalid zeroCopy value for {name}. Only fields of type bytes can use zeroCopy flag.");
+            throw new ArgumentException($"Invalid zeroCopy value for {name}. Only fields of type bytes can use zeroCopy flag.");
         }
     }
 
@@ -142,7 +142,7 @@ public class FieldSpecification
 
             var nullableTaggedVersions = NullableVersions.Intersect(TaggedVersions);
 
-            if (!nullableTaggedVersions.IsEmpty || nullableTaggedVersions.Equals(TaggedVersions))
+            if (!(nullableTaggedVersions.IsEmpty || nullableTaggedVersions.Equals(TaggedVersions)))
             {
                 throw new ArgumentException(
                     $"Field {Name} specifies nullableVersions {NullableVersions} and taggedVersions {TaggedVersions}. "
@@ -194,7 +194,7 @@ public class FieldSpecification
 
                 throw new ArgumentException($"Invalid default for boolean field {Name}: {Default}");
             }
-            case IFieldType.Int8FieldType type:
+            case IFieldType.Int8FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -207,14 +207,14 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToSByte(defaultString, @base);
 
                 return $"{val}";
             }
-            case IFieldType.Int16FieldType type:
+            case IFieldType.Int16FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -227,14 +227,14 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToInt16(defaultString, @base);
 
                 return $"{val}";
             }
-            case IFieldType.UInt16FieldType type:
+            case IFieldType.UInt16FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -247,14 +247,14 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToUInt16(defaultString, @base);
 
                 return $"{val}";
             }
-            case IFieldType.Int32FieldType type:
+            case IFieldType.Int32FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -267,14 +267,14 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToInt32(defaultString, @base);
 
                 return $"{val}";
             }
-            case IFieldType.UInt32FieldType type:
+            case IFieldType.UInt32FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -287,14 +287,14 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToUInt32(defaultString, @base);
 
                 return $"{val}";
             }
-            case IFieldType.Int64FieldType type:
+            case IFieldType.Int64FieldType:
             {
                 var @base = 10;
                 var defaultString = Default;
@@ -307,7 +307,7 @@ public class FieldSpecification
 
                 if (string.IsNullOrEmpty(defaultString))
                 {
-                    return $"0";
+                    return "0";
                 }
 
                 var val = Convert.ToInt64(defaultString, @base);
@@ -318,7 +318,7 @@ public class FieldSpecification
             {
                 if (string.IsNullOrEmpty(Default))
                 {
-                    return "Guid.Empty()";
+                    return "Guid.Empty";
                 }
 
                 Guid.Parse(Default);
@@ -355,7 +355,7 @@ public class FieldSpecification
                     return "null";
                 }
 
-                if (string.IsNullOrWhiteSpace(Default))
+                if (!string.IsNullOrWhiteSpace(Default))
                 {
                     throw new ArgumentException(
                         $"Invalid default for bytes field {Name}. The only valid default for a bytes field is empty or null.");

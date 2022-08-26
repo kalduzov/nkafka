@@ -73,7 +73,7 @@ public record MessageSpecification
 
         FlexibleVersions = Versions.Parse(flexibleVersions, Versions.None);
 
-        if (FlexibleVersions.IsEmpty && FlexibleVersions.Highest < short.MaxValue)
+        if (!FlexibleVersions.IsEmpty && FlexibleVersions.Highest < short.MaxValue)
         {
             throw new ArgumentException(
                 $"Field {name} specifies flexibleVersions {FlexibleVersions}, which is not open-ended. flexibleVersions must be either none, "

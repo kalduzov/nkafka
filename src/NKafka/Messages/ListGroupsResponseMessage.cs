@@ -39,12 +39,76 @@ public sealed class ListGroupsResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// Each group in the response.
     /// </summary>
-    public List<ListedGroupMessage> Groups { get; set; } = new();
+    public List<ListedGroupMessage> GroupsMessage { get; set; } = new ();
+
+    public ListGroupsResponseMessage()
+    {
+        ApiKey = ApiKeys.ListGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public ListGroupsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ListGroups;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ListedGroupMessage: Message
+    {
+        /// <summary>
+        /// The group ID.
+        /// </summary>
+        public string GroupIdMessage { get; set; } = "";
 
+        /// <summary>
+        /// The group protocol type.
+        /// </summary>
+        public string ProtocolTypeMessage { get; set; } = "";
+
+        /// <summary>
+        /// The group state name.
+        /// </summary>
+        public string GroupStateMessage { get; set; } = "";
+
+        public ListedGroupMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ListedGroupMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

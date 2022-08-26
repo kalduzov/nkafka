@@ -1,6 +1,7 @@
 ﻿using System.Text;
 
 using NKafka.MessageGenerator.Specifications;
+using NKafka.Protocol;
 
 namespace NKafka.MessageGenerator;
 
@@ -48,10 +49,10 @@ public class MessageGenerator: IMessageGenerator
         return result;
     }
 
-    private void GenerateClass(MessageSpecification? message, string className, StructSpecification messageStruct, Versions parentVersions)
+    private void GenerateClass(MessageSpecification? topLevelMessage, string className, StructSpecification messageStruct, Versions parentVersions)
     {
         _codeBuffer.AppendLine();
-        var isTopLevel = message is not null;
+        var isTopLevel = topLevelMessage is not null;
         var isDictionaryElement = messageStruct.HasKeys;
 
         if (isTopLevel && isDictionaryElement)
@@ -59,11 +60,11 @@ public class MessageGenerator: IMessageGenerator
             throw new ArgumentException("Cannot set mapKey on top level fields.");
         }
 
-        GenerateClassHeader(className, message?.Type);
+        GenerateClassHeader(className, topLevelMessage?.Type);
         _codeBuffer.IncrementIndent();
-        GenerateProperties(messageStruct, message?.Type, isDictionaryElement);
+        GenerateProperties(messageStruct, topLevelMessage?.Type, isDictionaryElement);
         _codeBuffer.AppendLine();
-        GenerateCtor(className, messageStruct, isTopLevel, isDictionaryElement);
+        GenerateCtor(className, topLevelMessage?.ApiKey, messageStruct, isTopLevel, isDictionaryElement);
         _codeBuffer.AppendLine();
         _readMethodGenerator.Generate(className, messageStruct, parentVersions);
         _codeBuffer.AppendLine();
@@ -102,7 +103,7 @@ public class MessageGenerator: IMessageGenerator
                 {
                     GenerateClass(
                         null,
-                        arrayType.ElementType.ToString(),
+                        $"{arrayType.ElementType.ToString()}Message",
                         _structRegistry.FindStruct(field),
                         parentVersions.Intersect(messageStruct.Versions));
                 }
@@ -115,7 +116,7 @@ public class MessageGenerator: IMessageGenerator
                     {
                         GenerateClass(
                             null,
-                            field.Type.ToString(),
+                            $"{field.Type.ToString()}Message",
                             _structRegistry.FindStruct(field),
                             parentVersions.Intersect(messageStruct.Versions));
                     }
@@ -133,8 +134,53 @@ public class MessageGenerator: IMessageGenerator
     {
     }
 
-    private void GenerateCtor(string className, StructSpecification messageStruct, bool isTopLevel, bool isDictionaryElement)
+    private void GenerateCtor(
+        string className,
+        int? apiKeyValue,
+        StructSpecification messageStruct,
+        bool isTopLevel,
+        bool isDictionaryElement)
     {
+        _codeBuffer.AppendLine($"public {className}()");
+        _codeBuffer.AppendLine("{");
+
+        if (apiKeyValue.HasValue)
+        {
+            _codeBuffer.IncrementIndent();
+            var apiKey = (ApiKeys)apiKeyValue;
+            _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
+            _codeBuffer.DecrementIndent();
+        }
+
+        _codeBuffer.IncrementIndent();
+        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Lowest};");
+        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Highest};");
+        _codeBuffer.DecrementIndent();
+
+        _codeBuffer.AppendLine("}");
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine($"public {className}(BufferReader reader, ApiVersions version)");
+
+        _codeBuffer.IncrementIndent();
+        _codeBuffer.AppendLine(": base(reader, version)");
+        _codeBuffer.DecrementIndent();
+
+        _codeBuffer.AppendLine("{");
+
+        _codeBuffer.IncrementIndent();
+        _codeBuffer.AppendLine("Read(reader, version);");
+
+        if (apiKeyValue.HasValue)
+        {
+            var apiKey = (ApiKeys)apiKeyValue;
+            _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
+        }
+
+        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Lowest};");
+        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{messageStruct.Versions.Highest};");
+        _codeBuffer.DecrementIndent();
+
+        _codeBuffer.AppendLine("}");
     }
 
     private void GenerateProperties(StructSpecification structSpecification, MessageType? messageType, bool isDictionaryElement)
@@ -165,22 +211,34 @@ public class MessageGenerator: IMessageGenerator
 
         var type = GetClrType(field, isDictionaryElement);
         var nullableMarker = NullableMarkerIfNeeded(field);
-        _codeBuffer.Append($"public {type}{nullableMarker} {field.Name} {{ get; set; }} = {field.FieldDefault()};");
+        _codeBuffer.AppendLine($"public {type}{nullableMarker} {field.Name}Message {{ get; set; }} = {field.FieldDefault()};");
     }
 
     private static string GetClrType(FieldSpecification field, bool isDictionaryElement)
     {
-        if (!field.Type.IsArray)
+        if (field.Type.IsArray && field.Type is IFieldType.ArrayType arrayType)
         {
-            return field.Type.ClrName;
+            if (field.Type.IsStructArray)
+            {
+                return $"List<{arrayType.ElementType.ClrName}Message>";
+            }
+            else
+            {
+                return $"List<{arrayType.ElementType.ClrName}>";
+            }
+        }
+
+        if (field.Type.IsStruct && field.Type is IFieldType.StructType structType)
+        {
+            return $"List<{structType.TypeName}>";
         }
 
         if (isDictionaryElement)
         {
-            return $"Dictionary<{field.Type.ClrName}>"; //todo тут должен быть словарь
+            return $"Dictionary<{field.Type.ClrName},>"; //todo тут должен быть словарь
         }
 
-        return $"List<{field.Type.ClrName}>";
+        return $"{field.Type.ClrName}";
     }
 
     private static string NullableMarkerIfNeeded(FieldSpecification field)

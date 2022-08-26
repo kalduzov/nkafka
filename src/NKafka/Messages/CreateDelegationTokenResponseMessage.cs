@@ -39,45 +39,76 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error, or zero if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The principal type of the token owner.
     /// </summary>
-    public string PrincipalType { get; set; } = null!;
+    public string PrincipalTypeMessage { get; set; } = "";
+
     /// <summary>
     /// The name of the token owner.
     /// </summary>
-    public string PrincipalName { get; set; } = null!;
+    public string PrincipalNameMessage { get; set; } = "";
+
     /// <summary>
     /// The principal type of the requester of the token.
     /// </summary>
-    public string TokenRequesterPrincipalType { get; set; } = null!;
+    public string TokenRequesterPrincipalTypeMessage { get; set; } = "";
+
     /// <summary>
     /// The principal type of the requester of the token.
     /// </summary>
-    public string TokenRequesterPrincipalName { get; set; } = null!;
+    public string TokenRequesterPrincipalNameMessage { get; set; } = "";
+
     /// <summary>
     /// When this token was generated.
     /// </summary>
-    public long IssueTimestampMs { get; set; } = 0;
+    public long IssueTimestampMsMessage { get; set; } = 0;
+
     /// <summary>
     /// When this token expires.
     /// </summary>
-    public long ExpiryTimestampMs { get; set; } = 0;
+    public long ExpiryTimestampMsMessage { get; set; } = 0;
+
     /// <summary>
     /// The maximum lifetime of this token.
     /// </summary>
-    public long MaxTimestampMs { get; set; } = 0;
+    public long MaxTimestampMsMessage { get; set; } = 0;
+
     /// <summary>
     /// The token UUID.
     /// </summary>
-    public string TokenId { get; set; } = null!;
+    public string TokenIdMessage { get; set; } = "";
+
     /// <summary>
     /// HMAC of the delegation token.
     /// </summary>
-    public byte[] Hmac { get; set; } = Array.Empty<byte>();
+    public byte[] HmacMessage { get; set; } = Array.Empty<byte>();
 
 
+    public CreateDelegationTokenResponseMessage()
+    {
+        ApiKey = ApiKeys.CreateDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
+    public CreateDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 }

@@ -39,28 +39,142 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
     /// <summary>
     /// The broker ID.
     /// </summary>
-    public int BrokerId { get; set; } = 0;
+    public int BrokerIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The cluster id of the broker process.
     /// </summary>
-    public string ClusterId { get; set; } = null!;
+    public string ClusterIdMessage { get; set; } = "";
+
     /// <summary>
     /// The incarnation id of the broker process.
     /// </summary>
-    public Guid IncarnationId { get; set; } = Guid.Empty;
+    public Guid IncarnationIdMessage { get; set; } = Guid.Empty;
+
     /// <summary>
     /// The listeners of this broker
     /// </summary>
-    public List<ListenerMessage> Listeners { get; set; } = new();
+    public List<ListenerMessage> ListenersMessage { get; set; } = new ();
+
     /// <summary>
     /// The features on this broker
     /// </summary>
-    public List<FeatureMessage> Features { get; set; } = new();
+    public List<FeatureMessage> FeaturesMessage { get; set; } = new ();
+
     /// <summary>
     /// The rack which this broker is in.
     /// </summary>
-    public string Rack { get; set; } = null!;
+    public string RackMessage { get; set; } = "";
+
+    public BrokerRegistrationRequestMessage()
+    {
+        ApiKey = ApiKeys.BrokerRegistration;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public BrokerRegistrationRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.BrokerRegistration;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ListenerMessage: Message
+    {
+        /// <summary>
+        /// The name of the endpoint.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The hostname.
+        /// </summary>
+        public Dictionary<string,> HostMessage { get; set; } = "";
+
+        /// <summary>
+        /// The port.
+        /// </summary>
+        public Dictionary<ushort,> PortMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The security protocol.
+        /// </summary>
+        public Dictionary<short,> SecurityProtocolMessage { get; set; } = 0;
+
+        public ListenerMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ListenerMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class FeatureMessage: Message
+    {
+        /// <summary>
+        /// The feature name.
+        /// </summary>
+        public Dictionary<string,> NameMessage { get; set; } = "";
+
+        /// <summary>
+        /// The minimum supported feature level.
+        /// </summary>
+        public Dictionary<short,> MinSupportedVersionMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The maximum supported feature level.
+        /// </summary>
+        public Dictionary<short,> MaxSupportedVersionMessage { get; set; } = 0;
+
+        public FeatureMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public FeatureMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

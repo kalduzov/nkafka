@@ -39,8 +39,107 @@ public sealed class AlterClientQuotasResponseMessage: ResponseMessage
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
-    public List<EntryDataMessage> Entries { get; set; } = new();
+    public List<EntryDataMessage> EntriesMessage { get; set; } = new ();
+
+    public AlterClientQuotasResponseMessage()
+    {
+        ApiKey = ApiKeys.AlterClientQuotas;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public AlterClientQuotasResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterClientQuotas;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class EntryDataMessage: Message
+    {
+        /// <summary>
+        /// The error code, or `0` if the quota alteration succeeded.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The error message, or `null` if the quota alteration succeeded.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        /// <summary>
+        /// The quota entity to alter.
+        /// </summary>
+        public List<EntityDataMessage> EntityMessage { get; set; } = new ();
+
+        public EntryDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public EntryDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class EntityDataMessage: Message
+    {
+        /// <summary>
+        /// The entity type.
+        /// </summary>
+        public string EntityTypeMessage { get; set; } = "";
+
+        /// <summary>
+        /// The name of the entity, or null if the default.
+        /// </summary>
+        public string EntityNameMessage { get; set; } = "";
+
+        public EntityDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public EntityDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

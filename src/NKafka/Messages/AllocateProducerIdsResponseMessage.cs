@@ -39,15 +39,33 @@ public sealed class AllocateProducerIdsResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The first producer ID in this range, inclusive
     /// </summary>
-    public long ProducerIdStart { get; set; } = 0;
+    public long ProducerIdStartMessage { get; set; } = 0;
+
     /// <summary>
     /// The number of producer IDs in this range
     /// </summary>
-    public int ProducerIdLen { get; set; } = 0;
+    public int ProducerIdLenMessage { get; set; } = 0;
+
+    public AllocateProducerIdsResponseMessage()
+    {
+        ApiKey = ApiKeys.AllocateProducerIds;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public AllocateProducerIdsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AllocateProducerIds;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

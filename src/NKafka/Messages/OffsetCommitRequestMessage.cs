@@ -39,28 +39,142 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = null!;
+    public string GroupIdMessage { get; set; } = "";
+
     /// <summary>
     /// The generation of the group.
     /// </summary>
-    public int? GenerationId { get; set; } = -1;
+    public int GenerationIdMessage { get; set; } = -1;
+
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string? MemberId { get; set; } = null!;
+    public string MemberIdMessage { get; set; } = "";
+
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string? GroupInstanceId { get; set; } = "null";
+    public string GroupInstanceIdMessage { get; set; } = null;
+
     /// <summary>
     /// The time period in ms to retain the offset.
     /// </summary>
-    public long? RetentionTimeMs { get; set; } = -1;
+    public long RetentionTimeMsMessage { get; set; } = -1;
+
     /// <summary>
     /// The topics to commit offsets for.
     /// </summary>
-    public List<OffsetCommitRequestTopicMessage> Topics { get; set; } = new();
+    public List<OffsetCommitRequestTopicMessage> TopicsMessage { get; set; } = new ();
+
+    public OffsetCommitRequestMessage()
+    {
+        ApiKey = ApiKeys.OffsetCommit;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version8;
+    }
+
+    public OffsetCommitRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.OffsetCommit;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version8;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class OffsetCommitRequestTopicMessage: Message
+    {
+        /// <summary>
+        /// The topic name.
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// Each partition to commit offsets for.
+        /// </summary>
+        public List<OffsetCommitRequestPartitionMessage> PartitionsMessage { get; set; } = new ();
+
+        public OffsetCommitRequestTopicMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class OffsetCommitRequestPartitionMessage: Message
+    {
+        /// <summary>
+        /// The partition index.
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The message offset to be committed.
+        /// </summary>
+        public long CommittedOffsetMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The leader epoch of this partition.
+        /// </summary>
+        public int CommittedLeaderEpochMessage { get; set; } = -1;
+
+        /// <summary>
+        /// The timestamp of the commit.
+        /// </summary>
+        public long CommitTimestampMessage { get; set; } = -1;
+
+        /// <summary>
+        /// Any associated metadata the client wants to keep.
+        /// </summary>
+        public string CommittedMetadataMessage { get; set; } = "";
+
+        public OffsetCommitRequestPartitionMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public OffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

@@ -39,8 +39,91 @@ public sealed class DeleteAclsRequestMessage: RequestMessage
     /// <summary>
     /// The filters to use when deleting ACLs.
     /// </summary>
-    public List<DeleteAclsFilterMessage> Filters { get; set; } = new();
+    public List<DeleteAclsFilterMessage> FiltersMessage { get; set; } = new ();
+
+    public DeleteAclsRequestMessage()
+    {
+        ApiKey = ApiKeys.DeleteAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DeleteAclsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DeleteAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DeleteAclsFilterMessage: Message
+    {
+        /// <summary>
+        /// The resource type.
+        /// </summary>
+        public sbyte ResourceTypeFilterMessage { get; set; } = 0;
 
+        /// <summary>
+        /// The resource name.
+        /// </summary>
+        public string ResourceNameFilterMessage { get; set; } = "";
+
+        /// <summary>
+        /// The pattern type.
+        /// </summary>
+        public sbyte PatternTypeFilterMessage { get; set; } = 3;
+
+        /// <summary>
+        /// The principal filter, or null to accept all principals.
+        /// </summary>
+        public string PrincipalFilterMessage { get; set; } = "";
+
+        /// <summary>
+        /// The host filter, or null to accept all hosts.
+        /// </summary>
+        public string HostFilterMessage { get; set; } = "";
+
+        /// <summary>
+        /// The ACL operation.
+        /// </summary>
+        public sbyte OperationMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The permission type.
+        /// </summary>
+        public sbyte PermissionTypeMessage { get; set; } = 0;
+
+        public DeleteAclsFilterMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DeleteAclsFilterMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

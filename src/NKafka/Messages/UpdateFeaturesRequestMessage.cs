@@ -39,16 +39,86 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
     /// </summary>
-    public int timeoutMs { get; set; } = 60000;
+    public int timeoutMsMessage { get; set; } = 60000;
+
     /// <summary>
     /// The list of updates to finalized features.
     /// </summary>
-    public List<FeatureUpdateKeyMessage> FeatureUpdates { get; set; } = new();
+    public List<FeatureUpdateKeyMessage> FeatureUpdatesMessage { get; set; } = new ();
+
     /// <summary>
     /// True if we should validate the request, but not perform the upgrade or downgrade.
     /// </summary>
-    public bool ValidateOnly { get; set; } = False;
+    public bool ValidateOnlyMessage { get; set; } = false;
+
+    public UpdateFeaturesRequestMessage()
+    {
+        ApiKey = ApiKeys.UpdateFeatures;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public UpdateFeaturesRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.UpdateFeatures;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version1;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class FeatureUpdateKeyMessage: Message
+    {
+        /// <summary>
+        /// The name of the finalized feature to be updated.
+        /// </summary>
+        public Dictionary<string,> FeatureMessage { get; set; } = "";
 
+        /// <summary>
+        /// The new maximum version level for the finalized feature. A value >= 1 is valid. A value < 1, is special, and can be used to request the deletion of the finalized feature.
+        /// </summary>
+        public Dictionary<short,> MaxVersionLevelMessage { get; set; } = 0;
+
+        /// <summary>
+        /// DEPRECATED in version 1 (see DowngradeType). When set to true, the finalized feature version level is allowed to be downgraded/deleted. The downgrade request will fail if the new maximum version level is a value that's not lower than the existing maximum finalized version level.
+        /// </summary>
+        public Dictionary<bool,> AllowDowngradeMessage { get; set; } = false;
+
+        /// <summary>
+        /// Determine which type of upgrade will be performed: 1 will perform an upgrade only (default), 2 is safe downgrades only (lossless), 3 is unsafe downgrades (lossy).
+        /// </summary>
+        public Dictionary<sbyte,> UpgradeTypeMessage { get; set; } = 1;
+
+        public FeatureUpdateKeyMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public FeatureUpdateKeyMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

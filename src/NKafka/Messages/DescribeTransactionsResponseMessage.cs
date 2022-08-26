@@ -39,8 +39,132 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionStateMessage> TransactionStates { get; set; } = new();
+    public List<TransactionStateMessage> TransactionStatesMessage { get; set; } = new ();
+
+    public DescribeTransactionsResponseMessage()
+    {
+        ApiKey = ApiKeys.DescribeTransactions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeTransactionsResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeTransactions;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TransactionStateMessage: Message
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public string TransactionalIdMessage { get; set; } = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string TransactionStateMessage { get; set; } = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int TransactionTimeoutMsMessage { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long TransactionStartTimeMsMessage { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public long ProducerIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public short ProducerEpochMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The set of partitions included in the current transaction (if active). When a transaction is preparing to commit or abort, this will include only partitions which do not have markers.
+        /// </summary>
+        public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+
+        public TransactionStateMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TransactionStateMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class TopicDataMessage: Message
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary<string,> TopicMessage { get; set; } = "";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<int> PartitionsMessage { get; set; } = new ();
+
+        public TopicDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

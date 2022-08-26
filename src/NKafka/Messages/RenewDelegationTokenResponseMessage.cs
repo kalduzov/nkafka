@@ -39,12 +39,29 @@ public sealed class RenewDelegationTokenResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The timestamp in milliseconds at which this token expires.
     /// </summary>
-    public long ExpiryTimestampMs { get; set; } = 0;
+    public long ExpiryTimestampMsMessage { get; set; } = 0;
 
+
+    public RenewDelegationTokenResponseMessage()
+    {
+        ApiKey = ApiKeys.RenewDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public RenewDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.RenewDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

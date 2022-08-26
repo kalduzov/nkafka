@@ -39,7 +39,23 @@ public sealed class UpdateMetadataResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
+    public UpdateMetadataResponseMessage()
+    {
+        ApiKey = ApiKeys.UpdateMetadata;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
+
+    public UpdateMetadataResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.UpdateMetadata;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version7;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

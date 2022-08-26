@@ -39,20 +39,81 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// The principal type of the owner of the token. If it's null it defaults to the token request principal.
     /// </summary>
-    public string OwnerPrincipalType { get; set; } = null!;
+    public string OwnerPrincipalTypeMessage { get; set; } = "";
+
     /// <summary>
     /// The principal name of the owner of the token. If it's null it defaults to the token request principal.
     /// </summary>
-    public string OwnerPrincipalName { get; set; } = null!;
+    public string OwnerPrincipalNameMessage { get; set; } = "";
+
     /// <summary>
     /// A list of those who are allowed to renew this token before it expires.
     /// </summary>
-    public List<CreatableRenewersMessage> Renewers { get; set; } = new();
+    public List<CreatableRenewersMessage> RenewersMessage { get; set; } = new ();
+
     /// <summary>
     /// The maximum lifetime of the token in milliseconds, or -1 to use the server side default.
     /// </summary>
-    public long MaxLifetimeMs { get; set; } = 0;
+    public long MaxLifetimeMsMessage { get; set; } = 0;
+
+    public CreateDelegationTokenRequestMessage()
+    {
+        ApiKey = ApiKeys.CreateDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public CreateDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.CreateDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class CreatableRenewersMessage: Message
+    {
+        /// <summary>
+        /// The type of the Kafka principal.
+        /// </summary>
+        public string PrincipalTypeMessage { get; set; } = "";
 
+        /// <summary>
+        /// The name of the Kafka principal.
+        /// </summary>
+        public string PrincipalNameMessage { get; set; } = "";
+
+        public CreatableRenewersMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public CreatableRenewersMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

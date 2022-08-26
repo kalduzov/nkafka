@@ -39,7 +39,23 @@ public sealed class DescribeClusterRequestMessage: RequestMessage
     /// <summary>
     /// Whether to include cluster authorized operations.
     /// </summary>
-    public bool IncludeClusterAuthorizedOperations { get; set; } = false;
+    public bool IncludeClusterAuthorizedOperationsMessage { get; set; } = false;
+
+    public DescribeClusterRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeCluster;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public DescribeClusterRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeCluster;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

@@ -34,27 +34,27 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetFetchRequestMessage: RequestMessage
+public sealed class OffsetFetchRequestMessage: RequestMessage
 {
     /// <summary>
     /// The group to fetch offsets for.
     /// </summary>
-    public string GroupId { get; set; } = null!;
+    public string GroupIdMessage { get; set; } = "";
 
     /// <summary>
     /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
     /// </summary>
-    public List<OffsetFetchRequestTopicMessage> Topics { get; set; } = new();
+    public List<OffsetFetchRequestTopicMessage> TopicsMessage { get; set; } = new ();
 
     /// <summary>
     /// Each group we would like to fetch offsets for
     /// </summary>
-    public List<OffsetFetchRequestGroupMessage> Groups { get; set; } = new();
+    public List<OffsetFetchRequestGroupMessage> GroupsMessage { get; set; } = new ();
 
     /// <summary>
     /// Whether broker should hold on returning unstable offsets but set a retriable error code for the partitions.
     /// </summary>
-    public bool RequireStable { get; set; } = false;
+    public bool RequireStableMessage { get; set; } = false;
 
     public OffsetFetchRequestMessage()
     {
@@ -80,22 +80,23 @@ public sealed partial class OffsetFetchRequestMessage: RequestMessage
     {
     }
 
-    public sealed partial class OffsetFetchRequestTopicMessage: Message
+
+    public sealed class OffsetFetchRequestTopicMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = null!;
+        public string NameMessage { get; set; } = "";
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new();
+        public List<int> PartitionIndexesMessage { get; set; } = new ();
 
         public OffsetFetchRequestTopicMessage()
         {
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public OffsetFetchRequestTopicMessage(BufferReader reader, ApiVersions version)
@@ -103,7 +104,7 @@ public sealed partial class OffsetFetchRequestMessage: RequestMessage
         {
             Read(reader, version);
             LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -113,31 +114,33 @@ public sealed partial class OffsetFetchRequestMessage: RequestMessage
         public override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+
     }
-    public sealed partial class OffsetFetchRequestGroupMessage: Message
+
+    public sealed class OffsetFetchRequestGroupMessage: Message
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = null!;
+        public string groupIdMessage { get; set; } = "";
 
         /// <summary>
         /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
         /// </summary>
-        public List<OffsetFetchRequestTopicsMessage> Topics { get; set; } = new();
+        public List<OffsetFetchRequestTopicsMessage> TopicsMessage { get; set; } = new ();
 
         public OffsetFetchRequestGroupMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public OffsetFetchRequestGroupMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -147,31 +150,33 @@ public sealed partial class OffsetFetchRequestMessage: RequestMessage
         public override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+
     }
-    public sealed partial class OffsetFetchRequestTopicsMessage: Message
+
+    public sealed class OffsetFetchRequestTopicsMessage: Message
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = null!;
+        public string NameMessage { get; set; } = "";
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new();
+        public List<int> PartitionIndexesMessage { get; set; } = new ();
 
         public OffsetFetchRequestTopicsMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public OffsetFetchRequestTopicsMessage(BufferReader reader, ApiVersions version)
             : base(reader, version)
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
+            LowestSupportedVersion = ApiVersions.Version8;
+            HighestSupportedVersion = ApiVersions.Version32767;
         }
 
         public override void Read(BufferReader reader, ApiVersions version)
@@ -181,5 +186,6 @@ public sealed partial class OffsetFetchRequestMessage: RequestMessage
         public override void Write(BufferWriter writer, ApiVersions version)
         {
         }
+
     }
 }

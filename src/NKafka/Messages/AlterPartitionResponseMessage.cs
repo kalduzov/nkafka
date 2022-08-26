@@ -39,12 +39,137 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new();
+    public List<TopicDataMessage> TopicsMessage { get; set; } = new ();
+
+    public AlterPartitionResponseMessage()
+    {
+        ApiKey = ApiKeys.AlterIsr;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public AlterPartitionResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.AlterIsr;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class TopicDataMessage: Message
+    {
+        /// <summary>
+        /// The name of the topic
+        /// </summary>
+        public string TopicNameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The ID of the topic
+        /// </summary>
+        public Guid TopicIdMessage { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<PartitionDataMessage> PartitionsMessage { get; set; } = new ();
+
+        public TopicDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public TopicDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class PartitionDataMessage: Message
+    {
+        /// <summary>
+        /// The partition index
+        /// </summary>
+        public int PartitionIndexMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The partition level error code
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The broker ID of the leader.
+        /// </summary>
+        public int LeaderIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The leader epoch.
+        /// </summary>
+        public int LeaderEpochMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The in-sync replica IDs.
+        /// </summary>
+        public List<int> IsrMessage { get; set; } = new ();
+
+        /// <summary>
+        /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.
+        /// </summary>
+        public sbyte LeaderRecoveryStateMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The current epoch for the partition for KRaft controllers. The current ZK version for the legacy controllers.
+        /// </summary>
+        public int PartitionEpochMessage { get; set; } = 0;
+
+        public PartitionDataMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

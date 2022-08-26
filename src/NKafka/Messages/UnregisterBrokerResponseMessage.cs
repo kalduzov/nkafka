@@ -39,11 +39,28 @@ public sealed class UnregisterBrokerResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessageMessage { get; set; } = "";
+
+    public UnregisterBrokerResponseMessage()
+    {
+        ApiKey = ApiKeys.UnregisterBroker;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public UnregisterBrokerResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.UnregisterBroker;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

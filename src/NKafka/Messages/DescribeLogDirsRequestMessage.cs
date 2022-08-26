@@ -39,8 +39,66 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
-    public List<DescribableLogDirTopicMessage> Topics { get; set; } = new();
+    public List<DescribableLogDirTopicMessage> TopicsMessage { get; set; } = new ();
+
+    public DescribeLogDirsRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeLogDirs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public DescribeLogDirsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeLogDirs;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DescribableLogDirTopicMessage: Message
+    {
+        /// <summary>
+        /// The topic name
+        /// </summary>
+        public Dictionary<string,> TopicMessage { get; set; } = "";
 
+        /// <summary>
+        /// The partition indexes.
+        /// </summary>
+        public List<int> PartitionsMessage { get; set; } = new ();
+
+        public DescribableLogDirTopicMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribableLogDirTopicMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

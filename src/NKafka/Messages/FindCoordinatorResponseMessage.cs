@@ -39,28 +39,111 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string? ErrorMessage { get; set; } = null!;
+    public string ErrorMessageMessage { get; set; } = "";
+
     /// <summary>
     /// The node id.
     /// </summary>
-    public int NodeId { get; set; } = 0;
+    public int NodeIdMessage { get; set; } = 0;
+
     /// <summary>
     /// The host name.
     /// </summary>
-    public string Host { get; set; } = null!;
+    public string HostMessage { get; set; } = "";
+
     /// <summary>
     /// The port.
     /// </summary>
-    public int Port { get; set; } = 0;
+    public int PortMessage { get; set; } = 0;
+
     /// <summary>
     /// Each coordinator result in the response
     /// </summary>
-    public List<CoordinatorMessage> Coordinators { get; set; } = new();
+    public List<CoordinatorMessage> CoordinatorsMessage { get; set; } = new ();
+
+    public FindCoordinatorResponseMessage()
+    {
+        ApiKey = ApiKeys.FindCoordinator;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public FindCoordinatorResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.FindCoordinator;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class CoordinatorMessage: Message
+    {
+        /// <summary>
+        /// The coordinator key.
+        /// </summary>
+        public string KeyMessage { get; set; } = "";
 
+        /// <summary>
+        /// The node id.
+        /// </summary>
+        public int NodeIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The host name.
+        /// </summary>
+        public string HostMessage { get; set; } = "";
+
+        /// <summary>
+        /// The port.
+        /// </summary>
+        public int PortMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The error code, or 0 if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The error message, or null if there was no error.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        public CoordinatorMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version4;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public CoordinatorMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version4;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

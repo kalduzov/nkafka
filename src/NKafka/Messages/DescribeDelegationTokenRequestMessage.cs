@@ -39,8 +39,66 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
-    public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new();
+    public List<DescribeDelegationTokenOwnerMessage> OwnersMessage { get; set; } = new ();
+
+    public DescribeDelegationTokenRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeDelegationToken;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class DescribeDelegationTokenOwnerMessage: Message
+    {
+        /// <summary>
+        /// The owner principal type.
+        /// </summary>
+        public string PrincipalTypeMessage { get; set; } = "";
 
+        /// <summary>
+        /// The owner principal name.
+        /// </summary>
+        public string PrincipalNameMessage { get; set; } = "";
+
+        public DescribeDelegationTokenOwnerMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public DescribeDelegationTokenOwnerMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

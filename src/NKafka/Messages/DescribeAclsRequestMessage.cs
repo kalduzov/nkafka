@@ -39,31 +39,53 @@ public sealed class DescribeAclsRequestMessage: RequestMessage
     /// <summary>
     /// The resource type.
     /// </summary>
-    public sbyte ResourceTypeFilter { get; set; } = 0;
+    public sbyte ResourceTypeFilterMessage { get; set; } = 0;
+
     /// <summary>
     /// The resource name, or null to match any resource name.
     /// </summary>
-    public string ResourceNameFilter { get; set; } = "";
+    public string ResourceNameFilterMessage { get; set; } = "";
+
     /// <summary>
     /// The resource pattern to match.
     /// </summary>
-    public sbyte PatternTypeFilter { get; set; } = 3;
+    public sbyte PatternTypeFilterMessage { get; set; } = 3;
+
     /// <summary>
     /// The principal to match, or null to match any principal.
     /// </summary>
-    public string PrincipalFilter { get; set; } = "";
+    public string PrincipalFilterMessage { get; set; } = "";
+
     /// <summary>
     /// The host to match, or null to match any host.
     /// </summary>
-    public string HostFilter { get; set; } = "";
+    public string HostFilterMessage { get; set; } = "";
+
     /// <summary>
     /// The operation to match.
     /// </summary>
-    public sbyte Operation { get; set; } = 0;
+    public sbyte OperationMessage { get; set; } = 0;
+
     /// <summary>
     /// The permission type to match.
     /// </summary>
-    public sbyte PermissionType { get; set; } = 0;
+    public sbyte PermissionTypeMessage { get; set; } = 0;
+
+    public DescribeAclsRequestMessage()
+    {
+        ApiKey = ApiKeys.DescribeAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
+
+    public DescribeAclsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.DescribeAcls;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version3;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

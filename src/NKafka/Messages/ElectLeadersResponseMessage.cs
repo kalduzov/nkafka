@@ -39,12 +39,112 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
     /// <summary>
     /// The top level response error code.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The election results, or an empty array if the requester did not have permission and the request asks for all partitions.
     /// </summary>
-    public List<ReplicaElectionResultMessage> ReplicaElectionResults { get; set; } = new();
+    public List<ReplicaElectionResultMessage> ReplicaElectionResultsMessage { get; set; } = new ();
+
+    public ElectLeadersResponseMessage()
+    {
+        ApiKey = ApiKeys.ElectLeaders;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public ElectLeadersResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ElectLeaders;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version2;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ReplicaElectionResultMessage: Message
+    {
+        /// <summary>
+        /// The topic name
+        /// </summary>
+        public string TopicMessage { get; set; } = "";
 
+        /// <summary>
+        /// The results for each partition
+        /// </summary>
+        public List<PartitionResultMessage> PartitionResultMessage { get; set; } = new ();
+
+        public ReplicaElectionResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ReplicaElectionResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
+
+    public sealed class PartitionResultMessage: Message
+    {
+        /// <summary>
+        /// The partition id
+        /// </summary>
+        public int PartitionIdMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The result error, or zero if there was no error.
+        /// </summary>
+        public short ErrorCodeMessage { get; set; } = 0;
+
+        /// <summary>
+        /// The result message, or null if there was no error.
+        /// </summary>
+        public string ErrorMessageMessage { get; set; } = "";
+
+        public PartitionResultMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public PartitionResultMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

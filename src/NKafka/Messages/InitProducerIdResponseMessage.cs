@@ -39,15 +39,33 @@ public sealed class InitProducerIdResponseMessage: ResponseMessage
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short ErrorCodeMessage { get; set; } = 0;
+
     /// <summary>
     /// The current producer id.
     /// </summary>
-    public long ProducerId { get; set; } = -1;
+    public long ProducerIdMessage { get; set; } = -1;
+
     /// <summary>
     /// The current epoch associated with the producer id.
     /// </summary>
-    public short ProducerEpoch { get; set; } = 0;
+    public short ProducerEpochMessage { get; set; } = 0;
+
+    public InitProducerIdResponseMessage()
+    {
+        ApiKey = ApiKeys.InitProducerId;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
+
+    public InitProducerIdResponseMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.InitProducerId;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version4;
+    }
 
     public override void Read(BufferReader reader, ApiVersions version)
     {

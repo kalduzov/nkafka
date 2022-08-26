@@ -39,12 +39,71 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The time in ms to wait for the request to complete.
     /// </summary>
-    public int TimeoutMs { get; set; } = 60000;
+    public int TimeoutMsMessage { get; set; } = 60000;
+
     /// <summary>
     /// The topics to list partition reassignments for, or null to list everything.
     /// </summary>
-    public List<ListPartitionReassignmentsTopicsMessage>? Topics { get; set; } = null;
+    public List<ListPartitionReassignmentsTopicsMessage> TopicsMessage { get; set; } = null;
+
+    public ListPartitionReassignmentsRequestMessage()
+    {
+        ApiKey = ApiKeys.ListPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public ListPartitionReassignmentsRequestMessage(BufferReader reader, ApiVersions version)
+        : base(reader, version)
+    {
+        Read(reader, version);
+        ApiKey = ApiKeys.ListPartitionReassignments;
+        LowestSupportedVersion = ApiVersions.Version0;
+        HighestSupportedVersion = ApiVersions.Version0;
+    }
+
+    public override void Read(BufferReader reader, ApiVersions version)
+    {
+    }
+
+    public override void Write(BufferWriter writer, ApiVersions version)
+    {
+    }
 
 
+    public sealed class ListPartitionReassignmentsTopicsMessage: Message
+    {
+        /// <summary>
+        /// The topic name
+        /// </summary>
+        public string NameMessage { get; set; } = "";
 
+        /// <summary>
+        /// The partitions to list partition reassignments for.
+        /// </summary>
+        public List<int> PartitionIndexesMessage { get; set; } = new ();
+
+        public ListPartitionReassignmentsTopicsMessage()
+        {
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public ListPartitionReassignmentsTopicsMessage(BufferReader reader, ApiVersions version)
+            : base(reader, version)
+        {
+            Read(reader, version);
+            LowestSupportedVersion = ApiVersions.Version0;
+            HighestSupportedVersion = ApiVersions.Version32767;
+        }
+
+        public override void Read(BufferReader reader, ApiVersions version)
+        {
+        }
+
+        public override void Write(BufferWriter writer, ApiVersions version)
+        {
+        }
+
+    }
 }

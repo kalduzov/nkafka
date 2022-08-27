@@ -78,7 +78,7 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = null;
 
         public CreatePartitionsTopicResultMessage()
         {

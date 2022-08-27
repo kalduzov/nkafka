@@ -133,7 +133,7 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
         /// </summary>
-        public string GroupInstanceId { get; set; } = null;
+        public string? GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The client ID used in the member's latest join group request.

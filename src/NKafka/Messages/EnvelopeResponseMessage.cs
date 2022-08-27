@@ -39,7 +39,7 @@ public sealed class EnvelopeResponseMessage: ResponseMessage
     /// <summary>
     /// The embedded response header and data.
     /// </summary>
-    public byte[] ResponseData { get; set; } = null;
+    public byte[]? ResponseData { get; set; } = null;
 
     /// <summary>
     /// The error code, or 0 if there was no error.

@@ -115,7 +115,7 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         /// <summary>
         /// The replicas to place the partitions on, or null to cancel a pending reassignment for this partition.
         /// </summary>
-        public List<int> Replicas { get; set; } = null;
+        public List<int>? Replicas { get; set; } = null;
 
         public ReassignablePartitionMessage()
         {

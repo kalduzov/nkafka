@@ -135,9 +135,23 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
 
     public sealed class AddPartitionsToTxnPartitionResultCollection: HashSet<AddPartitionsToTxnPartitionResultMessage>
     {
+        public AddPartitionsToTxnPartitionResultCollection()
+        {
+        }
+        public AddPartitionsToTxnPartitionResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
     {
+        public AddPartitionsToTxnTopicResultCollection()
+        {
+        }
+        public AddPartitionsToTxnTopicResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

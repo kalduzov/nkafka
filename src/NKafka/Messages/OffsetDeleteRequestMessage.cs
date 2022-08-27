@@ -137,5 +137,12 @@ public sealed class OffsetDeleteRequestMessage: RequestMessage
 
     public sealed class OffsetDeleteRequestTopicCollection: HashSet<OffsetDeleteRequestTopicMessage>
     {
+        public OffsetDeleteRequestTopicCollection()
+        {
+        }
+        public OffsetDeleteRequestTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

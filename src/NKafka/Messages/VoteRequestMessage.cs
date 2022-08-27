@@ -39,7 +39,7 @@ public sealed class VoteRequestMessage: RequestMessage
     /// <summary>
     /// 
     /// </summary>
-    public string ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = null;
 
     /// <summary>
     /// 

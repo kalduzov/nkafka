@@ -105,5 +105,12 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
 
     public sealed class RemainingPartitionCollection: HashSet<RemainingPartitionMessage>
     {
+        public RemainingPartitionCollection()
+        {
+        }
+        public RemainingPartitionCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

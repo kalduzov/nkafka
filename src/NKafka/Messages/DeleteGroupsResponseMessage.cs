@@ -100,5 +100,12 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
 
     public sealed class DeletableGroupResultCollection: HashSet<DeletableGroupResultMessage>
     {
+        public DeletableGroupResultCollection()
+        {
+        }
+        public DeletableGroupResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

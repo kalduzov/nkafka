@@ -134,7 +134,7 @@ public sealed class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
         /// </summary>
-        public string ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = null;
 
         public PartitionProduceResponseMessage()
         {
@@ -169,7 +169,7 @@ public sealed class ProduceResponseMessage: ResponseMessage
         /// <summary>
         /// The error message of the record that caused the batch to be dropped
         /// </summary>
-        public string BatchIndexErrorMessage { get; set; } = null;
+        public string? BatchIndexErrorMessage { get; set; } = null;
 
         public BatchIndexAndErrorMessageMessage()
         {
@@ -196,5 +196,12 @@ public sealed class ProduceResponseMessage: ResponseMessage
 
     public sealed class TopicProduceResponseCollection: HashSet<TopicProduceResponseMessage>
     {
+        public TopicProduceResponseCollection()
+        {
+        }
+        public TopicProduceResponseCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

@@ -54,7 +54,7 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// The time period in ms to retain the offset.

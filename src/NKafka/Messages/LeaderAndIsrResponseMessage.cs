@@ -110,6 +110,13 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
 
     public sealed class LeaderAndIsrTopicErrorCollection: HashSet<LeaderAndIsrTopicErrorMessage>
     {
+        public LeaderAndIsrTopicErrorCollection()
+        {
+        }
+        public LeaderAndIsrTopicErrorCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class LeaderAndIsrPartitionErrorMessage: Message

@@ -137,9 +137,23 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
 
     public sealed class AlterReplicaLogDirTopicCollection: HashSet<AlterReplicaLogDirTopicMessage>
     {
+        public AlterReplicaLogDirTopicCollection()
+        {
+        }
+        public AlterReplicaLogDirTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class AlterReplicaLogDirCollection: HashSet<AlterReplicaLogDirMessage>
     {
+        public AlterReplicaLogDirCollection()
+        {
+        }
+        public AlterReplicaLogDirCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

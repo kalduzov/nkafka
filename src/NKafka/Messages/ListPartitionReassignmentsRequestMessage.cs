@@ -44,7 +44,7 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage
     /// <summary>
     /// The topics to list partition reassignments for, or null to list everything.
     /// </summary>
-    public List<ListPartitionReassignmentsTopicsMessage> Topics { get; set; } = null;
+    public List<ListPartitionReassignmentsTopicsMessage>? Topics { get; set; } = null;
 
     public ListPartitionReassignmentsRequestMessage()
     {

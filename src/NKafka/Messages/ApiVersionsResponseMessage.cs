@@ -125,6 +125,13 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
     public sealed class ApiVersionCollection: HashSet<ApiVersionMessage>
     {
+        public ApiVersionCollection()
+        {
+        }
+        public ApiVersionCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class SupportedFeatureKeyMessage: Message
@@ -169,6 +176,13 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
     public sealed class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
     {
+        public SupportedFeatureKeyCollection()
+        {
+        }
+        public SupportedFeatureKeyCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class FinalizedFeatureKeyMessage: Message
@@ -213,5 +227,12 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
     public sealed class FinalizedFeatureKeyCollection: HashSet<FinalizedFeatureKeyMessage>
     {
+        public FinalizedFeatureKeyCollection()
+        {
+        }
+        public FinalizedFeatureKeyCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

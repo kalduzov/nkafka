@@ -180,5 +180,12 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
 
     public sealed class CreatableTopicResultCollection: HashSet<CreatableTopicResultMessage>
     {
+        public CreatableTopicResultCollection()
+        {
+        }
+        public CreatableTopicResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

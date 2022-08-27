@@ -147,5 +147,12 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
 
     public sealed class CreatePartitionsTopicCollection: HashSet<CreatePartitionsTopicMessage>
     {
+        public CreatePartitionsTopicCollection()
+        {
+        }
+        public CreatePartitionsTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

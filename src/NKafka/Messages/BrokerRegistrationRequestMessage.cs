@@ -137,6 +137,13 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
 
     public sealed class ListenerCollection: HashSet<ListenerMessage>
     {
+        public ListenerCollection()
+        {
+        }
+        public ListenerCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class FeatureMessage: Message
@@ -181,5 +188,12 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
 
     public sealed class FeatureCollection: HashSet<FeatureMessage>
     {
+        public FeatureCollection()
+        {
+        }
+        public FeatureCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

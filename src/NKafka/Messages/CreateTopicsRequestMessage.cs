@@ -162,6 +162,13 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
     public sealed class CreatableReplicaAssignmentCollection: HashSet<CreatableReplicaAssignmentMessage>
     {
+        public CreatableReplicaAssignmentCollection()
+        {
+        }
+        public CreatableReplicaAssignmentCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class CreateableTopicConfigMessage: Message
@@ -201,9 +208,23 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
     public sealed class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
     {
+        public CreateableTopicConfigCollection()
+        {
+        }
+        public CreateableTopicConfigCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class CreatableTopicCollection: HashSet<CreatableTopicMessage>
     {
+        public CreatableTopicCollection()
+        {
+        }
+        public CreatableTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

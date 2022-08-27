@@ -44,12 +44,12 @@ public sealed class SyncGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The group protocol type.
     /// </summary>
-    public string ProtocolType { get; set; } = null;
+    public string? ProtocolType { get; set; } = null;
 
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string ProtocolName { get; set; } = null;
+    public string? ProtocolName { get; set; } = null;
 
     /// <summary>
     /// The member assignment.

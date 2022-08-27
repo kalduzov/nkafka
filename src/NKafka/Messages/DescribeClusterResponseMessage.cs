@@ -44,7 +44,7 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = null;
+    public string? ErrorMessage { get; set; } = null;
 
     /// <summary>
     /// The cluster ID that responding broker belongs to.
@@ -108,7 +108,7 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
         /// <summary>
         /// The rack of the broker, or null if it has not been assigned to a rack.
         /// </summary>
-        public string Rack { get; set; } = null;
+        public string? Rack { get; set; } = null;
 
         public DescribeClusterBrokerMessage()
         {
@@ -135,5 +135,12 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
 
     public sealed class DescribeClusterBrokerCollection: HashSet<DescribeClusterBrokerMessage>
     {
+        public DescribeClusterBrokerCollection()
+        {
+        }
+        public DescribeClusterBrokerCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

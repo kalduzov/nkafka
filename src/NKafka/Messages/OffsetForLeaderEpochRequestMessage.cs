@@ -147,5 +147,12 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
 
     public sealed class OffsetForLeaderTopicCollection: HashSet<OffsetForLeaderTopicMessage>
     {
+        public OffsetForLeaderTopicCollection()
+        {
+        }
+        public OffsetForLeaderTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

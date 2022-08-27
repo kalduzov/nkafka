@@ -80,7 +80,7 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = null;
+        public string? Name { get; set; } = null;
 
         /// <summary>
         /// The unique topic ID

@@ -117,5 +117,12 @@ public sealed class AddPartitionsToTxnRequestMessage: RequestMessage
 
     public sealed class AddPartitionsToTxnTopicCollection: HashSet<AddPartitionsToTxnTopicMessage>
     {
+        public AddPartitionsToTxnTopicCollection()
+        {
+        }
+        public AddPartitionsToTxnTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

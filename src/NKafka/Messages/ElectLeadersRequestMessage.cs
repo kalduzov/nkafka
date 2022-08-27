@@ -112,5 +112,12 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
 
     public sealed class TopicPartitionsCollection: HashSet<TopicPartitionsMessage>
     {
+        public TopicPartitionsCollection()
+        {
+        }
+        public TopicPartitionsCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

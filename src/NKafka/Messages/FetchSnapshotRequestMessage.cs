@@ -39,7 +39,7 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
     /// <summary>
     /// The clusterId if known, this is used to validate metadata fetches prior to broker registration
     /// </summary>
-    public string ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = null;
 
     /// <summary>
     /// The broker ID of the follower

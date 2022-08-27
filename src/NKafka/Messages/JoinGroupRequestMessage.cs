@@ -59,7 +59,7 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// The unique name the for class of protocols implemented by the group we want to join.
@@ -74,7 +74,7 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The reason why the member (re-)joins the group.
     /// </summary>
-    public string Reason { get; set; } = null;
+    public string? Reason { get; set; } = null;
 
     public JoinGroupRequestMessage()
     {
@@ -137,5 +137,12 @@ public sealed class JoinGroupRequestMessage: RequestMessage
 
     public sealed class JoinGroupRequestProtocolCollection: HashSet<JoinGroupRequestProtocolMessage>
     {
+        public JoinGroupRequestProtocolCollection()
+        {
+        }
+        public JoinGroupRequestProtocolCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

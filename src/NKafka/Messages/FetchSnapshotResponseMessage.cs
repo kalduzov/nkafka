@@ -138,7 +138,7 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         /// <summary>
         /// Snapshot data in records format which may not be aligned on an offset boundary
         /// </summary>
-        public RecordBatch UnalignedRecords { get; set; } = null;
+        public RecordBatch? UnalignedRecords { get; set; } = null;
 
         public PartitionSnapshotMessage()
         {

@@ -113,7 +113,7 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         /// <summary>
         /// The partition error message, which may be null if no additional details are available
         /// </summary>
-        public string ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = null;
 
         /// <summary>
         /// 

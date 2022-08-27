@@ -115,5 +115,12 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
 
     public sealed class UpdatableFeatureResultCollection: HashSet<UpdatableFeatureResultMessage>
     {
+        public UpdatableFeatureResultCollection()
+        {
+        }
+        public UpdatableFeatureResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

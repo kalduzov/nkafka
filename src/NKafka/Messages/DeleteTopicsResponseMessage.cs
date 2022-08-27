@@ -83,7 +83,7 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = null;
+        public string? ErrorMessage { get; set; } = null;
 
         public DeletableTopicResultMessage()
         {
@@ -110,5 +110,12 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
 
     public sealed class DeletableTopicResultCollection: HashSet<DeletableTopicResultMessage>
     {
+        public DeletableTopicResultCollection()
+        {
+        }
+        public DeletableTopicResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

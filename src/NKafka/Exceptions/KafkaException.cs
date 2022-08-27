@@ -23,7 +23,7 @@
 
 namespace NKafka.Exceptions;
 
-public abstract class KafkaException : Exception
+public abstract class KafkaException: Exception
 {
     protected KafkaException(string message)
         : base(message)

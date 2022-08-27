@@ -165,5 +165,12 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
 
     public sealed class TopicDataCollection: HashSet<TopicDataMessage>
     {
+        public TopicDataCollection()
+        {
+        }
+        public TopicDataCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

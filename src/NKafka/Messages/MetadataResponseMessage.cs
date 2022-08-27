@@ -30,6 +30,7 @@
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
+
 using System.Text;
 
 namespace NKafka.Messages;
@@ -39,12 +40,12 @@ public sealed class MetadataResponseMessage: ResponseMessage
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public MetadataResponseBrokerCollection Brokers { get; set; } = new ();
+    public MetadataResponseBrokerCollection Brokers { get; set; } = new();
 
     /// <summary>
     /// The cluster ID that responding broker belongs to.
     /// </summary>
-    public string ClusterId { get; set; } = null;
+    public string? ClusterId { get; set; } = null;
 
     /// <summary>
     /// The ID of the controller broker.
@@ -54,7 +55,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public MetadataResponseTopicCollection Topics { get; set; } = new ();
+    public MetadataResponseTopicCollection Topics { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.
@@ -103,7 +104,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// The rack of the broker, or null if it has not been assigned to a rack.
         /// </summary>
-        public string Rack { get; set; } = null;
+        public string? Rack { get; set; } = null;
 
         public MetadataResponseBrokerMessage()
         {
@@ -130,6 +131,14 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
     public sealed class MetadataResponseBrokerCollection: HashSet<MetadataResponseBrokerMessage>
     {
+        public MetadataResponseBrokerCollection()
+        {
+        }
+
+        public MetadataResponseBrokerCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class MetadataResponseTopicMessage: Message
@@ -157,7 +166,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// Each partition in the topic.
         /// </summary>
-        public List<MetadataResponsePartitionMessage> Partitions { get; set; } = new ();
+        public List<MetadataResponsePartitionMessage> Partitions { get; set; } = new();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this topic.
@@ -212,17 +221,17 @@ public sealed class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// The set of all nodes that host this partition.
         /// </summary>
-        public List<int> ReplicaNodes { get; set; } = new ();
+        public List<int> ReplicaNodes { get; set; } = new();
 
         /// <summary>
         /// The set of nodes that are in sync with the leader for this partition.
         /// </summary>
-        public List<int> IsrNodes { get; set; } = new ();
+        public List<int> IsrNodes { get; set; } = new();
 
         /// <summary>
         /// The set of offline replicas of this partition.
         /// </summary>
-        public List<int> OfflineReplicas { get; set; } = new ();
+        public List<int> OfflineReplicas { get; set; } = new();
 
         public MetadataResponsePartitionMessage()
         {
@@ -249,5 +258,13 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
     public sealed class MetadataResponseTopicCollection: HashSet<MetadataResponseTopicMessage>
     {
+        public MetadataResponseTopicCollection()
+        {
+        }
+
+        public MetadataResponseTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

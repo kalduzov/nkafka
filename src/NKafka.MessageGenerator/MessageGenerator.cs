@@ -131,9 +131,26 @@ public class MessageGenerator: IMessageGenerator
 
     private void GenerateCollection(string className, StructSpecification messageStruct)
     {
+        var collectionName = FieldSpecification.CollectionType(messageStruct.Name);
         _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"public sealed class {FieldSpecification.CollectionType(messageStruct.Name)}: HashSet<{className}>");
+        _codeBuffer.AppendLine($"public sealed class {collectionName}: HashSet<{className}>");
         _codeBuffer.AppendLine("{");
+        
+        _codeBuffer.IncrementIndent();
+        
+        _codeBuffer.AppendLine($"public {collectionName}()");
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.AppendLine("}");
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine($"public {collectionName}(int capacity)");
+        _codeBuffer.IncrementIndent();
+        _codeBuffer.AppendLine(": base(capacity)");
+        _codeBuffer.DecrementIndent();
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.AppendLine("}");
+        
+        _codeBuffer.DecrementIndent();
+        
         _codeBuffer.AppendLine("}");
     }
 
@@ -213,7 +230,9 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.AppendLine($"/// </summary>");
 
         var type = field.FieldAbstractClrType(_structRegistry);
-        _codeBuffer.AppendLine($"public {type} {field.Name} {{ get; set; }} = {field.FieldDefault()};");
+        var defaultValue = field.FieldDefault();
+        var nullableMarker = defaultValue.Equals("null") ? "?" : string.Empty;
+        _codeBuffer.AppendLine($"public {type}{nullableMarker} {field.Name} {{ get; set; }} = {defaultValue};");
     }
 
     private void GenerateClassHeader(string className, bool isTopLevel, MessageType? messageType)
@@ -232,21 +251,4 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.AppendLine($"public sealed class {className}: {string.Join(", ", implementedInterfaces)}");
         _codeBuffer.AppendLine("{");
     }
-
-    // public StringBuilder Generate()
-    // {
-    //     var builder = new StringBuilder();
-    //
-    //     _headerGenerator.AppendUsing("System.Text");
-    //     _headerGenerator.AppendUsing("NKafka.Protocol");
-    //     _headerGenerator.AppendUsing("NKafka.Protocol.Records");
-    //     _headerGenerator.AppendUsing("NKafka.Protocol.Extensions");
-    //
-    //     var header = _headerGenerator.Generate();
-    //     builder.Append(header);
-    //     var @class = _classGenerator.Generate();
-    //     builder.Append(@class);
-    //
-    //     return builder;
-    // }
 }

@@ -106,7 +106,7 @@ public sealed class Versions: IEquatable<Versions>
         return new Versions(newLowest, newHighest);
     }
 
-    public static Versions operator -(Versions one, Versions two)
+    public static Versions? operator -(Versions one, Versions two)
     {
         if (two.Lowest <= one.Lowest)
         {
@@ -120,7 +120,7 @@ public sealed class Versions: IEquatable<Versions>
 
         if (two.Highest < one.Highest)
         {
-            return null!;
+            return null;
         }
 
         var newHighest = two.Lowest - 1;

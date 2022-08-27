@@ -54,17 +54,17 @@ public sealed class SyncGroupRequestMessage: RequestMessage
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// The group protocol type.
     /// </summary>
-    public string ProtocolType { get; set; } = null;
+    public string? ProtocolType { get; set; } = null;
 
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string ProtocolName { get; set; } = null;
+    public string? ProtocolName { get; set; } = null;
 
     /// <summary>
     /// Each assignment.

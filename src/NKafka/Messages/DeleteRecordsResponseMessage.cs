@@ -140,9 +140,23 @@ public sealed class DeleteRecordsResponseMessage: ResponseMessage
 
     public sealed class DeleteRecordsPartitionResultCollection: HashSet<DeleteRecordsPartitionResultMessage>
     {
+        public DeleteRecordsPartitionResultCollection()
+        {
+        }
+        public DeleteRecordsPartitionResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class DeleteRecordsTopicResultCollection: HashSet<DeleteRecordsTopicResultMessage>
     {
+        public DeleteRecordsTopicResultCollection()
+        {
+        }
+        public DeleteRecordsTopicResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

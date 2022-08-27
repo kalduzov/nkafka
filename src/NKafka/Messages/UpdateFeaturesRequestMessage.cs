@@ -122,5 +122,12 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
 
     public sealed class FeatureUpdateKeyCollection: HashSet<FeatureUpdateKeyMessage>
     {
+        public FeatureUpdateKeyCollection()
+        {
+        }
+        public FeatureUpdateKeyCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

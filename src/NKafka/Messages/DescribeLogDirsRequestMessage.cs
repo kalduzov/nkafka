@@ -102,5 +102,12 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
 
     public sealed class DescribableLogDirTopicCollection: HashSet<DescribableLogDirTopicMessage>
     {
+        public DescribableLogDirTopicCollection()
+        {
+        }
+        public DescribableLogDirTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

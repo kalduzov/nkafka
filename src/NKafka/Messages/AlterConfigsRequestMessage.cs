@@ -147,9 +147,23 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
 
     public sealed class AlterableConfigCollection: HashSet<AlterableConfigMessage>
     {
+        public AlterableConfigCollection()
+        {
+        }
+        public AlterableConfigCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
     {
+        public AlterConfigsResourceCollection()
+        {
+        }
+        public AlterConfigsResourceCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

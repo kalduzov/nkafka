@@ -49,7 +49,7 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The group protocol name.
     /// </summary>
-    public string ProtocolType { get; set; } = null;
+    public string? ProtocolType { get; set; } = null;
 
     /// <summary>
     /// The group protocol selected by the coordinator.
@@ -108,7 +108,7 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
         /// </summary>
-        public string GroupInstanceId { get; set; } = null;
+        public string? GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The group member metadata.

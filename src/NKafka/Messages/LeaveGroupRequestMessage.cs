@@ -85,12 +85,12 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
         /// <summary>
         /// The group instance ID to remove from the group.
         /// </summary>
-        public string GroupInstanceId { get; set; } = null;
+        public string? GroupInstanceId { get; set; } = null;
 
         /// <summary>
         /// The reason why the member left the group.
         /// </summary>
-        public string Reason { get; set; } = null;
+        public string? Reason { get; set; } = null;
 
         public MemberIdentityMessage()
         {

@@ -69,7 +69,7 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
     /// </summary>
-    public string GroupInstanceId { get; set; } = null;
+    public string? GroupInstanceId { get; set; } = null;
 
     /// <summary>
     /// Each topic that we want to commit offsets for.

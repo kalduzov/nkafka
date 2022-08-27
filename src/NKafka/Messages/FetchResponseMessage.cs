@@ -168,7 +168,7 @@ public sealed class FetchResponseMessage: ResponseMessage
         /// <summary>
         /// The record data.
         /// </summary>
-        public RecordBatch Records { get; set; } = null;
+        public RecordBatch? Records { get; set; } = null;
 
         public PartitionDataMessage()
         {

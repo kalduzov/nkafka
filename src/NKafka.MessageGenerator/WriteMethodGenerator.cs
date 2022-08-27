@@ -193,6 +193,15 @@ public class WriteMethodGenerator: Generator, IWriteMethodGenerator
     {
         _codeBuffer.AppendLine("internal override void Write(BufferWriter writer, ApiVersions version)");
         _codeBuffer.AppendLine("{");
+        _codeBuffer.IncrementIndent();
+
+        VersionConditional.ForVersions(structSpecification.Versions, parentVersions)
+            .AllowMembershipCheckAlwaysFalse(false)
+            .IfNotMember(
+                _ => { _codeBuffer.AppendLine($"throw new UnsupportedVersionException($\"Can't write version {{version}} of {className}\");"); })
+            .Generate(_codeBuffer);
+
+        _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("}");
     }
 }

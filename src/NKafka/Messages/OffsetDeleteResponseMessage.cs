@@ -140,9 +140,23 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
 
     public sealed class OffsetDeleteResponsePartitionCollection: HashSet<OffsetDeleteResponsePartitionMessage>
     {
+        public OffsetDeleteResponsePartitionCollection()
+        {
+        }
+        public OffsetDeleteResponsePartitionCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 
     public sealed class OffsetDeleteResponseTopicCollection: HashSet<OffsetDeleteResponseTopicMessage>
     {
+        public OffsetDeleteResponseTopicCollection()
+        {
+        }
+        public OffsetDeleteResponseTopicCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

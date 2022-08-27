@@ -39,7 +39,7 @@ public sealed class ProduceRequestMessage: RequestMessage
     /// <summary>
     /// The transactional ID, or null if the producer is not transactional.
     /// </summary>
-    public string TransactionalId { get; set; } = null;
+    public string? TransactionalId { get; set; } = null;
 
     /// <summary>
     /// The number of acknowledgments the producer requires the leader to have received before considering a request complete. Allowed values: 0 for no acknowledgments, 1 for only the leader and -1 for the full ISR.
@@ -125,7 +125,7 @@ public sealed class ProduceRequestMessage: RequestMessage
         /// <summary>
         /// The record data to be produced.
         /// </summary>
-        public RecordBatch Records { get; set; } = null;
+        public RecordBatch? Records { get; set; } = null;
 
         public PartitionProduceDataMessage()
         {
@@ -152,5 +152,12 @@ public sealed class ProduceRequestMessage: RequestMessage
 
     public sealed class TopicProduceDataCollection: HashSet<TopicProduceDataMessage>
     {
+        public TopicProduceDataCollection()
+        {
+        }
+        public TopicProduceDataCollection(int capacity)
+            : base(capacity)
+        {
+        }
     }
 }

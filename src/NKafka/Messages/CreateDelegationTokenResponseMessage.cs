@@ -108,5 +108,86 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalType);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (TokenRequesterPrincipalType.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalType at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (TokenRequesterPrincipalName.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalName at version {version}");
+            }
+        }
+        writer.WriteLong(IssueTimestampMs);
+        writer.WriteLong(ExpiryTimestampMs);
+        writer.WriteLong(MaxTimestampMs);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(TokenId);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Hmac.Length + 1);
+        }
+        else
+        {
+            writer.WriteInt(Hmac.Length);
+        }
+        writer.WriteBytes(Hmac);
+        writer.WriteInt(ThrottleTimeMs);
     }
 }

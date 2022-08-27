@@ -69,6 +69,22 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (ClusterId is null)
+        {
+            writer.WriteShort(-1);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+            writer.WriteShort((short)stringBytes.Length);
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(Topics.Count);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicDataMessage: Message
@@ -103,6 +119,17 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Partitions.Count);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -143,6 +170,10 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(LeaderId);
+            writer.WriteInt(LeaderEpoch);
         }
     }
 }

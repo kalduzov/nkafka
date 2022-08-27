@@ -79,6 +79,18 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (ClusterId is not null)
+        {
+            numTaggedFields++;
+        }
+        writer.WriteInt(ReplicaId);
+        writer.WriteInt(MaxBytes);
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicSnapshotMessage: Message
@@ -113,6 +125,17 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -158,6 +181,11 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Partition);
+            writer.WriteInt(CurrentLeaderEpoch);
+            SnapshotId.Write(writer, version);
+            writer.WriteLong(Position);
         }
     }
 
@@ -193,6 +221,9 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteLong(EndOffset);
+            writer.WriteInt(Epoch);
         }
     }
 }

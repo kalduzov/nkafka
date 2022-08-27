@@ -69,5 +69,11 @@ public sealed class ControlledShutdownRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(BrokerId);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteLong(BrokerEpoch);
+        }
     }
 }

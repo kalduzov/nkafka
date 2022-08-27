@@ -79,5 +79,53 @@ public sealed class InitProducerIdRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (TransactionalId is null)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteShort(-1);
+            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(TransactionTimeoutMs);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteLong(ProducerId);
+        }
+        else
+        {
+            if (ProducerId != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ProducerId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteShort(ProducerEpoch);
+        }
+        else
+        {
+            if (ProducerEpoch != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ProducerEpoch at version {version}");
+            }
+        }
     }
 }

@@ -67,5 +67,14 @@ namespace NKafka.Resources {
                 return ResourceManager.GetString("ClusterInitFailed", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kafka message header key cannot be null.
+        /// </summary>
+        internal static string Kafka_message_header_key_cannot_be_null {
+            get {
+                return ResourceManager.GetString("Kafka_message_header_key_cannot_be_null", resourceCulture);
+            }
+        }
     }
 }

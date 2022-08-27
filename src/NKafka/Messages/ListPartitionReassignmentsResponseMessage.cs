@@ -72,6 +72,24 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        if (ErrorMessage is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class OngoingTopicReassignmentMessage: Message
@@ -106,6 +124,17 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -151,6 +180,23 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteVarUInt(Replicas.Count + 1);
+            foreach (var element in Replicas)
+            {
+                writer.WriteInt(element);
+            }
+            writer.WriteVarUInt(AddingReplicas.Count + 1);
+            foreach (var element in AddingReplicas)
+            {
+                writer.WriteInt(element);
+            }
+            writer.WriteVarUInt(RemovingReplicas.Count + 1);
+            foreach (var element in RemovingReplicas)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 }

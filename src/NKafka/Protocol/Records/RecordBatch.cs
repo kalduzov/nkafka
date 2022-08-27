@@ -23,7 +23,7 @@
 
 namespace NKafka.Protocol.Records;
 
-public class RecordBatch
+public class RecordBatch: List<Record>
 {
     /// <summary>
     /// Denotes the first offset in the RecordBatch. The 'offsetDelta' of each Record in the batch would be be computed relative to this FirstOffset.
@@ -31,8 +31,7 @@ public class RecordBatch
     /// </summary>
     public long FirstOffset { get; set; }
 
-  
-    public int Lenght { get; set; }
+    public int Length { get; set; }
 
     /// <summary>
     /// Introduced with KIP-101, this is set by the broker upon receipt of a produce request and is used to ensure no loss of data when there are
@@ -83,4 +82,6 @@ public class RecordBatch
     public int FirstSequence { get; set; }
 
     public IReadOnlyCollection<Record> Records { get; set; }
+
+    public byte[] Buffer { get; set; }
 }

@@ -69,6 +69,24 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(Components.Count + 1);
+            foreach (var element in Components)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Components.Count);
+            foreach (var element in Components)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteBool(Strict);
     }
 
     public sealed class ComponentDataMessage: Message
@@ -108,6 +126,44 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(EntityType);
+                if (version >= ApiVersions.Version1)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(MatchType);
+            if (Match is null)
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Match);
+                if (version >= ApiVersions.Version1)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

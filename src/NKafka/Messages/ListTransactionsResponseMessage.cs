@@ -72,6 +72,23 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteVarUInt(UnknownStateFilters.Count + 1);
+        foreach (var element in UnknownStateFilters)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(element);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        writer.WriteVarUInt(TransactionStates.Count + 1);
+        foreach (var element in TransactionStates)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TransactionStateMessage: Message
@@ -111,6 +128,18 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteLong(ProducerId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionState);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

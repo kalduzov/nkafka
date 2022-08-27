@@ -74,5 +74,58 @@ public sealed class FindCoordinatorRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version <= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Key);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (Key.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Key at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteSByte(KeyType);
+        }
+        else
+        {
+            if (KeyType != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default KeyType at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(CoordinatorKeys.Count + 1);
+            foreach (var element in CoordinatorKeys)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        else
+        {
+            if (CoordinatorKeys.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default CoordinatorKeys at version {version}");
+            }
+        }
     }
 }

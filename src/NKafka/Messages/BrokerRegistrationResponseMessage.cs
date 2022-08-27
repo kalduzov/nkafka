@@ -67,5 +67,9 @@ public sealed class BrokerRegistrationResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteLong(BrokerEpoch);
     }
 }

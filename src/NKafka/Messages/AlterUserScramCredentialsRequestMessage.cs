@@ -69,6 +69,17 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteVarUInt(Deletions.Count + 1);
+        foreach (var element in Deletions)
+        {
+            element.Write(writer, version);
+        }
+        writer.WriteVarUInt(Upsertions.Count + 1);
+        foreach (var element in Upsertions)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class ScramCredentialDeletionMessage: Message
@@ -103,6 +114,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(Mechanism);
         }
     }
 
@@ -153,6 +171,18 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(Mechanism);
+            writer.WriteInt(Iterations);
+            writer.WriteVarUInt(Salt.Length + 1);
+            writer.WriteBytes(Salt);
+            writer.WriteVarUInt(SaltedPassword.Length + 1);
+            writer.WriteBytes(SaltedPassword);
         }
     }
 }

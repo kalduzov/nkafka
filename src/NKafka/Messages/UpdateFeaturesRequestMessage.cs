@@ -74,6 +74,24 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(timeoutMs);
+        writer.WriteVarUInt(FeatureUpdates.Count + 1);
+        foreach (var element in FeatureUpdates)
+        {
+            element.Write(writer, version);
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteBool(ValidateOnly);
+        }
+        else
+        {
+            if (ValidateOnly)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ValidateOnly at version {version}");
+            }
+        }
     }
 
     public sealed class FeatureUpdateKeyMessage: Message
@@ -118,6 +136,35 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Feature);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(MaxVersionLevel);
+            if (version <= ApiVersions.Version0)
+            {
+                writer.WriteBool(AllowDowngrade);
+            }
+            else
+            {
+                if (AllowDowngrade)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default AllowDowngrade at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(UpgradeType);
+            }
+            else
+            {
+                if (UpgradeType != 1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default UpgradeType at version {version}");
+                }
+            }
         }
     }
 

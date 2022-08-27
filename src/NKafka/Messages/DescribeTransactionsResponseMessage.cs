@@ -62,6 +62,13 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteVarUInt(TransactionStates.Count + 1);
+        foreach (var element in TransactionStates)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TransactionStateMessage: Message
@@ -126,6 +133,27 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionState);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(TransactionTimeoutMs);
+            writer.WriteLong(TransactionStartTimeMs);
+            writer.WriteLong(ProducerId);
+            writer.WriteShort(ProducerEpoch);
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -161,6 +189,17 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 

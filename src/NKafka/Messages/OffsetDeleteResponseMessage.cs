@@ -67,6 +67,14 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteInt(Topics.Count);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class OffsetDeleteResponseTopicMessage: Message
@@ -101,6 +109,17 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Partitions.Count);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -136,6 +155,9 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
         }
     }
 

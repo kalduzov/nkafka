@@ -89,6 +89,92 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version8)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(GenerationId);
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            if (GroupInstanceId is null)
+            {
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupInstanceId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version4)
+        {
+            writer.WriteLong(RetentionTimeMs);
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class OffsetCommitRequestTopicMessage: Message
@@ -123,6 +209,35 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version8)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -173,6 +288,48 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteLong(CommittedOffset);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteInt(CommittedLeaderEpoch);
+            }
+            if (version >= ApiVersions.Version1 && version <= ApiVersions.Version1)
+            {
+                writer.WriteLong(CommitTimestamp);
+            }
+            else
+            {
+                if (CommitTimestamp != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default CommitTimestamp at version {version}");
+                }
+            }
+            if (CommittedMetadata is null)
+            {
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
+                if (version >= ApiVersions.Version8)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

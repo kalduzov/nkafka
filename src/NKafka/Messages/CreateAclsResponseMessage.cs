@@ -62,6 +62,24 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Results.Count + 1);
+            foreach (var element in Results)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Results.Count);
+            foreach (var element in Results)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class AclCreationResultMessage: Message
@@ -96,6 +114,32 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

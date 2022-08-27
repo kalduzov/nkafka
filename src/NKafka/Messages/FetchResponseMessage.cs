@@ -72,6 +72,42 @@ public sealed class FetchResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            writer.WriteShort(ErrorCode);
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            writer.WriteInt(SessionId);
+        }
+        else
+        {
+            if (SessionId != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default SessionId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version12)
+        {
+            writer.WriteVarUInt(Responses.Count + 1);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Responses.Count);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class FetchableTopicResponseMessage: Message
@@ -111,6 +147,42 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version12)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                    if (version >= ApiVersions.Version12)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version13)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -191,6 +263,127 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
+            writer.WriteLong(HighWatermark);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteLong(LastStableOffset);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteLong(LogStartOffset);
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                if (DivergingEpoch.Equals(new ()))
+                {
+                    numTaggedFields++;
+                }
+            }
+            else
+            {
+                if (DivergingEpoch.Equals(new ()))
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default DivergingEpoch at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                if (CurrentLeader.Equals(new ()))
+                {
+                    numTaggedFields++;
+                }
+            }
+            else
+            {
+                if (CurrentLeader.Equals(new ()))
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default CurrentLeader at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                if (SnapshotId.Equals(new ()))
+                {
+                    numTaggedFields++;
+                }
+            }
+            else
+            {
+                if (SnapshotId.Equals(new ()))
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default SnapshotId at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                if (version >= ApiVersions.Version12)
+                {
+                    if (AbortedTransactions is null)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteVarUInt(AbortedTransactions.Count + 1);
+                        foreach (var element in AbortedTransactions)
+                        {
+                            element.Write(writer, version);
+                        }
+                    }
+                }
+                else
+                {
+                    if (AbortedTransactions is null)
+                    {
+                        writer.WriteInt(-1);
+                    }
+                    else
+                    {
+                        writer.WriteInt(AbortedTransactions.Count);
+                        foreach (var element in AbortedTransactions)
+                        {
+                            element.Write(writer, version);
+                        }
+                    }
+                }
+            }
+            if (version >= ApiVersions.Version11)
+            {
+                writer.WriteInt(PreferredReadReplica);
+            }
+            else
+            {
+                if (PreferredReadReplica != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default PreferredReadReplica at version {version}");
+                }
+            }
+            if (Records is null)
+            {
+                if (version >= ApiVersions.Version12)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteInt(-1);
+                }
+            }
+            else
+            {
+                if (version >= ApiVersions.Version12)
+                {
+                    writer.WriteVarUInt(Records.Length + 1);
+                }
+                else
+                {
+                    writer.WriteInt(Records.Length);
+                }
+                writer.WriteRecords(Records);
+            }
         }
     }
 
@@ -226,6 +419,13 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of EpochEndOffsetMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(Epoch);
+            writer.WriteLong(EndOffset);
         }
     }
 
@@ -261,6 +461,13 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of LeaderIdAndEpochMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(LeaderId);
+            writer.WriteInt(LeaderEpoch);
         }
     }
 
@@ -296,6 +503,13 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of SnapshotIdMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteLong(EndOffset);
+            writer.WriteInt(Epoch);
         }
     }
 
@@ -331,6 +545,13 @@ public sealed class FetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of AbortedTransactionMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteLong(ProducerId);
+            writer.WriteLong(FirstOffset);
         }
     }
 }

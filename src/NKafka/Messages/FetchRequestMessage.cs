@@ -114,6 +114,90 @@ public sealed class FetchRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version12)
+        {
+            if (ClusterId is not null)
+            {
+                numTaggedFields++;
+            }
+        }
+        writer.WriteInt(ReplicaId);
+        writer.WriteInt(MaxWaitMs);
+        writer.WriteInt(MinBytes);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteInt(MaxBytes);
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteSByte(IsolationLevel);
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            writer.WriteInt(SessionId);
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            writer.WriteInt(SessionEpoch);
+        }
+        if (version >= ApiVersions.Version12)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(ForgottenTopicsData.Count + 1);
+                foreach (var element in ForgottenTopicsData)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(ForgottenTopicsData.Count);
+                foreach (var element in ForgottenTopicsData)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (ForgottenTopicsData.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ForgottenTopicsData at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version11)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(RackId);
+                if (version >= ApiVersions.Version12)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
     }
 
     public sealed class FetchTopicMessage: Message
@@ -153,6 +237,42 @@ public sealed class FetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version12)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                    if (version >= ApiVersions.Version12)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version13)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -208,6 +328,29 @@ public sealed class FetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Partition);
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteInt(CurrentLeaderEpoch);
+            }
+            writer.WriteLong(FetchOffset);
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteInt(LastFetchedEpoch);
+            }
+            else
+            {
+                if (LastFetchedEpoch != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default LastFetchedEpoch at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteLong(LogStartOffset);
+            }
+            writer.WriteInt(PartitionMaxBytes);
         }
     }
 
@@ -248,6 +391,42 @@ public sealed class FetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of ForgottenTopicMessage");
+            }
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version12)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                    if (version >= ApiVersions.Version12)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version13)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+            }
+            foreach (var element in Partitions)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 }

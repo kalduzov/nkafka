@@ -94,6 +94,81 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ControllerId);
+        writer.WriteInt(ControllerEpoch);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteLong(BrokerEpoch);
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteSByte(Type);
+        }
+        else
+        {
+            if (Type != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Type at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version1)
+        {
+            writer.WriteInt(UngroupedPartitionStates.Count);
+            foreach (var element in UngroupedPartitionStates)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (UngroupedPartitionStates.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default UngroupedPartitionStates at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(TopicStates.Count + 1);
+                foreach (var element in TopicStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(TopicStates.Count);
+                foreach (var element in TopicStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (TopicStates.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TopicStates at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(LiveLeaders.Count + 1);
+            foreach (var element in LiveLeaders)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(LiveLeaders.Count);
+            foreach (var element in LiveLeaders)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class LeaderAndIsrTopicStateMessage: Message
@@ -133,6 +208,43 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version2)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of LeaderAndIsrTopicStateMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(PartitionStates.Count + 1);
+                foreach (var element in PartitionStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionStates.Count);
+                foreach (var element in PartitionStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -173,6 +285,21 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(BrokerId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(HostName);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Port);
         }
     }
 
@@ -258,6 +385,89 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version1)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(ControllerEpoch);
+            writer.WriteInt(Leader);
+            writer.WriteInt(LeaderEpoch);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Isr.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Isr.Count);
+            }
+            foreach (var element in Isr)
+            {
+                writer.WriteInt(element);
+            }
+            writer.WriteInt(PartitionEpoch);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Replicas.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Replicas.Count);
+            }
+            foreach (var element in Replicas)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(AddingReplicas.Count + 1);
+                }
+                else
+                {
+                    writer.WriteInt(AddingReplicas.Count);
+                }
+                foreach (var element in AddingReplicas)
+                {
+                    writer.WriteInt(element);
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(RemovingReplicas.Count + 1);
+                }
+                else
+                {
+                    writer.WriteInt(RemovingReplicas.Count);
+                }
+                foreach (var element in RemovingReplicas)
+                {
+                    writer.WriteInt(element);
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteBool(IsNew);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteSByte(LeaderRecoveryState);
+            }
+            else
+            {
+                if (LeaderRecoveryState != 0)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default LeaderRecoveryState at version {version}");
+                }
+            }
         }
     }
 }

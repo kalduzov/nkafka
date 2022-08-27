@@ -79,6 +79,64 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            if (OwnerPrincipalType is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(OwnerPrincipalType);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (OwnerPrincipalType is not null || OwnerPrincipalType.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default OwnerPrincipalType at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (OwnerPrincipalName is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(OwnerPrincipalName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (OwnerPrincipalName is not null || OwnerPrincipalName.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default OwnerPrincipalName at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Renewers.Count + 1);
+            foreach (var element in Renewers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Renewers.Count);
+            foreach (var element in Renewers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteLong(MaxLifetimeMs);
     }
 
     public sealed class CreatableRenewersMessage: Message
@@ -113,6 +171,31 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

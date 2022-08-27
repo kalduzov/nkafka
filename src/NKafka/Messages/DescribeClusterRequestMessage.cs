@@ -64,5 +64,7 @@ public sealed class DescribeClusterRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteBool(IncludeClusterAuthorizedOperations);
     }
 }

@@ -79,6 +79,59 @@ public sealed class ProduceRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            if (TransactionalId is null)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (TransactionalId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TransactionalId at version {version}");
+            }
+        }
+        writer.WriteShort(Acks);
+        writer.WriteInt(TimeoutMs);
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(TopicData.Count + 1);
+            foreach (var element in TopicData)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(TopicData.Count);
+            foreach (var element in TopicData)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class TopicProduceDataMessage: Message
@@ -113,6 +166,35 @@ public sealed class ProduceRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(PartitionData.Count + 1);
+                foreach (var element in PartitionData)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionData.Count);
+                foreach (var element in PartitionData)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -148,6 +230,31 @@ public sealed class ProduceRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Index);
+            if (Records is null)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteInt(-1);
+                }
+            }
+            else
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(Records.Length + 1);
+                }
+                else
+                {
+                    writer.WriteInt(Records.Length);
+                }
+                writer.WriteRecords(Records);
+            }
         }
     }
 

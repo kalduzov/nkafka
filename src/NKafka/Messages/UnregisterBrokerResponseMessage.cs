@@ -67,5 +67,18 @@ public sealed class UnregisterBrokerResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        if (ErrorMessage is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
     }
 }

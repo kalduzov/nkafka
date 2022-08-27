@@ -74,6 +74,60 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version <= ApiVersions.Version2)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (MemberId.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default MemberId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Members.Count + 1);
+                foreach (var element in Members)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Members.Count);
+                foreach (var element in Members)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Members.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Members at version {version}");
+            }
+        }
     }
 
     public sealed class MemberIdentityMessage: Message
@@ -113,6 +167,60 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of MemberIdentityMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (GroupInstanceId is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                if (Reason is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Reason);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 }

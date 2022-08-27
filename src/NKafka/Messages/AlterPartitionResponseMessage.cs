@@ -67,6 +67,14 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicDataMessage: Message
@@ -106,6 +114,24 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version1)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -166,6 +192,21 @@ public sealed class AlterPartitionResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
+            writer.WriteInt(LeaderId);
+            writer.WriteInt(LeaderEpoch);
+            writer.WriteVarUInt(Isr.Count + 1);
+            foreach (var element in Isr)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(LeaderRecoveryState);
+            }
+            writer.WriteInt(PartitionEpoch);
         }
     }
 }

@@ -67,6 +67,28 @@ public sealed class ListGroupsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(Groups.Count + 1);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Groups.Count);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class ListedGroupMessage: Message
@@ -106,6 +128,39 @@ public sealed class ListGroupsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(GroupState);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 }

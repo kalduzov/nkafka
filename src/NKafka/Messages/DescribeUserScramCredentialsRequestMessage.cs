@@ -64,6 +64,19 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (Users is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            writer.WriteVarUInt(Users.Count + 1);
+            foreach (var element in Users)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class UserNameMessage: Message
@@ -93,6 +106,12 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

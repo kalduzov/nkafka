@@ -82,6 +82,85 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(Brokers.Count + 1);
+            foreach (var element in Brokers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Brokers.Count);
+            foreach (var element in Brokers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            if (ClusterId is null)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ControllerId);
+        }
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        {
+            writer.WriteInt(ClusterAuthorizedOperations);
+        }
+        else
+        {
+            if (ClusterAuthorizedOperations != -2147483648)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ClusterAuthorizedOperations at version {version}");
+            }
+        }
     }
 
     public sealed class MetadataResponseBrokerMessage: Message
@@ -126,6 +205,48 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(NodeId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Port);
+            if (version >= ApiVersions.Version1)
+            {
+                if (Rack is null)
+                {
+                    if (version >= ApiVersions.Version9)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Rack);
+                    if (version >= ApiVersions.Version9)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 
@@ -193,6 +314,66 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            if (Name is null)
+            {
+                if (version >= ApiVersions.Version12)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    throw new NullReferenceException();                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version10)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteBool(IsInternal);
+            }
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            if (version >= ApiVersions.Version8)
+            {
+                writer.WriteInt(TopicAuthorizedOperations);
+            }
+            else
+            {
+                if (TopicAuthorizedOperations != -2147483648)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default TopicAuthorizedOperations at version {version}");
+                }
+            }
         }
     }
 
@@ -253,6 +434,53 @@ public sealed class MetadataResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(LeaderId);
+            if (version >= ApiVersions.Version7)
+            {
+                writer.WriteInt(LeaderEpoch);
+            }
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(ReplicaNodes.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(ReplicaNodes.Count);
+            }
+            foreach (var element in ReplicaNodes)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(IsrNodes.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(IsrNodes.Count);
+            }
+            foreach (var element in IsrNodes)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(OfflineReplicas.Count + 1);
+                }
+                else
+                {
+                    writer.WriteInt(OfflineReplicas.Count);
+                }
+                foreach (var element in OfflineReplicas)
+                {
+                    writer.WriteInt(element);
+                }
+            }
         }
     }
 

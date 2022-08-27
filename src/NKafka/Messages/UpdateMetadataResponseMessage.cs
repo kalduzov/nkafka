@@ -62,5 +62,7 @@ public sealed class UpdateMetadataResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
     }
 }

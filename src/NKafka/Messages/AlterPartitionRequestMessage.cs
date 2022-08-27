@@ -74,6 +74,14 @@ public sealed class AlterPartitionRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(BrokerId);
+        writer.WriteLong(BrokerEpoch);
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicDataMessage: Message
@@ -113,6 +121,24 @@ public sealed class AlterPartitionRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version1)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -163,6 +189,26 @@ public sealed class AlterPartitionRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(LeaderEpoch);
+            writer.WriteVarUInt(NewIsr.Count + 1);
+            foreach (var element in NewIsr)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(LeaderRecoveryState);
+            }
+            else
+            {
+                if (LeaderRecoveryState != 0)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default LeaderRecoveryState at version {version}");
+                }
+            }
+            writer.WriteInt(PartitionEpoch);
         }
     }
 }

@@ -62,6 +62,24 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Results.Count + 1);
+            foreach (var element in Results)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Results.Count);
+            foreach (var element in Results)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class DescribeConfigsResultMessage: Message
@@ -111,6 +129,61 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(ResourceType);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Configs.Count + 1);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Configs.Count);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -181,6 +254,110 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (Value is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Value);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteBool(ReadOnly);
+            if (version <= ApiVersions.Version0)
+            {
+                writer.WriteBool(IsDefault);
+            }
+            else
+            {
+                if (IsDefault)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default IsDefault at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(ConfigSource);
+            }
+            writer.WriteBool(IsSensitive);
+            if (version >= ApiVersions.Version1)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(Synonyms.Count + 1);
+                    foreach (var element in Synonyms)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+                else
+                {
+                    writer.WriteInt(Synonyms.Count);
+                    foreach (var element in Synonyms)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteSByte(ConfigType);
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                if (Documentation is null)
+                {
+                    if (version >= ApiVersions.Version4)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Documentation);
+                    if (version >= ApiVersions.Version4)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 
@@ -221,6 +398,48 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of DescribeConfigsSynonymMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (Value is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Value);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(Source);
         }
     }
 }

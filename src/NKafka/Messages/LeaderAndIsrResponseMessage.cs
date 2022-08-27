@@ -72,6 +72,49 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (version <= ApiVersions.Version4)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(PartitionErrors.Count + 1);
+                foreach (var element in PartitionErrors)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionErrors.Count);
+                foreach (var element in PartitionErrors)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (PartitionErrors.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default PartitionErrors at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (Topics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
+            }
+        }
     }
 
     public sealed class LeaderAndIsrTopicErrorMessage: Message
@@ -106,6 +149,17 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of LeaderAndIsrTopicErrorMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteGuid(TopicId);
+            writer.WriteVarUInt(PartitionErrors.Count + 1);
+            foreach (var element in PartitionErrors)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -158,6 +212,24 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version4)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                    if (version >= ApiVersions.Version4)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
         }
     }
 }

@@ -77,5 +77,46 @@ public sealed class SyncGroupResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version5)
+        {
+            if (ProtocolType is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            if (ProtocolName is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Assignment.Length + 1);
+        }
+        else
+        {
+            writer.WriteInt(Assignment.Length);
+        }
+        writer.WriteBytes(Assignment);
     }
 }

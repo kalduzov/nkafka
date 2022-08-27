@@ -67,5 +67,16 @@ public sealed class EnvelopeResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (ResponseData is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            writer.WriteVarUInt(ResponseData.Length + 1);
+            writer.WriteBytes(ResponseData);
+        }
+        writer.WriteShort(ErrorCode);
     }
 }

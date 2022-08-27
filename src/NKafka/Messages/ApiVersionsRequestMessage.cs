@@ -69,5 +69,22 @@ public sealed class ApiVersionsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareVersion);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
     }
 }

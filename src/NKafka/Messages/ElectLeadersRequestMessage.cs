@@ -74,6 +74,49 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteSByte(ElectionType);
+        }
+        else
+        {
+            if (ElectionType != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ElectionType at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            if (TopicPartitions is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt(TopicPartitions.Count + 1);
+                foreach (var element in TopicPartitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (TopicPartitions is null)
+            {
+                writer.WriteInt(-1);
+            }
+            else
+            {
+                writer.WriteInt(TopicPartitions.Count);
+                foreach (var element in TopicPartitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        writer.WriteInt(TimeoutMs);
     }
 
     public sealed class TopicPartitionsMessage: Message
@@ -108,6 +151,31 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+            }
+            foreach (var element in Partitions)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 

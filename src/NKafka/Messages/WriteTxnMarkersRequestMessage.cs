@@ -64,6 +64,23 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(Markers.Count + 1);
+            foreach (var element in Markers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Markers.Count);
+            foreach (var element in Markers)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class WritableTxnMarkerMessage: Message
@@ -113,6 +130,27 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteLong(ProducerId);
+            writer.WriteShort(ProducerEpoch);
+            writer.WriteBool(TransactionResult);
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Topics.Count);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            writer.WriteInt(CoordinatorEpoch);
         }
     }
 
@@ -148,6 +186,31 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version1)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(PartitionIndexes.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(PartitionIndexes.Count);
+            }
+            foreach (var element in PartitionIndexes)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 }

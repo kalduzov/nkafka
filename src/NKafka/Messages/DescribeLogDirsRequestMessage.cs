@@ -64,6 +64,37 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            if (Topics is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Topics is null)
+            {
+                writer.WriteInt(-1);
+            }
+            else
+            {
+                writer.WriteInt(Topics.Count);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
     }
 
     public sealed class DescribableLogDirTopicMessage: Message
@@ -98,6 +129,31 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+            }
+            foreach (var element in Partitions)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 

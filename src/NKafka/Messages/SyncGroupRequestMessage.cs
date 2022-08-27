@@ -94,6 +94,108 @@ public sealed class SyncGroupRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(GenerationId);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (GroupInstanceId is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupInstanceId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            if (ProtocolType is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            if (ProtocolName is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Assignments.Count + 1);
+            foreach (var element in Assignments)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Assignments.Count);
+            foreach (var element in Assignments)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class SyncGroupRequestAssignmentMessage: Message
@@ -128,6 +230,28 @@ public sealed class SyncGroupRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Assignment.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(Assignment.Length);
+            }
+            writer.WriteBytes(Assignment);
         }
     }
 }

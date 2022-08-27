@@ -64,5 +64,11 @@ public sealed class SaslHandshakeRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(Mechanism);
+            writer.WriteShort((short)stringBytes.Length);
+            writer.WriteBytes(stringBytes);
+        }
     }
 }

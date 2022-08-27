@@ -62,6 +62,24 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(FilterResults.Count + 1);
+            foreach (var element in FilterResults)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(FilterResults.Count);
+            foreach (var element in FilterResults)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class DeleteAclsFilterResultMessage: Message
@@ -101,6 +119,48 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(MatchingAcls.Count + 1);
+                foreach (var element in MatchingAcls)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(MatchingAcls.Count);
+                foreach (var element in MatchingAcls)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -171,6 +231,82 @@ public sealed class DeleteAclsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(ResourceType);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(PatternType);
+            }
+            else
+            {
+                if (PatternType != 3)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default PatternType at version {version}");
+                }
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Principal);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(Operation);
+            writer.WriteSByte(PermissionType);
         }
     }
 }

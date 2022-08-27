@@ -21,4 +21,7 @@
     <data name="ClusterInitFailed" xml:space="preserve">
         <value>Failed to initialize the cluster within the specified time {0}ms.</value>
     </data>
+    <data name="Kafka_message_header_key_cannot_be_null" xml:space="preserve">
+        <value>Kafka message header key cannot be null</value>
+    </data>
 </root>

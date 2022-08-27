@@ -69,5 +69,41 @@ public sealed class DescribeGroupsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(Groups.Count + 1);
+            foreach (var element in Groups)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        else
+        {
+            writer.WriteInt(Groups.Count);
+            foreach (var element in Groups)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteBool(IncludeAuthorizedOperations);
+        }
+        else
+        {
+            if (IncludeAuthorizedOperations)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeAuthorizedOperations at version {version}");
+            }
+        }
     }
 }

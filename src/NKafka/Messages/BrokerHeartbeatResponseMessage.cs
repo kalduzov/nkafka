@@ -77,5 +77,11 @@ public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteBool(IsCaughtUp);
+        writer.WriteBool(IsFenced);
+        writer.WriteBool(ShouldShutDown);
     }
 }

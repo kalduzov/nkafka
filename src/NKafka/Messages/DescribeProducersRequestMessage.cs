@@ -64,6 +64,12 @@ public sealed class DescribeProducersRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicRequestMessage: Message
@@ -98,6 +104,17 @@ public sealed class DescribeProducersRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(PartitionIndexes.Count + 1);
+            foreach (var element in PartitionIndexes)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 }

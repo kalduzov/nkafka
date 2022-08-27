@@ -64,5 +64,25 @@ public sealed class ListGroupsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(StatesFilter.Count + 1);
+            foreach (var element in StatesFilter)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        else
+        {
+            if (StatesFilter.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default StatesFilter at version {version}");
+            }
+        }
     }
 }

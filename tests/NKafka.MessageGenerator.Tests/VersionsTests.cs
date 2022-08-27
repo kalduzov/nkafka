@@ -37,6 +37,7 @@ public class VersionsTests
     [InlineData("4+", 4, short.MaxValue)]
     [InlineData("2", 2, 2)]
     [InlineData("2-5", 2, 5)]
+    [InlineData("12+", 12, short.MaxValue)]
     public void VersionTests_Successful(string inputVersion, short lowest, short highest)
     {
         var versions = Versions.Parse(inputVersion, _defaultVersion);

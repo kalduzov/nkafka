@@ -69,6 +69,24 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Resources.Count + 1);
+            foreach (var element in Resources)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Resources.Count);
+            foreach (var element in Resources)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteBool(ValidateOnly);
     }
 
     public sealed class AlterConfigsResourceMessage: Message
@@ -108,6 +126,36 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteSByte(ResourceType);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Configs.Count + 1);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Configs.Count);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -143,6 +191,43 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (Value is null)
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Value);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 

@@ -79,6 +79,76 @@ public sealed class MetadataRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version9)
+        {
+            if (Topics is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Topics is null)
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    writer.WriteInt(-1);
+                }
+                else
+                {
+                    throw new NullReferenceException();                }
+            }
+            else
+            {
+                writer.WriteInt(Topics.Count);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteBool(AllowAutoTopicCreation);
+        }
+        else
+        {
+            if (!AllowAutoTopicCreation)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default AllowAutoTopicCreation at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        {
+            writer.WriteBool(IncludeClusterAuthorizedOperations);
+        }
+        else
+        {
+            if (IncludeClusterAuthorizedOperations)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeClusterAuthorizedOperations at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            writer.WriteBool(IncludeTopicAuthorizedOperations);
+        }
+        else
+        {
+            if (IncludeTopicAuthorizedOperations)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeTopicAuthorizedOperations at version {version}");
+            }
+        }
     }
 
     public sealed class MetadataRequestTopicMessage: Message
@@ -113,6 +183,34 @@ public sealed class MetadataRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version >= ApiVersions.Version10)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (Name is null)
+            {
+                if (version >= ApiVersions.Version10)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    throw new NullReferenceException();                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

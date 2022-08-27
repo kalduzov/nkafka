@@ -466,6 +466,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
             if (_stream.CanWrite)
             {
+                //todo добавить запись тела в отдельный буфер (stream) а потом его длинну добавить в исходное сообщение
                 request.Write(_stream);
                 await _stream.FlushAsync(cts.Token);
             }

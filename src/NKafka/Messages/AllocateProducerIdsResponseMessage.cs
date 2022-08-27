@@ -72,5 +72,10 @@ public sealed class AllocateProducerIdsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteLong(ProducerIdStart);
+        writer.WriteInt(ProducerIdLen);
     }
 }

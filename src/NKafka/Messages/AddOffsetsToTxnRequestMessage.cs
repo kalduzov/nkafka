@@ -79,5 +79,32 @@ public sealed class AddOffsetsToTxnRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteLong(ProducerId);
+        writer.WriteShort(ProducerEpoch);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
     }
 }

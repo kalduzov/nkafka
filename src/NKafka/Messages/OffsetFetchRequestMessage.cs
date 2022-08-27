@@ -79,6 +79,101 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version <= ApiVersions.Version7)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupId.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupId at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version7)
+        {
+            if (version >= ApiVersions.Version6)
+            {
+                if (Topics is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt(Topics.Count + 1);
+                    foreach (var element in Topics)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            else
+            {
+                if (Topics is null)
+                {
+                    if (version >= ApiVersions.Version2)
+                    {
+                        writer.WriteInt(-1);
+                    }
+                    else
+                    {
+                        throw new NullReferenceException();                    }
+                }
+                else
+                {
+                    writer.WriteInt(Topics.Count);
+                    foreach (var element in Topics)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (Topics is not null || Topics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            writer.WriteVarUInt(Groups.Count + 1);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (Groups.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Groups at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            writer.WriteBool(RequireStable);
+        }
+        else
+        {
+            if (RequireStable)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default RequireStable at version {version}");
+            }
+        }
     }
 
     public sealed class OffsetFetchRequestTopicMessage: Message
@@ -113,6 +208,35 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version > ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchRequestTopicMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(PartitionIndexes.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(PartitionIndexes.Count);
+            }
+            foreach (var element in PartitionIndexes)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 
@@ -148,6 +272,28 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version8)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchRequestGroupMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(groupId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            if (Topics is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -183,6 +329,17 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(PartitionIndexes.Count + 1);
+            foreach (var element in PartitionIndexes)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 }

@@ -89,6 +89,70 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ControllerId);
+        writer.WriteInt(ControllerEpoch);
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteLong(BrokerEpoch);
+        }
+        if (version <= ApiVersions.Version4)
+        {
+            writer.WriteInt(UngroupedPartitionStates.Count);
+            foreach (var element in UngroupedPartitionStates)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (UngroupedPartitionStates.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default UngroupedPartitionStates at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(TopicStates.Count + 1);
+                foreach (var element in TopicStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(TopicStates.Count);
+                foreach (var element in TopicStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (TopicStates.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TopicStates at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(LiveBrokers.Count + 1);
+            foreach (var element in LiveBrokers)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(LiveBrokers.Count);
+            foreach (var element in LiveBrokers)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class UpdateMetadataTopicStateMessage: Message
@@ -128,6 +192,43 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of UpdateMetadataTopicStateMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version7)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(PartitionStates.Count + 1);
+                foreach (var element in PartitionStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionStates.Count);
+                foreach (var element in PartitionStates)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -178,6 +279,66 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Id);
+            if (version <= ApiVersions.Version0)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(V0Host);
+                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version <= ApiVersions.Version0)
+            {
+                writer.WriteInt(V0Port);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(Endpoints.Count + 1);
+                    foreach (var element in Endpoints)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+                else
+                {
+                    writer.WriteInt(Endpoints.Count);
+                    foreach (var element in Endpoints)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                if (Rack is null)
+                {
+                    if (version >= ApiVersions.Version6)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Rack);
+                    if (version >= ApiVersions.Version6)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 
@@ -223,6 +384,40 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of UpdateMetadataEndpointMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(Port);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Listener);
+                    if (version >= ApiVersions.Version6)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            writer.WriteShort(SecurityProtocol);
         }
     }
 
@@ -293,6 +488,59 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version <= ApiVersions.Version4)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(ControllerEpoch);
+            writer.WriteInt(Leader);
+            writer.WriteInt(LeaderEpoch);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Isr.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Isr.Count);
+            }
+            foreach (var element in Isr)
+            {
+                writer.WriteInt(element);
+            }
+            writer.WriteInt(ZkVersion);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Replicas.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(Replicas.Count);
+            }
+            foreach (var element in Replicas)
+            {
+                writer.WriteInt(element);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(OfflineReplicas.Count + 1);
+                }
+                else
+                {
+                    writer.WriteInt(OfflineReplicas.Count);
+                }
+                foreach (var element in OfflineReplicas)
+                {
+                    writer.WriteInt(element);
+                }
+            }
         }
     }
 }

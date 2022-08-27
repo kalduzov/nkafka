@@ -82,6 +82,49 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(ApiKeys.Count + 1);
+            foreach (var element in ApiKeys)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(ApiKeys.Count);
+            foreach (var element in ApiKeys)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (SupportedFeatures.Count != 0)
+            {
+                numTaggedFields++;
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (FinalizedFeaturesEpoch != -1)
+            {
+                numTaggedFields++;
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (FinalizedFeatures.Count != 0)
+            {
+                numTaggedFields++;
+            }
+        }
     }
 
     public sealed class ApiVersionMessage: Message
@@ -121,6 +164,10 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ApiKey);
+            writer.WriteShort(MinVersion);
+            writer.WriteShort(MaxVersion);
         }
     }
 
@@ -173,6 +220,18 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of SupportedFeatureKeyMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(MinVersion);
+            writer.WriteShort(MaxVersion);
         }
     }
 
@@ -225,6 +284,18 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of FinalizedFeatureKeyMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(MaxVersionLevel);
+            writer.WriteShort(MinVersionLevel);
         }
     }
 

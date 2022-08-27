@@ -431,10 +431,8 @@ public class FieldSpecification
                 {
                     return $"List<{arrayType.ElementType.ClrName}Message>";
                 }
-                else
-                {
-                    return $"List<{arrayType.ElementType.ClrName}>";
-                }
+
+                return $"List<{arrayType.ElementType.ClrName}>";
             }
             default:
             {
@@ -453,6 +451,88 @@ public class FieldSpecification
         if (!NullableVersions.Contains(Versions))
         {
             throw new ArgumentException($"null cannot be the default for field {Name}, because not all versions of this field are nullable.");
+        }
+    }
+
+    public void GenerateNonIgnorableFieldCheck(StructRegistry structRegistry, CodeBuffer codeBuffer)
+    {
+        GenerateNonDefaultValueCheck(structRegistry, codeBuffer, NullableVersions);
+        codeBuffer.IncrementIndent();
+        codeBuffer.AppendLine($"throw new UnsupportedVersionException($\"Attempted to write a non-default {Name} at version {{version}}\");");
+        codeBuffer.DecrementIndent();
+        codeBuffer.AppendLine("}");
+    }
+
+    public void GenerateNonDefaultValueCheck(
+        StructRegistry structRegistry,
+        CodeBuffer codeBuffer,
+        Versions nullableVersions)
+    {
+        var fieldDefault = FieldDefault();
+
+        if (Type.IsArray)
+        {
+            if (fieldDefault.Equals("null"))
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null)");
+                codeBuffer.AppendLine("{");
+            }
+            else if (nullableVersions.IsEmpty)
+            {
+                codeBuffer.AppendLine($"if ({Name}.Count != 0)");
+                codeBuffer.AppendLine("{");
+            }
+            else
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Count != 0)");
+                codeBuffer.AppendLine("{");
+            }
+        }
+        else if (Type.IsBytes)
+        {
+            if (fieldDefault.Equals("null"))
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null)");
+                codeBuffer.AppendLine("{");
+            }
+            else if (nullableVersions.IsEmpty)
+            {
+                codeBuffer.AppendLine($"if ({Name}.Length != 0)");
+                codeBuffer.AppendLine("{");
+            }
+            else
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Length != 0)");
+                codeBuffer.AppendLine("{");
+            }
+        }
+        else if (Type.IsString || Type.IsStruct || Type is IFieldType.UuidFieldType)
+        {
+            if (fieldDefault.Equals("null"))
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null)");
+                codeBuffer.AppendLine("{");
+            }
+            else if (nullableVersions.IsEmpty)
+            {
+                codeBuffer.AppendLine($"if ({Name}.Equals({fieldDefault}))");
+                codeBuffer.AppendLine("{");
+            }
+            else
+            {
+                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Equals({fieldDefault}))");
+                codeBuffer.AppendLine("{");
+            }
+        }
+        else if (Type is IFieldType.BoolFieldType)
+        {
+            codeBuffer.AppendLine($"if ({(fieldDefault.Equals("true") ? "!" : "")}{Name})");
+            codeBuffer.AppendLine("{");
+        }
+        else
+        {
+            codeBuffer.AppendLine($"if ({Name} != {fieldDefault})");
+            codeBuffer.AppendLine("{");
         }
     }
 }

@@ -64,6 +64,23 @@ public sealed class CreateAclsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Creations.Count + 1);
+            foreach (var element in Creations)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Creations.Count);
+            foreach (var element in Creations)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class AclCreationMessage: Message
@@ -123,6 +140,57 @@ public sealed class CreateAclsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteSByte(ResourceType);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteSByte(ResourcePatternType);
+            }
+            else
+            {
+                if (ResourcePatternType != 3)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default ResourcePatternType at version {version}");
+                }
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Principal);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteSByte(Operation);
+            writer.WriteSByte(PermissionType);
         }
     }
 }

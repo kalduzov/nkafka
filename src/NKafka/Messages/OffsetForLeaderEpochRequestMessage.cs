@@ -69,6 +69,27 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteInt(ReplicaId);
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class OffsetForLeaderTopicMessage: Message
@@ -103,6 +124,35 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -143,6 +193,13 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Partition);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteInt(CurrentLeaderEpoch);
+            }
+            writer.WriteInt(LeaderEpoch);
         }
     }
 

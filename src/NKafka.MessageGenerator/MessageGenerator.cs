@@ -15,6 +15,7 @@ public class MessageGenerator: IMessageGenerator
     private readonly StructRegistry _structRegistry;
     private readonly IReadMethodGenerator _readMethodGenerator;
     private readonly IWriteMethodGenerator _writeMethodGenerator;
+    private Versions _messageFlexibleVersions;
 
     public MessageGenerator(string ns)
     {
@@ -22,7 +23,7 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer = new CodeBuffer();
         _structRegistry = new StructRegistry();
         _readMethodGenerator = new ReadMethodGenerator(_codeBuffer);
-        _writeMethodGenerator = new WriteMethodGenerator(_codeBuffer);
+        _writeMethodGenerator = new WriteMethodGenerator(_headerGenerator, _structRegistry, _codeBuffer);
     }
 
     public StringBuilder Generate(MessageSpecification message)
@@ -33,6 +34,7 @@ public class MessageGenerator: IMessageGenerator
         }
 
         _structRegistry.Register(message);
+        _messageFlexibleVersions = message.FlexibleVersions;
 
         GenerateClass(message, message.ClassName, message.Struct, message.Struct.Versions);
 
@@ -69,7 +71,7 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.AppendLine();
         _readMethodGenerator.Generate(className, @struct, parentVersions);
         _codeBuffer.AppendLine();
-        _writeMethodGenerator.Generate(className, @struct, parentVersions);
+        _writeMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
 
         if (!isTopLevel)
         {
@@ -136,9 +138,9 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.AppendLine();
         _codeBuffer.AppendLine($"public sealed class {collectionName}: HashSet<{className}>");
         _codeBuffer.AppendLine("{");
-        
+
         _codeBuffer.IncrementIndent();
-        
+
         _codeBuffer.AppendLine($"public {collectionName}()");
         _codeBuffer.AppendLine("{");
         _codeBuffer.AppendLine("}");
@@ -149,9 +151,9 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("{");
         _codeBuffer.AppendLine("}");
-        
+
         _codeBuffer.DecrementIndent();
-        
+
         _codeBuffer.AppendLine("}");
     }
 

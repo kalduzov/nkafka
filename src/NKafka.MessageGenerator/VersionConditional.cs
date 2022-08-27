@@ -28,10 +28,10 @@ internal sealed class VersionConditional
     private readonly Versions _containingVersions;
     private readonly Versions _possibleVersions;
 
-    private Action<Versions>? _ifMember = null;
-    private Action<Versions>? _ifNotMember = null;
+    private Action<Versions>? _ifMember;
+    private Action<Versions>? _ifNotMember;
     private bool _allowMembershipCheckAlwaysFalse = true;
-    private bool _alwaysEmitBlockScope = false;
+    private bool _alwaysEmitBlockScope;
 
     private VersionConditional(Versions containingVersions, Versions possibleVersions)
     {
@@ -111,27 +111,31 @@ internal sealed class VersionConditional
         }
     }
 
-    private void GenerateAlwaysTrueCheck(Versions ifVersions, CodeBuffer codeBuffer)
-    {
-    }
-
-    private void GenerateUpperRangeCheck(Versions ifVersions, Versions ifNotVersions, CodeBuffer codeBuffer)
-    {
-    }
-
-    private void GenerateAlwaysFalseCheck(Versions ifNotVersions, CodeBuffer codeBuffer)
-    {
-    }
-
-    private void GenerateLowerRangeCheck(Versions ifVersions, Versions ifNotVersions, CodeBuffer codeBuffer)
-    {
-    }
-
-    private void GenerateFullRangeCheck(Versions ifVersions, Versions ifNotVersions, CodeBuffer codeBuffer)
+    private void GenerateAlwaysTrueCheck(Versions ifVersions, ICodeBuffer codeBuffer)
     {
         if (_ifMember is not null)
         {
-            codeBuffer.AppendLine($"if ((version >= ApiVersions.Version{_containingVersions.Lowest}) && (version <= ApiVersions.Version{_containingVersions.Highest}))");
+            if (_alwaysEmitBlockScope)
+            {
+                codeBuffer.AppendLine("{");
+                codeBuffer.IncrementIndent();
+            }
+
+            _ifMember(ifVersions);
+
+            if (_alwaysEmitBlockScope)
+            {
+                codeBuffer.DecrementIndent();
+                codeBuffer.AppendLine("}");
+            }
+        }
+    }
+
+    private void GenerateUpperRangeCheck(Versions ifVersions, Versions ifNotVersions, ICodeBuffer codeBuffer)
+    {
+        if (_ifMember is not null)
+        {
+            codeBuffer.AppendLine($"if (version <= ApiVersions.Version{_containingVersions.Highest})");
             codeBuffer.AppendLine("{");
 
             codeBuffer.IncrementIndent();
@@ -153,7 +157,104 @@ internal sealed class VersionConditional
         }
         else if (_ifNotMember is not null)
         {
-            codeBuffer.AppendLine($"if ((version < ApiVersions.Version{_containingVersions.Lowest}) || (version > ApiVersions.Version{_containingVersions.Highest}))");
+            codeBuffer.AppendLine($"if (version > ApiVersions.Version{_containingVersions.Highest})");
+            codeBuffer.AppendLine("{");
+            codeBuffer.IncrementIndent();
+            _ifNotMember(ifNotVersions);
+            codeBuffer.DecrementIndent();
+            codeBuffer.AppendLine("}");
+        }
+    }
+
+    private void GenerateAlwaysFalseCheck(Versions ifNotVersions, ICodeBuffer codeBuffer)
+    {
+        if (!_allowMembershipCheckAlwaysFalse)
+        {
+            throw new ArgumentException($"Version ranges {_containingVersions} and {_possibleVersions} have no versions in common.");
+        }
+
+        if (_ifNotMember is not null)
+        {
+            if (_alwaysEmitBlockScope)
+            {
+                codeBuffer.AppendLine("{");
+                codeBuffer.IncrementIndent();
+            }
+
+            _ifNotMember(ifNotVersions);
+
+            if (_alwaysEmitBlockScope)
+            {
+                codeBuffer.DecrementIndent();
+                codeBuffer.AppendLine("}");
+            }
+        }
+    }
+
+    private void GenerateLowerRangeCheck(Versions ifVersions, Versions ifNotVersions, ICodeBuffer codeBuffer)
+    {
+        if (_ifMember is not null)
+        {
+            codeBuffer.AppendLine($"if (version >= ApiVersions.Version{_containingVersions.Lowest})");
+            codeBuffer.AppendLine("{");
+
+            codeBuffer.IncrementIndent();
+            _ifMember(ifVersions);
+            codeBuffer.DecrementIndent();
+
+            if (_ifNotMember is not null)
+            {
+                codeBuffer.AppendLine("}");
+                codeBuffer.AppendLine("else");
+                codeBuffer.AppendLine("{");
+
+                codeBuffer.IncrementIndent();
+                _ifNotMember(ifNotVersions);
+                codeBuffer.DecrementIndent();
+            }
+
+            codeBuffer.AppendLine("}");
+        }
+        else if (_ifNotMember is not null)
+        {
+            codeBuffer.AppendLine($"if (version < ApiVersions.Version{_containingVersions.Lowest})");
+            codeBuffer.AppendLine("{");
+            codeBuffer.IncrementIndent();
+            _ifNotMember(ifNotVersions);
+            codeBuffer.DecrementIndent();
+            codeBuffer.AppendLine("}");
+        }
+    }
+
+    private void GenerateFullRangeCheck(Versions ifVersions, Versions ifNotVersions, ICodeBuffer codeBuffer)
+    {
+        if (_ifMember is not null)
+        {
+            codeBuffer.AppendLine(
+                $"if (version >= ApiVersions.Version{_containingVersions.Lowest} && version <= ApiVersions.Version{_containingVersions.Highest})");
+            codeBuffer.AppendLine("{");
+
+            codeBuffer.IncrementIndent();
+            _ifMember(ifVersions);
+            codeBuffer.DecrementIndent();
+
+            if (_ifNotMember is not null)
+            {
+                codeBuffer.AppendLine("}");
+                codeBuffer.AppendLine("else");
+                codeBuffer.AppendLine("{");
+
+                codeBuffer.IncrementIndent();
+                _ifNotMember(ifNotVersions);
+                codeBuffer.DecrementIndent();
+            }
+
+            codeBuffer.AppendLine("}");
+        }
+        else if (_ifNotMember is not null)
+        {
+            codeBuffer.AppendLine(
+                $"if (version < ApiVersions.Version{_containingVersions.Lowest} || version > ApiVersions.Version{_containingVersions.Highest})");
             codeBuffer.AppendLine("{");
             codeBuffer.IncrementIndent();
             _ifNotMember(ifNotVersions);

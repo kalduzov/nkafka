@@ -69,5 +69,20 @@ public sealed class ListTransactionsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteVarUInt(StateFilters.Count + 1);
+        foreach (var element in StateFilters)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(element);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        writer.WriteVarUInt(ProducerIdFilters.Count + 1);
+        foreach (var element in ProducerIdFilters)
+        {
+            writer.WriteLong(element);
+        }
     }
 }

@@ -74,6 +74,25 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteInt(TimeoutMs);
+        writer.WriteBool(ValidateOnly);
     }
 
     public sealed class CreatePartitionsTopicMessage: Message
@@ -113,6 +132,50 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Count);
+            if (version >= ApiVersions.Version2)
+            {
+                if (Assignments is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt(Assignments.Count + 1);
+                    foreach (var element in Assignments)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            else
+            {
+                if (Assignments is null)
+                {
+                    writer.WriteInt(-1);
+                }
+                else
+                {
+                    writer.WriteInt(Assignments.Count);
+                    foreach (var element in Assignments)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
         }
     }
 
@@ -143,6 +206,19 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(BrokerIds.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(BrokerIds.Count);
+            }
+            foreach (var element in BrokerIds)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 

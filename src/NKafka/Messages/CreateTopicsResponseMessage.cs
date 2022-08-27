@@ -62,6 +62,27 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class CreatableTopicResultMessage: Message
@@ -126,6 +147,81 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version7)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            writer.WriteShort(ErrorCode);
+            if (version >= ApiVersions.Version1)
+            {
+                if (ErrorMessage is null)
+                {
+                    if (version >= ApiVersions.Version5)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                    if (version >= ApiVersions.Version5)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                if (TopicConfigErrorCode != 0)
+                {
+                    numTaggedFields++;
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteInt(NumPartitions);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteShort(ReplicationFactor);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                if (Configs is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt(Configs.Count + 1);
+                    foreach (var element in Configs)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
         }
     }
 
@@ -176,6 +272,29 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of CreatableTopicConfigsMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            if (Value is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Value);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteBool(ReadOnly);
+            writer.WriteSByte(ConfigSource);
+            writer.WriteBool(IsSensitive);
         }
     }
 

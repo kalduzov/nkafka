@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Protocol.Extensions;
+using NKafka.Protocol.Records;
 
 namespace NKafka.Protocol;
 
@@ -82,6 +83,11 @@ public readonly ref struct BufferWriter
         _stream.WriteVarUInt(value);
     }
 
+    public void WriteVarUInt(int value)
+    {
+        _stream.WriteVarUInt((uint)value);
+    }
+
     public void WriteVarInt(int value)
     {
         _stream.WriteVarInt(value);
@@ -95,5 +101,26 @@ public readonly ref struct BufferWriter
     public void WriteVarULong(ulong value)
     {
         _stream.WriteVarUInt64(value);
+    }
+
+    public void WriteGuid(Guid value)
+    {
+        _stream.Write(value.ToByteArray());
+    }
+
+    public void WriteDouble(double value)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        _stream.Write(bytes);
+    }
+
+    public void WriteBytes(ReadOnlySpan<byte> value)
+    {
+        _stream.Write(value);
+    }
+
+    public void WriteRecords(RecordBatch records)
+    {
+        _stream.Write(records.Buffer);
     }
 }

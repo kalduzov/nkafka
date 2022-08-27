@@ -62,6 +62,27 @@ public sealed class ListOffsetsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class ListOffsetsTopicResponseMessage: Message
@@ -96,6 +117,35 @@ public sealed class ListOffsetsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -151,6 +201,57 @@ public sealed class ListOffsetsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
+            if (version <= ApiVersions.Version0)
+            {
+                writer.WriteInt(OldStyleOffsets.Count);
+                foreach (var element in OldStyleOffsets)
+                {
+                    writer.WriteLong(element);
+                }
+            }
+            else
+            {
+                if (OldStyleOffsets.Count != 0)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default OldStyleOffsets at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteLong(Timestamp);
+            }
+            else
+            {
+                if (Timestamp != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default Timestamp at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteLong(Offset);
+            }
+            else
+            {
+                if (Offset != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default Offset at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteInt(LeaderEpoch);
+            }
+            else
+            {
+                if (LeaderEpoch != -1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default LeaderEpoch at version {version}");
+                }
+            }
         }
     }
 }

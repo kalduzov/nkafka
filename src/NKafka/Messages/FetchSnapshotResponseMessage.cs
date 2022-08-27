@@ -67,6 +67,14 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicSnapshotMessage: Message
@@ -101,6 +109,17 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -161,6 +180,18 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Index);
+            writer.WriteShort(ErrorCode);
+            SnapshotId.Write(writer, version);
+            if (CurrentLeader.Equals(new ()))
+            {
+                numTaggedFields++;
+            }
+            writer.WriteLong(Size);
+            writer.WriteLong(Position);
+            writer.WriteVarUInt(UnalignedRecords.Length + 1);
+            writer.WriteRecords(UnalignedRecords);
         }
     }
 
@@ -196,6 +227,9 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteLong(EndOffset);
+            writer.WriteInt(Epoch);
         }
     }
 
@@ -231,6 +265,9 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(LeaderId);
+            writer.WriteInt(LeaderEpoch);
         }
     }
 }

@@ -62,6 +62,13 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteVarUInt(Topics.Count + 1);
+        foreach (var element in Topics)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class TopicResponseMessage: Message
@@ -96,6 +103,17 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -141,6 +159,24 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(ActiveProducers.Count + 1);
+            foreach (var element in ActiveProducers)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -196,6 +232,13 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteLong(ProducerId);
+            writer.WriteInt(ProducerEpoch);
+            writer.WriteInt(LastSequence);
+            writer.WriteLong(LastTimestamp);
+            writer.WriteInt(CoordinatorEpoch);
+            writer.WriteLong(CurrentTxnStartOffset);
         }
     }
 }

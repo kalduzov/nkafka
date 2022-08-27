@@ -25,5 +25,5 @@ namespace NKafka.MessageGenerator;
 
 public interface IWriteMethodGenerator
 {
-    void Generate(string className, StructSpecification structSpecification, Versions parentVersions);
+    void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions);
 }

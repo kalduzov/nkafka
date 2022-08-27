@@ -68,6 +68,25 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Tokens.Count + 1);
+            foreach (var element in Tokens)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Tokens.Count);
+            foreach (var element in Tokens)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteInt(ThrottleTimeMs);
     }
 
     public sealed class DescribedDelegationTokenMessage: Message
@@ -142,6 +161,101 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalType);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            else
+            {
+                if (TokenRequesterPrincipalType.Equals(""))
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalType at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalName);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            else
+            {
+                if (TokenRequesterPrincipalName.Equals(""))
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalName at version {version}");
+                }
+            }
+            writer.WriteLong(IssueTimestamp);
+            writer.WriteLong(ExpiryTimestamp);
+            writer.WriteLong(MaxTimestamp);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TokenId);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Hmac.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(Hmac.Length);
+            }
+            writer.WriteBytes(Hmac);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Renewers.Count + 1);
+                foreach (var element in Renewers)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Renewers.Count);
+                foreach (var element in Renewers)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -177,6 +291,31 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

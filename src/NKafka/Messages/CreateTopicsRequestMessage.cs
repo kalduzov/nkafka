@@ -74,6 +74,35 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        writer.WriteInt(timeoutMs);
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteBool(validateOnly);
+        }
+        else
+        {
+            if (validateOnly)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default validateOnly at version {version}");
+            }
+        }
     }
 
     public sealed class CreatableTopicMessage: Message
@@ -123,6 +152,53 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(NumPartitions);
+            writer.WriteShort(ReplicationFactor);
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(Assignments.Count + 1);
+                foreach (var element in Assignments)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Assignments.Count);
+                foreach (var element in Assignments)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(Configs.Count + 1);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Configs.Count);
+                foreach (var element in Configs)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -158,6 +234,20 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(BrokerIds.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(BrokerIds.Count);
+            }
+            foreach (var element in BrokerIds)
+            {
+                writer.WriteInt(element);
+            }
         }
     }
 
@@ -205,6 +295,43 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (Value is null)
+            {
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Value);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 

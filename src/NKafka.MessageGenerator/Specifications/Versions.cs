@@ -71,7 +71,7 @@ public sealed class Versions: IEquatable<Versions>
 
         if (trimmedInput.EndsWith('+'))
         {
-            var lowest = short.Parse(trimmedInput[..1]);
+            var lowest = short.Parse(trimmedInput[..^1]);
 
             return new Versions(lowest, short.MaxValue);
         }

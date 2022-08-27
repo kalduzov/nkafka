@@ -74,6 +74,35 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ReplicaId);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteSByte(IsolationLevel);
+        }
+        else
+        {
+            if (IsolationLevel != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IsolationLevel at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class ListOffsetsTopicMessage: Message
@@ -108,6 +137,35 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -153,6 +211,24 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteInt(CurrentLeaderEpoch);
+            }
+            writer.WriteLong(Timestamp);
+            if (version <= ApiVersions.Version0)
+            {
+                writer.WriteInt(MaxNumOffsets);
+            }
+            else
+            {
+                if (MaxNumOffsets != 1)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default MaxNumOffsets at version {version}");
+                }
+            }
         }
     }
 }

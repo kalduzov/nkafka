@@ -64,5 +64,15 @@ public sealed class DescribeTransactionsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteVarUInt(TransactionalIds.Count + 1);
+        foreach (var element in TransactionalIds)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(element);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
     }
 }

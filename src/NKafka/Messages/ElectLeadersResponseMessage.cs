@@ -67,6 +67,35 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteShort(ErrorCode);
+        }
+        else
+        {
+            if (ErrorCode != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ErrorCode at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(ReplicaElectionResults.Count + 1);
+            foreach (var element in ReplicaElectionResults)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(ReplicaElectionResults.Count);
+            foreach (var element in ReplicaElectionResults)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class ReplicaElectionResultMessage: Message
@@ -101,6 +130,35 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Topic);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(PartitionResult.Count + 1);
+                foreach (var element in PartitionResult)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionResult.Count);
+                foreach (var element in PartitionResult)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -141,6 +199,33 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionId);
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

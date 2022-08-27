@@ -68,5 +68,9 @@ public sealed class ExpireDelegationTokenResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        writer.WriteLong(ExpiryTimestampMs);
+        writer.WriteInt(ThrottleTimeMs);
     }
 }

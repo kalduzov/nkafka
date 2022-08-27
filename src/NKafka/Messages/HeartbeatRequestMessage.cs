@@ -79,5 +79,65 @@ public sealed class HeartbeatRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(GenerationId);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (GroupInstanceId is null)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupInstanceId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+            }
+        }
     }
 }

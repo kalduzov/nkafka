@@ -63,6 +63,27 @@ public sealed class ProduceResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(Responses.Count + 1);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Responses.Count);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
     }
 
     public sealed class TopicProduceResponseMessage: Message
@@ -97,6 +118,35 @@ public sealed class ProduceResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(PartitionResponses.Count + 1);
+                foreach (var element in PartitionResponses)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(PartitionResponses.Count);
+                foreach (var element in PartitionResponses)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -157,6 +207,64 @@ public sealed class ProduceResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(Index);
+            writer.WriteShort(ErrorCode);
+            writer.WriteLong(BaseOffset);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteLong(LogAppendTimeMs);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteLong(LogStartOffset);
+            }
+            if (version >= ApiVersions.Version8)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(RecordErrors.Count + 1);
+                    foreach (var element in RecordErrors)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+                else
+                {
+                    writer.WriteInt(RecordErrors.Count);
+                    foreach (var element in RecordErrors)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            if (version >= ApiVersions.Version8)
+            {
+                if (ErrorMessage is null)
+                {
+                    if (version >= ApiVersions.Version9)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                    if (version >= ApiVersions.Version9)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 
@@ -192,6 +300,36 @@ public sealed class ProduceResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version8)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of BatchIndexAndErrorMessageMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(BatchIndex);
+            if (BatchIndexErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(BatchIndexErrorMessage);
+                if (version >= ApiVersions.Version9)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 

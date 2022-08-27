@@ -62,6 +62,27 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Responses.Count + 1);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Responses.Count);
+            foreach (var element in Responses)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class DeletableTopicResultMessage: Message
@@ -106,6 +127,48 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            if (Name is null)
+            {
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    throw new NullReferenceException();                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteGuid(TopicId);
+            }
+            writer.WriteShort(ErrorCode);
+            if (version >= ApiVersions.Version5)
+            {
+                if (ErrorMessage is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
         }
     }
 

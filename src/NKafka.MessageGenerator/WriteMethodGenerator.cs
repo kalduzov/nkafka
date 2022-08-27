@@ -25,17 +25,24 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-public class WriteMethodGenerator: IWriteMethodGenerator
+internal class WriteMethodGenerator: IWriteMethodGenerator
 {
+    private readonly IHeaderGenerator _headerGenerator;
+    private readonly StructRegistry _structRegistry;
     private readonly CodeBuffer _codeBuffer;
+    private Versions _messageFlexibleVersions = Versions.None;
 
-    public WriteMethodGenerator(CodeBuffer codeBuffer)
+    public WriteMethodGenerator(IHeaderGenerator headerGenerator, StructRegistry structRegistry, CodeBuffer codeBuffer)
     {
+        _headerGenerator = headerGenerator;
+        _structRegistry = structRegistry;
         _codeBuffer = codeBuffer;
     }
 
-    public void Generate(string className, StructSpecification structSpecification, Versions parentVersions)
+    public void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions)
     {
+        _messageFlexibleVersions = messageFlexibleVersions;
+
         _codeBuffer.AppendLine("internal override void Write(BufferWriter writer, ApiVersions version)");
         _codeBuffer.AppendLine("{");
         _codeBuffer.IncrementIndent();
@@ -46,7 +53,233 @@ public class WriteMethodGenerator: IWriteMethodGenerator
                 _ => { _codeBuffer.AppendLine($"throw new UnsupportedVersionException($\"Can't write version {{version}} of {className}\");"); })
             .Generate(_codeBuffer);
 
+        _codeBuffer.AppendLine("var numTaggedFields = 0;");
+        var curVersions = parentVersions.Intersect(structSpecification.Versions);
+        var taggedFields = new Dictionary<int, FieldSpecification>();
+
+        foreach (var field in structSpecification.Fields)
+        {
+            var cond = VersionConditional.ForVersions(field.Versions, curVersions)
+                .IfMember(
+                    presentVersions =>
+                    {
+                        VersionConditional.ForVersions(field.TaggedVersions, presentVersions)
+                            .IfNotMember(
+                                presentAndUntaggedVersions =>
+                                {
+                                    if (field.Type.IsVariableLength && !field.Type.IsStruct)
+                                    {
+                                        void CallGenerateVariableLengthWriter(Versions versions)
+                                        {
+                                            GenerateVariableLengthWriter(
+                                                FieldFlexibleVersions(field),
+                                                field.Name,
+                                                field.Type,
+                                                versions,
+                                                field.NullableVersions,
+                                                field.ZeroCopy);
+                                        }
+
+                                        if (field.Type.IsArray
+                                            && ((IFieldType.ArrayType)field.Type).ElementType.SerializationIsDifferentInFlexibleVersions)
+                                        {
+                                            VersionConditional.ForVersions(FieldFlexibleVersions(field), presentAndUntaggedVersions)
+                                                .IfMember(CallGenerateVariableLengthWriter)
+                                                .IfNotMember(CallGenerateVariableLengthWriter)
+                                                .Generate(_codeBuffer);
+                                        }
+                                        else
+                                        {
+                                            CallGenerateVariableLengthWriter(presentAndUntaggedVersions);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                    }
+                                })
+                            .IfMember(
+                                _ =>
+                                {
+                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeBuffer, field.NullableVersions);
+                                    _codeBuffer.IncrementIndent();
+                                    _codeBuffer.AppendLine("numTaggedFields++;");
+                                    _codeBuffer.DecrementIndent();
+                                    _codeBuffer.AppendLine("}");
+
+                                    if (!taggedFields.TryAdd(field.Tag.Value, field))
+                                    {
+                                        throw new Exception($"Field {field.Name} has tag {field.Tag}, but another field already used that tag.");
+                                    }
+                                })
+                            .Generate(_codeBuffer);
+                    });
+
+            if (!field.Ignorable)
+            {
+                cond.IfNotMember(_ => { field.GenerateNonIgnorableFieldCheck(_structRegistry, _codeBuffer); });
+            }
+
+            cond.Generate(_codeBuffer);
+        }
+
+        //_codeBuffer.
         _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("}");
+    }
+
+    private static string PrimitiveWriteExpression(IFieldType type, string name)
+    {
+        return type switch
+        {
+            IFieldType.BoolFieldType => $"writer.WriteBool({name})",
+            IFieldType.Int8FieldType => $"writer.WriteSByte({name})",
+            IFieldType.Int16FieldType => $"writer.WriteShort({name})",
+            IFieldType.UInt16FieldType => $"writer.WriteUShort({name})",
+            IFieldType.Int32FieldType => $"writer.WriteInt({name})",
+            IFieldType.UInt32FieldType => $"writer.WriteUInt({name})",
+            IFieldType.Int64FieldType => $"writer.WriteLong({name})",
+            IFieldType.UuidFieldType => $"writer.WriteGuid({name})",
+            IFieldType.Float64FieldType => $"writer.WriteDouble({name})",
+            IFieldType.StructType => $"{name}.Write(writer, version)",
+            _ => throw new Exception($"Unsupported field type {type}")
+        };
+    }
+
+    private Versions FieldFlexibleVersions(FieldSpecification field)
+    {
+        if (field.FlexibleVersions is null)
+        {
+            return _messageFlexibleVersions;
+        }
+
+        if (!_messageFlexibleVersions.Intersect(field.FlexibleVersions).Equals(field.FlexibleVersions))
+        {
+            throw new Exception(
+                $"The flexible versions for field {field.Name} are {field.FlexibleVersions}, "
+                + $"which are not a subset of the flexible versions for the message as a whole, which are {_messageFlexibleVersions}");
+        }
+
+        return field.FlexibleVersions;
+    }
+
+    private void GenerateVariableLengthWriter(
+        Versions fieldFlexibleVersions,
+        string name,
+        IFieldType type,
+        Versions possibleVersions,
+        Versions nullableVersions,
+        bool zeroCopy)
+    {
+        IsNullConditional.ForName(name)
+            .PossibleVersions(possibleVersions)
+            .NullableVersions(nullableVersions)
+            .AlwaysEmitBlockScope(type.IsString)
+            .IfNull(
+                () =>
+                {
+                    VersionConditional.ForVersions(nullableVersions, possibleVersions)
+                        .IfMember(
+                            presentVersions =>
+                            {
+                                VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
+                                    .IfMember(_ => { _codeBuffer.AppendLine($"writer.WriteVarUInt(0);"); })
+                                    .IfNotMember(
+                                        _ =>
+                                        {
+                                            if (type.IsString)
+                                            {
+                                                _codeBuffer.AppendLine($"writer.WriteShort(-1);");
+                                            }
+                                            else
+                                            {
+                                                _codeBuffer.AppendLine($"writer.WriteInt(-1);");
+                                            }
+                                        })
+                                    .Generate(_codeBuffer);
+                            })
+                        .IfNotMember(_ => { _codeBuffer.Append("throw new NullReferenceException();"); })
+                        .Generate(_codeBuffer);
+                })
+            .IfShouldNotBeNull(
+                () =>
+                {
+                    string lengthExpression;
+
+                    if (type.IsString)
+                    {
+                        _codeBuffer.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({name});");
+                        lengthExpression = "stringBytes.Length";
+                    }
+                    else if (type.IsBytes)
+                    {
+                        lengthExpression = $"{name}.Length";
+                    }
+                    else if (type.IsRecords)
+                    {
+                        lengthExpression = $"{name}.Length";
+                    }
+                    else if (type.IsArray)
+                    {
+                        lengthExpression = $"{name}.Count";
+                    }
+                    else
+                    {
+                        throw new Exception($"Unhandled type {type}");
+                    }
+
+                    VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
+                        .IfMember(_ => { _codeBuffer.AppendLine($"writer.WriteVarUInt({lengthExpression} + 1);"); })
+                        .IfNotMember(
+                            _ =>
+                            {
+                                if (type.IsString)
+                                {
+                                    _codeBuffer.AppendLine($"writer.WriteShort((short){lengthExpression});");
+                                }
+                                else
+                                {
+                                    _codeBuffer.AppendLine($"writer.WriteInt({lengthExpression});");
+                                }
+                            })
+                        .Generate(_codeBuffer);
+
+                    if (type.IsString)
+                    {
+                        _codeBuffer.AppendLine("writer.WriteBytes(stringBytes);");
+                    }
+                    else if (type.IsBytes)
+                    {
+                        _codeBuffer.AppendLine($"writer.WriteBytes({name});");
+                    }
+                    else if (type.IsRecords)
+                    {
+                        _codeBuffer.AppendLine($"writer.WriteRecords({name});");
+                    }
+                    else if (type is IFieldType.ArrayType arrayType)
+                    {
+                        var elementType = arrayType.ElementType;
+                        _codeBuffer.AppendLine($"foreach (var element in {name})");
+                        _codeBuffer.AppendLine("{");
+                        _codeBuffer.IncrementIndent();
+
+                        if (elementType.IsArray)
+                        {
+                            throw new Exception("Nested arrays are not supported. Use an array of structures containing another array.");
+                        }
+                        else if (elementType.IsBytes || elementType.IsString)
+                        {
+                            GenerateVariableLengthWriter(fieldFlexibleVersions, "element", elementType, possibleVersions, Versions.None, false);
+                        }
+                        else
+                        {
+                            _codeBuffer.AppendLine($"{PrimitiveWriteExpression(elementType, "element")};");
+                        }
+
+                        _codeBuffer.DecrementIndent();
+                        _codeBuffer.AppendLine("}");
+                    }
+                })
+            .Generate(_codeBuffer);
     }
 }

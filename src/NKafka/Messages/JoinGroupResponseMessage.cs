@@ -97,6 +97,100 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        writer.WriteShort(ErrorCode);
+        writer.WriteInt(GenerationId);
+        if (version >= ApiVersions.Version7)
+        {
+            if (ProtocolType is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (ProtocolName is null)
+        {
+            if (version >= ApiVersions.Version7)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                throw new NullReferenceException();            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(Leader);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteBool(SkipAssignment);
+        }
+        else
+        {
+            if (SkipAssignment)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default SkipAssignment at version {version}");
+            }
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(Members.Count + 1);
+            foreach (var element in Members)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Members.Count);
+            foreach (var element in Members)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class JoinGroupResponseMemberMessage: Message
@@ -136,6 +230,62 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                if (GroupInstanceId is null)
+                {
+                    if (version >= ApiVersions.Version6)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                    if (version >= ApiVersions.Version6)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            else
+            {
+                if (GroupInstanceId is not null)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+                }
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Metadata.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(Metadata.Length);
+            }
+            writer.WriteBytes(Metadata);
         }
     }
 }

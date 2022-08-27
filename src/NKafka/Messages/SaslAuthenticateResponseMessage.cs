@@ -77,5 +77,44 @@ public sealed class SaslAuthenticateResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (ErrorMessage is null)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteShort(-1);
+            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(AuthBytes.Length + 1);
+        }
+        else
+        {
+            writer.WriteInt(AuthBytes.Length);
+        }
+        writer.WriteBytes(AuthBytes);
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteLong(SessionLifetimeMs);
+        }
     }
 }

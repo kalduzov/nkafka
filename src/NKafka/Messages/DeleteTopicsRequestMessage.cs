@@ -74,6 +74,50 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (Topics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version5)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(TopicNames.Count + 1);
+                foreach (var element in TopicNames)
+                {
+                    {
+                        var stringBytes = Encoding.UTF8.GetBytes(element);
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                        writer.WriteBytes(stringBytes);
+                    }
+                }
+            }
+            else
+            {
+                writer.WriteInt(TopicNames.Count);
+                foreach (var element in TopicNames)
+                {
+                    {
+                        var stringBytes = Encoding.UTF8.GetBytes(element);
+                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteBytes(stringBytes);
+                    }
+                }
+            }
+        }
+        writer.WriteInt(TimeoutMs);
     }
 
     public sealed class DeleteTopicStateMessage: Message
@@ -108,6 +152,22 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version6)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of DeleteTopicStateMessage");
+            }
+            var numTaggedFields = 0;
+            if (Name is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteGuid(TopicId);
         }
     }
 }

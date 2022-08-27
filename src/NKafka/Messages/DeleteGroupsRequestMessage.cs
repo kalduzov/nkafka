@@ -64,5 +64,30 @@ public sealed class DeleteGroupsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(GroupsNames.Count + 1);
+            foreach (var element in GroupsNames)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        else
+        {
+            writer.WriteInt(GroupsNames.Count);
+            foreach (var element in GroupsNames)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
     }
 }

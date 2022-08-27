@@ -74,6 +74,45 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Resources.Count + 1);
+            foreach (var element in Resources)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Resources.Count);
+            foreach (var element in Resources)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteBool(IncludeSynonyms);
+        }
+        else
+        {
+            if (IncludeSynonyms)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeSynonyms at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteBool(IncludeDocumentation);
+        }
+        else
+        {
+            if (IncludeDocumentation)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeDocumentation at version {version}");
+            }
+        }
     }
 
     public sealed class DescribeConfigsResourceMessage: Message
@@ -113,6 +152,58 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteSByte(ResourceType);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
+                if (version >= ApiVersions.Version4)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                if (ConfigurationKeys is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteVarUInt(ConfigurationKeys.Count + 1);
+                    foreach (var element in ConfigurationKeys)
+                    {
+                        {
+                            var stringBytes = Encoding.UTF8.GetBytes(element);
+                            writer.WriteVarUInt(stringBytes.Length + 1);
+                            writer.WriteBytes(stringBytes);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (ConfigurationKeys is null)
+                {
+                    writer.WriteInt(-1);
+                }
+                else
+                {
+                    writer.WriteInt(ConfigurationKeys.Count);
+                    foreach (var element in ConfigurationKeys)
+                    {
+                        {
+                            var stringBytes = Encoding.UTF8.GetBytes(element);
+                            writer.WriteShort((short)stringBytes.Length);
+                            writer.WriteBytes(stringBytes);
+                        }
+                    }
+                }
+            }
         }
     }
 }

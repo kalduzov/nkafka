@@ -94,5 +94,92 @@ public sealed class DescribeAclsRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteSByte(ResourceTypeFilter);
+        if (ResourceNameFilter is null)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteShort(-1);
+            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ResourceNameFilter);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteSByte(PatternTypeFilter);
+        }
+        else
+        {
+            if (PatternTypeFilter != 3)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default PatternTypeFilter at version {version}");
+            }
+        }
+        if (PrincipalFilter is null)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteShort(-1);
+            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(PrincipalFilter);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (HostFilter is null)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteShort(-1);
+            }
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(HostFilter);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteSByte(Operation);
+        writer.WriteSByte(PermissionType);
     }
 }

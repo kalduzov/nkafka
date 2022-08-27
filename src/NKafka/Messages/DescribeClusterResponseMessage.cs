@@ -87,6 +87,31 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        if (ErrorMessage is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(ControllerId);
+        writer.WriteVarUInt(Brokers.Count + 1);
+        foreach (var element in Brokers)
+        {
+            element.Write(writer, version);
+        }
+        writer.WriteInt(ClusterAuthorizedOperations);
     }
 
     public sealed class DescribeClusterBrokerMessage: Message
@@ -131,6 +156,24 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(BrokerId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Port);
+            if (Rack is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Rack);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 

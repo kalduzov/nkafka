@@ -99,6 +99,111 @@ public sealed class JoinGroupRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteInt(SessionTimeoutMs);
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(RebalanceTimeoutMs);
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            if (GroupInstanceId is null)
+            {
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupInstanceId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+            }
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(Protocols.Count + 1);
+            foreach (var element in Protocols)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Protocols.Count);
+            foreach (var element in Protocols)
+            {
+                element.Write(writer, version);
+            }
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            if (Reason is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Reason);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
     }
 
     public sealed class JoinGroupRequestProtocolMessage: Message
@@ -133,6 +238,28 @@ public sealed class JoinGroupRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Metadata.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(Metadata.Length);
+            }
+            writer.WriteBytes(Metadata);
         }
     }
 

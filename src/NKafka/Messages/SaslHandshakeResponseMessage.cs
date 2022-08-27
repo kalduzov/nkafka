@@ -67,5 +67,16 @@ public sealed class SaslHandshakeResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        writer.WriteInt(Mechanisms.Count);
+        foreach (var element in Mechanisms)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(element);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+        }
     }
 }

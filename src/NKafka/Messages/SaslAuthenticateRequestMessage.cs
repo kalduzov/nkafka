@@ -64,5 +64,15 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(AuthBytes.Length + 1);
+        }
+        else
+        {
+            writer.WriteInt(AuthBytes.Length);
+        }
+        writer.WriteBytes(AuthBytes);
     }
 }

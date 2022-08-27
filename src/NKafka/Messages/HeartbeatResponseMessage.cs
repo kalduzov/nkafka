@@ -62,5 +62,11 @@ public sealed class HeartbeatResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        writer.WriteShort(ErrorCode);
     }
 }

@@ -67,6 +67,24 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(RemainingPartitions.Count + 1);
+            foreach (var element in RemainingPartitions)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(RemainingPartitions.Count);
+            foreach (var element in RemainingPartitions)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class RemainingPartitionMessage: Message
@@ -101,6 +119,20 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(PartitionIndex);
         }
     }
 

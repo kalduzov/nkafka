@@ -62,6 +62,27 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(Groups.Count + 1);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Groups.Count);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class DescribedGroupMessage: Message
@@ -121,6 +142,83 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteShort(ErrorCode);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupState);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ProtocolData);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(Members.Count + 1);
+                foreach (var element in Members)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Members.Count);
+                foreach (var element in Members)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteInt(AuthorizedOperations);
+            }
+            else
+            {
+                if (AuthorizedOperations != -2147483648)
+                {
+                    throw new UnsupportedVersionException($"Attempted to write a non-default AuthorizedOperations at version {version}");
+                }
+            }
         }
     }
 
@@ -176,6 +274,88 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version4)
+            {
+                if (GroupInstanceId is null)
+                {
+                    if (version >= ApiVersions.Version5)
+                    {
+                        writer.WriteVarUInt(0);
+                    }
+                    else
+                    {
+                        writer.WriteShort(-1);
+                    }
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                    if (version >= ApiVersions.Version5)
+                    {
+                        writer.WriteVarUInt(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClientId);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClientHost);
+                if (version >= ApiVersions.Version5)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(MemberMetadata.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(MemberMetadata.Length);
+            }
+            writer.WriteBytes(MemberMetadata);
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(MemberAssignment.Length + 1);
+            }
+            else
+            {
+                writer.WriteInt(MemberAssignment.Length);
+            }
+            writer.WriteBytes(MemberAssignment);
         }
     }
 }

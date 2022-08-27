@@ -69,5 +69,16 @@ public sealed class ExpireDelegationTokenRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(Hmac.Length + 1);
+        }
+        else
+        {
+            writer.WriteInt(Hmac.Length);
+        }
+        writer.WriteBytes(Hmac);
+        writer.WriteLong(ExpiryTimePeriodMs);
     }
 }

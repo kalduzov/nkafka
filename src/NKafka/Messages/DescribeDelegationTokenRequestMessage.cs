@@ -64,6 +64,37 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version2)
+        {
+            if (Owners is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                writer.WriteVarUInt(Owners.Count + 1);
+                foreach (var element in Owners)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Owners is null)
+            {
+                writer.WriteInt(-1);
+            }
+            else
+            {
+                writer.WriteInt(Owners.Count);
+                foreach (var element in Owners)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
     }
 
     public sealed class DescribeDelegationTokenOwnerMessage: Message
@@ -98,6 +129,31 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

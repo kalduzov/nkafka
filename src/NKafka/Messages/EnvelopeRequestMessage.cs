@@ -74,5 +74,19 @@ public sealed class EnvelopeRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteVarUInt(RequestData.Length + 1);
+        writer.WriteBytes(RequestData);
+        if (RequestPrincipal is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            writer.WriteVarUInt(RequestPrincipal.Length + 1);
+            writer.WriteBytes(RequestPrincipal);
+        }
+        writer.WriteVarUInt(ClientHostAddress.Length + 1);
+        writer.WriteBytes(ClientHostAddress);
     }
 }

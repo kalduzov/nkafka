@@ -89,6 +89,34 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(BrokerId);
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteGuid(IncarnationId);
+        writer.WriteVarUInt(Listeners.Count + 1);
+        foreach (var element in Listeners)
+        {
+            element.Write(writer, version);
+        }
+        writer.WriteVarUInt(Features.Count + 1);
+        foreach (var element in Features)
+        {
+            element.Write(writer, version);
+        }
+        if (Rack is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(Rack);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
     }
 
     public sealed class ListenerMessage: Message
@@ -133,6 +161,19 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteUShort(Port);
+            writer.WriteShort(SecurityProtocol);
         }
     }
 
@@ -185,6 +226,14 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(MinSupportedVersion);
+            writer.WriteShort(MaxSupportedVersion);
         }
     }
 

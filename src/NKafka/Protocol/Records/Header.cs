@@ -21,6 +21,8 @@
  * limitations under the License.
  */
 
+using NKafka.Resources;
+
 namespace NKafka.Protocol.Records;
 
 /// <summary>
@@ -45,7 +47,7 @@ public class Header : IHeader
     /// <exception cref="ArgumentNullException"></exception>
     public Header(string key, byte[] value)
     {
-        Key = key ?? throw new ArgumentNullException(nameof(key), "Kafka message header key cannot be null");
+        Key = key ?? throw new ArgumentNullException(nameof(key), ExceptionMessages.Kafka_message_header_key_cannot_be_null);
         _val = value;
     }
 

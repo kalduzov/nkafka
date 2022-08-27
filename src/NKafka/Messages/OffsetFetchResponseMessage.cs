@@ -72,6 +72,56 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version <= ApiVersions.Version7)
+        {
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Topics.Count);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Topics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version7)
+        {
+            writer.WriteShort(ErrorCode);
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            writer.WriteVarUInt(Groups.Count + 1);
+            foreach (var element in Groups)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (Groups.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Groups at version {version}");
+            }
+        }
     }
 
     public sealed class OffsetFetchResponseTopicMessage: Message
@@ -106,6 +156,39 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version > ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchResponseTopicMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -156,6 +239,38 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteLong(CommittedOffset);
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteInt(CommittedLeaderEpoch);
+            }
+            if (Metadata is null)
+            {
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Metadata);
+                if (version >= ApiVersions.Version6)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(ErrorCode);
         }
     }
 
@@ -196,6 +311,22 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version8)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchResponseGroupMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(groupId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+            writer.WriteShort(ErrorCode);
         }
     }
 
@@ -231,6 +362,17 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(Partitions.Count + 1);
+            foreach (var element in Partitions)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -281,6 +423,21 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteLong(CommittedOffset);
+            writer.WriteInt(CommittedLeaderEpoch);
+            if (Metadata is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Metadata);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(ErrorCode);
         }
     }
 }

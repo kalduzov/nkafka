@@ -67,6 +67,24 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteShort(ErrorCode);
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(PartitionErrors.Count + 1);
+            foreach (var element in PartitionErrors)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(PartitionErrors.Count);
+            foreach (var element in PartitionErrors)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class StopReplicaPartitionErrorMessage: Message
@@ -106,6 +124,21 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(PartitionIndex);
+            writer.WriteShort(ErrorCode);
         }
     }
 }

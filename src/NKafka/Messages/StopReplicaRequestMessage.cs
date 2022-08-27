@@ -94,6 +94,80 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ControllerId);
+        writer.WriteInt(ControllerEpoch);
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteLong(BrokerEpoch);
+        }
+        if (version <= ApiVersions.Version2)
+        {
+            writer.WriteBool(DeletePartitions);
+        }
+        else
+        {
+            if (DeletePartitions)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default DeletePartitions at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version0)
+        {
+            writer.WriteInt(UngroupedPartitions.Count);
+            foreach (var element in UngroupedPartitions)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (UngroupedPartitions.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default UngroupedPartitions at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version1 && version <= ApiVersions.Version2)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(Topics.Count + 1);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Topics.Count);
+                foreach (var element in Topics)
+                {
+                    element.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (Topics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(TopicStates.Count + 1);
+            foreach (var element in TopicStates)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (TopicStates.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TopicStates at version {version}");
+            }
+        }
     }
 
     public sealed class StopReplicaPartitionV0Message: Message
@@ -128,6 +202,17 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of StopReplicaPartitionV0Message");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(PartitionIndex);
         }
     }
 
@@ -163,9 +248,34 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
-            if ((version < ApiVersions.Version1) || (version > ApiVersions.Version2))
+            if (version < ApiVersions.Version1 || version > ApiVersions.Version2)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of StopReplicaTopicV1Message");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version2)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(PartitionIndexes.Count + 1);
+            }
+            else
+            {
+                writer.WriteInt(PartitionIndexes.Count);
+            }
+            foreach (var element in PartitionIndexes)
+            {
+                writer.WriteInt(element);
             }
         }
     }
@@ -202,6 +312,21 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of StopReplicaTopicStateMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(PartitionStates.Count + 1);
+            foreach (var element in PartitionStates)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -242,6 +367,10 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteInt(LeaderEpoch);
+            writer.WriteBool(DeletePartition);
         }
     }
 }

@@ -23,7 +23,7 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-internal sealed class StructRegistry
+public sealed class StructRegistry
 {
     private readonly Dictionary<string, StructInfo> _struct;
 

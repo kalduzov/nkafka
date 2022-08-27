@@ -99,6 +99,95 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteLong(ProducerId);
+        writer.WriteShort(ProducerEpoch);
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteInt(GenerationId);
+        }
+        else
+        {
+            if (GenerationId != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GenerationId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (MemberId.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default MemberId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (GroupInstanceId is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (GroupInstanceId is not null)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            writer.WriteInt(Topics.Count);
+            foreach (var element in Topics)
+            {
+                element.Write(writer, version);
+            }
+        }
     }
 
     public sealed class TxnOffsetCommitRequestTopicMessage: Message
@@ -133,6 +222,35 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Name);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(Partitions.Count + 1);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(Partitions.Count);
+                foreach (var element in Partitions)
+                {
+                    element.Write(writer, version);
+                }
+            }
         }
     }
 
@@ -178,6 +296,37 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteInt(PartitionIndex);
+            writer.WriteLong(CommittedOffset);
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteInt(CommittedLeaderEpoch);
+            }
+            if (CommittedMetadata is null)
+            {
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

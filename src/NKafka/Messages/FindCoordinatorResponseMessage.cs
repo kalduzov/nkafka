@@ -87,6 +87,108 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteInt(ThrottleTimeMs);
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            writer.WriteShort(ErrorCode);
+        }
+        else
+        {
+            if (ErrorCode != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ErrorCode at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version1 && version <= ApiVersions.Version3)
+        {
+            if (ErrorMessage is null)
+            {
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    writer.WriteShort(-1);
+                }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            writer.WriteInt(NodeId);
+        }
+        else
+        {
+            if (NodeId != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default NodeId at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                if (version >= ApiVersions.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (Host.Equals(""))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Host at version {version}");
+            }
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            writer.WriteInt(Port);
+        }
+        else
+        {
+            if (Port != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Port at version {version}");
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(Coordinators.Count + 1);
+            foreach (var element in Coordinators)
+            {
+                element.Write(writer, version);
+            }
+        }
+        else
+        {
+            if (Coordinators.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Coordinators at version {version}");
+            }
+        }
     }
 
     public sealed class CoordinatorMessage: Message
@@ -141,6 +243,34 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if (version < ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of CoordinatorMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Key);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(NodeId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteInt(Port);
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
         }
     }
 }

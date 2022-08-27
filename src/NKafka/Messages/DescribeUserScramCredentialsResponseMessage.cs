@@ -72,6 +72,24 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
+        var numTaggedFields = 0;
+        writer.WriteInt(ThrottleTimeMs);
+        writer.WriteShort(ErrorCode);
+        if (ErrorMessage is null)
+        {
+            writer.WriteVarUInt(0);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        writer.WriteVarUInt(Results.Count + 1);
+        foreach (var element in Results)
+        {
+            element.Write(writer, version);
+        }
     }
 
     public sealed class DescribeUserScramCredentialsResultMessage: Message
@@ -116,6 +134,28 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(User);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteShort(ErrorCode);
+            if (ErrorMessage is null)
+            {
+                writer.WriteVarUInt(0);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(CredentialInfos.Count + 1);
+            foreach (var element in CredentialInfos)
+            {
+                element.Write(writer, version);
+            }
         }
     }
 
@@ -151,6 +191,9 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            var numTaggedFields = 0;
+            writer.WriteSByte(Mechanism);
+            writer.WriteInt(Iterations);
         }
     }
 }

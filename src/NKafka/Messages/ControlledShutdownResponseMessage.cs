@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -108,6 +109,7 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
         public RemainingPartitionCollection()
         {
         }
+
         public RemainingPartitionCollection(int capacity)
             : base(capacity)
         {

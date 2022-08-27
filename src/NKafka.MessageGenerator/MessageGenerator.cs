@@ -40,6 +40,7 @@ public class MessageGenerator: IMessageGenerator
         _headerGenerator.AppendUsing("NKafka.Protocol");
         _headerGenerator.AppendUsing("NKafka.Protocol.Records");
         _headerGenerator.AppendUsing("NKafka.Protocol.Extensions");
+        _headerGenerator.AppendUsing("NKafka.Exceptions");
         _headerGenerator.Generate();
 
         var result = new StringBuilder();

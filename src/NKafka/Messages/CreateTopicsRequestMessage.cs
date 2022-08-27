@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -165,6 +166,7 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         public CreatableReplicaAssignmentCollection()
         {
         }
+
         public CreatableReplicaAssignmentCollection(int capacity)
             : base(capacity)
         {
@@ -211,6 +213,7 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         public CreateableTopicConfigCollection()
         {
         }
+
         public CreateableTopicConfigCollection(int capacity)
             : base(capacity)
         {
@@ -222,6 +225,7 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         public CreatableTopicCollection()
         {
         }
+
         public CreatableTopicCollection(int capacity)
             : base(capacity)
         {

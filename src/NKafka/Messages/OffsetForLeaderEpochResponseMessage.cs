@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -148,6 +149,7 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
         public OffsetForLeaderTopicResultCollection()
         {
         }
+
         public OffsetForLeaderTopicResultCollection(int capacity)
             : base(capacity)
         {

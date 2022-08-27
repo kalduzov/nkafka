@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -155,6 +156,7 @@ public sealed class ProduceRequestMessage: RequestMessage
         public TopicProduceDataCollection()
         {
         }
+
         public TopicProduceDataCollection(int capacity)
             : base(capacity)
         {

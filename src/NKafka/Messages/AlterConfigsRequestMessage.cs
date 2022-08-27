@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -150,6 +151,7 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
         public AlterableConfigCollection()
         {
         }
+
         public AlterableConfigCollection(int capacity)
             : base(capacity)
         {
@@ -161,6 +163,7 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
         public AlterConfigsResourceCollection()
         {
         }
+
         public AlterConfigsResourceCollection(int capacity)
             : base(capacity)
         {

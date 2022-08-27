@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -140,6 +141,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         public AlterReplicaLogDirTopicCollection()
         {
         }
+
         public AlterReplicaLogDirTopicCollection(int capacity)
             : base(capacity)
         {
@@ -151,6 +153,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
         public AlterReplicaLogDirCollection()
         {
         }
+
         public AlterReplicaLogDirCollection(int capacity)
             : base(capacity)
         {

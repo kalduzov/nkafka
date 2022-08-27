@@ -131,13 +131,33 @@ internal sealed class VersionConditional
     {
         if (_ifMember is not null)
         {
-            codeBuffer.AppendLine($"if ((version >= {_containingVersions.Lowest}) && (version <= {_containingVersions.Highest}))");
+            codeBuffer.AppendLine($"if ((version >= ApiVersions.Version{_containingVersions.Lowest}) && (version <= ApiVersions.Version{_containingVersions.Highest}))");
             codeBuffer.AppendLine("{");
 
             codeBuffer.IncrementIndent();
             _ifMember(ifVersions);
             codeBuffer.DecrementIndent();
 
+            if (_ifNotMember is not null)
+            {
+                codeBuffer.AppendLine("}");
+                codeBuffer.AppendLine("else");
+                codeBuffer.AppendLine("{");
+
+                codeBuffer.IncrementIndent();
+                _ifNotMember(ifNotVersions);
+                codeBuffer.DecrementIndent();
+            }
+
+            codeBuffer.AppendLine("}");
+        }
+        else if (_ifNotMember is not null)
+        {
+            codeBuffer.AppendLine($"if ((version < ApiVersions.Version{_containingVersions.Lowest}) || (version > ApiVersions.Version{_containingVersions.Highest}))");
+            codeBuffer.AppendLine("{");
+            codeBuffer.IncrementIndent();
+            _ifNotMember(ifNotVersions);
+            codeBuffer.DecrementIndent();
             codeBuffer.AppendLine("}");
         }
     }

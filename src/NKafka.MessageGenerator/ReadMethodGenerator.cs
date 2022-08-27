@@ -23,7 +23,7 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-public class ReadMethodGenerator: Generator, IReadMethodGenerator
+public class ReadMethodGenerator: IReadMethodGenerator
 {
     private readonly CodeBuffer _codeBuffer;
 

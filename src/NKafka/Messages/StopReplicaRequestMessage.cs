@@ -27,6 +27,7 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
@@ -162,6 +163,10 @@ public sealed class StopReplicaRequestMessage: RequestMessage
 
         internal override void Write(BufferWriter writer, ApiVersions version)
         {
+            if ((version < ApiVersions.Version1) || (version > ApiVersions.Version2))
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of StopReplicaTopicV1Message");
+            }
         }
     }
 

@@ -75,8 +75,8 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
                 }
                 else
                 {
-                    AlterReplicaLogDirCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AlterReplicaLogDirCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterReplicaLogDirMessage(reader, version));
                     }
@@ -93,8 +93,8 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
                 }
                 else
                 {
-                    AlterReplicaLogDirCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AlterReplicaLogDirCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterReplicaLogDirMessage(reader, version));
                     }
@@ -163,6 +163,13 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
     public bool Equals(AlterReplicaLogDirsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Dirs);
+        return hashCode;
     }
 
     public sealed class AlterReplicaLogDirMessage: IMessage, IEquatable<AlterReplicaLogDirMessage>
@@ -235,8 +242,8 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
                     }
                     else
                     {
-                        AlterReplicaLogDirTopicCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AlterReplicaLogDirTopicCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterReplicaLogDirTopicMessage(reader, version));
                         }
@@ -253,8 +260,8 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
                     }
                     else
                     {
-                        AlterReplicaLogDirTopicCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AlterReplicaLogDirTopicCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterReplicaLogDirTopicMessage(reader, version));
                         }
@@ -337,6 +344,13 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Path);
+            return hashCode;
+        }
     }
 
     public sealed class AlterReplicaLogDirTopicMessage: IMessage, IEquatable<AlterReplicaLogDirTopicMessage>
@@ -415,7 +429,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -492,6 +506,13 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
         public bool Equals(AlterReplicaLogDirTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

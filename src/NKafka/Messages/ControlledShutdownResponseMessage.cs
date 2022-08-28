@@ -84,8 +84,8 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
                 }
                 else
                 {
-                    RemainingPartitionCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new RemainingPartitionCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new RemainingPartitionMessage(reader, version));
                     }
@@ -102,8 +102,8 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
                 }
                 else
                 {
-                    RemainingPartitionCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new RemainingPartitionCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new RemainingPartitionMessage(reader, version));
                     }
@@ -173,6 +173,13 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
     public bool Equals(ControlledShutdownResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, RemainingPartitions);
+        return hashCode;
     }
 
     public sealed class RemainingPartitionMessage: IMessage, IEquatable<RemainingPartitionMessage>
@@ -294,6 +301,13 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
         public bool Equals(RemainingPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex);
+            return hashCode;
         }
     }
 

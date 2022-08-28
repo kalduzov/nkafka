@@ -54,7 +54,7 @@ public sealed class HeaderGenerator: IHeaderGenerator
 
     private readonly string _namespaceName;
     private readonly SortedSet<string> _using = new();
-    private readonly CodeBuffer _codeBuffer;
+    private readonly ICodeGenerator _codeGenerator;
 
     public HeaderGenerator(string namespaceName)
     {
@@ -64,7 +64,7 @@ public sealed class HeaderGenerator: IHeaderGenerator
         }
 
         _namespaceName = namespaceName;
-        _codeBuffer = new CodeBuffer();
+        _codeGenerator = new CodeGenerator();
     }
 
     public void AppendUsing(string value)
@@ -74,23 +74,23 @@ public sealed class HeaderGenerator: IHeaderGenerator
 
     public void Generate()
     {
-        _codeBuffer.AppendLine(_HEADER);
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine(_HEADER);
+        _codeGenerator.AppendLine();
 
         foreach (var @using in _using)
         {
-            _codeBuffer.AppendLine($"using {@using};");
+            _codeGenerator.AppendLine($"using {@using};");
         }
 
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
 
-        _codeBuffer.AppendLine($"namespace {_namespaceName};");
+        _codeGenerator.AppendLine($"namespace {_namespaceName};");
     }
 
     /// <summary>Returns a string that represents the current object.</summary>
     /// <returns>A string that represents the current object.</returns>
     public override string ToString()
     {
-        return _codeBuffer.ToString();
+        return _codeGenerator.ToString();
     }
 }

@@ -11,19 +11,19 @@ namespace NKafka.MessageGenerator;
 public class MessageGenerator: IMessageGenerator
 {
     private readonly IHeaderGenerator _headerGenerator;
-    private readonly CodeBuffer _codeBuffer;
+    private readonly ICodeGenerator _codeGenerator;
     private readonly StructRegistry _structRegistry;
     private readonly IReadMethodGenerator _readMethodGenerator;
     private readonly IWriteMethodGenerator _writeMethodGenerator;
-    private Versions _messageFlexibleVersions;
+    private Versions _messageFlexibleVersions = Versions.None;
 
     public MessageGenerator(string ns)
     {
         _headerGenerator = new HeaderGenerator(ns);
-        _codeBuffer = new CodeBuffer();
+        _codeGenerator = new CodeGenerator();
         _structRegistry = new StructRegistry();
-        _readMethodGenerator = new ReadMethodGenerator(_headerGenerator, _structRegistry, _codeBuffer);
-        _writeMethodGenerator = new WriteMethodGenerator(_headerGenerator, _structRegistry, _codeBuffer);
+        _readMethodGenerator = new ReadMethodGenerator(_structRegistry, _codeGenerator);
+        _writeMethodGenerator = new WriteMethodGenerator(_structRegistry, _codeGenerator);
     }
 
     public StringBuilder Generate(MessageSpecification message)
@@ -47,14 +47,14 @@ public class MessageGenerator: IMessageGenerator
 
         var result = new StringBuilder();
         result.Append(_headerGenerator);
-        result.Append(_codeBuffer);
+        result.Append(_codeGenerator);
 
         return result;
     }
 
     private void GenerateClass(MessageSpecification? topLevelMessage, string className, StructSpecification @struct, Versions parentVersions)
     {
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
         var isTopLevel = topLevelMessage is not null;
         var isSetElement = @struct.HasKeys;
 
@@ -64,28 +64,34 @@ public class MessageGenerator: IMessageGenerator
         }
 
         GenerateClassHeader(className, isTopLevel, topLevelMessage?.Type);
-        _codeBuffer.IncrementIndent();
+        _codeGenerator.IncrementIndent();
         GenerateProperties(@struct, isTopLevel, topLevelMessage, parentVersions);
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
         GenerateCtor(className, topLevelMessage, parentVersions);
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
         _readMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
         _writeMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
 
         if (isSetElement)
         {
-            _codeBuffer.AppendLine();
+            _codeGenerator.AppendLine();
             GenerateEquals(className, @struct, true);
         }
 
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine();
         GenerateEquals(className, @struct, false);
+
+        _codeGenerator.AppendLine();
+        GenerateHashCode(@struct, isSetElement);
+
+        _codeGenerator.AppendLine();
+        GenerateToString(className, @struct);
 
         if (!isTopLevel)
         {
-            _codeBuffer.DecrementIndent();
-            _codeBuffer.AppendLine("}");
+            _codeGenerator.DecrementIndent();
+            _codeGenerator.AppendRightBrace();
         }
 
         GenerateSubclasses(className, @struct, parentVersions, isSetElement);
@@ -100,29 +106,67 @@ public class MessageGenerator: IMessageGenerator
             GenerateClass(null, commonStruct.Name + "Message", commonStruct, parentVersions);
         }
 
-        _codeBuffer.DecrementIndent();
-        _codeBuffer.AppendLine("}");
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
+    }
+
+    private void GenerateToString(string className, StructSpecification @struct)
+    {
+        _codeGenerator.AppendLine("public override string ToString()");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
+        
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
+    }
+
+    private void GenerateHashCode(StructSpecification @struct, bool onlyMapKeys)
+    {
+        _codeGenerator.AppendLine("public override int GetHashCode()");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine("var hashCode = 0;");
+
+        var names = new List<string>(@struct.Fields.Count);
+
+        foreach (var field in @struct.Fields)
+        {
+            if (!onlyMapKeys || field.MapKey)
+            {
+                names.Add(field.Name);
+            }
+        }
+
+        foreach (var nameChunks in names.Chunk(7)) //8 is max number of arguments in Combine method
+        {
+            var values = string.Join(", ", nameChunks);
+            _codeGenerator.AppendLine($"hashCode = HashCode.Combine(hashCode, {values});");
+        }
+
+        _codeGenerator.AppendLine("return hashCode;");
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
     }
 
     private void GenerateEquals(string className, StructSpecification @struct, bool elementKeysAreEqual)
     {
         if (!elementKeysAreEqual)
         {
-            _codeBuffer.AppendLine("public override bool Equals(object? obj)");
-            _codeBuffer.AppendLine("{");
-            _codeBuffer.IncrementIndent();
-            _codeBuffer.AppendLine($"return ReferenceEquals(this, obj) || obj is {className} other && Equals(other);");
-            _codeBuffer.DecrementIndent();
-            _codeBuffer.AppendLine("}");
+            _codeGenerator.AppendLine("public override bool Equals(object? obj)");
+            _codeGenerator.AppendLeftBrace();
+            _codeGenerator.IncrementIndent();
+            _codeGenerator.AppendLine($"return ReferenceEquals(this, obj) || obj is {className} other && Equals(other);");
+            _codeGenerator.DecrementIndent();
+            _codeGenerator.AppendRightBrace();
 
-            _codeBuffer.AppendLine();
+            _codeGenerator.AppendLine();
 
-            _codeBuffer.AppendLine($"public bool Equals({className}? other)");
-            _codeBuffer.AppendLine("{");
-            _codeBuffer.IncrementIndent();
-            _codeBuffer.AppendLine("return true;");
-            _codeBuffer.DecrementIndent();
-            _codeBuffer.AppendLine("}");
+            _codeGenerator.AppendLine($"public bool Equals({className}? other)");
+            _codeGenerator.AppendLeftBrace();
+            _codeGenerator.IncrementIndent();
+            _codeGenerator.AppendLine("return true;");
+            _codeGenerator.DecrementIndent();
+            _codeGenerator.AppendRightBrace();
         }
     }
 
@@ -166,26 +210,26 @@ public class MessageGenerator: IMessageGenerator
     private void GenerateCollection(string className, StructSpecification messageStruct)
     {
         var collectionName = FieldSpecification.CollectionType(messageStruct.Name);
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"public sealed class {collectionName}: HashSet<{className}>");
-        _codeBuffer.AppendLine("{");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public sealed class {collectionName}: HashSet<{className}>");
+        _codeGenerator.AppendLeftBrace();
 
-        _codeBuffer.IncrementIndent();
+        _codeGenerator.IncrementIndent();
 
-        _codeBuffer.AppendLine($"public {collectionName}()");
-        _codeBuffer.AppendLine("{");
-        _codeBuffer.AppendLine("}");
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"public {collectionName}(int capacity)");
-        _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine(": base(capacity)");
-        _codeBuffer.DecrementIndent();
-        _codeBuffer.AppendLine("{");
-        _codeBuffer.AppendLine("}");
+        _codeGenerator.AppendLine($"public {collectionName}()");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.AppendRightBrace();
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public {collectionName}(int capacity)");
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine(": base(capacity)");
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.AppendRightBrace();
 
-        _codeBuffer.DecrementIndent();
+        _codeGenerator.DecrementIndent();
 
-        _codeBuffer.AppendLine("}");
+        _codeGenerator.AppendRightBrace();
     }
 
     private void GenerateCtor(
@@ -193,65 +237,65 @@ public class MessageGenerator: IMessageGenerator
         MessageSpecification? topLevelMessage,
         Versions versions)
     {
-        _codeBuffer.AppendLine($"public {className}()");
-        _codeBuffer.AppendLine("{");
-        _codeBuffer.AppendLine("}");
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"public {className}(BufferReader reader, ApiVersions version)");
+        _codeGenerator.AppendLine($"public {className}()");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.AppendRightBrace();
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public {className}(BufferReader reader, ApiVersions version)");
 
-        _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine(": this()");
-        _codeBuffer.DecrementIndent();
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine(": this()");
+        _codeGenerator.DecrementIndent();
 
-        _codeBuffer.AppendLine("{");
+        _codeGenerator.AppendLeftBrace();
 
-        _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine("Read(reader, version);");
-        _codeBuffer.DecrementIndent();
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine("Read(reader, version);");
+        _codeGenerator.DecrementIndent();
 
-        _codeBuffer.AppendLine("}");
+        _codeGenerator.AppendRightBrace();
     }
 
     private void GenerateProperties(
         StructSpecification structSpecification,
         bool isTopLevel,
-        MessageSpecification topLevelMessage,
+        MessageSpecification? topLevelMessage,
         Versions versions)
     {
         var lastField = structSpecification.Fields.Last();
 
-        _codeBuffer.AppendLine($"public ApiVersions LowestSupportedVersion => ApiVersions.Version{versions.Lowest};");
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"public ApiVersions HighestSupportedVersion => ApiVersions.Version{versions.Highest};");
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine($"public ApiVersions LowestSupportedVersion => ApiVersions.Version{versions.Lowest};");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public ApiVersions HighestSupportedVersion => ApiVersions.Version{versions.Highest};");
+        _codeGenerator.AppendLine();
 
         if (isTopLevel)
         {
-            switch (topLevelMessage.Type)
+            switch (topLevelMessage!.Type)
             {
                 //Данные поля есть в базовом классе
                 case MessageType.Request:
                 {
                     var apiKey = (ApiKeys)topLevelMessage.ApiKey;
-                    _codeBuffer.AppendLine($"public ApiKeys ApiKey => ApiKeys.{apiKey};");
-                    _codeBuffer.AppendLine();
+                    _codeGenerator.AppendLine($"public ApiKeys ApiKey => ApiKeys.{apiKey};");
+                    _codeGenerator.AppendLine();
 
                     break;
                 }
             }
         }
 
-        _codeBuffer.AppendLine("public ApiVersions Version {get; set;}");
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine("public List<TaggedField>? UnknownTaggedFields { get; set; } = null;");
-        _codeBuffer.AppendLine();
+        _codeGenerator.AppendLine("public ApiVersions Version {get; set;}");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine("public List<TaggedField>? UnknownTaggedFields { get; set; } = null;");
+        _codeGenerator.AppendLine();
 
         var containsThrottleTimeField = structSpecification.Fields.Any(x => x.Name == "ThrottleTimeMs");
-        
-        if (isTopLevel && topLevelMessage.Type == MessageType.Response && !containsThrottleTimeField)
+
+        if (isTopLevel && topLevelMessage!.Type == MessageType.Response && !containsThrottleTimeField)
         {
-            _codeBuffer.AppendLine("public int ThrottleTimeMs { get; set; } = 0;");
-            _codeBuffer.AppendLine();
+            _codeGenerator.AppendLine("public int ThrottleTimeMs { get; set; } = 0;");
+            _codeGenerator.AppendLine();
         }
 
         foreach (var field in structSpecification.Fields)
@@ -260,30 +304,30 @@ public class MessageGenerator: IMessageGenerator
 
             if (field != lastField)
             {
-                _codeBuffer.AppendLine();
+                _codeGenerator.AppendLine();
             }
         }
     }
 
     private void GenerateProperty(FieldSpecification field)
     {
-        _codeBuffer.AppendLine($"/// <summary>");
-        _codeBuffer.AppendLine($"/// {field.About}");
-        _codeBuffer.AppendLine($"/// </summary>");
+        _codeGenerator.AppendLine($"/// <summary>");
+        _codeGenerator.AppendLine($"/// {field.About}");
+        _codeGenerator.AppendLine($"/// </summary>");
 
         var type = field.FieldAbstractClrType(_structRegistry);
         var defaultValue = field.FieldDefault();
         var nullableMarker = defaultValue.Equals("null") ? "?" : string.Empty;
-        _codeBuffer.AppendLine($"public {type}{nullableMarker} {field.Name} {{ get; set; }} = {defaultValue};");
+        _codeGenerator.AppendLine($"public {type}{nullableMarker} {field.Name} {{ get; set; }} = {defaultValue};");
 
         if (field.Name != "ErrorCode")
         {
             return;
         }
 
-        _codeBuffer.AppendLine();
-        _codeBuffer.AppendLine($"/// <inheritdoc />");
-        _codeBuffer.AppendLine("public ErrorCodes Code => (ErrorCodes)ErrorCode;");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"/// <inheritdoc />");
+        _codeGenerator.AppendLine("public ErrorCodes Code => (ErrorCodes)ErrorCode;");
     }
 
     private void GenerateClassHeader(string className, bool isTopLevel, MessageType? messageType)
@@ -308,7 +352,7 @@ public class MessageGenerator: IMessageGenerator
 
         implementedInterfaces.Add($"IEquatable<{className}>");
 
-        _codeBuffer.AppendLine($"public sealed class {className}: {string.Join(", ", implementedInterfaces)}");
-        _codeBuffer.AppendLine("{");
+        _codeGenerator.AppendLine($"public sealed class {className}: {string.Join(", ", implementedInterfaces)}");
+        _codeGenerator.AppendLeftBrace();
     }
 }

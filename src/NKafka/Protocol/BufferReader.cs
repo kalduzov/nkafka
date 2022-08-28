@@ -32,12 +32,12 @@ namespace NKafka.Protocol;
 /// <summary>
 /// Special struct for read data by kafka protocol
 /// </summary>
-public ref struct BufferReader
+public class BufferReader
 {
-    private readonly ReadOnlySpan<byte> _body;
+    private readonly byte[] _body;
     private int _offset;
 
-    public BufferReader(ReadOnlySpan<byte> span)
+    public BufferReader(byte[] span)
     {
         _body = span;
         _offset = 0;
@@ -227,7 +227,7 @@ public ref struct BufferReader
 
     public string ReadString(int length)
     {
-        var byteSting = _body.Slice(_offset, length);
+        var byteSting = _body.AsSpan().Slice(_offset, length);
         var value = Encoding.UTF8.GetString(byteSting);
         _offset += length;
 
@@ -243,7 +243,7 @@ public ref struct BufferReader
             return null;
         }
 
-        var byteSting = _body.Slice(_offset, stringLength);
+        var byteSting = _body.AsSpan().Slice(_offset, stringLength);
         var value = Encoding.UTF8.GetString(byteSting);
         _offset += stringLength;
 
@@ -261,7 +261,7 @@ public ref struct BufferReader
 
         ThrowIfInsufficientData(stringLength);
 
-        var byteSting = _body.Slice(_offset, stringLength);
+        var byteSting = _body.AsSpan().Slice(_offset, stringLength);
         var value = Encoding.UTF8.GetString(byteSting);
         _offset += stringLength;
 
@@ -279,7 +279,7 @@ public ref struct BufferReader
 
         ThrowIfInsufficientData(stringLength);
 
-        var byteSting = _body.Slice(_offset, stringLength);
+        var byteSting = _body.AsSpan().Slice(_offset, stringLength);
         var value = Encoding.UTF8.GetString(byteSting);
         _offset += stringLength;
 
@@ -304,7 +304,9 @@ public ref struct BufferReader
     {
         ThrowIfInsufficientData(16);
 
-        throw new NotImplementedException();
+        var data = ReadBytes(16);
+
+        return new Guid(data);
     }
 
     private int ReadStringLength()
@@ -410,8 +412,16 @@ public ref struct BufferReader
         return (int)value;
     }
 
-    public List<TaggedField>? ReadUnknownTaggedField(List<TaggedField>? unknownTaggedFields, int tag, int size)
+    public List<TaggedField> ReadUnknownTaggedField(List<TaggedField>? unknowns, int tag, int size)
     {
-        return null;
+        if (unknowns is null)
+        {
+            return new List<TaggedField>(0);
+        }
+
+        var data = ReadBytes(size);
+        unknowns.Add(new TaggedField(tag, data));
+
+        return unknowns;
     }
 }

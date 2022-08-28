@@ -78,7 +78,7 @@ public sealed class AlterUserScramCredentialsResponseMessage: IResponseMessage, 
             else
             {
                 var newCollection = new List<AlterUserScramCredentialsResultMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new AlterUserScramCredentialsResultMessage(reader, version));
                 }
@@ -123,6 +123,13 @@ public sealed class AlterUserScramCredentialsResponseMessage: IResponseMessage, 
     public bool Equals(AlterUserScramCredentialsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class AlterUserScramCredentialsResultMessage: IMessage, IEquatable<AlterUserScramCredentialsResultMessage>
@@ -250,6 +257,13 @@ public sealed class AlterUserScramCredentialsResponseMessage: IResponseMessage, 
         public bool Equals(AlterUserScramCredentialsResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, User, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

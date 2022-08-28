@@ -76,7 +76,7 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
                 else
                 {
                     var newCollection = new List<AclCreationMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AclCreationMessage(reader, version));
                     }
@@ -94,7 +94,7 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
                 else
                 {
                     var newCollection = new List<AclCreationMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AclCreationMessage(reader, version));
                     }
@@ -163,6 +163,13 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
     public bool Equals(CreateAclsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Creations);
+        return hashCode;
     }
 
     public sealed class AclCreationMessage: IMessage, IEquatable<AclCreationMessage>
@@ -401,6 +408,13 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
         public bool Equals(AclCreationMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, ResourcePatternType, Principal, Host, Operation, PermissionType);
+            return hashCode;
         }
     }
 }

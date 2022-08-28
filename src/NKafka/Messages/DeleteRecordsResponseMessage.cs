@@ -79,8 +79,8 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
                 }
                 else
                 {
-                    DeleteRecordsTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeleteRecordsTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteRecordsTopicResultMessage(reader, version));
                     }
@@ -97,8 +97,8 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
                 }
                 else
                 {
-                    DeleteRecordsTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeleteRecordsTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteRecordsTopicResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
     public bool Equals(DeleteRecordsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
     }
 
     public sealed class DeleteRecordsTopicResultMessage: IMessage, IEquatable<DeleteRecordsTopicResultMessage>
@@ -240,8 +247,8 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
                     }
                     else
                     {
-                        DeleteRecordsPartitionResultCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new DeleteRecordsPartitionResultCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteRecordsPartitionResultMessage(reader, version));
                         }
@@ -258,8 +265,8 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
                     }
                     else
                     {
-                        DeleteRecordsPartitionResultCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new DeleteRecordsPartitionResultCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteRecordsPartitionResultMessage(reader, version));
                         }
@@ -341,6 +348,13 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
         public bool Equals(DeleteRecordsTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 
@@ -440,6 +454,13 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
         public bool Equals(DeleteRecordsPartitionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 

@@ -164,7 +164,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 else
                 {
                     var newCollection = new List<FetchTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new FetchTopicMessage(reader, version));
                     }
@@ -182,7 +182,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 else
                 {
                     var newCollection = new List<FetchTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new FetchTopicMessage(reader, version));
                     }
@@ -203,7 +203,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 else
                 {
                     var newCollection = new List<ForgottenTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ForgottenTopicMessage(reader, version));
                     }
@@ -221,7 +221,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 else
                 {
                     var newCollection = new List<ForgottenTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ForgottenTopicMessage(reader, version));
                     }
@@ -417,6 +417,14 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ClusterId, ReplicaId, MaxWaitMs, MinBytes, MaxBytes, IsolationLevel, SessionId);
+        hashCode = HashCode.Combine(hashCode, SessionEpoch, Topics, ForgottenTopicsData, RackId);
+        return hashCode;
+    }
+
     public sealed class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -506,7 +514,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                     else
                     {
                         var newCollection = new List<FetchPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new FetchPartitionMessage(reader, version));
                         }
@@ -524,7 +532,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                     else
                     {
                         var newCollection = new List<FetchPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new FetchPartitionMessage(reader, version));
                         }
@@ -612,6 +620,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         public bool Equals(FetchTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic, TopicId, Partitions);
+            return hashCode;
         }
     }
 
@@ -766,6 +781,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, FetchOffset, LastFetchedEpoch, LogStartOffset, PartitionMaxBytes);
+            return hashCode;
+        }
     }
 
     public sealed class ForgottenTopicMessage: IMessage, IEquatable<ForgottenTopicMessage>
@@ -862,7 +884,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -949,6 +971,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         public bool Equals(ForgottenTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic, TopicId, Partitions);
+            return hashCode;
         }
     }
 }

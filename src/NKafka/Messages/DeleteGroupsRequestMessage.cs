@@ -76,7 +76,7 @@ public sealed class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadVarUInt() - 1;
@@ -107,7 +107,7 @@ public sealed class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadShort();
@@ -197,5 +197,12 @@ public sealed class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<Dele
     public bool Equals(DeleteGroupsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupsNames);
+        return hashCode;
     }
 }

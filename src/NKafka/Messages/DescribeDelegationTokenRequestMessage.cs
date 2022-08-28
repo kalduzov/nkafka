@@ -76,7 +76,7 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
                 else
                 {
                     var newCollection = new List<DescribeDelegationTokenOwnerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeDelegationTokenOwnerMessage(reader, version));
                     }
@@ -94,7 +94,7 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
                 else
                 {
                     var newCollection = new List<DescribeDelegationTokenOwnerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeDelegationTokenOwnerMessage(reader, version));
                     }
@@ -177,6 +177,13 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
     public bool Equals(DescribeDelegationTokenRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Owners);
+        return hashCode;
     }
 
     public sealed class DescribeDelegationTokenOwnerMessage: IMessage, IEquatable<DescribeDelegationTokenOwnerMessage>
@@ -330,6 +337,13 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
         public bool Equals(DescribeDelegationTokenOwnerMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
+            return hashCode;
         }
     }
 }

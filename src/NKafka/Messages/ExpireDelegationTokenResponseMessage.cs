@@ -127,4 +127,11 @@ public sealed class ExpireDelegationTokenResponseMessage: IResponseMessage, IEqu
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, ExpiryTimestampMs, ThrottleTimeMs);
+        return hashCode;
+    }
 }

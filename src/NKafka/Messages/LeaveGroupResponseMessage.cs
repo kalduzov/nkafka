@@ -97,7 +97,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
                 else
                 {
                     var newCollection = new List<MemberResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MemberResponseMessage(reader, version));
                     }
@@ -115,7 +115,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
                 else
                 {
                     var newCollection = new List<MemberResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MemberResponseMessage(reader, version));
                     }
@@ -203,6 +203,13 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
     public bool Equals(LeaveGroupResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, Members);
+        return hashCode;
     }
 
     public sealed class MemberResponseMessage: IMessage, IEquatable<MemberResponseMessage>
@@ -382,6 +389,13 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
         public bool Equals(MemberResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, ErrorCode);
+            return hashCode;
         }
     }
 }

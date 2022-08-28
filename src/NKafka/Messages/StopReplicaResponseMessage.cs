@@ -85,7 +85,7 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
                 else
                 {
                     var newCollection = new List<StopReplicaPartitionErrorMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new StopReplicaPartitionErrorMessage(reader, version));
                     }
@@ -103,7 +103,7 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
                 else
                 {
                     var newCollection = new List<StopReplicaPartitionErrorMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new StopReplicaPartitionErrorMessage(reader, version));
                     }
@@ -173,6 +173,13 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
     public bool Equals(StopReplicaResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, PartitionErrors);
+        return hashCode;
     }
 
     public sealed class StopReplicaPartitionErrorMessage: IMessage, IEquatable<StopReplicaPartitionErrorMessage>
@@ -303,6 +310,13 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
         public bool Equals(StopReplicaPartitionErrorMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ErrorCode);
+            return hashCode;
         }
     }
 }

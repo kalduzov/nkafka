@@ -117,7 +117,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
                 else
                 {
                     var newCollection = new List<DescribeAclsResourceMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeAclsResourceMessage(reader, version));
                     }
@@ -135,7 +135,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
                 else
                 {
                     var newCollection = new List<DescribeAclsResourceMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeAclsResourceMessage(reader, version));
                     }
@@ -232,6 +232,13 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, Resources);
+        return hashCode;
+    }
+
     public sealed class DescribeAclsResourceMessage: IMessage, IEquatable<DescribeAclsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -322,7 +329,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
                     else
                     {
                         var newCollection = new List<AclDescriptionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AclDescriptionMessage(reader, version));
                         }
@@ -340,7 +347,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
                     else
                     {
                         var newCollection = new List<AclDescriptionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AclDescriptionMessage(reader, version));
                         }
@@ -433,6 +440,13 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
         public bool Equals(DescribeAclsResourceMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, PatternType, Acls);
+            return hashCode;
         }
     }
 
@@ -601,6 +615,13 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
         public bool Equals(AclDescriptionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Principal, Host, Operation, PermissionType);
+            return hashCode;
         }
     }
 }

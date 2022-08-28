@@ -128,4 +128,11 @@ public sealed class EnvelopeResponseMessage: IResponseMessage, IEquatable<Envelo
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ResponseData, ErrorCode);
+        return hashCode;
+    }
 }

@@ -74,7 +74,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
             else
             {
                 var newCollection = new List<TopicRequestMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicRequestMessage(reader, version));
                 }
@@ -118,6 +118,13 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
     public bool Equals(DescribeProducersRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics);
+        return hashCode;
     }
 
     public sealed class TopicRequestMessage: IMessage, IEquatable<TopicRequestMessage>
@@ -182,7 +189,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -231,6 +238,13 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
         public bool Equals(TopicRequestMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
+            return hashCode;
         }
     }
 }

@@ -306,4 +306,11 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ResourceTypeFilter, ResourceNameFilter, PatternTypeFilter, PrincipalFilter, HostFilter, Operation, PermissionType);
+        return hashCode;
+    }
 }

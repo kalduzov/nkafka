@@ -134,4 +134,11 @@ public sealed class InitProducerIdResponseMessage: IResponseMessage, IEquatable<
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerId, ProducerEpoch);
+        return hashCode;
+    }
 }

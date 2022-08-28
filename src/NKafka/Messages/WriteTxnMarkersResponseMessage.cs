@@ -76,7 +76,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<WritableTxnMarkerResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new WritableTxnMarkerResultMessage(reader, version));
                     }
@@ -94,7 +94,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<WritableTxnMarkerResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new WritableTxnMarkerResultMessage(reader, version));
                     }
@@ -165,6 +165,13 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Markers);
+        return hashCode;
+    }
+
     public sealed class WritableTxnMarkerResultMessage: IMessage, IEquatable<WritableTxnMarkerResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -214,7 +221,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerTopicResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerTopicResultMessage(reader, version));
                         }
@@ -232,7 +239,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerTopicResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerTopicResultMessage(reader, version));
                         }
@@ -302,6 +309,13 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         public bool Equals(WritableTxnMarkerResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ProducerId, Topics);
+            return hashCode;
         }
     }
 
@@ -376,7 +390,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerPartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerPartitionResultMessage(reader, version));
                         }
@@ -394,7 +408,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerPartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerPartitionResultMessage(reader, version));
                         }
@@ -475,6 +489,13 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         public bool Equals(WritableTxnMarkerTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -566,6 +587,13 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         public bool Equals(WritableTxnMarkerPartitionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
+            return hashCode;
         }
     }
 }

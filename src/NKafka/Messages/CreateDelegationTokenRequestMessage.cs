@@ -133,7 +133,7 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
                 else
                 {
                     var newCollection = new List<CreatableRenewersMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableRenewersMessage(reader, version));
                     }
@@ -151,7 +151,7 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
                 else
                 {
                     var newCollection = new List<CreatableRenewersMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableRenewersMessage(reader, version));
                     }
@@ -262,6 +262,13 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
     public bool Equals(CreateDelegationTokenRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, OwnerPrincipalType, OwnerPrincipalName, Renewers, MaxLifetimeMs);
+        return hashCode;
     }
 
     public sealed class CreatableRenewersMessage: IMessage, IEquatable<CreatableRenewersMessage>
@@ -415,6 +422,13 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
         public bool Equals(CreatableRenewersMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
+            return hashCode;
         }
     }
 }

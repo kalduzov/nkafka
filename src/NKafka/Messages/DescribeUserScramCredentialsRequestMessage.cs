@@ -74,7 +74,7 @@ public sealed class DescribeUserScramCredentialsRequestMessage: IRequestMessage,
             else
             {
                 var newCollection = new List<UserNameMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new UserNameMessage(reader, version));
                 }
@@ -125,6 +125,13 @@ public sealed class DescribeUserScramCredentialsRequestMessage: IRequestMessage,
     public bool Equals(DescribeUserScramCredentialsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Users);
+        return hashCode;
     }
 
     public sealed class UserNameMessage: IMessage, IEquatable<UserNameMessage>
@@ -211,6 +218,13 @@ public sealed class DescribeUserScramCredentialsRequestMessage: IRequestMessage,
         public bool Equals(UserNameMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 }

@@ -209,7 +209,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 else
                 {
                     var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
                     }
@@ -227,7 +227,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 else
                 {
                     var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
                     }
@@ -370,6 +370,14 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, TransactionalId, GroupId, ProducerId, ProducerEpoch, GenerationId, MemberId, GroupInstanceId);
+        hashCode = HashCode.Combine(hashCode, Topics);
+        return hashCode;
+    }
+
     public sealed class TxnOffsetCommitRequestTopicMessage: IMessage, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -441,7 +449,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                     else
                     {
                         var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
                         }
@@ -459,7 +467,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                     else
                     {
                         var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
                         }
@@ -540,6 +548,13 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         public bool Equals(TxnOffsetCommitRequestTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -697,6 +712,13 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         public bool Equals(TxnOffsetCommitRequestPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommittedMetadata);
+            return hashCode;
         }
     }
 }

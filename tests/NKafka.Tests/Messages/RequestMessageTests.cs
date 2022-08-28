@@ -34,7 +34,7 @@ public class RequestMessageTests<T>
         var writer = new BufferWriter(stream);
         message.Write(writer, version);
 
-        var serializeMessage = stream.ToArray().AsSpan();
+        var serializeMessage = stream.ToArray();
 
         var reader = new BufferReader(serializeMessage);
         var deserializeMessage = new T();

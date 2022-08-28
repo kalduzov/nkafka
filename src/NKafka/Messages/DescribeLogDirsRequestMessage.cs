@@ -75,8 +75,8 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
                 }
                 else
                 {
-                    DescribableLogDirTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DescribableLogDirTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribableLogDirTopicMessage(reader, version));
                     }
@@ -93,8 +93,8 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
                 }
                 else
                 {
-                    DescribableLogDirTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DescribableLogDirTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribableLogDirTopicMessage(reader, version));
                     }
@@ -179,6 +179,13 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics);
+        return hashCode;
+    }
+
     public sealed class DescribableLogDirTopicMessage: IMessage, IEquatable<DescribableLogDirTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -255,7 +262,7 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -332,6 +339,13 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
         public bool Equals(DescribableLogDirTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic);
+            return hashCode;
         }
     }
 

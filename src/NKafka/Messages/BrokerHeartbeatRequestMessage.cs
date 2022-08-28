@@ -127,4 +127,11 @@ public sealed class BrokerHeartbeatRequestMessage: IRequestMessage, IEquatable<B
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch, CurrentMetadataOffset, WantFence, WantShutDown);
+        return hashCode;
+    }
 }

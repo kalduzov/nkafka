@@ -78,8 +78,8 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
                 else
                 {
-                    TopicProduceResponseCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new TopicProduceResponseCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TopicProduceResponseMessage(reader, version));
                     }
@@ -96,8 +96,8 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
                 else
                 {
-                    TopicProduceResponseCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new TopicProduceResponseCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TopicProduceResponseMessage(reader, version));
                     }
@@ -180,6 +180,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Responses, ThrottleTimeMs);
+        return hashCode;
+    }
+
     public sealed class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -251,7 +258,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                     else
                     {
                         var newCollection = new List<PartitionProduceResponseMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionProduceResponseMessage(reader, version));
                         }
@@ -269,7 +276,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                     else
                     {
                         var newCollection = new List<PartitionProduceResponseMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionProduceResponseMessage(reader, version));
                         }
@@ -351,6 +358,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         public bool Equals(TopicProduceResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 
@@ -450,7 +464,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                     else
                     {
                         var newCollection = new List<BatchIndexAndErrorMessageMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new BatchIndexAndErrorMessageMessage(reader, version));
                         }
@@ -468,7 +482,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                     else
                     {
                         var newCollection = new List<BatchIndexAndErrorMessageMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new BatchIndexAndErrorMessageMessage(reader, version));
                         }
@@ -611,6 +625,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Index, ErrorCode, BaseOffset, LogAppendTimeMs, LogStartOffset, RecordErrors, ErrorMessage);
+            return hashCode;
+        }
     }
 
     public sealed class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
@@ -747,6 +768,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         public bool Equals(BatchIndexAndErrorMessageMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, BatchIndex, BatchIndexErrorMessage);
+            return hashCode;
         }
     }
 

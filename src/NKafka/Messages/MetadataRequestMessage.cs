@@ -91,7 +91,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 else
                 {
                     var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataRequestTopicMessage(reader, version));
                     }
@@ -116,7 +116,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 else
                 {
                     var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataRequestTopicMessage(reader, version));
                     }
@@ -262,6 +262,13 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
     public bool Equals(MetadataRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics, AllowAutoTopicCreation, IncludeClusterAuthorizedOperations, IncludeTopicAuthorizedOperations);
+        return hashCode;
     }
 
     public sealed class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
@@ -410,6 +417,13 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         public bool Equals(MetadataRequestTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicId, Name);
+            return hashCode;
         }
     }
 }

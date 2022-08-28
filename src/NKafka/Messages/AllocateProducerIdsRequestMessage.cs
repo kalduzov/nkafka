@@ -106,4 +106,11 @@ public sealed class AllocateProducerIdsRequestMessage: IRequestMessage, IEquatab
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch);
+        return hashCode;
+    }
 }

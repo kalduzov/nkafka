@@ -259,4 +259,11 @@ public sealed class HeartbeatRequestMessage: IRequestMessage, IEquatable<Heartbe
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, GenerationId, MemberId, GroupInstanceId);
+        return hashCode;
+    }
 }

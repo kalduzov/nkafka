@@ -80,7 +80,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                 else
                 {
                     var newCollection = new List<AlterReplicaLogDirTopicResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterReplicaLogDirTopicResultMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                 else
                 {
                     var newCollection = new List<AlterReplicaLogDirTopicResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterReplicaLogDirTopicResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
     public bool Equals(AlterReplicaLogDirsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class AlterReplicaLogDirTopicResultMessage: IMessage, IEquatable<AlterReplicaLogDirTopicResultMessage>
@@ -241,7 +248,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                     else
                     {
                         var newCollection = new List<AlterReplicaLogDirPartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterReplicaLogDirPartitionResultMessage(reader, version));
                         }
@@ -259,7 +266,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                     else
                     {
                         var newCollection = new List<AlterReplicaLogDirPartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterReplicaLogDirPartitionResultMessage(reader, version));
                         }
@@ -340,6 +347,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         public bool Equals(AlterReplicaLogDirTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
+            return hashCode;
         }
     }
 
@@ -431,6 +445,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         public bool Equals(AlterReplicaLogDirPartitionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
+            return hashCode;
         }
     }
 }

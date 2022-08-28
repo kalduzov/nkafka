@@ -96,7 +96,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<DescribeLogDirsResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeLogDirsResultMessage(reader, version));
                     }
@@ -114,7 +114,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<DescribeLogDirsResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeLogDirsResultMessage(reader, version));
                     }
@@ -188,6 +188,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
     public bool Equals(DescribeLogDirsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, Results);
+        return hashCode;
     }
 
     public sealed class DescribeLogDirsResultMessage: IMessage, IEquatable<DescribeLogDirsResultMessage>
@@ -280,7 +287,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeLogDirsTopicMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeLogDirsTopicMessage(reader, version));
                         }
@@ -298,7 +305,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeLogDirsTopicMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeLogDirsTopicMessage(reader, version));
                         }
@@ -405,6 +412,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, LogDir, Topics, TotalBytes, UsableBytes);
+            return hashCode;
+        }
     }
 
     public sealed class DescribeLogDirsTopicMessage: IMessage, IEquatable<DescribeLogDirsTopicMessage>
@@ -478,7 +492,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeLogDirsPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeLogDirsPartitionMessage(reader, version));
                         }
@@ -496,7 +510,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeLogDirsPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeLogDirsPartitionMessage(reader, version));
                         }
@@ -577,6 +591,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         public bool Equals(DescribeLogDirsTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -679,6 +700,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         public bool Equals(DescribeLogDirsPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, PartitionSize, OffsetLag, IsFutureKey);
+            return hashCode;
         }
     }
 }

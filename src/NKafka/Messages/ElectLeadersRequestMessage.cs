@@ -93,8 +93,8 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 }
                 else
                 {
-                    TopicPartitionsCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new TopicPartitionsCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TopicPartitionsMessage(reader, version));
                     }
@@ -111,8 +111,8 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 }
                 else
                 {
-                    TopicPartitionsCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new TopicPartitionsCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TopicPartitionsMessage(reader, version));
                     }
@@ -210,6 +210,13 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ElectionType, TopicPartitions, TimeoutMs);
+        return hashCode;
+    }
+
     public sealed class TopicPartitionsMessage: IMessage, IEquatable<TopicPartitionsMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -286,7 +293,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -363,6 +370,13 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         public bool Equals(TopicPartitionsMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic);
+            return hashCode;
         }
     }
 

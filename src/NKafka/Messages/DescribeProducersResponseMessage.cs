@@ -78,7 +78,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             else
             {
                 var newCollection = new List<TopicResponseMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicResponseMessage(reader, version));
                 }
@@ -123,6 +123,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
     public bool Equals(DescribeProducersResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
     }
 
     public sealed class TopicResponseMessage: IMessage, IEquatable<TopicResponseMessage>
@@ -187,7 +194,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
                 else
                 {
                     var newCollection = new List<PartitionResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionResponseMessage(reader, version));
                     }
@@ -236,6 +243,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         public bool Equals(TopicResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -316,7 +330,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
                 else
                 {
                     var newCollection = new List<ProducerStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ProducerStateMessage(reader, version));
                     }
@@ -372,6 +386,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         public bool Equals(PartitionResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, ErrorMessage, ActiveProducers);
+            return hashCode;
         }
     }
 
@@ -475,6 +496,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         public bool Equals(ProducerStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ProducerId, ProducerEpoch, LastSequence, LastTimestamp, CoordinatorEpoch, CurrentTxnStartOffset);
+            return hashCode;
         }
     }
 }

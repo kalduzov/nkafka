@@ -87,7 +87,7 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
                 else
                 {
                     var newCollection = new List<DescribedGroupMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribedGroupMessage(reader, version));
                     }
@@ -105,7 +105,7 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
                 else
                 {
                     var newCollection = new List<DescribedGroupMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribedGroupMessage(reader, version));
                     }
@@ -178,6 +178,13 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
     public bool Equals(DescribeGroupsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Groups);
+        return hashCode;
     }
 
     public sealed class DescribedGroupMessage: IMessage, IEquatable<DescribedGroupMessage>
@@ -349,7 +356,7 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
                     else
                     {
                         var newCollection = new List<DescribedGroupMemberMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribedGroupMemberMessage(reader, version));
                         }
@@ -367,7 +374,7 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
                     else
                     {
                         var newCollection = new List<DescribedGroupMemberMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribedGroupMemberMessage(reader, version));
                         }
@@ -504,6 +511,13 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
         public bool Equals(DescribedGroupMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, GroupId, GroupState, ProtocolType, ProtocolData, Members, AuthorizedOperations);
+            return hashCode;
         }
     }
 
@@ -824,6 +838,13 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
         public bool Equals(DescribedGroupMemberMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, ClientId, ClientHost, MemberMetadata, MemberAssignment);
+            return hashCode;
         }
     }
 }

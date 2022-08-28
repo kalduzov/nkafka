@@ -79,7 +79,7 @@ public sealed class IsNullConditional
         return this;
     }
 
-    public void Generate(ICodeBuffer codeBuffer)
+    public void Generate(ICodeGenerator codeGenerator)
     {
         if (_nullableVersions.Intersect(_possibleVersions).IsEmpty)
         {
@@ -87,16 +87,16 @@ public sealed class IsNullConditional
             {
                 if (_alwaysEmitBlockScope)
                 {
-                    codeBuffer.AppendLine("{");
-                    codeBuffer.IncrementIndent();
+                    codeGenerator.AppendLeftBrace();
+                    codeGenerator.IncrementIndent();
                 }
 
                 _ifShouldNotBeNull();
 
                 if (_alwaysEmitBlockScope)
                 {
-                    codeBuffer.DecrementIndent();
-                    codeBuffer.AppendLine("}");
+                    codeGenerator.DecrementIndent();
+                    codeGenerator.AppendRightBrace();
                 }
             }
         }
@@ -104,32 +104,32 @@ public sealed class IsNullConditional
         {
             if (_ifNull is not null)
             {
-                codeBuffer.AppendLine($"if ({_conditionalGenerator(_name, false)})");
-                codeBuffer.AppendLine("{");
-                codeBuffer.IncrementIndent();
+                codeGenerator.AppendLine($"if ({_conditionalGenerator(_name, false)})");
+                codeGenerator.AppendLeftBrace();
+                codeGenerator.IncrementIndent();
                 _ifNull();
-                codeBuffer.DecrementIndent();
+                codeGenerator.DecrementIndent();
 
                 if (_ifShouldNotBeNull is not null)
                 {
-                    codeBuffer.AppendLine("}");
-                    codeBuffer.AppendLine("else");
-                    codeBuffer.AppendLine("{");
-                    codeBuffer.IncrementIndent();
+                    codeGenerator.AppendRightBrace();
+                    codeGenerator.AppendLine("else");
+                    codeGenerator.AppendLeftBrace();
+                    codeGenerator.IncrementIndent();
                     _ifShouldNotBeNull();
-                    codeBuffer.DecrementIndent();
+                    codeGenerator.DecrementIndent();
                 }
 
-                codeBuffer.AppendLine("}");
+                codeGenerator.AppendRightBrace();
             }
             else if (_ifShouldNotBeNull is not null)
             {
-                codeBuffer.AppendLine($"if ({_conditionalGenerator(_name, true)})");
-                codeBuffer.AppendLine("{");
-                codeBuffer.IncrementIndent();
+                codeGenerator.AppendLine($"if ({_conditionalGenerator(_name, true)})");
+                codeGenerator.AppendLeftBrace();
+                codeGenerator.IncrementIndent();
                 _ifShouldNotBeNull();
-                codeBuffer.DecrementIndent();
-                codeBuffer.AppendLine("}");
+                codeGenerator.DecrementIndent();
+                codeGenerator.AppendRightBrace();
             }
         }
     }

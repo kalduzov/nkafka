@@ -145,4 +145,11 @@ public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquat
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Hmac, ExpiryTimePeriodMs);
+        return hashCode;
+    }
 }

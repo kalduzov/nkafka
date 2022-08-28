@@ -81,7 +81,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                 else
                 {
                     var newCollection = new List<EntryDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new EntryDataMessage(reader, version));
                     }
@@ -99,7 +99,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                 else
                 {
                     var newCollection = new List<EntryDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new EntryDataMessage(reader, version));
                     }
@@ -172,6 +172,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Entries, ValidateOnly);
+        return hashCode;
+    }
+
     public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -220,7 +227,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                     else
                     {
                         var newCollection = new List<EntityDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EntityDataMessage(reader, version));
                         }
@@ -238,7 +245,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                     else
                     {
                         var newCollection = new List<EntityDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EntityDataMessage(reader, version));
                         }
@@ -258,7 +265,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                     else
                     {
                         var newCollection = new List<OpDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OpDataMessage(reader, version));
                         }
@@ -276,7 +283,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                     else
                     {
                         var newCollection = new List<OpDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OpDataMessage(reader, version));
                         }
@@ -361,6 +368,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         public bool Equals(EntryDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Entity, Ops);
+            return hashCode;
         }
     }
 
@@ -528,6 +542,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, EntityType, EntityName);
+            return hashCode;
+        }
     }
 
     public sealed class OpDataMessage: IMessage, IEquatable<OpDataMessage>
@@ -655,6 +676,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         public bool Equals(OpDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Key, Value, Remove);
+            return hashCode;
         }
     }
 }

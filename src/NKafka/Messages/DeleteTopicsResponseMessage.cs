@@ -86,8 +86,8 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
                 }
                 else
                 {
-                    DeletableTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeletableTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeletableTopicResultMessage(reader, version));
                     }
@@ -104,8 +104,8 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
                 }
                 else
                 {
-                    DeletableTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeletableTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeletableTopicResultMessage(reader, version));
                     }
@@ -178,6 +178,13 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
     public bool Equals(DeleteTopicsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Responses);
+        return hashCode;
     }
 
     public sealed class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
@@ -376,6 +383,13 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
         public bool Equals(DeletableTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

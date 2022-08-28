@@ -76,7 +76,7 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
                 else
                 {
                     var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteAclsFilterMessage(reader, version));
                     }
@@ -94,7 +94,7 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
                 else
                 {
                     var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteAclsFilterMessage(reader, version));
                     }
@@ -163,6 +163,13 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
     public bool Equals(DeleteAclsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Filters);
+        return hashCode;
     }
 
     public sealed class DeleteAclsFilterMessage: IMessage, IEquatable<DeleteAclsFilterMessage>
@@ -437,6 +444,13 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
         public bool Equals(DeleteAclsFilterMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ResourceTypeFilter, ResourceNameFilter, PatternTypeFilter, PrincipalFilter, HostFilter, Operation, PermissionType);
+            return hashCode;
         }
     }
 }

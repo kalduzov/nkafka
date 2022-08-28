@@ -123,7 +123,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             else
             {
                 var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
                 }
@@ -147,7 +147,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<LeaderAndIsrTopicStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrTopicStateMessage(reader, version));
                     }
@@ -165,7 +165,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<LeaderAndIsrTopicStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrTopicStateMessage(reader, version));
                     }
@@ -189,7 +189,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<LeaderAndIsrLiveLeaderMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrLiveLeaderMessage(reader, version));
                     }
@@ -207,7 +207,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<LeaderAndIsrLiveLeaderMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrLiveLeaderMessage(reader, version));
                     }
@@ -336,6 +336,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ControllerId, ControllerEpoch, BrokerEpoch, Type, UngroupedPartitionStates, TopicStates, LiveLeaders);
+        return hashCode;
+    }
+
     public sealed class LeaderAndIsrTopicStateMessage: IMessage, IEquatable<LeaderAndIsrTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -420,7 +427,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     else
                     {
                         var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
                         }
@@ -438,7 +445,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     else
                     {
                         var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
                         }
@@ -527,6 +534,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         public bool Equals(LeaderAndIsrTopicStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, TopicId, PartitionStates);
+            return hashCode;
         }
     }
 
@@ -655,6 +669,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         public bool Equals(LeaderAndIsrLiveLeaderMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, BrokerId, HostName, Port);
+            return hashCode;
         }
     }
 
@@ -786,7 +807,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -811,7 +832,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -836,7 +857,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -865,7 +886,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -1019,6 +1040,14 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         public bool Equals(LeaderAndIsrPartitionStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ControllerEpoch, Leader, LeaderEpoch, Isr, PartitionEpoch);
+            hashCode = HashCode.Combine(hashCode, Replicas, AddingReplicas, RemovingReplicas, IsNew, LeaderRecoveryState);
+            return hashCode;
         }
     }
 }

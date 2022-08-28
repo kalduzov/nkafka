@@ -27,32 +27,30 @@ namespace NKafka.MessageGenerator;
 
 internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
 {
-    private readonly IHeaderGenerator _headerGenerator;
     private readonly StructRegistry _structRegistry;
-    private readonly CodeBuffer _codeBuffer;
+    private readonly ICodeGenerator _codeGenerator;
 
-    public WriteMethodGenerator(IHeaderGenerator headerGenerator, StructRegistry structRegistry, CodeBuffer codeBuffer)
+    public WriteMethodGenerator(StructRegistry structRegistry, ICodeGenerator codeGenerator)
     {
-        _headerGenerator = headerGenerator;
         _structRegistry = structRegistry;
-        _codeBuffer = codeBuffer;
+        _codeGenerator = codeGenerator;
     }
 
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions)
     {
         MessageFlexibleVersions = messageFlexibleVersions;
 
-        _codeBuffer.AppendLine("public void Write(BufferWriter writer, ApiVersions version)");
-        _codeBuffer.AppendLine("{");
-        _codeBuffer.IncrementIndent();
+        _codeGenerator.AppendLine("public void Write(BufferWriter writer, ApiVersions version)");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
 
         VersionConditional.ForVersions(structSpecification.Versions, parentVersions)
             .AllowMembershipCheckAlwaysFalse(false)
             .IfNotMember(
-                _ => { _codeBuffer.AppendLine($"throw new UnsupportedVersionException($\"Can't write version {{version}} of {className}\");"); })
-            .Generate(_codeBuffer);
+                _ => { _codeGenerator.AppendLine($"throw new UnsupportedVersionException($\"Can't write version {{version}} of {className}\");"); })
+            .Generate(_codeGenerator);
 
-        _codeBuffer.AppendLine("var numTaggedFields = 0;");
+        _codeGenerator.AppendLine("var numTaggedFields = 0;");
         var curVersions = parentVersions.Intersect(structSpecification.Versions);
         var taggedFields = new Dictionary<int, FieldSpecification>();
 
@@ -85,7 +83,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                             VersionConditional.ForVersions(FieldFlexibleVersions(field), presentAndUntaggedVersions)
                                                 .IfMember(CallGenerateVariableLengthWriter)
                                                 .IfNotMember(CallGenerateVariableLengthWriter)
-                                                .Generate(_codeBuffer);
+                                                .Generate(_codeGenerator);
                                         }
                                         else
                                         {
@@ -94,50 +92,50 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                     }
                                     else
                                     {
-                                        _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                        _codeGenerator.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
                                     }
                                 })
                             .IfMember(
                                 _ =>
                                 {
-                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeBuffer, field.NullableVersions);
-                                    _codeBuffer.IncrementIndent();
-                                    _codeBuffer.AppendLine("numTaggedFields++;");
-                                    _codeBuffer.DecrementIndent();
-                                    _codeBuffer.AppendLine("}");
+                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeGenerator, field.NullableVersions);
+                                    _codeGenerator.IncrementIndent();
+                                    _codeGenerator.AppendLine("numTaggedFields++;");
+                                    _codeGenerator.DecrementIndent();
+                                    _codeGenerator.AppendRightBrace();
 
-                                    if (!taggedFields.TryAdd(field.Tag.Value, field))
+                                    if (!taggedFields.TryAdd(field.Tag!.Value, field))
                                     {
                                         throw new Exception($"Field {field.Name} has tag {field.Tag}, but another field already used that tag.");
                                     }
                                 })
-                            .Generate(_codeBuffer);
+                            .Generate(_codeGenerator);
                     });
 
             if (!field.Ignorable)
             {
-                cond.IfNotMember(_ => { field.GenerateNonIgnorableFieldCheck(_structRegistry, _codeBuffer); });
+                cond.IfNotMember(_ => { field.GenerateNonIgnorableFieldCheck(_structRegistry, _codeGenerator); });
             }
 
-            cond.Generate(_codeBuffer);
+            cond.Generate(_codeGenerator);
         }
 
-        _codeBuffer.AppendLine("var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);");
-        _codeBuffer.AppendLine("numTaggedFields += rawWriter.FieldsCount;");
+        _codeGenerator.AppendLine("var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);");
+        _codeGenerator.AppendLine("numTaggedFields += rawWriter.FieldsCount;");
 
         VersionConditional.ForVersions(messageFlexibleVersions, curVersions)
             .IfNotMember(_ => { GenerateCheckForUnsupportedNumTaggedFields("numTaggedFields > 0"); })
             .IfMember(
                 _ =>
                 {
-                    _codeBuffer.AppendLine("writer.WriteVarUInt(numTaggedFields);");
+                    _codeGenerator.AppendLine("writer.WriteVarUInt(numTaggedFields);");
                     var prevTag = -1;
 
                     foreach (var field in taggedFields.Values)
                     {
                         if (prevTag + 1 != field.Tag)
                         {
-                            _codeBuffer.AppendLine($"rawWriter.WriteRawTags(writer,{field.Tag});");
+                            _codeGenerator.AppendLine($"rawWriter.WriteRawTags(writer,{field.Tag});");
                         }
 
                         VersionConditional
@@ -155,26 +153,26 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                             {
                                                 if (!field.Default.Equals("null"))
                                                 {
-                                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeBuffer, Versions.None);
-                                                    _codeBuffer.IncrementIndent();
+                                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeGenerator, Versions.None);
+                                                    _codeGenerator.IncrementIndent();
                                                 }
 
-                                                _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Tag});");
+                                                _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Tag});");
 
                                                 if (field.Type.IsString)
                                                 {
-                                                    _codeBuffer.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({field.Name});");
-                                                    _codeBuffer.AppendLine(
+                                                    _codeGenerator.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({field.Name});");
+                                                    _codeGenerator.AppendLine(
                                                         "writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());");
-                                                    _codeBuffer.AppendLine("writer.WriteVarUInt(stringBytes.Length + 1);");
-                                                    _codeBuffer.AppendLine("writer.WriteBytes(stringBytes);");
+                                                    _codeGenerator.AppendLine("writer.WriteVarUInt(stringBytes.Length + 1);");
+                                                    _codeGenerator.AppendLine("writer.WriteBytes(stringBytes);");
                                                 }
                                                 else if (field.Type.IsBytes)
                                                 {
-                                                    _codeBuffer.AppendLine(
+                                                    _codeGenerator.AppendLine(
                                                         $"writer.WriteVarUInt({field.Name}.Length + ({field.Name}.Length + 1).SizeOfVarUInt());");
-                                                    _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Name}.Length + 1);");
-                                                    _codeBuffer.AppendLine($"writer.WriteBytes({field.Name});");
+                                                    _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Name}.Length + 1);");
+                                                    _codeGenerator.AppendLine($"writer.WriteBytes({field.Name});");
                                                 }
                                                 else if (field.Type.IsArray)
                                                 {
@@ -190,7 +188,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                                 else if (field.Type.IsStruct)
                                                 {
                                                     //todo тут проблема с рассчетом размера - надо подумать как сделать
-                                                    _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                                    _codeGenerator.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
                                                 }
                                                 else if (field.Type.IsRecords)
                                                 {
@@ -199,14 +197,14 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                                 }
                                                 else
                                                 {
-                                                    _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Type.Size});");
-                                                    _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                                    _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Type.Size});");
+                                                    _codeGenerator.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
                                                 }
 
                                                 if (!field.Default.Equals("null"))
                                                 {
-                                                    _codeBuffer.DecrementIndent();
-                                                    _codeBuffer.AppendLine("}");
+                                                    _codeGenerator.DecrementIndent();
+                                                    _codeGenerator.AppendRightBrace();
                                                 }
                                             });
 
@@ -215,38 +213,38 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                         cond.IfNull(
                                             () =>
                                             {
-                                                _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Tag});");
-                                                _codeBuffer.AppendLine("writer.WriteVarUInt(1);");
-                                                _codeBuffer.AppendLine("writer.WriteVarUInt(0);");
+                                                _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Tag});");
+                                                _codeGenerator.AppendLine("writer.WriteVarUInt(1);");
+                                                _codeGenerator.AppendLine("writer.WriteVarUInt(0);");
                                             });
                                     }
 
-                                    cond.Generate(_codeBuffer);
+                                    cond.Generate(_codeGenerator);
                                 })
-                            .Generate(_codeBuffer);
-                        prevTag = field.Tag.Value;
+                            .Generate(_codeGenerator);
+                        prevTag = field.Tag!.Value;
                     }
 
                     if (prevTag < int.MaxValue)
                     {
-                        _codeBuffer.AppendLine("rawWriter.WriteRawTags(writer, int.MaxValue);");
+                        _codeGenerator.AppendLine("rawWriter.WriteRawTags(writer, int.MaxValue);");
                     }
                 })
-            .Generate(_codeBuffer);
-        _codeBuffer.DecrementIndent();
-        _codeBuffer.AppendLine("}");
+            .Generate(_codeGenerator);
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
     }
 
     private void GenerateCheckForUnsupportedNumTaggedFields(string conditional)
     {
-        _codeBuffer.AppendLine($"if ({conditional})");
-        _codeBuffer.AppendLine("{");
-        _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine(
+        _codeGenerator.AppendLine($"if ({conditional})");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine(
             "throw new UnsupportedVersionException($\"Tagged fields were set, "
             + "but version {version} of this message does not support them.\");");
-        _codeBuffer.DecrementIndent();
-        _codeBuffer.AppendLine("}");
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
     }
 
     private static string PrimitiveWriteExpression(IFieldType type, string name)
@@ -287,23 +285,23 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                             presentVersions =>
                             {
                                 VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
-                                    .IfMember(_ => { _codeBuffer.AppendLine($"writer.WriteVarUInt(0);"); })
+                                    .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarUInt(0);"); })
                                     .IfNotMember(
                                         _ =>
                                         {
                                             if (type.IsString)
                                             {
-                                                _codeBuffer.AppendLine($"writer.WriteShort(-1);");
+                                                _codeGenerator.AppendLine($"writer.WriteShort(-1);");
                                             }
                                             else
                                             {
-                                                _codeBuffer.AppendLine($"writer.WriteInt(-1);");
+                                                _codeGenerator.AppendLine($"writer.WriteInt(-1);");
                                             }
                                         })
-                                    .Generate(_codeBuffer);
+                                    .Generate(_codeGenerator);
                             })
-                        .IfNotMember(_ => { _codeBuffer.Append("throw new NullReferenceException();"); })
-                        .Generate(_codeBuffer);
+                        .IfNotMember(_ => { _codeGenerator.Append("throw new NullReferenceException();"); })
+                        .Generate(_codeGenerator);
                 })
             .IfShouldNotBeNull(
                 () =>
@@ -312,7 +310,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
 
                     if (type.IsString)
                     {
-                        _codeBuffer.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({name});");
+                        _codeGenerator.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({name});");
                         lengthExpression = "stringBytes.Length";
                     }
                     else if (type.IsBytes)
@@ -333,39 +331,39 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                     }
 
                     VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
-                        .IfMember(_ => { _codeBuffer.AppendLine($"writer.WriteVarUInt({lengthExpression} + 1);"); })
+                        .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarUInt({lengthExpression} + 1);"); })
                         .IfNotMember(
                             _ =>
                             {
                                 if (type.IsString)
                                 {
-                                    _codeBuffer.AppendLine($"writer.WriteShort((short){lengthExpression});");
+                                    _codeGenerator.AppendLine($"writer.WriteShort((short){lengthExpression});");
                                 }
                                 else
                                 {
-                                    _codeBuffer.AppendLine($"writer.WriteInt({lengthExpression});");
+                                    _codeGenerator.AppendLine($"writer.WriteInt({lengthExpression});");
                                 }
                             })
-                        .Generate(_codeBuffer);
+                        .Generate(_codeGenerator);
 
                     if (type.IsString)
                     {
-                        _codeBuffer.AppendLine("writer.WriteBytes(stringBytes);");
+                        _codeGenerator.AppendLine("writer.WriteBytes(stringBytes);");
                     }
                     else if (type.IsBytes)
                     {
-                        _codeBuffer.AppendLine($"writer.WriteBytes({name});");
+                        _codeGenerator.AppendLine($"writer.WriteBytes({name});");
                     }
                     else if (type.IsRecords)
                     {
-                        _codeBuffer.AppendLine($"writer.WriteRecords({name});");
+                        _codeGenerator.AppendLine($"writer.WriteRecords({name});");
                     }
                     else if (type is IFieldType.ArrayType arrayType)
                     {
                         var elementType = arrayType.ElementType;
-                        _codeBuffer.AppendLine($"foreach (var element in {name})");
-                        _codeBuffer.AppendLine("{");
-                        _codeBuffer.IncrementIndent();
+                        _codeGenerator.AppendLine($"foreach (var element in {name})");
+                        _codeGenerator.AppendLeftBrace();
+                        _codeGenerator.IncrementIndent();
 
                         if (elementType.IsArray)
                         {
@@ -377,13 +375,13 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                         }
                         else
                         {
-                            _codeBuffer.AppendLine($"{PrimitiveWriteExpression(elementType, "element")};");
+                            _codeGenerator.AppendLine($"{PrimitiveWriteExpression(elementType, "element")};");
                         }
 
-                        _codeBuffer.DecrementIndent();
-                        _codeBuffer.AppendLine("}");
+                        _codeGenerator.DecrementIndent();
+                        _codeGenerator.AppendRightBrace();
                     }
                 })
-            .Generate(_codeBuffer);
+            .Generate(_codeGenerator);
     }
 }

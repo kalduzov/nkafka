@@ -173,4 +173,11 @@ public sealed class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVe
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ClientSoftwareName, ClientSoftwareVersion);
+        return hashCode;
+    }
 }

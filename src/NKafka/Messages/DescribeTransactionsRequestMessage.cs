@@ -74,7 +74,7 @@ public sealed class DescribeTransactionsRequestMessage: IRequestMessage, IEquata
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadVarUInt() - 1;
@@ -135,5 +135,12 @@ public sealed class DescribeTransactionsRequestMessage: IRequestMessage, IEquata
     public bool Equals(DescribeTransactionsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, TransactionalIds);
+        return hashCode;
     }
 }

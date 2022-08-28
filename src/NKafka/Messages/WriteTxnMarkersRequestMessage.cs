@@ -76,7 +76,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
                 else
                 {
                     var newCollection = new List<WritableTxnMarkerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new WritableTxnMarkerMessage(reader, version));
                     }
@@ -94,7 +94,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
                 else
                 {
                     var newCollection = new List<WritableTxnMarkerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new WritableTxnMarkerMessage(reader, version));
                     }
@@ -165,6 +165,13 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Markers);
+        return hashCode;
+    }
+
     public sealed class WritableTxnMarkerMessage: IMessage, IEquatable<WritableTxnMarkerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -231,7 +238,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerTopicMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerTopicMessage(reader, version));
                         }
@@ -249,7 +256,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
                     else
                     {
                         var newCollection = new List<WritableTxnMarkerTopicMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new WritableTxnMarkerTopicMessage(reader, version));
                         }
@@ -323,6 +330,13 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         public bool Equals(WritableTxnMarkerMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ProducerId, ProducerEpoch, TransactionResult, Topics, CoordinatorEpoch);
+            return hashCode;
         }
     }
 
@@ -402,7 +416,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -478,6 +492,13 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         public bool Equals(WritableTxnMarkerTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
+            return hashCode;
         }
     }
 }

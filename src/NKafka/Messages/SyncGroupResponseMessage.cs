@@ -241,4 +241,11 @@ public sealed class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncG
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProtocolType, ProtocolName, Assignment);
+        return hashCode;
+    }
 }

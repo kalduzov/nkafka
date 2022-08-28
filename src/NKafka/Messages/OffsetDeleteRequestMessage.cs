@@ -94,8 +94,8 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
             }
             else
             {
-                OffsetDeleteRequestTopicCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new OffsetDeleteRequestTopicCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new OffsetDeleteRequestTopicMessage(reader, version));
                 }
@@ -134,6 +134,13 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
     public bool Equals(OffsetDeleteRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, Topics);
+        return hashCode;
     }
 
     public sealed class OffsetDeleteRequestTopicMessage: IMessage, IEquatable<OffsetDeleteRequestTopicMessage>
@@ -198,7 +205,7 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
                 else
                 {
                     var newCollection = new List<OffsetDeleteRequestPartitionMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetDeleteRequestPartitionMessage(reader, version));
                     }
@@ -238,6 +245,13 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
         public bool Equals(OffsetDeleteRequestTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 
@@ -296,6 +310,13 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
         public bool Equals(OffsetDeleteRequestPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 

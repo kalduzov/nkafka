@@ -81,7 +81,7 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
                 else
                 {
                     var newCollection = new List<ComponentDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ComponentDataMessage(reader, version));
                     }
@@ -99,7 +99,7 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
                 else
                 {
                     var newCollection = new List<ComponentDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ComponentDataMessage(reader, version));
                     }
@@ -170,6 +170,13 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
     public bool Equals(DescribeClientQuotasRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Components, Strict);
+        return hashCode;
     }
 
     public sealed class ComponentDataMessage: IMessage, IEquatable<ComponentDataMessage>
@@ -342,6 +349,13 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
         public bool Equals(ComponentDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, EntityType, MatchType, Match);
+            return hashCode;
         }
     }
 }

@@ -88,7 +88,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
                 else
                 {
                     var newCollection = new List<DescribedDelegationTokenMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribedDelegationTokenMessage(reader, version));
                     }
@@ -106,7 +106,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
                 else
                 {
                     var newCollection = new List<DescribedDelegationTokenMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribedDelegationTokenMessage(reader, version));
                     }
@@ -178,6 +178,13 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
     public bool Equals(DescribeDelegationTokenResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, Tokens, ThrottleTimeMs);
+        return hashCode;
     }
 
     public sealed class DescribedDelegationTokenMessage: IMessage, IEquatable<DescribedDelegationTokenMessage>
@@ -401,7 +408,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
                     else
                     {
                         var newCollection = new List<DescribedDelegationTokenRenewerMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribedDelegationTokenRenewerMessage(reader, version));
                         }
@@ -419,7 +426,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
                     else
                     {
                         var newCollection = new List<DescribedDelegationTokenRenewerMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribedDelegationTokenRenewerMessage(reader, version));
                         }
@@ -566,6 +573,14 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
         public bool Equals(DescribedDelegationTokenMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName, TokenRequesterPrincipalType, TokenRequesterPrincipalName, IssueTimestamp, ExpiryTimestamp, MaxTimestamp);
+            hashCode = HashCode.Combine(hashCode, TokenId, Hmac, Renewers);
+            return hashCode;
         }
     }
 
@@ -720,6 +735,13 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
         public bool Equals(DescribedDelegationTokenRenewerMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
+            return hashCode;
         }
     }
 }

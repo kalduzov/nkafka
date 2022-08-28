@@ -80,7 +80,7 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<TxnOffsetCommitResponseTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TxnOffsetCommitResponseTopicMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<TxnOffsetCommitResponseTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TxnOffsetCommitResponseTopicMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
     public bool Equals(TxnOffsetCommitResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
     }
 
     public sealed class TxnOffsetCommitResponseTopicMessage: IMessage, IEquatable<TxnOffsetCommitResponseTopicMessage>
@@ -241,7 +248,7 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<TxnOffsetCommitResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new TxnOffsetCommitResponsePartitionMessage(reader, version));
                         }
@@ -259,7 +266,7 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<TxnOffsetCommitResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new TxnOffsetCommitResponsePartitionMessage(reader, version));
                         }
@@ -340,6 +347,13 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
         public bool Equals(TxnOffsetCommitResponseTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -431,6 +445,13 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
         public bool Equals(TxnOffsetCommitResponsePartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
+            return hashCode;
         }
     }
 }

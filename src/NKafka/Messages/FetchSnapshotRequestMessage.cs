@@ -94,7 +94,7 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
             else
             {
                 var newCollection = new List<TopicSnapshotMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicSnapshotMessage(reader, version));
                 }
@@ -172,6 +172,13 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ClusterId, ReplicaId, MaxBytes, Topics);
+        return hashCode;
+    }
+
     public sealed class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -234,7 +241,7 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
                 else
                 {
                     var newCollection = new List<PartitionSnapshotMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionSnapshotMessage(reader, version));
                     }
@@ -283,6 +290,13 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
         public bool Equals(TopicSnapshotMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -375,6 +389,13 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, SnapshotId, Position);
+            return hashCode;
+        }
     }
 
     public sealed class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
@@ -449,6 +470,13 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
         public bool Equals(SnapshotIdMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, EndOffset, Epoch);
+            return hashCode;
         }
     }
 }

@@ -232,7 +232,7 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
                 else
                 {
                     var newCollection = new List<JoinGroupResponseMemberMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new JoinGroupResponseMemberMessage(reader, version));
                     }
@@ -250,7 +250,7 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
                 else
                 {
                     var newCollection = new List<JoinGroupResponseMemberMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new JoinGroupResponseMemberMessage(reader, version));
                     }
@@ -396,6 +396,14 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
     public bool Equals(JoinGroupResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, GenerationId, ProtocolType, ProtocolName, Leader, SkipAssignment);
+        hashCode = HashCode.Combine(hashCode, MemberId, Members);
+        return hashCode;
     }
 
     public sealed class JoinGroupResponseMemberMessage: IMessage, IEquatable<JoinGroupResponseMemberMessage>
@@ -609,6 +617,13 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
         public bool Equals(JoinGroupResponseMemberMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, Metadata);
+            return hashCode;
         }
     }
 }

@@ -80,8 +80,8 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
                 }
                 else
                 {
-                    AlterConfigsResourceCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AlterConfigsResourceCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterConfigsResourceMessage(reader, version));
                     }
@@ -98,8 +98,8 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
                 }
                 else
                 {
-                    AlterConfigsResourceCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AlterConfigsResourceCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterConfigsResourceMessage(reader, version));
                     }
@@ -170,6 +170,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
     public bool Equals(IncrementalAlterConfigsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Resources, ValidateOnly);
+        return hashCode;
     }
 
     public sealed class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
@@ -248,8 +255,8 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
                     }
                     else
                     {
-                        AlterableConfigCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AlterableConfigCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterableConfigMessage(reader, version));
                         }
@@ -266,8 +273,8 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
                     }
                     else
                     {
-                        AlterableConfigCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AlterableConfigCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AlterableConfigMessage(reader, version));
                         }
@@ -350,6 +357,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
         public bool Equals(AlterConfigsResourceMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName);
+            return hashCode;
         }
     }
 
@@ -524,6 +538,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
         public bool Equals(AlterableConfigMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, ConfigOperation);
+            return hashCode;
         }
     }
 

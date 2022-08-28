@@ -107,8 +107,8 @@ public sealed class UpdateFeaturesResponseMessage: IResponseMessage, IEquatable<
             }
             else
             {
-                UpdatableFeatureResultCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new UpdatableFeatureResultCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new UpdatableFeatureResultMessage(reader, version));
                 }
@@ -164,6 +164,13 @@ public sealed class UpdateFeaturesResponseMessage: IResponseMessage, IEquatable<
     public bool Equals(UpdateFeaturesResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, Results);
+        return hashCode;
     }
 
     public sealed class UpdatableFeatureResultMessage: IMessage, IEquatable<UpdatableFeatureResultMessage>
@@ -292,6 +299,13 @@ public sealed class UpdateFeaturesResponseMessage: IResponseMessage, IEquatable<
         public bool Equals(UpdatableFeatureResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Feature);
+            return hashCode;
         }
     }
 

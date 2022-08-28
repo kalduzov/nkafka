@@ -123,7 +123,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             else
             {
                 var newCollection = new List<StopReplicaPartitionV0Message>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new StopReplicaPartitionV0Message(reader, version));
                 }
@@ -147,7 +147,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
                 else
                 {
                     var newCollection = new List<StopReplicaTopicV1Message>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new StopReplicaTopicV1Message(reader, version));
                     }
@@ -165,7 +165,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
                 else
                 {
                     var newCollection = new List<StopReplicaTopicV1Message>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new StopReplicaTopicV1Message(reader, version));
                     }
@@ -188,7 +188,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             else
             {
                 var newCollection = new List<StopReplicaTopicStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new StopReplicaTopicStateMessage(reader, version));
                 }
@@ -319,6 +319,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ControllerId, ControllerEpoch, BrokerEpoch, DeletePartitions, UngroupedPartitions, Topics, TopicStates);
+        return hashCode;
+    }
+
     public sealed class StopReplicaPartitionV0Message: IMessage, IEquatable<StopReplicaPartitionV0Message>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -401,6 +408,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex);
+            return hashCode;
+        }
     }
 
     public sealed class StopReplicaTopicV1Message: IMessage, IEquatable<StopReplicaTopicV1Message>
@@ -475,7 +489,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -556,6 +570,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
+            return hashCode;
+        }
     }
 
     public sealed class StopReplicaTopicStateMessage: IMessage, IEquatable<StopReplicaTopicStateMessage>
@@ -620,7 +641,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
                 else
                 {
                     var newCollection = new List<StopReplicaPartitionStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new StopReplicaPartitionStateMessage(reader, version));
                     }
@@ -673,6 +694,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         public bool Equals(StopReplicaTopicStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionStates);
+            return hashCode;
         }
     }
 
@@ -755,6 +783,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         public bool Equals(StopReplicaPartitionStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, LeaderEpoch, DeletePartition);
+            return hashCode;
         }
     }
 }

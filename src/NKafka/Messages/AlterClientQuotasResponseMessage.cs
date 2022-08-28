@@ -80,7 +80,7 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
                 else
                 {
                     var newCollection = new List<EntryDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new EntryDataMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
                 else
                 {
                     var newCollection = new List<EntryDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new EntryDataMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
     public bool Equals(AlterClientQuotasResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Entries);
+        return hashCode;
     }
 
     public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
@@ -250,7 +257,7 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
                     else
                     {
                         var newCollection = new List<EntityDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EntityDataMessage(reader, version));
                         }
@@ -268,7 +275,7 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
                     else
                     {
                         var newCollection = new List<EntityDataMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EntityDataMessage(reader, version));
                         }
@@ -362,6 +369,13 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
         public bool Equals(EntryDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, Entity);
+            return hashCode;
         }
     }
 
@@ -528,6 +542,13 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
         public bool Equals(EntityDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, EntityType, EntityName);
+            return hashCode;
         }
     }
 }

@@ -156,4 +156,11 @@ public sealed class EnvelopeRequestMessage: IRequestMessage, IEquatable<Envelope
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, RequestData, RequestPrincipal, ClientHostAddress);
+        return hashCode;
+    }
 }

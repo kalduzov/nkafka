@@ -216,8 +216,8 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 }
                 else
                 {
-                    JoinGroupRequestProtocolCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new JoinGroupRequestProtocolCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new JoinGroupRequestProtocolMessage(reader, version));
                     }
@@ -234,8 +234,8 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 }
                 else
                 {
-                    JoinGroupRequestProtocolCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new JoinGroupRequestProtocolCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new JoinGroupRequestProtocolMessage(reader, version));
                     }
@@ -415,6 +415,14 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, SessionTimeoutMs, RebalanceTimeoutMs, MemberId, GroupInstanceId, ProtocolType, Protocols);
+        hashCode = HashCode.Combine(hashCode, Reason);
+        return hashCode;
+    }
+
     public sealed class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -560,6 +568,13 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         public bool Equals(JoinGroupRequestProtocolMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

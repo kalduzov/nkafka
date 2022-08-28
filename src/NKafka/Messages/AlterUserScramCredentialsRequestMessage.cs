@@ -79,7 +79,7 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             else
             {
                 var newCollection = new List<ScramCredentialDeletionMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new ScramCredentialDeletionMessage(reader, version));
                 }
@@ -96,7 +96,7 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             else
             {
                 var newCollection = new List<ScramCredentialUpsertionMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new ScramCredentialUpsertionMessage(reader, version));
                 }
@@ -145,6 +145,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
     public bool Equals(AlterUserScramCredentialsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Deletions, Upsertions);
+        return hashCode;
     }
 
     public sealed class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
@@ -238,6 +245,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         public bool Equals(ScramCredentialDeletionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Mechanism);
+            return hashCode;
         }
     }
 
@@ -377,6 +391,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         public bool Equals(ScramCredentialUpsertionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Mechanism, Iterations, Salt, SaltedPassword);
+            return hashCode;
         }
     }
 }

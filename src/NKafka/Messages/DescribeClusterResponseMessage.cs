@@ -139,8 +139,8 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
             }
             else
             {
-                DescribeClusterBrokerCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new DescribeClusterBrokerCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new DescribeClusterBrokerMessage(reader, version));
                 }
@@ -204,6 +204,13 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
     public bool Equals(DescribeClusterResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, ClusterId, ControllerId, Brokers, ClusterAuthorizedOperations);
+        return hashCode;
     }
 
     public sealed class DescribeClusterBrokerMessage: IMessage, IEquatable<DescribeClusterBrokerMessage>
@@ -336,6 +343,13 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
         public bool Equals(DescribeClusterBrokerMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, BrokerId);
+            return hashCode;
         }
     }
 

@@ -80,7 +80,7 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
                 else
                 {
                     var newCollection = new List<CreatePartitionsTopicResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatePartitionsTopicResultMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
                 else
                 {
                     var newCollection = new List<CreatePartitionsTopicResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatePartitionsTopicResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
     public bool Equals(CreatePartitionsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class CreatePartitionsTopicResultMessage: IMessage, IEquatable<CreatePartitionsTopicResultMessage>
@@ -343,6 +350,13 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
         public bool Equals(CreatePartitionsTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

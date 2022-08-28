@@ -128,4 +128,11 @@ public sealed class BrokerHeartbeatResponseMessage: IResponseMessage, IEquatable
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, IsCaughtUp, IsFenced, ShouldShutDown);
+        return hashCode;
+    }
 }

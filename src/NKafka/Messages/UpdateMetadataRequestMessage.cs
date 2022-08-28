@@ -110,7 +110,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             else
             {
                 var newCollection = new List<UpdateMetadataPartitionStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new UpdateMetadataPartitionStateMessage(reader, version));
                 }
@@ -134,7 +134,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<UpdateMetadataTopicStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new UpdateMetadataTopicStateMessage(reader, version));
                     }
@@ -152,7 +152,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<UpdateMetadataTopicStateMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new UpdateMetadataTopicStateMessage(reader, version));
                     }
@@ -176,7 +176,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<UpdateMetadataBrokerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new UpdateMetadataBrokerMessage(reader, version));
                     }
@@ -194,7 +194,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<UpdateMetadataBrokerMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new UpdateMetadataBrokerMessage(reader, version));
                     }
@@ -312,6 +312,13 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ControllerId, ControllerEpoch, BrokerEpoch, UngroupedPartitionStates, TopicStates, LiveBrokers);
+        return hashCode;
+    }
+
     public sealed class UpdateMetadataTopicStateMessage: IMessage, IEquatable<UpdateMetadataTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -396,7 +403,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                     else
                     {
                         var newCollection = new List<UpdateMetadataPartitionStateMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new UpdateMetadataPartitionStateMessage(reader, version));
                         }
@@ -414,7 +421,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                     else
                     {
                         var newCollection = new List<UpdateMetadataPartitionStateMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new UpdateMetadataPartitionStateMessage(reader, version));
                         }
@@ -503,6 +510,13 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         public bool Equals(UpdateMetadataTopicStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, TopicId, PartitionStates);
+            return hashCode;
         }
     }
 
@@ -600,7 +614,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                     else
                     {
                         var newCollection = new List<UpdateMetadataEndpointMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new UpdateMetadataEndpointMessage(reader, version));
                         }
@@ -618,7 +632,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                     else
                     {
                         var newCollection = new List<UpdateMetadataEndpointMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new UpdateMetadataEndpointMessage(reader, version));
                         }
@@ -762,6 +776,13 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         public bool Equals(UpdateMetadataBrokerMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Id, V0Host, V0Port, Endpoints, Rack);
+            return hashCode;
         }
     }
 
@@ -943,6 +964,13 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Port, Host, Listener, SecurityProtocol);
+            return hashCode;
+        }
     }
 
     public sealed class UpdateMetadataPartitionStateMessage: IMessage, IEquatable<UpdateMetadataPartitionStateMessage>
@@ -1058,7 +1086,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -1083,7 +1111,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -1108,7 +1136,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -1216,6 +1244,14 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         public bool Equals(UpdateMetadataPartitionStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ControllerEpoch, Leader, LeaderEpoch, Isr, ZkVersion);
+            hashCode = HashCode.Combine(hashCode, Replicas, OfflineReplicas);
+            return hashCode;
         }
     }
 }

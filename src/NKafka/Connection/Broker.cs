@@ -362,7 +362,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
                 try
                 {
-                    var message = responseInfo.BuildResponseMessage(buffer.AsSpan(), bodyLen);
+                    var message = responseInfo.BuildResponseMessage(buffer, bodyLen);
                     UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen);
 
                     if (message.IsSuccessStatusCode)
@@ -588,7 +588,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
             _version = version;
         }
 
-        internal IResponseMessage BuildResponseMessage(ReadOnlySpan<byte> span, int bodyLen)
+        internal IResponseMessage BuildResponseMessage(byte[] span, int bodyLen)
         {
             return DefaultResponseBuilder.Build(_apiKey, _version, bodyLen, span);
         }

@@ -86,7 +86,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             else
             {
                 var newCollection = new List<TopicDataMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicDataMessage(reader, version));
                 }
@@ -132,6 +132,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
     public bool Equals(AlterPartitionRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch, Topics);
+        return hashCode;
     }
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
@@ -214,7 +221,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
                 else
                 {
                     var newCollection = new List<PartitionDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionDataMessage(reader, version));
                     }
@@ -270,6 +277,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         public bool Equals(TopicDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, TopicId, Partitions);
+            return hashCode;
         }
     }
 
@@ -336,7 +350,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -403,6 +417,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         public bool Equals(PartitionDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, LeaderEpoch, NewIsr, LeaderRecoveryState, PartitionEpoch);
+            return hashCode;
         }
     }
 }

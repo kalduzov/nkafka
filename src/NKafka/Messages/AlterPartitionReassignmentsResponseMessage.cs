@@ -108,7 +108,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
             else
             {
                 var newCollection = new List<ReassignableTopicResponseMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new ReassignableTopicResponseMessage(reader, version));
                 }
@@ -164,6 +164,13 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
     public bool Equals(AlterPartitionReassignmentsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, Responses);
+        return hashCode;
     }
 
     public sealed class ReassignableTopicResponseMessage: IMessage, IEquatable<ReassignableTopicResponseMessage>
@@ -228,7 +235,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
                 else
                 {
                     var newCollection = new List<ReassignablePartitionResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ReassignablePartitionResponseMessage(reader, version));
                     }
@@ -277,6 +284,13 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
         public bool Equals(ReassignableTopicResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -386,6 +400,13 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
         public bool Equals(ReassignablePartitionResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

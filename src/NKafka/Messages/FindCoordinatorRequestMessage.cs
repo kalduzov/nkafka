@@ -121,7 +121,7 @@ public sealed class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<F
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadVarUInt() - 1;
@@ -242,5 +242,12 @@ public sealed class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<F
     public bool Equals(FindCoordinatorRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Key, KeyType, CoordinatorKeys);
+        return hashCode;
     }
 }

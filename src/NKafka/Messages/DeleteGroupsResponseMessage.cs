@@ -79,8 +79,8 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
                 }
                 else
                 {
-                    DeletableGroupResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeletableGroupResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeletableGroupResultMessage(reader, version));
                     }
@@ -97,8 +97,8 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
                 }
                 else
                 {
-                    DeletableGroupResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new DeletableGroupResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeletableGroupResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
     public bool Equals(DeleteGroupsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class DeletableGroupResultMessage: IMessage, IEquatable<DeletableGroupResultMessage>
@@ -292,6 +299,13 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
         public bool Equals(DeletableGroupResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, GroupId);
+            return hashCode;
         }
     }
 

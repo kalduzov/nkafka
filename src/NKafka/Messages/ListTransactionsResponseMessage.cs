@@ -92,7 +92,7 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadVarUInt() - 1;
@@ -122,7 +122,7 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
             else
             {
                 var newCollection = new List<TransactionStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TransactionStateMessage(reader, version));
                 }
@@ -177,6 +177,13 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
     public bool Equals(ListTransactionsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, UnknownStateFilters, TransactionStates);
+        return hashCode;
     }
 
     public sealed class TransactionStateMessage: IMessage, IEquatable<TransactionStateMessage>
@@ -296,6 +303,13 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
         public bool Equals(TransactionStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, TransactionState);
+            return hashCode;
         }
     }
 }

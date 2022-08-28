@@ -121,4 +121,11 @@ public sealed class AllocateProducerIdsResponseMessage: IResponseMessage, IEquat
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerIdStart, ProducerIdLen);
+        return hashCode;
+    }
 }

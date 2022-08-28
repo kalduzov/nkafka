@@ -454,18 +454,18 @@ public class FieldSpecification
         }
     }
 
-    public void GenerateNonIgnorableFieldCheck(StructRegistry structRegistry, CodeBuffer codeBuffer)
+    public void GenerateNonIgnorableFieldCheck(StructRegistry structRegistry, ICodeGenerator codeGenerator)
     {
-        GenerateNonDefaultValueCheck(structRegistry, codeBuffer, NullableVersions);
-        codeBuffer.IncrementIndent();
-        codeBuffer.AppendLine($"throw new UnsupportedVersionException($\"Attempted to write a non-default {Name} at version {{version}}\");");
-        codeBuffer.DecrementIndent();
-        codeBuffer.AppendLine("}");
+        GenerateNonDefaultValueCheck(structRegistry, codeGenerator, NullableVersions);
+        codeGenerator.IncrementIndent();
+        codeGenerator.AppendLine($"throw new UnsupportedVersionException($\"Attempted to write a non-default {Name} at version {{version}}\");");
+        codeGenerator.DecrementIndent();
+        codeGenerator.AppendRightBrace();
     }
 
     public void GenerateNonDefaultValueCheck(
         StructRegistry structRegistry,
-        CodeBuffer codeBuffer,
+        ICodeGenerator codeGenerator,
         Versions nullableVersions)
     {
         var fieldDefault = FieldDefault();
@@ -474,65 +474,65 @@ public class FieldSpecification
         {
             if (fieldDefault.Equals("null"))
             {
-                codeBuffer.AppendLine($"if ({Name} is not null)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is not null)");
+                codeGenerator.AppendLeftBrace();
             }
             else if (nullableVersions.IsEmpty)
             {
-                codeBuffer.AppendLine($"if ({Name}.Count != 0)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name}.Count != 0)");
+                codeGenerator.AppendLeftBrace();
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is null || {Name}.Count != 0)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is null || {Name}.Count != 0)");
+                codeGenerator.AppendLeftBrace();
             }
         }
         else if (Type.IsBytes)
         {
             if (fieldDefault.Equals("null"))
             {
-                codeBuffer.AppendLine($"if ({Name} is not null)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is not null)");
+                codeGenerator.AppendLeftBrace();
             }
             else if (nullableVersions.IsEmpty)
             {
-                codeBuffer.AppendLine($"if ({Name}.Length != 0)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name}.Length != 0)");
+                codeGenerator.AppendLeftBrace();
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is null || {Name}.Length != 0)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is null || {Name}.Length != 0)");
+                codeGenerator.AppendLeftBrace();
             }
         }
         else if (Type.IsString || Type.IsStruct || Type is IFieldType.UuidFieldType)
         {
             if (fieldDefault.Equals("null"))
             {
-                codeBuffer.AppendLine($"if ({Name} is not null)");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is not null)");
+                codeGenerator.AppendLeftBrace();
             }
             else if (nullableVersions.IsEmpty)
             {
-                codeBuffer.AppendLine($"if (!{Name}.Equals({fieldDefault}))");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if (!{Name}.Equals({fieldDefault}))");
+                codeGenerator.AppendLeftBrace();
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is null || !{Name}.Equals({fieldDefault}))");
-                codeBuffer.AppendLine("{");
+                codeGenerator.AppendLine($"if ({Name} is null || !{Name}.Equals({fieldDefault}))");
+                codeGenerator.AppendLeftBrace();
             }
         }
         else if (Type is IFieldType.BoolFieldType)
         {
-            codeBuffer.AppendLine($"if ({(fieldDefault.Equals("true") ? "!" : "")}{Name})");
-            codeBuffer.AppendLine("{");
+            codeGenerator.AppendLine($"if ({(fieldDefault.Equals("true") ? "!" : "")}{Name})");
+            codeGenerator.AppendLeftBrace();
         }
         else
         {
-            codeBuffer.AppendLine($"if ({Name} != {fieldDefault})");
-            codeBuffer.AppendLine("{");
+            codeGenerator.AppendLine($"if ({Name} != {fieldDefault})");
+            codeGenerator.AppendLeftBrace();
         }
     }
 }

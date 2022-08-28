@@ -80,7 +80,7 @@ public sealed class IncrementalAlterConfigsResponseMessage: IResponseMessage, IE
                 else
                 {
                     var newCollection = new List<AlterConfigsResourceResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterConfigsResourceResponseMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class IncrementalAlterConfigsResponseMessage: IResponseMessage, IE
                 else
                 {
                     var newCollection = new List<AlterConfigsResourceResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AlterConfigsResourceResponseMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class IncrementalAlterConfigsResponseMessage: IResponseMessage, IE
     public bool Equals(IncrementalAlterConfigsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Responses);
+        return hashCode;
     }
 
     public sealed class AlterConfigsResourceResponseMessage: IMessage, IEquatable<AlterConfigsResourceResponseMessage>
@@ -350,6 +357,13 @@ public sealed class IncrementalAlterConfigsResponseMessage: IResponseMessage, IE
         public bool Equals(AlterConfigsResourceResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName);
+            return hashCode;
         }
     }
 }

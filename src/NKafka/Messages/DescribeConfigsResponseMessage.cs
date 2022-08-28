@@ -80,7 +80,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeConfigsResultMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeConfigsResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
     public bool Equals(DescribeConfigsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
@@ -284,7 +291,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
                         }
@@ -302,7 +309,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
                         }
@@ -409,6 +416,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         public bool Equals(DescribeConfigsResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName, Configs);
+            return hashCode;
         }
     }
 
@@ -560,7 +574,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
                         }
@@ -578,7 +592,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     else
                     {
                         var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
                         }
@@ -775,6 +789,14 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Value, ReadOnly, IsDefault, ConfigSource, IsSensitive, Synonyms);
+            hashCode = HashCode.Combine(hashCode, ConfigType, Documentation);
+            return hashCode;
+        }
     }
 
     public sealed class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
@@ -951,6 +973,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         public bool Equals(DescribeConfigsSynonymMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Value, Source);
+            return hashCode;
         }
     }
 }

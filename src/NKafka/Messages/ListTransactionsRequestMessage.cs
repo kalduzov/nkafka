@@ -79,7 +79,7 @@ public sealed class ListTransactionsRequestMessage: IRequestMessage, IEquatable<
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadVarUInt() - 1;
@@ -109,7 +109,7 @@ public sealed class ListTransactionsRequestMessage: IRequestMessage, IEquatable<
             else
             {
                 var newCollection = new List<long>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(reader.ReadLong());
                 }
@@ -162,5 +162,12 @@ public sealed class ListTransactionsRequestMessage: IRequestMessage, IEquatable<
     public bool Equals(ListTransactionsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, StateFilters, ProducerIdFilters);
+        return hashCode;
     }
 }

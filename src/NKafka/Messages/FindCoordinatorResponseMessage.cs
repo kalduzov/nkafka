@@ -194,7 +194,7 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
             else
             {
                 var newCollection = new List<CoordinatorMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new CoordinatorMessage(reader, version));
                 }
@@ -351,6 +351,13 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
     public bool Equals(FindCoordinatorResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, NodeId, Host, Port, Coordinators);
+        return hashCode;
     }
 
     public sealed class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
@@ -522,6 +529,13 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
         public bool Equals(CoordinatorMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Key, NodeId, Host, Port, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

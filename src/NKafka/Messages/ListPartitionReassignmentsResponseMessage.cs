@@ -108,7 +108,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
             else
             {
                 var newCollection = new List<OngoingTopicReassignmentMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new OngoingTopicReassignmentMessage(reader, version));
                 }
@@ -164,6 +164,13 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
     public bool Equals(ListPartitionReassignmentsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, Topics);
+        return hashCode;
     }
 
     public sealed class OngoingTopicReassignmentMessage: IMessage, IEquatable<OngoingTopicReassignmentMessage>
@@ -228,7 +235,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
                 else
                 {
                     var newCollection = new List<OngoingPartitionReassignmentMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OngoingPartitionReassignmentMessage(reader, version));
                     }
@@ -277,6 +284,13 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
         public bool Equals(OngoingTopicReassignmentMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -337,7 +351,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -354,7 +368,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -371,7 +385,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -426,6 +440,13 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
         public bool Equals(OngoingPartitionReassignmentMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, Replicas, AddingReplicas, RemovingReplicas);
+            return hashCode;
         }
     }
 }

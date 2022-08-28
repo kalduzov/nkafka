@@ -85,8 +85,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
                 else
                 {
-                    CreatableTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new CreatableTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableTopicMessage(reader, version));
                     }
@@ -103,8 +103,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
                 else
                 {
-                    CreatableTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new CreatableTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableTopicMessage(reader, version));
                     }
@@ -196,6 +196,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics, timeoutMs, validateOnly);
+        return hashCode;
+    }
+
     public sealed class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -283,8 +290,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                     }
                     else
                     {
-                        CreatableReplicaAssignmentCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new CreatableReplicaAssignmentCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
                         }
@@ -301,8 +308,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                     }
                     else
                     {
-                        CreatableReplicaAssignmentCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new CreatableReplicaAssignmentCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
                         }
@@ -321,8 +328,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                     }
                     else
                     {
-                        CreateableTopicConfigCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new CreateableTopicConfigCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new CreateableTopicConfigMessage(reader, version));
                         }
@@ -339,8 +346,8 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                     }
                     else
                     {
-                        CreateableTopicConfigCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new CreateableTopicConfigCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new CreateableTopicConfigMessage(reader, version));
                         }
@@ -441,6 +448,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
+        }
     }
 
     public sealed class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
@@ -497,7 +511,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -563,6 +577,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         public bool Equals(CreatableReplicaAssignmentMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 
@@ -742,6 +763,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         public bool Equals(CreateableTopicConfigMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

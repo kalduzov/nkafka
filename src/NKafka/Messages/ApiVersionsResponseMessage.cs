@@ -102,8 +102,8 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
                 }
                 else
                 {
-                    ApiVersionCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new ApiVersionCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ApiVersionMessage(reader, version));
                     }
@@ -120,8 +120,8 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
                 }
                 else
                 {
-                    ApiVersionCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new ApiVersionCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ApiVersionMessage(reader, version));
                     }
@@ -164,8 +164,8 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
                         }
                         else
                         {
-                            SupportedFeatureKeyCollection newCollection = new(arrayLength);
-                            for (var i = 0; i< arrayLength; i++)
+                            var newCollection = new SupportedFeatureKeyCollection(arrayLength);
+                            for (var i = 0; i < arrayLength; i++)
                             {
                                 newCollection.Add(new SupportedFeatureKeyMessage(reader, version));
                             }
@@ -188,8 +188,8 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
                         }
                         else
                         {
-                            FinalizedFeatureKeyCollection newCollection = new(arrayLength);
-                            for (var i = 0; i< arrayLength; i++)
+                            var newCollection = new FinalizedFeatureKeyCollection(arrayLength);
+                            for (var i = 0; i < arrayLength; i++)
                             {
                                 newCollection.Add(new FinalizedFeatureKeyMessage(reader, version));
                             }
@@ -306,6 +306,13 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, ApiKeys, ThrottleTimeMs, SupportedFeatures, FinalizedFeaturesEpoch, FinalizedFeatures);
+        return hashCode;
+    }
+
     public sealed class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -399,6 +406,13 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
         public bool Equals(ApiVersionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ApiKey);
+            return hashCode;
         }
     }
 
@@ -518,6 +532,13 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
+        }
     }
 
     public sealed class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
@@ -635,6 +656,13 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
         public bool Equals(FinalizedFeatureKeyMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

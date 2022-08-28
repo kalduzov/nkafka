@@ -80,7 +80,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<DeleteAclsFilterResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteAclsFilterResultMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<DeleteAclsFilterResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteAclsFilterResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
     public bool Equals(DeleteAclsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, FilterResults);
+        return hashCode;
     }
 
     public sealed class DeleteAclsFilterResultMessage: IMessage, IEquatable<DeleteAclsFilterResultMessage>
@@ -250,7 +257,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
                     else
                     {
                         var newCollection = new List<DeleteAclsMatchingAclMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteAclsMatchingAclMessage(reader, version));
                         }
@@ -268,7 +275,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
                     else
                     {
                         var newCollection = new List<DeleteAclsMatchingAclMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteAclsMatchingAclMessage(reader, version));
                         }
@@ -362,6 +369,13 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
         public bool Equals(DeleteAclsFilterResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, MatchingAcls);
+            return hashCode;
         }
     }
 
@@ -663,6 +677,14 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
         public bool Equals(DeleteAclsMatchingAclMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName, PatternType, Principal, Host);
+            hashCode = HashCode.Combine(hashCode, Operation, PermissionType);
+            return hashCode;
         }
     }
 }

@@ -131,7 +131,7 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
                 else
                 {
                     var newCollection = new List<MemberIdentityMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MemberIdentityMessage(reader, version));
                     }
@@ -149,7 +149,7 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
                 else
                 {
                     var newCollection = new List<MemberIdentityMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MemberIdentityMessage(reader, version));
                     }
@@ -259,6 +259,13 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
     public bool Equals(LeaveGroupRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, MemberId, Members);
+        return hashCode;
     }
 
     public sealed class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
@@ -467,6 +474,13 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
         public bool Equals(MemberIdentityMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, Reason);
+            return hashCode;
         }
     }
 }

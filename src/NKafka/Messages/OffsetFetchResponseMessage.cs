@@ -101,7 +101,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 else
                 {
                     var newCollection = new List<OffsetFetchResponseTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetFetchResponseTopicMessage(reader, version));
                     }
@@ -119,7 +119,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 else
                 {
                     var newCollection = new List<OffsetFetchResponseTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetFetchResponseTopicMessage(reader, version));
                     }
@@ -150,7 +150,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             else
             {
                 var newCollection = new List<OffsetFetchResponseGroupMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new OffsetFetchResponseGroupMessage(reader, version));
                 }
@@ -257,6 +257,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics, ErrorCode, Groups);
+        return hashCode;
+    }
+
     public sealed class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -324,7 +331,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                     else
                     {
                         var newCollection = new List<OffsetFetchResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OffsetFetchResponsePartitionMessage(reader, version));
                         }
@@ -342,7 +349,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                     else
                     {
                         var newCollection = new List<OffsetFetchResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OffsetFetchResponsePartitionMessage(reader, version));
                         }
@@ -427,6 +434,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         public bool Equals(OffsetFetchResponseTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -591,6 +605,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, Metadata, ErrorCode);
+            return hashCode;
+        }
     }
 
     public sealed class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
@@ -663,7 +684,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 else
                 {
                     var newCollection = new List<OffsetFetchResponseTopicsMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetFetchResponseTopicsMessage(reader, version));
                     }
@@ -718,6 +739,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         public bool Equals(OffsetFetchResponseGroupMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, groupId, Topics, ErrorCode);
+            return hashCode;
         }
     }
 
@@ -783,7 +811,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 else
                 {
                     var newCollection = new List<OffsetFetchResponsePartitionsMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetFetchResponsePartitionsMessage(reader, version));
                     }
@@ -832,6 +860,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         public bool Equals(OffsetFetchResponseTopicsMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -955,6 +990,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         public bool Equals(OffsetFetchResponsePartitionsMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, Metadata, ErrorCode);
+            return hashCode;
         }
     }
 }

@@ -101,7 +101,7 @@ public sealed class StructRegistry
 
     public StructSpecification FindStruct(FieldSpecification field)
     {
-        string structFieldName = null;
+        string structFieldName;
 
         if (field.Type.IsArray && field.Type is IFieldType.ArrayType arrayType)
         {
@@ -122,8 +122,6 @@ public sealed class StructRegistry
         }
 
         return structInfo.Specification;
-
-        return null;
     }
 
     public bool IsStructArrayWithKeys(FieldSpecification field)

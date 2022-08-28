@@ -86,8 +86,8 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
                 }
                 else
                 {
-                    CreatableTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new CreatableTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableTopicResultMessage(reader, version));
                     }
@@ -104,8 +104,8 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
                 }
                 else
                 {
-                    CreatableTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new CreatableTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableTopicResultMessage(reader, version));
                     }
@@ -178,6 +178,13 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
     public bool Equals(CreateTopicsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
     }
 
     public sealed class CreatableTopicResultMessage: IMessage, IEquatable<CreatableTopicResultMessage>
@@ -337,7 +344,7 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
                 else
                 {
                     var newCollection = new List<CreatableTopicConfigsMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CreatableTopicConfigsMessage(reader, version));
                     }
@@ -482,6 +489,13 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
+        }
     }
 
     public sealed class CreatableTopicConfigsMessage: IMessage, IEquatable<CreatableTopicConfigsMessage>
@@ -624,6 +638,13 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
         public bool Equals(CreatableTopicConfigsMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Value, ReadOnly, ConfigSource, IsSensitive);
+            return hashCode;
         }
     }
 

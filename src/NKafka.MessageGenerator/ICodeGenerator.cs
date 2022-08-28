@@ -19,11 +19,25 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 namespace NKafka.MessageGenerator;
 
-public interface IClassGenerator
+public interface ICodeGenerator
 {
-    StringBuilder Generate();
+    internal const int DEFAULT_INDENT = 4;
+
+    public void AppendLine(string value);
+
+    public void AppendLine();
+
+    public void AppendLeftBrace();
+
+    public void AppendRightBrace();
+
+    public void Append(string value);
+
+    void IncrementIndent(int value = DEFAULT_INDENT);
+
+    void DecrementIndent(int value = DEFAULT_INDENT);
+
+    string ToString();
 }

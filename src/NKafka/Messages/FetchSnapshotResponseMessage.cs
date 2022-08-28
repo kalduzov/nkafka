@@ -87,7 +87,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             else
             {
                 var newCollection = new List<TopicSnapshotMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicSnapshotMessage(reader, version));
                 }
@@ -133,6 +133,13 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
     public bool Equals(FetchSnapshotResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, Topics);
+        return hashCode;
     }
 
     public sealed class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
@@ -197,7 +204,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
                 else
                 {
                     var newCollection = new List<PartitionSnapshotMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionSnapshotMessage(reader, version));
                     }
@@ -246,6 +253,13 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         public bool Equals(TopicSnapshotMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -391,6 +405,13 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Index, ErrorCode, SnapshotId, CurrentLeader, Size, Position, UnalignedRecords);
+            return hashCode;
+        }
     }
 
     public sealed class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
@@ -466,6 +487,13 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, EndOffset, Epoch);
+            return hashCode;
+        }
     }
 
     public sealed class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
@@ -540,6 +568,13 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         public bool Equals(LeaderIdAndEpochMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, LeaderId, LeaderEpoch);
+            return hashCode;
         }
     }
 }

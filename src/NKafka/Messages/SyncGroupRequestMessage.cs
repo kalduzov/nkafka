@@ -223,7 +223,7 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
                 else
                 {
                     var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
                     }
@@ -241,7 +241,7 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
                 else
                 {
                     var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
                     }
@@ -397,6 +397,13 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, GenerationId, MemberId, GroupInstanceId, ProtocolType, ProtocolName, Assignments);
+        return hashCode;
+    }
+
     public sealed class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -541,6 +548,13 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
         public bool Equals(SyncGroupRequestAssignmentMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, MemberId, Assignment);
+            return hashCode;
         }
     }
 }

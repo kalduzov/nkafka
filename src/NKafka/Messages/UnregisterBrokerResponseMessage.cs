@@ -138,4 +138,11 @@ public sealed class UnregisterBrokerResponseMessage: IResponseMessage, IEquatabl
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage);
+        return hashCode;
+    }
 }

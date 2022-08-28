@@ -23,11 +23,11 @@ using System.Text;
 
 namespace NKafka.MessageGenerator;
 
-public class CodeBuffer: ICodeBuffer
+public class CodeGenerator: ICodeGenerator
 {
     private readonly Dictionary<int, string> _indents = new();
 
-    private int IndentValue { get; set; }
+    private int _indentValue;
 
     private readonly StringBuilder _builder = new();
 
@@ -41,47 +41,55 @@ public class CodeBuffer: ICodeBuffer
         _builder.AppendLine();
     }
 
+    public void AppendLeftBrace()
+    {
+        _builder.AppendLine("{");
+    }
+
+    public void AppendRightBrace()
+    {
+        _builder.AppendLine("}");
+    }
+
     public void Append(string value)
     {
         _builder.Append($"{Indent}{value}");
     }
 
-    protected string Indent
+    private string Indent
     {
         get
         {
             {
-                if (_indents.TryGetValue(IndentValue, out var result))
+                if (_indents.TryGetValue(_indentValue, out var result))
                 {
                     return result;
                 }
 
                 result = string.Empty;
 
-                for (var i = 0; i < IndentValue; i++)
+                for (var i = 0; i < _indentValue; i++)
                 {
                     result += " ";
                 }
 
-                _indents.TryAdd(IndentValue, result);
+                _indents.TryAdd(_indentValue, result);
 
                 return result;
             }
         }
     }
 
-    public void IncrementIndent(int value = ICodeBuffer.DEFAULT_INDENT)
+    public void IncrementIndent(int value = ICodeGenerator.DEFAULT_INDENT)
     {
-        IndentValue += value;
+        _indentValue += value;
     }
 
-    public void DecrementIndent(int value = ICodeBuffer.DEFAULT_INDENT)
+    public void DecrementIndent(int value = ICodeGenerator.DEFAULT_INDENT)
     {
-        IndentValue -= value;
+        _indentValue -= value;
     }
 
-    /// <summary>Returns a string that represents the current object.</summary>
-    /// <returns>A string that represents the current object.</returns>
     public override string ToString()
     {
         return _builder.ToString();

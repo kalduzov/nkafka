@@ -84,8 +84,8 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
             }
             else
             {
-                FeatureUpdateKeyCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new FeatureUpdateKeyCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new FeatureUpdateKeyMessage(reader, version));
                 }
@@ -149,6 +149,13 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
     public bool Equals(UpdateFeaturesRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, timeoutMs, FeatureUpdates, ValidateOnly);
+        return hashCode;
     }
 
     public sealed class FeatureUpdateKeyMessage: IMessage, IEquatable<FeatureUpdateKeyMessage>
@@ -291,6 +298,13 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
         public bool Equals(FeatureUpdateKeyMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Feature);
+            return hashCode;
         }
     }
 

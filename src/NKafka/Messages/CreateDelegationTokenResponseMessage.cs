@@ -376,4 +376,12 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, PrincipalType, PrincipalName, TokenRequesterPrincipalType, TokenRequesterPrincipalName, IssueTimestampMs, ExpiryTimestampMs);
+        hashCode = HashCode.Combine(hashCode, MaxTimestampMs, TokenId, Hmac, ThrottleTimeMs);
+        return hashCode;
+    }
 }

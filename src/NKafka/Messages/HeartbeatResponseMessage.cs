@@ -130,4 +130,11 @@ public sealed class HeartbeatResponseMessage: IResponseMessage, IEquatable<Heart
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode);
+        return hashCode;
+    }
 }

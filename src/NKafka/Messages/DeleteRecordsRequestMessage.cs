@@ -81,7 +81,7 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
                 else
                 {
                     var newCollection = new List<DeleteRecordsTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteRecordsTopicMessage(reader, version));
                     }
@@ -99,7 +99,7 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
                 else
                 {
                     var newCollection = new List<DeleteRecordsTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DeleteRecordsTopicMessage(reader, version));
                     }
@@ -170,6 +170,13 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
     public bool Equals(DeleteRecordsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics, TimeoutMs);
+        return hashCode;
     }
 
     public sealed class DeleteRecordsTopicMessage: IMessage, IEquatable<DeleteRecordsTopicMessage>
@@ -243,7 +250,7 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
                     else
                     {
                         var newCollection = new List<DeleteRecordsPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteRecordsPartitionMessage(reader, version));
                         }
@@ -261,7 +268,7 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
                     else
                     {
                         var newCollection = new List<DeleteRecordsPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new DeleteRecordsPartitionMessage(reader, version));
                         }
@@ -342,6 +349,13 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
         public bool Equals(DeleteRecordsTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -430,6 +444,13 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
         public bool Equals(DeleteRecordsPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, Offset);
+            return hashCode;
         }
     }
 }

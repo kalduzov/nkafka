@@ -81,7 +81,7 @@ public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<De
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadVarUInt() - 1;
@@ -112,7 +112,7 @@ public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<De
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadShort();
@@ -221,5 +221,12 @@ public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<De
     public bool Equals(DescribeGroupsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Groups, IncludeAuthorizedOperations);
+        return hashCode;
     }
 }

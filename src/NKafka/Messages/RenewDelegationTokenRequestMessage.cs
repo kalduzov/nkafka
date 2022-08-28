@@ -145,4 +145,11 @@ public sealed class RenewDelegationTokenRequestMessage: IRequestMessage, IEquata
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Hmac, RenewPeriodMs);
+        return hashCode;
+    }
 }

@@ -116,8 +116,8 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
             }
             else
             {
-                ListenerCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new ListenerCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new ListenerMessage(reader, version));
                 }
@@ -133,8 +133,8 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
             }
             else
             {
-                FeatureCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new FeatureCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new FeatureMessage(reader, version));
                 }
@@ -216,6 +216,13 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
     public bool Equals(BrokerRegistrationRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, BrokerId, ClusterId, IncarnationId, Listeners, Features, Rack);
+        return hashCode;
     }
 
     public sealed class ListenerMessage: IMessage, IEquatable<ListenerMessage>
@@ -344,6 +351,13 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
+        }
     }
 
     public sealed class ListenerCollection: HashSet<ListenerMessage>
@@ -457,6 +471,13 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
         public bool Equals(FeatureMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

@@ -86,7 +86,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
                 else
                 {
                     var newCollection = new List<DescribeConfigsResourceMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeConfigsResourceMessage(reader, version));
                     }
@@ -104,7 +104,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
                 else
                 {
                     var newCollection = new List<DescribeConfigsResourceMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new DescribeConfigsResourceMessage(reader, version));
                     }
@@ -213,6 +213,13 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Resources, IncludeSynonyms, IncludeDocumentation);
+        return hashCode;
+    }
+
     public sealed class DescribeConfigsResourceMessage: IMessage, IEquatable<DescribeConfigsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -290,7 +297,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
                     else
                     {
                         var newCollection = new List<string>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             int length;
                             length = reader.ReadVarUInt() - 1;
@@ -321,7 +328,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
                     else
                     {
                         var newCollection = new List<string>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             int length;
                             length = reader.ReadShort();
@@ -438,6 +445,13 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
         public bool Equals(DescribeConfigsResourceMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, ConfigurationKeys);
+            return hashCode;
         }
     }
 }

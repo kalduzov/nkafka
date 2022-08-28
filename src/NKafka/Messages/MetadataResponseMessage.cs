@@ -106,8 +106,8 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 else
                 {
-                    MetadataResponseBrokerCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new MetadataResponseBrokerCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
                     }
@@ -124,8 +124,8 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 else
                 {
-                    MetadataResponseBrokerCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new MetadataResponseBrokerCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
                     }
@@ -180,8 +180,8 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 else
                 {
-                    MetadataResponseTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new MetadataResponseTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataResponseTopicMessage(reader, version));
                     }
@@ -198,8 +198,8 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 else
                 {
-                    MetadataResponseTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new MetadataResponseTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new MetadataResponseTopicMessage(reader, version));
                     }
@@ -338,6 +338,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
     public bool Equals(MetadataResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Brokers, ClusterId, ControllerId, Topics, ClusterAuthorizedOperations);
+        return hashCode;
     }
 
     public sealed class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
@@ -527,6 +534,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, NodeId);
+            return hashCode;
+        }
     }
 
     public sealed class MetadataResponseBrokerCollection: HashSet<MetadataResponseBrokerMessage>
@@ -659,7 +673,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     else
                     {
                         var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
                         }
@@ -677,7 +691,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     else
                     {
                         var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
                         }
@@ -799,6 +813,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
+        }
     }
 
     public sealed class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
@@ -893,7 +914,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -917,7 +938,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -942,7 +963,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -1044,6 +1065,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         public bool Equals(MetadataResponsePartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, PartitionIndex, LeaderId, LeaderEpoch, ReplicaNodes, IsrNodes, OfflineReplicas);
+            return hashCode;
         }
     }
 

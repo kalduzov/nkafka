@@ -86,8 +86,8 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
             }
             else
             {
-                OffsetDeleteResponseTopicCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new OffsetDeleteResponseTopicCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new OffsetDeleteResponseTopicMessage(reader, version));
                 }
@@ -123,6 +123,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
     public bool Equals(OffsetDeleteResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, ThrottleTimeMs, Topics);
+        return hashCode;
     }
 
     public sealed class OffsetDeleteResponseTopicMessage: IMessage, IEquatable<OffsetDeleteResponseTopicMessage>
@@ -186,8 +193,8 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
                 }
                 else
                 {
-                    OffsetDeleteResponsePartitionCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new OffsetDeleteResponsePartitionCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetDeleteResponsePartitionMessage(reader, version));
                     }
@@ -227,6 +234,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
         public bool Equals(OffsetDeleteResponseTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 
@@ -296,6 +310,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
         public bool Equals(OffsetDeleteResponsePartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 

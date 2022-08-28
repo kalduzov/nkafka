@@ -46,6 +46,18 @@ public class SerializationTests
             CorrelationId = 1,
         };
 
+        var hashCode = header.GetHashCode();
+        
+        var header1 = new RequestHeader
+        {
+            RequestApiKey = (short)request.ApiKey,
+            RequestApiVersion = (short)ApiVersions.Version1,
+            ClientId = "test",
+            CorrelationId = 2,
+        };
+
+        var hashCode2 = header1.GetHashCode();
+        
         var sendMessage = new SendMessage(header, request);
 
         using var stream = new MemoryStream();
@@ -53,6 +65,6 @@ public class SerializationTests
         sendMessage.Write(stream);
 
         var str = Convert.ToHexString(stream.ToArray());
-        stream.Length.Should().Be(6);
+        stream.Length.Should().Be(18);
     }
 }

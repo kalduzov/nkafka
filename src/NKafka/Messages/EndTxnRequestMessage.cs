@@ -166,4 +166,11 @@ public sealed class EndTxnRequestMessage: IRequestMessage, IEquatable<EndTxnRequ
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, ProducerEpoch, Committed);
+        return hashCode;
+    }
 }

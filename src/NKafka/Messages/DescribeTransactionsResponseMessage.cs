@@ -78,7 +78,7 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
             else
             {
                 var newCollection = new List<TransactionStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TransactionStateMessage(reader, version));
                 }
@@ -123,6 +123,13 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
     public bool Equals(DescribeTransactionsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, TransactionStates);
+        return hashCode;
     }
 
     public sealed class TransactionStateMessage: IMessage, IEquatable<TransactionStateMessage>
@@ -240,8 +247,8 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
                 }
                 else
                 {
-                    TopicDataCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new TopicDataCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new TopicDataMessage(reader, version));
                     }
@@ -300,6 +307,14 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
         public bool Equals(TransactionStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, TransactionalId, TransactionState, TransactionTimeoutMs, TransactionStartTimeMs, ProducerId, ProducerEpoch);
+            hashCode = HashCode.Combine(hashCode, Topics);
+            return hashCode;
         }
     }
 
@@ -365,7 +380,7 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -415,6 +430,13 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
         public bool Equals(TopicDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic);
+            return hashCode;
         }
     }
 

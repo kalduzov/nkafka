@@ -85,7 +85,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
             else
             {
                 var newCollection = new List<DeleteTopicStateMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new DeleteTopicStateMessage(reader, version));
                 }
@@ -109,7 +109,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadVarUInt() - 1;
@@ -140,7 +140,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
                 else
                 {
                     var newCollection = new List<string>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
                         length = reader.ReadShort();
@@ -256,6 +256,13 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics, TopicNames, TimeoutMs);
+        return hashCode;
+    }
+
     public sealed class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -356,6 +363,13 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         public bool Equals(DeleteTopicStateMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, TopicId);
+            return hashCode;
         }
     }
 }

@@ -86,8 +86,8 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
                 }
                 else
                 {
-                    OffsetForLeaderTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new OffsetForLeaderTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
                     }
@@ -104,8 +104,8 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
                 }
                 else
                 {
-                    OffsetForLeaderTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new OffsetForLeaderTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
                     }
@@ -180,6 +180,13 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
+    }
+
     public sealed class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -251,7 +258,7 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
                     else
                     {
                         var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EpochEndOffsetMessage(reader, version));
                         }
@@ -269,7 +276,7 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
                     else
                     {
                         var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new EpochEndOffsetMessage(reader, version));
                         }
@@ -351,6 +358,13 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
         public bool Equals(OffsetForLeaderTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic);
+            return hashCode;
         }
     }
 
@@ -466,6 +480,13 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
         public bool Equals(EpochEndOffsetMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, Partition, LeaderEpoch, EndOffset);
+            return hashCode;
         }
     }
 

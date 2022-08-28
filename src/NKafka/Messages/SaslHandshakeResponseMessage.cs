@@ -83,7 +83,7 @@ public sealed class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<S
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadShort();
@@ -135,5 +135,12 @@ public sealed class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<S
     public bool Equals(SaslHandshakeResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, Mechanisms);
+        return hashCode;
     }
 }

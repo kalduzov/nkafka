@@ -108,7 +108,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
             else
             {
                 var newCollection = new List<DescribeUserScramCredentialsResultMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new DescribeUserScramCredentialsResultMessage(reader, version));
                 }
@@ -164,6 +164,13 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
     public bool Equals(DescribeUserScramCredentialsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage, Results);
+        return hashCode;
     }
 
     public sealed class DescribeUserScramCredentialsResultMessage: IMessage, IEquatable<DescribeUserScramCredentialsResultMessage>
@@ -258,7 +265,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
                 else
                 {
                     var newCollection = new List<CredentialInfoMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new CredentialInfoMessage(reader, version));
                     }
@@ -318,6 +325,13 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
         public bool Equals(DescribeUserScramCredentialsResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, User, ErrorCode, ErrorMessage, CredentialInfos);
+            return hashCode;
         }
     }
 
@@ -393,6 +407,13 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
         public bool Equals(CredentialInfoMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Mechanism, Iterations);
+            return hashCode;
         }
     }
 }

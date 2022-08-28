@@ -87,7 +87,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
                 else
                 {
                     var newCollection = new List<ListOffsetsTopicResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ListOffsetsTopicResponseMessage(reader, version));
                     }
@@ -105,7 +105,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
                 else
                 {
                     var newCollection = new List<ListOffsetsTopicResponseMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ListOffsetsTopicResponseMessage(reader, version));
                     }
@@ -180,6 +180,13 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Topics);
+        return hashCode;
+    }
+
     public sealed class ListOffsetsTopicResponseMessage: IMessage, IEquatable<ListOffsetsTopicResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -251,7 +258,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
                     else
                     {
                         var newCollection = new List<ListOffsetsPartitionResponseMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new ListOffsetsPartitionResponseMessage(reader, version));
                         }
@@ -269,7 +276,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
                     else
                     {
                         var newCollection = new List<ListOffsetsPartitionResponseMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new ListOffsetsPartitionResponseMessage(reader, version));
                         }
@@ -351,6 +358,13 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         {
             return true;
         }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
+        }
     }
 
     public sealed class ListOffsetsPartitionResponseMessage: IMessage, IEquatable<ListOffsetsPartitionResponseMessage>
@@ -425,7 +439,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
                 else
                 {
                     var newCollection = new List<long>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadLong());
                     }
@@ -555,6 +569,13 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         public bool Equals(ListOffsetsPartitionResponseMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, OldStyleOffsets, Timestamp, Offset, LeaderEpoch);
+            return hashCode;
         }
     }
 }

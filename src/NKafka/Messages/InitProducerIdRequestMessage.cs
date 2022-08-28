@@ -212,4 +212,11 @@ public sealed class InitProducerIdRequestMessage: IRequestMessage, IEquatable<In
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, TransactionalId, TransactionTimeoutMs, ProducerId, ProducerEpoch);
+        return hashCode;
+    }
 }

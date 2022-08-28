@@ -80,7 +80,7 @@ public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<Crea
                 else
                 {
                     var newCollection = new List<AclCreationResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AclCreationResultMessage(reader, version));
                     }
@@ -98,7 +98,7 @@ public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<Crea
                 else
                 {
                     var newCollection = new List<AclCreationResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AclCreationResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<Crea
     public bool Equals(CreateAclsResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class AclCreationResultMessage: IMessage, IEquatable<AclCreationResultMessage>
@@ -303,6 +310,13 @@ public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<Crea
         public bool Equals(AclCreationResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

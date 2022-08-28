@@ -115,4 +115,11 @@ public sealed class UpdateMetadataResponseMessage: IResponseMessage, IEquatable<
     {
         return true;
     }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode);
+        return hashCode;
+    }
 }

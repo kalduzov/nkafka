@@ -75,7 +75,7 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
             else
             {
                 var newCollection = new List<string>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
                     length = reader.ReadVarUInt() - 1;
@@ -163,5 +163,12 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
     public bool Equals(ListGroupsRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, StatesFilter);
+        return hashCode;
     }
 }

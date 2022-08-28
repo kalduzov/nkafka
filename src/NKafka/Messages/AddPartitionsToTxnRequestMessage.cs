@@ -115,8 +115,8 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
                 }
                 else
                 {
-                    AddPartitionsToTxnTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AddPartitionsToTxnTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicMessage(reader, version));
                     }
@@ -133,8 +133,8 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
                 }
                 else
                 {
-                    AddPartitionsToTxnTopicCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AddPartitionsToTxnTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicMessage(reader, version));
                     }
@@ -219,6 +219,13 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, ProducerEpoch, Topics);
+        return hashCode;
+    }
+
     public sealed class AddPartitionsToTxnTopicMessage: IMessage, IEquatable<AddPartitionsToTxnTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -295,7 +302,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
                 else
                 {
                     var newCollection = new List<int>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(reader.ReadInt());
                     }
@@ -372,6 +379,13 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         public bool Equals(AddPartitionsToTxnTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 

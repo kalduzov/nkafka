@@ -196,7 +196,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 else
                 {
                     var newCollection = new List<OffsetCommitRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetCommitRequestTopicMessage(reader, version));
                     }
@@ -214,7 +214,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 else
                 {
                     var newCollection = new List<OffsetCommitRequestTopicMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new OffsetCommitRequestTopicMessage(reader, version));
                     }
@@ -354,6 +354,13 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, GroupId, GenerationId, MemberId, GroupInstanceId, RetentionTimeMs, Topics);
+        return hashCode;
+    }
+
     public sealed class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -425,7 +432,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                     else
                     {
                         var newCollection = new List<OffsetCommitRequestPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OffsetCommitRequestPartitionMessage(reader, version));
                         }
@@ -443,7 +450,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                     else
                     {
                         var newCollection = new List<OffsetCommitRequestPartitionMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new OffsetCommitRequestPartitionMessage(reader, version));
                         }
@@ -524,6 +531,13 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         public bool Equals(OffsetCommitRequestTopicMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            return hashCode;
         }
     }
 
@@ -705,6 +719,13 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         public bool Equals(OffsetCommitRequestPartitionMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommitTimestamp, CommittedMetadata);
+            return hashCode;
         }
     }
 }

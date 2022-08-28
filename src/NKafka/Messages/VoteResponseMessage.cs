@@ -83,7 +83,7 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
             else
             {
                 var newCollection = new List<TopicDataMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicDataMessage(reader, version));
                 }
@@ -128,6 +128,13 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
     public bool Equals(VoteResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, Topics);
+        return hashCode;
     }
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
@@ -192,7 +199,7 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
                 else
                 {
                     var newCollection = new List<PartitionDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionDataMessage(reader, version));
                     }
@@ -241,6 +248,13 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
         public bool Equals(TopicDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
+            return hashCode;
         }
     }
 
@@ -340,6 +354,13 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
         public bool Equals(PartitionDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, LeaderId, LeaderEpoch, VoteGranted);
+            return hashCode;
         }
     }
 }

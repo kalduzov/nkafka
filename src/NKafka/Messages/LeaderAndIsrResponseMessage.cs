@@ -91,7 +91,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
                 else
                 {
                     var newCollection = new List<LeaderAndIsrPartitionErrorMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrPartitionErrorMessage(reader, version));
                     }
@@ -109,7 +109,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
                 else
                 {
                     var newCollection = new List<LeaderAndIsrPartitionErrorMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrPartitionErrorMessage(reader, version));
                     }
@@ -131,8 +131,8 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             }
             else
             {
-                LeaderAndIsrTopicErrorCollection newCollection = new(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                var newCollection = new LeaderAndIsrTopicErrorCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new LeaderAndIsrTopicErrorMessage(reader, version));
                 }
@@ -232,6 +232,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ErrorCode, PartitionErrors, Topics);
+        return hashCode;
+    }
+
     public sealed class LeaderAndIsrTopicErrorMessage: IMessage, IEquatable<LeaderAndIsrTopicErrorMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -279,7 +286,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
                 else
                 {
                     var newCollection = new List<LeaderAndIsrPartitionErrorMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new LeaderAndIsrPartitionErrorMessage(reader, version));
                     }
@@ -329,6 +336,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         public bool Equals(LeaderAndIsrTopicErrorMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicId);
+            return hashCode;
         }
     }
 
@@ -480,6 +494,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         public bool Equals(LeaderAndIsrPartitionErrorMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ErrorCode);
+            return hashCode;
         }
     }
 }

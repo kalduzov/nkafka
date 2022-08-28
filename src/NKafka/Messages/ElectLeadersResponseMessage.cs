@@ -96,7 +96,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
                 else
                 {
                     var newCollection = new List<ReplicaElectionResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ReplicaElectionResultMessage(reader, version));
                     }
@@ -114,7 +114,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
                 else
                 {
                     var newCollection = new List<ReplicaElectionResultMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new ReplicaElectionResultMessage(reader, version));
                     }
@@ -197,6 +197,13 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
         return true;
     }
 
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ReplicaElectionResults);
+        return hashCode;
+    }
+
     public sealed class ReplicaElectionResultMessage: IMessage, IEquatable<ReplicaElectionResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -268,7 +275,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
                     else
                     {
                         var newCollection = new List<PartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionResultMessage(reader, version));
                         }
@@ -286,7 +293,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
                     else
                     {
                         var newCollection = new List<PartitionResultMessage>(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionResultMessage(reader, version));
                         }
@@ -367,6 +374,13 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
         public bool Equals(ReplicaElectionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Topic, PartitionResult);
+            return hashCode;
         }
     }
 
@@ -510,6 +524,13 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
         public bool Equals(PartitionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionId, ErrorCode, ErrorMessage);
+            return hashCode;
         }
     }
 }

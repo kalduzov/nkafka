@@ -79,8 +79,8 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                 }
                 else
                 {
-                    AddPartitionsToTxnTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AddPartitionsToTxnTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicResultMessage(reader, version));
                     }
@@ -97,8 +97,8 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                 }
                 else
                 {
-                    AddPartitionsToTxnTopicResultCollection newCollection = new(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    var newCollection = new AddPartitionsToTxnTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicResultMessage(reader, version));
                     }
@@ -168,6 +168,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
     public bool Equals(AddPartitionsToTxnResponseMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        return hashCode;
     }
 
     public sealed class AddPartitionsToTxnTopicResultMessage: IMessage, IEquatable<AddPartitionsToTxnTopicResultMessage>
@@ -240,8 +247,8 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                     }
                     else
                     {
-                        AddPartitionsToTxnPartitionResultCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AddPartitionsToTxnPartitionResultCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AddPartitionsToTxnPartitionResultMessage(reader, version));
                         }
@@ -258,8 +265,8 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                     }
                     else
                     {
-                        AddPartitionsToTxnPartitionResultCollection newCollection = new(arrayLength);
-                        for (var i = 0; i< arrayLength; i++)
+                        var newCollection = new AddPartitionsToTxnPartitionResultCollection(arrayLength);
+                        for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AddPartitionsToTxnPartitionResultMessage(reader, version));
                         }
@@ -341,6 +348,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         public bool Equals(AddPartitionsToTxnTopicResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, Name);
+            return hashCode;
         }
     }
 
@@ -433,6 +447,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         public bool Equals(AddPartitionsToTxnPartitionResultMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 

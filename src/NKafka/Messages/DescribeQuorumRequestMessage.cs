@@ -74,7 +74,7 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
             else
             {
                 var newCollection = new List<TopicDataMessage>(arrayLength);
-                for (var i = 0; i< arrayLength; i++)
+                for (var i = 0; i < arrayLength; i++)
                 {
                     newCollection.Add(new TopicDataMessage(reader, version));
                 }
@@ -118,6 +118,13 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
     public bool Equals(DescribeQuorumRequestMessage? other)
     {
         return true;
+    }
+
+    public override int GetHashCode()
+    {
+        var hashCode = 0;
+        hashCode = HashCode.Combine(hashCode, Topics);
+        return hashCode;
     }
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
@@ -182,7 +189,7 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
                 else
                 {
                     var newCollection = new List<PartitionDataMessage>(arrayLength);
-                    for (var i = 0; i< arrayLength; i++)
+                    for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new PartitionDataMessage(reader, version));
                     }
@@ -231,6 +238,13 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
         public bool Equals(TopicDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
+            return hashCode;
         }
     }
 
@@ -299,6 +313,13 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
         public bool Equals(PartitionDataMessage? other)
         {
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, PartitionIndex);
+            return hashCode;
         }
     }
 }

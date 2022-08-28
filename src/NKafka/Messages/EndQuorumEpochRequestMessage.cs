@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EndQuorumEpochRequestMessage: RequestMessage
+public sealed class EndQuorumEpochRequestMessage: RequestMessage, IEquatable<EndQuorumEpochRequestMessage>
 {
     /// <summary>
     /// 
@@ -85,14 +85,30 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (numTaggedFields > 0)
+        {
+            throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+        }
     }
 
-    public sealed class TopicDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EndQuorumEpochRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(EndQuorumEpochRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicDataMessage: Message, IEquatable<TopicDataMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -130,10 +146,26 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicDataMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionDataMessage: Message
+    public sealed class PartitionDataMessage: Message, IEquatable<PartitionDataMessage>
     {
         /// <summary>
         /// The partition index.
@@ -184,6 +216,22 @@ public sealed class EndQuorumEpochRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionDataMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionDataMessage? other)
+        {
+            return true;
         }
     }
 }

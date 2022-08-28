@@ -73,6 +73,15 @@ public class MessageGenerator: IMessageGenerator
         _codeBuffer.AppendLine();
         _writeMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
 
+        if (isSetElement)
+        {
+            _codeBuffer.AppendLine();
+            GenerateEquals(className, @struct, true);
+        }
+
+        _codeBuffer.AppendLine();
+        GenerateEquals(className, @struct, false);
+
         if (!isTopLevel)
         {
             _codeBuffer.DecrementIndent();
@@ -93,6 +102,28 @@ public class MessageGenerator: IMessageGenerator
 
         _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("}");
+    }
+
+    private void GenerateEquals(string className, StructSpecification @struct, bool elementKeysAreEqual)
+    {
+        if (!elementKeysAreEqual)
+        {
+            _codeBuffer.AppendLine("public override bool Equals(object? obj)");
+            _codeBuffer.AppendLine("{");
+            _codeBuffer.IncrementIndent();
+            _codeBuffer.AppendLine($"return ReferenceEquals(this, obj) || obj is {className} other && Equals(other);");
+            _codeBuffer.DecrementIndent();
+            _codeBuffer.AppendLine("}");
+
+            _codeBuffer.AppendLine();
+
+            _codeBuffer.AppendLine($"public bool Equals({className}? other)");
+            _codeBuffer.AppendLine("{");
+            _codeBuffer.IncrementIndent();
+            _codeBuffer.AppendLine("return true;");
+            _codeBuffer.DecrementIndent();
+            _codeBuffer.AppendLine("}");
+        }
     }
 
     private void GenerateSubclasses(string className, StructSpecification messageStruct, Versions parentVersions, bool isSetElement)
@@ -242,14 +273,23 @@ public class MessageGenerator: IMessageGenerator
     {
         var implementedInterfaces = new HashSet<string>();
 
-        if (isTopLevel && messageType.HasValue)
+        if (isTopLevel)
         {
-            implementedInterfaces.Add(messageType + "Message");
+            var baseType = messageType switch
+            {
+                MessageType.Request => "Request",
+                MessageType.Response => "Response",
+                MessageType.Header => className.StartsWith("Request") ? "Request" : "Response",
+                _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
+            };
+            implementedInterfaces.Add(baseType + "Message");
         }
         else
         {
             implementedInterfaces.Add("Message");
         }
+
+        implementedInterfaces.Add($"IEquatable<{className}>");
 
         _codeBuffer.AppendLine($"public sealed class {className}: {string.Join(", ", implementedInterfaces)}");
         _codeBuffer.AppendLine("{");

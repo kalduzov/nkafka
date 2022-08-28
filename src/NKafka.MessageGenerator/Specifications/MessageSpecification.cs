@@ -41,7 +41,7 @@ public record MessageSpecification
             {
                 MessageType.Request => Struct.Name + "Message",
                 MessageType.Response => Struct.Name + "Message",
-                MessageType.Header => Struct.Name + "Message",
+                MessageType.Header => Struct.Name,
                 _ => Struct.Name
             };
         }

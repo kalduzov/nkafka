@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EndTxnResponseMessage: ResponseMessage
+public sealed class EndTxnResponseMessage: ResponseMessage, IEquatable<EndTxnResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -65,5 +65,29 @@ public sealed class EndTxnResponseMessage: ResponseMessage
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
         writer.WriteShort(ErrorCode);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EndTxnResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(EndTxnResponseMessage? other)
+    {
+        return true;
     }
 }

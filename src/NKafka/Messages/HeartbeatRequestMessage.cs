@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class HeartbeatRequestMessage: RequestMessage
+public sealed class HeartbeatRequestMessage: RequestMessage, IEquatable<HeartbeatRequestMessage>
 {
     /// <summary>
     /// The group id.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The generation of the group.
@@ -50,7 +50,7 @@ public sealed class HeartbeatRequestMessage: RequestMessage
     /// <summary>
     /// The member ID.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
@@ -139,5 +139,29 @@ public sealed class HeartbeatRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is HeartbeatRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(HeartbeatRequestMessage? other)
+    {
+        return true;
     }
 }

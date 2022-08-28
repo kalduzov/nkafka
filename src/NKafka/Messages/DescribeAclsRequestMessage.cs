@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeAclsRequestMessage: RequestMessage
+public sealed class DescribeAclsRequestMessage: RequestMessage, IEquatable<DescribeAclsRequestMessage>
 {
     /// <summary>
     /// The resource type.
@@ -45,7 +45,7 @@ public sealed class DescribeAclsRequestMessage: RequestMessage
     /// <summary>
     /// The resource name, or null to match any resource name.
     /// </summary>
-    public string ResourceNameFilter { get; set; } = "";
+    public string ResourceNameFilter { get; set; } = string.Empty;
 
     /// <summary>
     /// The resource pattern to match.
@@ -55,12 +55,12 @@ public sealed class DescribeAclsRequestMessage: RequestMessage
     /// <summary>
     /// The principal to match, or null to match any principal.
     /// </summary>
-    public string PrincipalFilter { get; set; } = "";
+    public string PrincipalFilter { get; set; } = string.Empty;
 
     /// <summary>
     /// The host to match, or null to match any host.
     /// </summary>
-    public string HostFilter { get; set; } = "";
+    public string HostFilter { get; set; } = string.Empty;
 
     /// <summary>
     /// The operation to match.
@@ -181,5 +181,29 @@ public sealed class DescribeAclsRequestMessage: RequestMessage
         }
         writer.WriteSByte(Operation);
         writer.WriteSByte(PermissionType);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeAclsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeAclsRequestMessage? other)
+    {
+        return true;
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
+public sealed class DescribeDelegationTokenRequestMessage: RequestMessage, IEquatable<DescribeDelegationTokenRequestMessage>
 {
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
@@ -95,19 +95,43 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
                 }
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribeDelegationTokenOwnerMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeDelegationTokenRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeDelegationTokenRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeDelegationTokenOwnerMessage: Message, IEquatable<DescribeDelegationTokenOwnerMessage>
     {
         /// <summary>
         /// The owner principal type.
         /// </summary>
-        public string PrincipalType { get; set; } = "";
+        public string PrincipalType { get; set; } = string.Empty;
 
         /// <summary>
         /// The owner principal name.
         /// </summary>
-        public string PrincipalName { get; set; } = "";
+        public string PrincipalName { get; set; } = string.Empty;
 
         public DescribeDelegationTokenOwnerMessage()
         {
@@ -154,6 +178,30 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeDelegationTokenOwnerMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeDelegationTokenOwnerMessage? other)
+        {
+            return true;
         }
     }
 }

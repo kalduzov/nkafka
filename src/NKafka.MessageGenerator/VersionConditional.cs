@@ -60,6 +60,13 @@ internal sealed class VersionConditional
         return this;
     }
 
+    /// <summary>
+    /// Генерирует новый scope в коде
+    /// </summary>
+    /// <remarks>
+    /// Новый scope требуется, т.к. возможно несколько блоков с объявлением одинаковых переменных.
+    /// Во время генерации мы в общем случае не знаем, сколько переменных с одинаковым именем нам встретиться
+    /// </remarks>
     internal VersionConditional AlwaysEmitBlockScope(bool alwaysEmitBlockScope)
     {
         _alwaysEmitBlockScope = alwaysEmitBlockScope;

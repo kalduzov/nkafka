@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterConfigsResponseMessage: ResponseMessage
+public sealed class AlterConfigsResponseMessage: ResponseMessage, IEquatable<AlterConfigsResponseMessage>
 {
     /// <summary>
     /// The responses for each resource.
@@ -80,9 +80,33 @@ public sealed class AlterConfigsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AlterConfigsResourceResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterConfigsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterConfigsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AlterConfigsResourceResponseMessage: Message, IEquatable<AlterConfigsResourceResponseMessage>
     {
         /// <summary>
         /// The resource error code.
@@ -92,7 +116,7 @@ public sealed class AlterConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The resource error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// The resource type.
@@ -102,7 +126,7 @@ public sealed class AlterConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         public AlterConfigsResourceResponseMessage()
         {
@@ -163,6 +187,30 @@ public sealed class AlterConfigsResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterConfigsResourceResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterConfigsResourceResponseMessage? other)
+        {
+            return true;
         }
     }
 }

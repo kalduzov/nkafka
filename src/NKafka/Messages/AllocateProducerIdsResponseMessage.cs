@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AllocateProducerIdsResponseMessage: ResponseMessage
+public sealed class AllocateProducerIdsResponseMessage: ResponseMessage, IEquatable<AllocateProducerIdsResponseMessage>
 {
     /// <summary>
     /// The top level response error code
@@ -77,5 +77,19 @@ public sealed class AllocateProducerIdsResponseMessage: ResponseMessage
         writer.WriteShort(ErrorCode);
         writer.WriteLong(ProducerIdStart);
         writer.WriteInt(ProducerIdLen);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AllocateProducerIdsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AllocateProducerIdsResponseMessage? other)
+    {
+        return true;
     }
 }

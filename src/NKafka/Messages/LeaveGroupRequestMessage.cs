@@ -35,17 +35,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaveGroupRequestMessage: RequestMessage
+public sealed class LeaveGroupRequestMessage: RequestMessage, IEquatable<LeaveGroupRequestMessage>
 {
     /// <summary>
     /// The ID of the group to leave.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The member ID to remove from the group.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// List of leaving member identities.
@@ -97,7 +97,7 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
         }
         else
         {
-            if (MemberId.Equals(""))
+            if (!MemberId.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default MemberId at version {version}");
             }
@@ -128,14 +128,38 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default Members at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class MemberIdentityMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is LeaveGroupRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(LeaveGroupRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class MemberIdentityMessage: Message, IEquatable<MemberIdentityMessage>
     {
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
-        public string MemberId { get; set; } = "";
+        public string MemberId { get; set; } = string.Empty;
 
         /// <summary>
         /// The group instance ID to remove from the group.
@@ -221,6 +245,30 @@ public sealed class LeaveGroupRequestMessage: RequestMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is MemberIdentityMessage other && Equals(other);
+        }
+
+        public bool Equals(MemberIdentityMessage? other)
+        {
+            return true;
         }
     }
 }

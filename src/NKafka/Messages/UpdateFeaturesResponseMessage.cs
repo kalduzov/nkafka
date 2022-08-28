@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UpdateFeaturesResponseMessage: ResponseMessage
+public sealed class UpdateFeaturesResponseMessage: ResponseMessage, IEquatable<UpdateFeaturesResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or `0` if there was no top-level error.
@@ -45,7 +45,7 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// Results for each feature update.
@@ -90,14 +90,28 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class UpdatableFeatureResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UpdateFeaturesResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(UpdateFeaturesResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class UpdatableFeatureResultMessage: Message, IEquatable<UpdatableFeatureResultMessage>
     {
         /// <summary>
         /// The name of the finalized feature.
         /// </summary>
-        public string Feature { get; set; } = "";
+        public string Feature { get; set; } = string.Empty;
 
         /// <summary>
         /// The feature update error code or `0` if the feature update succeeded.
@@ -107,7 +121,7 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
         /// <summary>
         /// The feature update error, or `null` if the feature update succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public UpdatableFeatureResultMessage()
         {
@@ -146,6 +160,21 @@ public sealed class UpdateFeaturesResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UpdatableFeatureResultMessage other && Equals(other);
+        }
+
+        public bool Equals(UpdatableFeatureResultMessage? other)
+        {
+            return true;
         }
     }
 

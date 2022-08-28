@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class JoinGroupRequestMessage: RequestMessage
+public sealed class JoinGroupRequestMessage: RequestMessage, IEquatable<JoinGroupRequestMessage>
 {
     /// <summary>
     /// The group identifier.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The coordinator considers the consumer dead if it receives no heartbeat after this timeout in milliseconds.
@@ -55,7 +55,7 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The member id assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
@@ -65,7 +65,7 @@ public sealed class JoinGroupRequestMessage: RequestMessage
     /// <summary>
     /// The unique name the for class of protocols implemented by the group we want to join.
     /// </summary>
-    public string ProtocolType { get; set; } = "";
+    public string ProtocolType { get; set; } = string.Empty;
 
     /// <summary>
     /// The list of protocols that the member supports.
@@ -204,14 +204,38 @@ public sealed class JoinGroupRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class JoinGroupRequestProtocolMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is JoinGroupRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(JoinGroupRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class JoinGroupRequestProtocolMessage: Message, IEquatable<JoinGroupRequestProtocolMessage>
     {
         /// <summary>
         /// The protocol name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The protocol metadata.
@@ -260,6 +284,31 @@ public sealed class JoinGroupRequestMessage: RequestMessage
                 writer.WriteInt(Metadata.Length);
             }
             writer.WriteBytes(Metadata);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is JoinGroupRequestProtocolMessage other && Equals(other);
+        }
+
+        public bool Equals(JoinGroupRequestProtocolMessage? other)
+        {
+            return true;
         }
     }
 

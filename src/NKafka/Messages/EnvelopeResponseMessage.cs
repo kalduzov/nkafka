@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EnvelopeResponseMessage: ResponseMessage
+public sealed class EnvelopeResponseMessage: ResponseMessage, IEquatable<EnvelopeResponseMessage>
 {
     /// <summary>
     /// The embedded response header and data.
@@ -78,5 +78,19 @@ public sealed class EnvelopeResponseMessage: ResponseMessage
             writer.WriteBytes(ResponseData);
         }
         writer.WriteShort(ErrorCode);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EnvelopeResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(EnvelopeResponseMessage? other)
+    {
+        return true;
     }
 }

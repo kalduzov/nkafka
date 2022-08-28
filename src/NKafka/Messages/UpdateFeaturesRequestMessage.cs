@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UpdateFeaturesRequestMessage: RequestMessage
+public sealed class UpdateFeaturesRequestMessage: RequestMessage, IEquatable<UpdateFeaturesRequestMessage>
 {
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
@@ -92,14 +92,28 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default ValidateOnly at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class FeatureUpdateKeyMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UpdateFeaturesRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(UpdateFeaturesRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class FeatureUpdateKeyMessage: Message, IEquatable<FeatureUpdateKeyMessage>
     {
         /// <summary>
         /// The name of the finalized feature to be updated.
         /// </summary>
-        public string Feature { get; set; } = "";
+        public string Feature { get; set; } = string.Empty;
 
         /// <summary>
         /// The new maximum version level for the finalized feature. A value >= 1 is valid. A value < 1, is special, and can be used to request the deletion of the finalized feature.
@@ -165,6 +179,21 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage
                     throw new UnsupportedVersionException($"Attempted to write a non-default UpgradeType at version {version}");
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FeatureUpdateKeyMessage other && Equals(other);
+        }
+
+        public bool Equals(FeatureUpdateKeyMessage? other)
+        {
+            return true;
         }
     }
 

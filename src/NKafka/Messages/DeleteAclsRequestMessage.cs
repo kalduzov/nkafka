@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteAclsRequestMessage: RequestMessage
+public sealed class DeleteAclsRequestMessage: RequestMessage, IEquatable<DeleteAclsRequestMessage>
 {
     /// <summary>
     /// The filters to use when deleting ACLs.
@@ -81,9 +81,33 @@ public sealed class DeleteAclsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DeleteAclsFilterMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteAclsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteAclsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DeleteAclsFilterMessage: Message, IEquatable<DeleteAclsFilterMessage>
     {
         /// <summary>
         /// The resource type.
@@ -93,7 +117,7 @@ public sealed class DeleteAclsRequestMessage: RequestMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceNameFilter { get; set; } = "";
+        public string ResourceNameFilter { get; set; } = string.Empty;
 
         /// <summary>
         /// The pattern type.
@@ -103,12 +127,12 @@ public sealed class DeleteAclsRequestMessage: RequestMessage
         /// <summary>
         /// The principal filter, or null to accept all principals.
         /// </summary>
-        public string PrincipalFilter { get; set; } = "";
+        public string PrincipalFilter { get; set; } = string.Empty;
 
         /// <summary>
         /// The host filter, or null to accept all hosts.
         /// </summary>
-        public string HostFilter { get; set; } = "";
+        public string HostFilter { get; set; } = string.Empty;
 
         /// <summary>
         /// The ACL operation.
@@ -227,6 +251,30 @@ public sealed class DeleteAclsRequestMessage: RequestMessage
             }
             writer.WriteSByte(Operation);
             writer.WriteSByte(PermissionType);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeleteAclsFilterMessage other && Equals(other);
+        }
+
+        public bool Equals(DeleteAclsFilterMessage? other)
+        {
+            return true;
         }
     }
 }

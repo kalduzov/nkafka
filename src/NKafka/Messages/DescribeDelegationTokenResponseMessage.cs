@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
+public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEquatable<DescribeDelegationTokenResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -87,29 +87,53 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
             }
         }
         writer.WriteInt(ThrottleTimeMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribedDelegationTokenMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeDelegationTokenResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeDelegationTokenResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribedDelegationTokenMessage: Message, IEquatable<DescribedDelegationTokenMessage>
     {
         /// <summary>
         /// The token principal type.
         /// </summary>
-        public string PrincipalType { get; set; } = "";
+        public string PrincipalType { get; set; } = string.Empty;
 
         /// <summary>
         /// The token principal name.
         /// </summary>
-        public string PrincipalName { get; set; } = "";
+        public string PrincipalName { get; set; } = string.Empty;
 
         /// <summary>
         /// The principal type of the requester of the token.
         /// </summary>
-        public string TokenRequesterPrincipalType { get; set; } = "";
+        public string TokenRequesterPrincipalType { get; set; } = string.Empty;
 
         /// <summary>
         /// The principal type of the requester of the token.
         /// </summary>
-        public string TokenRequesterPrincipalName { get; set; } = "";
+        public string TokenRequesterPrincipalName { get; set; } = string.Empty;
 
         /// <summary>
         /// The token issue timestamp in milliseconds.
@@ -129,7 +153,7 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
         /// <summary>
         /// The token ID.
         /// </summary>
-        public string TokenId { get; set; } = "";
+        public string TokenId { get; set; } = string.Empty;
 
         /// <summary>
         /// The token HMAC.
@@ -196,7 +220,7 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
             }
             else
             {
-                if (TokenRequesterPrincipalType.Equals(""))
+                if (!TokenRequesterPrincipalType.Equals(string.Empty))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalType at version {version}");
                 }
@@ -211,7 +235,7 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
             }
             else
             {
-                if (TokenRequesterPrincipalName.Equals(""))
+                if (!TokenRequesterPrincipalName.Equals(string.Empty))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalName at version {version}");
                 }
@@ -256,20 +280,44 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribedDelegationTokenMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribedDelegationTokenMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribedDelegationTokenRenewerMessage: Message
+    public sealed class DescribedDelegationTokenRenewerMessage: Message, IEquatable<DescribedDelegationTokenRenewerMessage>
     {
         /// <summary>
         /// The renewer principal type
         /// </summary>
-        public string PrincipalType { get; set; } = "";
+        public string PrincipalType { get; set; } = string.Empty;
 
         /// <summary>
         /// The renewer principal name
         /// </summary>
-        public string PrincipalName { get; set; } = "";
+        public string PrincipalName { get; set; } = string.Empty;
 
         public DescribedDelegationTokenRenewerMessage()
         {
@@ -316,6 +364,30 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribedDelegationTokenRenewerMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribedDelegationTokenRenewerMessage? other)
+        {
+            return true;
         }
     }
 }

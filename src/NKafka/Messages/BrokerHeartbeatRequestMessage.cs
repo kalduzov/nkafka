@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerHeartbeatRequestMessage: RequestMessage
+public sealed class BrokerHeartbeatRequestMessage: RequestMessage, IEquatable<BrokerHeartbeatRequestMessage>
 {
     /// <summary>
     /// The broker ID.
@@ -90,5 +90,19 @@ public sealed class BrokerHeartbeatRequestMessage: RequestMessage
         writer.WriteLong(CurrentMetadataOffset);
         writer.WriteBool(WantFence);
         writer.WriteBool(WantShutDown);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is BrokerHeartbeatRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(BrokerHeartbeatRequestMessage? other)
+    {
+        return true;
     }
 }

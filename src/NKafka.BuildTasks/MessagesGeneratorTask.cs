@@ -46,7 +46,7 @@ public class MessagesGeneratorTask: Task
 
                     switch (apiDescriptor.Type)
                     {
-                        case MessageType.Request or MessageType.Response:
+                        case MessageType.Request or MessageType.Response or MessageType.Header:
                         {
                             IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
                             var result = messageGenerator.Generate(apiDescriptor);

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerRegistrationRequestMessage: RequestMessage
+public sealed class BrokerRegistrationRequestMessage: RequestMessage, IEquatable<BrokerRegistrationRequestMessage>
 {
     /// <summary>
     /// The broker ID.
@@ -45,7 +45,7 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
     /// <summary>
     /// The cluster id of the broker process.
     /// </summary>
-    public string ClusterId { get; set; } = "";
+    public string ClusterId { get; set; } = string.Empty;
 
     /// <summary>
     /// The incarnation id of the broker process.
@@ -65,7 +65,7 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
     /// <summary>
     /// The rack which this broker is in.
     /// </summary>
-    public string Rack { get; set; } = "";
+    public string Rack { get; set; } = string.Empty;
 
     public BrokerRegistrationRequestMessage()
     {
@@ -117,19 +117,33 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
             writer.WriteVarUInt(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class ListenerMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is BrokerRegistrationRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(BrokerRegistrationRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ListenerMessage: Message, IEquatable<ListenerMessage>
     {
         /// <summary>
         /// The name of the endpoint.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The hostname.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The port.
@@ -174,6 +188,21 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
             }
             writer.WriteUShort(Port);
             writer.WriteShort(SecurityProtocol);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ListenerMessage other && Equals(other);
+        }
+
+        public bool Equals(ListenerMessage? other)
+        {
+            return true;
         }
     }
 
@@ -189,12 +218,12 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
         }
     }
 
-    public sealed class FeatureMessage: Message
+    public sealed class FeatureMessage: Message, IEquatable<FeatureMessage>
     {
         /// <summary>
         /// The feature name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The minimum supported feature level.
@@ -234,6 +263,21 @@ public sealed class BrokerRegistrationRequestMessage: RequestMessage
             }
             writer.WriteShort(MinSupportedVersion);
             writer.WriteShort(MaxSupportedVersion);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FeatureMessage other && Equals(other);
+        }
+
+        public bool Equals(FeatureMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetFetchRequestMessage: RequestMessage
+public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<OffsetFetchRequestMessage>
 {
     /// <summary>
     /// The group to fetch offsets for.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
@@ -97,7 +97,7 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
         }
         else
         {
-            if (GroupId.Equals(""))
+            if (!GroupId.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default GroupId at version {version}");
             }
@@ -143,7 +143,7 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
         }
         else
         {
-            if (Topics is not null || Topics.Count != 0)
+            if (Topics is null || Topics.Count != 0)
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
             }
@@ -174,14 +174,38 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default RequireStable at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class OffsetFetchRequestTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetFetchRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetFetchRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetFetchRequestTopicMessage: Message, IEquatable<OffsetFetchRequestTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
@@ -237,15 +261,39 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchRequestTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchRequestTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchRequestGroupMessage: Message
+    public sealed class OffsetFetchRequestGroupMessage: Message, IEquatable<OffsetFetchRequestGroupMessage>
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = "";
+        public string groupId { get; set; } = string.Empty;
 
         /// <summary>
         /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
@@ -294,15 +342,29 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchRequestGroupMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchRequestGroupMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchRequestTopicsMessage: Message
+    public sealed class OffsetFetchRequestTopicsMessage: Message, IEquatable<OffsetFetchRequestTopicsMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
@@ -340,6 +402,20 @@ public sealed class OffsetFetchRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchRequestTopicsMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchRequestTopicsMessage? other)
+        {
+            return true;
         }
     }
 }

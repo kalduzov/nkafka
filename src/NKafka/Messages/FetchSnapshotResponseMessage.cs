@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FetchSnapshotResponseMessage: ResponseMessage
+public sealed class FetchSnapshotResponseMessage: ResponseMessage, IEquatable<FetchSnapshotResponseMessage>
 {
     /// <summary>
     /// The top level response error code.
@@ -75,14 +75,28 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicSnapshotMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FetchSnapshotResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(FetchSnapshotResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicSnapshotMessage: Message, IEquatable<TopicSnapshotMessage>
     {
         /// <summary>
         /// The name of the topic to fetch.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions to fetch.
@@ -120,10 +134,24 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicSnapshotMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicSnapshotMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionSnapshotMessage: Message
+    public sealed class PartitionSnapshotMessage: Message, IEquatable<PartitionSnapshotMessage>
     {
         /// <summary>
         /// The partition index.
@@ -184,7 +212,7 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
             writer.WriteInt(Index);
             writer.WriteShort(ErrorCode);
             SnapshotId.Write(writer, version);
-            if (CurrentLeader.Equals(new ()))
+            if (!CurrentLeader.Equals(new ()))
             {
                 numTaggedFields++;
             }
@@ -192,10 +220,31 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
             writer.WriteLong(Position);
             writer.WriteVarUInt(UnalignedRecords.Length + 1);
             writer.WriteRecords(UnalignedRecords);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            {
+                if (!CurrentLeader.Equals(new ()))
+                {
+                    writer.WriteVarUInt(0);
+                    CurrentLeader.Write(writer, version);
+                }
+            }
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionSnapshotMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionSnapshotMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class SnapshotIdMessage: Message
+    public sealed class SnapshotIdMessage: Message, IEquatable<SnapshotIdMessage>
     {
         /// <summary>
         /// 
@@ -230,10 +279,24 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);
             writer.WriteInt(Epoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is SnapshotIdMessage other && Equals(other);
+        }
+
+        public bool Equals(SnapshotIdMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class LeaderIdAndEpochMessage: Message
+    public sealed class LeaderIdAndEpochMessage: Message, IEquatable<LeaderIdAndEpochMessage>
     {
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
@@ -268,6 +331,20 @@ public sealed class FetchSnapshotResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(LeaderId);
             writer.WriteInt(LeaderEpoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderIdAndEpochMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderIdAndEpochMessage? other)
+        {
+            return true;
         }
     }
 }

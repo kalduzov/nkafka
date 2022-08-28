@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeProducersResponseMessage: ResponseMessage
+public sealed class DescribeProducersResponseMessage: ResponseMessage, IEquatable<DescribeProducersResponseMessage>
 {
     /// <summary>
     /// Each topic in the response.
@@ -69,14 +69,28 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeProducersResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeProducersResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicResponseMessage: Message, IEquatable<TopicResponseMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition in the response.
@@ -114,10 +128,24 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionResponseMessage: Message
+    public sealed class PartitionResponseMessage: Message, IEquatable<PartitionResponseMessage>
     {
         /// <summary>
         /// The partition index.
@@ -177,10 +205,24 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ProducerStateMessage: Message
+    public sealed class ProducerStateMessage: Message, IEquatable<ProducerStateMessage>
     {
         /// <summary>
         /// 
@@ -239,6 +281,20 @@ public sealed class DescribeProducersResponseMessage: ResponseMessage
             writer.WriteLong(LastTimestamp);
             writer.WriteInt(CoordinatorEpoch);
             writer.WriteLong(CurrentTxnStartOffset);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ProducerStateMessage other && Equals(other);
+        }
+
+        public bool Equals(ProducerStateMessage? other)
+        {
+            return true;
         }
     }
 }

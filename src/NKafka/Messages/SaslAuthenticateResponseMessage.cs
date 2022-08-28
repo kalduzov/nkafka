@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslAuthenticateResponseMessage: ResponseMessage
+public sealed class SaslAuthenticateResponseMessage: ResponseMessage, IEquatable<SaslAuthenticateResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -45,7 +45,7 @@ public sealed class SaslAuthenticateResponseMessage: ResponseMessage
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
@@ -116,5 +116,29 @@ public sealed class SaslAuthenticateResponseMessage: ResponseMessage
         {
             writer.WriteLong(SessionLifetimeMs);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is SaslAuthenticateResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(SaslAuthenticateResponseMessage? other)
+    {
+        return true;
     }
 }

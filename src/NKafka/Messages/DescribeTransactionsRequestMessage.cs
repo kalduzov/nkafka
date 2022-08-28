@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeTransactionsRequestMessage: RequestMessage
+public sealed class DescribeTransactionsRequestMessage: RequestMessage, IEquatable<DescribeTransactionsRequestMessage>
 {
     /// <summary>
     /// Array of transactionalIds to include in describe results. If empty, then no results will be returned.
@@ -74,5 +74,19 @@ public sealed class DescribeTransactionsRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeTransactionsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeTransactionsRequestMessage? other)
+    {
+        return true;
     }
 }

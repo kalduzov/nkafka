@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class StopReplicaResponseMessage: ResponseMessage
+public sealed class StopReplicaResponseMessage: ResponseMessage, IEquatable<StopReplicaResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no top-level error.
@@ -85,14 +85,38 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class StopReplicaPartitionErrorMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is StopReplicaResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(StopReplicaResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class StopReplicaPartitionErrorMessage: Message, IEquatable<StopReplicaPartitionErrorMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition index.
@@ -139,6 +163,30 @@ public sealed class StopReplicaResponseMessage: ResponseMessage
             }
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is StopReplicaPartitionErrorMessage other && Equals(other);
+        }
+
+        public bool Equals(StopReplicaPartitionErrorMessage? other)
+        {
+            return true;
         }
     }
 }

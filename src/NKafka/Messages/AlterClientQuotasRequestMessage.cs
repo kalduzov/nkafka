@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterClientQuotasRequestMessage: RequestMessage
+public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<AlterClientQuotasRequestMessage>
 {
     /// <summary>
     /// The quota configuration entries to alter.
@@ -87,9 +87,33 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
             }
         }
         writer.WriteBool(ValidateOnly);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class EntryDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterClientQuotasRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterClientQuotasRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class EntryDataMessage: Message, IEquatable<EntryDataMessage>
     {
         /// <summary>
         /// The quota entity to alter.
@@ -154,20 +178,44 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntryDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntryDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class EntityDataMessage: Message
+    public sealed class EntityDataMessage: Message, IEquatable<EntityDataMessage>
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; } = "";
+        public string EntityType { get; set; } = string.Empty;
 
         /// <summary>
         /// The name of the entity, or null if the default.
         /// </summary>
-        public string EntityName { get; set; } = "";
+        public string EntityName { get; set; } = string.Empty;
 
         public EntityDataMessage()
         {
@@ -226,15 +274,39 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntityDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntityDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OpDataMessage: Message
+    public sealed class OpDataMessage: Message, IEquatable<OpDataMessage>
     {
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string Key { get; set; } = "";
+        public string Key { get; set; } = string.Empty;
 
         /// <summary>
         /// The value to set, otherwise ignored if the value is to be removed.
@@ -281,6 +353,30 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage
             }
             writer.WriteDouble(Value);
             writer.WriteBool(Remove);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OpDataMessage other && Equals(other);
+        }
+
+        public bool Equals(OpDataMessage? other)
+        {
+            return true;
         }
     }
 }

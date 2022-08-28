@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeTransactionsResponseMessage: ResponseMessage
+public sealed class DescribeTransactionsResponseMessage: ResponseMessage, IEquatable<DescribeTransactionsResponseMessage>
 {
     /// <summary>
     /// 
@@ -69,9 +69,23 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TransactionStateMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeTransactionsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeTransactionsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TransactionStateMessage: Message, IEquatable<TransactionStateMessage>
     {
         /// <summary>
         /// 
@@ -81,12 +95,12 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionalId { get; set; } = "";
+        public string TransactionalId { get; set; } = string.Empty;
 
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionState { get; set; } = "";
+        public string TransactionState { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -154,15 +168,29 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TransactionStateMessage other && Equals(other);
+        }
+
+        public bool Equals(TransactionStateMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class TopicDataMessage: Message
+    public sealed class TopicDataMessage: Message, IEquatable<TopicDataMessage>
     {
         /// <summary>
         /// 
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -200,6 +228,21 @@ public sealed class DescribeTransactionsResponseMessage: ResponseMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicDataMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicDataMessage? other)
+        {
+            return true;
         }
     }
 

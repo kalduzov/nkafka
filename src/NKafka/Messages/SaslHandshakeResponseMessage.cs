@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslHandshakeResponseMessage: ResponseMessage
+public sealed class SaslHandshakeResponseMessage: ResponseMessage, IEquatable<SaslHandshakeResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -78,5 +78,21 @@ public sealed class SaslHandshakeResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (numTaggedFields > 0)
+        {
+            throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is SaslHandshakeResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(SaslHandshakeResponseMessage? other)
+    {
+        return true;
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ControlledShutdownResponseMessage: ResponseMessage
+public sealed class ControlledShutdownResponseMessage: ResponseMessage, IEquatable<ControlledShutdownResponseMessage>
 {
     /// <summary>
     /// The top-level error code.
@@ -85,14 +85,38 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class RemainingPartitionMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ControlledShutdownResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ControlledShutdownResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class RemainingPartitionMessage: Message, IEquatable<RemainingPartitionMessage>
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The index of the partition.
@@ -133,6 +157,31 @@ public sealed class ControlledShutdownResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(PartitionIndex);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is RemainingPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(RemainingPartitionMessage? other)
+        {
+            return true;
         }
     }
 

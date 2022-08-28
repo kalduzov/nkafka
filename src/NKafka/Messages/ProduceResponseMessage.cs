@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ProduceResponseMessage: ResponseMessage
+public sealed class ProduceResponseMessage: ResponseMessage, IEquatable<ProduceResponseMessage>
 {
     /// <summary>
     /// Each produce response
@@ -84,14 +84,38 @@ public sealed class ProduceResponseMessage: ResponseMessage
         {
             writer.WriteInt(ThrottleTimeMs);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class TopicProduceResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ProduceResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ProduceResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicProduceResponseMessage: Message, IEquatable<TopicProduceResponseMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition that we produced to within the topic.
@@ -147,10 +171,35 @@ public sealed class ProduceResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicProduceResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicProduceResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionProduceResponseMessage: Message
+    public sealed class PartitionProduceResponseMessage: Message, IEquatable<PartitionProduceResponseMessage>
     {
         /// <summary>
         /// The partition index.
@@ -265,10 +314,34 @@ public sealed class ProduceResponseMessage: ResponseMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionProduceResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionProduceResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class BatchIndexAndErrorMessageMessage: Message
+    public sealed class BatchIndexAndErrorMessageMessage: Message, IEquatable<BatchIndexAndErrorMessageMessage>
     {
         /// <summary>
         /// The batch index of the record that cause the batch to be dropped
@@ -330,6 +403,30 @@ public sealed class ProduceResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is BatchIndexAndErrorMessageMessage other && Equals(other);
+        }
+
+        public bool Equals(BatchIndexAndErrorMessageMessage? other)
+        {
+            return true;
         }
     }
 

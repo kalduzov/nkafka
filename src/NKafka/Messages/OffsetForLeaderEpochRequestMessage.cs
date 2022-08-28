@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
+public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage, IEquatable<OffsetForLeaderEpochRequestMessage>
 {
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
@@ -90,14 +90,38 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class OffsetForLeaderTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetForLeaderEpochRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetForLeaderEpochRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetForLeaderTopicMessage: Message, IEquatable<OffsetForLeaderTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition to get offsets for.
@@ -153,10 +177,35 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetForLeaderTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetForLeaderTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetForLeaderPartitionMessage: Message
+    public sealed class OffsetForLeaderPartitionMessage: Message, IEquatable<OffsetForLeaderPartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -200,6 +249,30 @@ public sealed class OffsetForLeaderEpochRequestMessage: RequestMessage
                 writer.WriteInt(CurrentLeaderEpoch);
             }
             writer.WriteInt(LeaderEpoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetForLeaderPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetForLeaderPartitionMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteTopicsRequestMessage: RequestMessage
+public sealed class DeleteTopicsRequestMessage: RequestMessage, IEquatable<DeleteTopicsRequestMessage>
 {
     /// <summary>
     /// The name or topic ID of the topic
@@ -118,9 +118,33 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
             }
         }
         writer.WriteInt(TimeoutMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DeleteTopicStateMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteTopicsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteTopicsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DeleteTopicStateMessage: Message, IEquatable<DeleteTopicStateMessage>
     {
         /// <summary>
         /// The topic name
@@ -168,6 +192,20 @@ public sealed class DeleteTopicsRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteGuid(TopicId);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeleteTopicStateMessage other && Equals(other);
+        }
+
+        public bool Equals(DeleteTopicStateMessage? other)
+        {
+            return true;
         }
     }
 }

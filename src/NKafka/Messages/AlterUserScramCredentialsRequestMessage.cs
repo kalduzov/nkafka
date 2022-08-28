@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
+public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
 {
     /// <summary>
     /// The SCRAM credentials to remove.
@@ -80,14 +80,28 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class ScramCredentialDeletionMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterUserScramCredentialsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterUserScramCredentialsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ScramCredentialDeletionMessage: Message, IEquatable<ScramCredentialDeletionMessage>
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The SCRAM mechanism.
@@ -121,15 +135,29 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(Mechanism);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ScramCredentialDeletionMessage other && Equals(other);
+        }
+
+        public bool Equals(ScramCredentialDeletionMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ScramCredentialUpsertionMessage: Message
+    public sealed class ScramCredentialUpsertionMessage: Message, IEquatable<ScramCredentialUpsertionMessage>
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The SCRAM mechanism.
@@ -183,6 +211,20 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage
             writer.WriteBytes(Salt);
             writer.WriteVarUInt(SaltedPassword.Length + 1);
             writer.WriteBytes(SaltedPassword);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ScramCredentialUpsertionMessage other && Equals(other);
+        }
+
+        public bool Equals(ScramCredentialUpsertionMessage? other)
+        {
+            return true;
         }
     }
 }

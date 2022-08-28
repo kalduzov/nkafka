@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateTopicsRequestMessage: RequestMessage
+public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<CreateTopicsRequestMessage>
 {
     /// <summary>
     /// The topics to create.
@@ -103,14 +103,38 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default validateOnly at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CreatableTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateTopicsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateTopicsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CreatableTopicMessage: Message, IEquatable<CreatableTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The number of partitions to create in the topic, or -1 if we are either specifying a manual partition assignment or using the default partitions.
@@ -199,10 +223,35 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatableTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatableTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class CreatableReplicaAssignmentMessage: Message
+    public sealed class CreatableReplicaAssignmentMessage: Message, IEquatable<CreatableReplicaAssignmentMessage>
     {
         /// <summary>
         /// The partition index.
@@ -248,6 +297,31 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatableReplicaAssignmentMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatableReplicaAssignmentMessage? other)
+        {
+            return true;
         }
     }
 
@@ -263,17 +337,17 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
         }
     }
 
-    public sealed class CreateableTopicConfigMessage: Message
+    public sealed class CreateableTopicConfigMessage: Message, IEquatable<CreateableTopicConfigMessage>
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; } = "";
+        public string Value { get; set; } = string.Empty;
 
         public CreateableTopicConfigMessage()
         {
@@ -332,6 +406,31 @@ public sealed class CreateTopicsRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreateableTopicConfigMessage other && Equals(other);
+        }
+
+        public bool Equals(CreateableTopicConfigMessage? other)
+        {
+            return true;
         }
     }
 

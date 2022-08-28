@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FindCoordinatorResponseMessage: ResponseMessage
+public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<FindCoordinatorResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -45,7 +45,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// The node id.
@@ -55,7 +55,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
     /// <summary>
     /// The host name.
     /// </summary>
-    public string Host { get; set; } = "";
+    public string Host { get; set; } = string.Empty;
 
     /// <summary>
     /// The port.
@@ -158,7 +158,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
         }
         else
         {
-            if (Host.Equals(""))
+            if (!Host.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default Host at version {version}");
             }
@@ -189,14 +189,38 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default Coordinators at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CoordinatorMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FindCoordinatorResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(FindCoordinatorResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CoordinatorMessage: Message, IEquatable<CoordinatorMessage>
     {
         /// <summary>
         /// The coordinator key.
         /// </summary>
-        public string Key { get; set; } = "";
+        public string Key { get; set; } = string.Empty;
 
         /// <summary>
         /// The node id.
@@ -206,7 +230,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
         /// <summary>
         /// The host name.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The port.
@@ -221,7 +245,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public CoordinatorMessage()
         {
@@ -271,6 +295,20 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CoordinatorMessage other && Equals(other);
+        }
+
+        public bool Equals(CoordinatorMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListTransactionsRequestMessage: RequestMessage
+public sealed class ListTransactionsRequestMessage: RequestMessage, IEquatable<ListTransactionsRequestMessage>
 {
     /// <summary>
     /// The transaction states to filter by: if empty, all transactions are returned; if non-empty, then only transactions matching one of the filtered states will be returned
@@ -84,5 +84,19 @@ public sealed class ListTransactionsRequestMessage: RequestMessage
         {
             writer.WriteLong(element);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListTransactionsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ListTransactionsRequestMessage? other)
+    {
+        return true;
     }
 }

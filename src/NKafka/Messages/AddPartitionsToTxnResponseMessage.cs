@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
+public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage, IEquatable<AddPartitionsToTxnResponseMessage>
 {
     /// <summary>
     /// The results for each topic.
@@ -80,14 +80,38 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AddPartitionsToTxnTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AddPartitionsToTxnResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AddPartitionsToTxnTopicResultMessage: Message, IEquatable<AddPartitionsToTxnTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The results for each partition
@@ -143,10 +167,35 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(AddPartitionsToTxnTopicResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class AddPartitionsToTxnPartitionResultMessage: Message
+    public sealed class AddPartitionsToTxnPartitionResultMessage: Message, IEquatable<AddPartitionsToTxnPartitionResultMessage>
     {
         /// <summary>
         /// The partition indexes.
@@ -181,6 +230,31 @@ public sealed class AddPartitionsToTxnResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnPartitionResultMessage other && Equals(other);
+        }
+
+        public bool Equals(AddPartitionsToTxnPartitionResultMessage? other)
+        {
+            return true;
         }
     }
 

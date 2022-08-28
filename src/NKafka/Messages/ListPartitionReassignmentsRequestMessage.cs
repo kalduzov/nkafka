@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage
+public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage, IEquatable<ListPartitionReassignmentsRequestMessage>
 {
     /// <summary>
     /// The time in ms to wait for the request to complete.
@@ -83,14 +83,28 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class ListPartitionReassignmentsTopicsMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListPartitionReassignmentsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ListPartitionReassignmentsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ListPartitionReassignmentsTopicsMessage: Message, IEquatable<ListPartitionReassignmentsTopicsMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions to list partition reassignments for.
@@ -128,6 +142,20 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ListPartitionReassignmentsTopicsMessage other && Equals(other);
+        }
+
+        public bool Equals(ListPartitionReassignmentsTopicsMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListGroupsResponseMessage: ResponseMessage
+public sealed class ListGroupsResponseMessage: ResponseMessage, IEquatable<ListGroupsResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -89,24 +89,48 @@ public sealed class ListGroupsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class ListedGroupMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListGroupsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ListGroupsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ListedGroupMessage: Message, IEquatable<ListedGroupMessage>
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string GroupId { get; set; } = "";
+        public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The group protocol type.
         /// </summary>
-        public string ProtocolType { get; set; } = "";
+        public string ProtocolType { get; set; } = string.Empty;
 
         /// <summary>
         /// The group state name.
         /// </summary>
-        public string GroupState { get; set; } = "";
+        public string GroupState { get; set; } = string.Empty;
 
         public ListedGroupMessage()
         {
@@ -161,6 +185,30 @@ public sealed class ListGroupsResponseMessage: ResponseMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ListedGroupMessage other && Equals(other);
+        }
+
+        public bool Equals(ListedGroupMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterConfigsRequestMessage: RequestMessage
+public sealed class AlterConfigsRequestMessage: RequestMessage, IEquatable<AlterConfigsRequestMessage>
 {
     /// <summary>
     /// The updates for each resource.
@@ -87,9 +87,33 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
             }
         }
         writer.WriteBool(ValidateOnly);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AlterConfigsResourceMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterConfigsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterConfigsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AlterConfigsResourceMessage: Message, IEquatable<AlterConfigsResourceMessage>
     {
         /// <summary>
         /// The resource type.
@@ -99,7 +123,7 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         /// <summary>
         /// The configurations.
@@ -156,20 +180,45 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterConfigsResourceMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterConfigsResourceMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class AlterableConfigMessage: Message
+    public sealed class AlterableConfigMessage: Message, IEquatable<AlterableConfigMessage>
     {
         /// <summary>
         /// The configuration key name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The value to set for the configuration key.
         /// </summary>
-        public string Value { get; set; } = "";
+        public string Value { get; set; } = string.Empty;
 
         public AlterableConfigMessage()
         {
@@ -228,6 +277,31 @@ public sealed class AlterConfigsRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterableConfigMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterableConfigMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,17 +35,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateDelegationTokenRequestMessage: RequestMessage
+public sealed class CreateDelegationTokenRequestMessage: RequestMessage, IEquatable<CreateDelegationTokenRequestMessage>
 {
     /// <summary>
     /// The principal type of the owner of the token. If it's null it defaults to the token request principal.
     /// </summary>
-    public string OwnerPrincipalType { get; set; } = "";
+    public string OwnerPrincipalType { get; set; } = string.Empty;
 
     /// <summary>
     /// The principal name of the owner of the token. If it's null it defaults to the token request principal.
     /// </summary>
-    public string OwnerPrincipalName { get; set; } = "";
+    public string OwnerPrincipalName { get; set; } = string.Empty;
 
     /// <summary>
     /// A list of those who are allowed to renew this token before it expires.
@@ -95,7 +95,7 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
         }
         else
         {
-            if (OwnerPrincipalType is not null || OwnerPrincipalType.Equals(""))
+            if (OwnerPrincipalType is null || !OwnerPrincipalType.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default OwnerPrincipalType at version {version}");
             }
@@ -115,7 +115,7 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
         }
         else
         {
-            if (OwnerPrincipalName is not null || OwnerPrincipalName.Equals(""))
+            if (OwnerPrincipalName is null || !OwnerPrincipalName.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default OwnerPrincipalName at version {version}");
             }
@@ -137,19 +137,43 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
             }
         }
         writer.WriteLong(MaxLifetimeMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CreatableRenewersMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateDelegationTokenRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateDelegationTokenRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CreatableRenewersMessage: Message, IEquatable<CreatableRenewersMessage>
     {
         /// <summary>
         /// The type of the Kafka principal.
         /// </summary>
-        public string PrincipalType { get; set; } = "";
+        public string PrincipalType { get; set; } = string.Empty;
 
         /// <summary>
         /// The name of the Kafka principal.
         /// </summary>
-        public string PrincipalName { get; set; } = "";
+        public string PrincipalName { get; set; } = string.Empty;
 
         public CreatableRenewersMessage()
         {
@@ -196,6 +220,30 @@ public sealed class CreateDelegationTokenRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatableRenewersMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatableRenewersMessage? other)
+        {
+            return true;
         }
     }
 }

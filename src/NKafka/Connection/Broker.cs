@@ -35,8 +35,8 @@ using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Protocol;
-//using NKafka.Protocol.Requests;
 
+//using NKafka.Protocol.Requests;
 using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Connection;
@@ -433,7 +433,15 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, requestId, Id, EndPoint);
 
-        var request = new SendMessage(new RequestHeader(content.ApiKey, content.Version, requestId, _config.ClientId), content);
+        var request = new SendMessage(
+            new RequestHeader
+            {
+                ClientId = _config.ClientId,
+                RequestApiVersion = (short)content.Version,
+                CorrelationId = requestId,
+                RequestApiKey = (short)content.ApiKey
+            },
+            content);
 
         ThrowExceptionIfRequestNotValid(request, activity);
 
@@ -448,7 +456,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var taskCompletionSource = new ResponseTaskCompletionSource(request.Header.ApiKey, request.Header.ApiVersion);
+        var taskCompletionSource = new ResponseTaskCompletionSource((ApiKeys)request.Header.RequestApiKey, (ApiVersions)request.Header.RequestApiVersion);
 
         token.Register(
             state =>
@@ -496,14 +504,14 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
     private void ThrowExceptionIfRequestNotValid(SendMessage message, Activity? activity)
     {
-        if (message.RequestLength >= _config.MessageMaxBytes)
-        {
-            var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {_config.MessageMaxBytes}";
-            activity?.SetStatus(ActivityStatusCode.Error);
-            activity?.AddTag("error.message", logMessage);
-
-            throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
-        }
+        // if (message.RequestLength >= _config.MessageMaxBytes)
+        // {
+        //     var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {_config.MessageMaxBytes}";
+        //     activity?.SetStatus(ActivityStatusCode.Error);
+        //     activity?.AddTag("error.message", logMessage);
+        //
+        //     throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
+        // }
     }
 
     private Task ThrowIfBrokerDontSupportApiVersion(SendMessage message)

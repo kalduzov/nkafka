@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ElectLeadersResponseMessage: ResponseMessage
+public sealed class ElectLeadersResponseMessage: ResponseMessage, IEquatable<ElectLeadersResponseMessage>
 {
     /// <summary>
     /// The top level response error code.
@@ -96,14 +96,38 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class ReplicaElectionResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ElectLeadersResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ElectLeadersResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ReplicaElectionResultMessage: Message, IEquatable<ReplicaElectionResultMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The results for each partition
@@ -159,10 +183,34 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReplicaElectionResultMessage other && Equals(other);
+        }
+
+        public bool Equals(ReplicaElectionResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionResultMessage: Message
+    public sealed class PartitionResultMessage: Message, IEquatable<PartitionResultMessage>
     {
         /// <summary>
         /// The partition id
@@ -177,7 +225,7 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public PartitionResultMessage()
         {
@@ -226,6 +274,30 @@ public sealed class ElectLeadersResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionResultMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionResultMessage? other)
+        {
+            return true;
         }
     }
 }

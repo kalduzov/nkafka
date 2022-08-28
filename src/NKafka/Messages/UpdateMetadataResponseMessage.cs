@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UpdateMetadataResponseMessage: ResponseMessage
+public sealed class UpdateMetadataResponseMessage: ResponseMessage, IEquatable<UpdateMetadataResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -64,5 +64,29 @@ public sealed class UpdateMetadataResponseMessage: ResponseMessage
     {
         var numTaggedFields = 0;
         writer.WriteShort(ErrorCode);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UpdateMetadataResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(UpdateMetadataResponseMessage? other)
+    {
+        return true;
     }
 }

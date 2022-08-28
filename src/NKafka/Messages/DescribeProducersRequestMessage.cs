@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeProducersRequestMessage: RequestMessage
+public sealed class DescribeProducersRequestMessage: RequestMessage, IEquatable<DescribeProducersRequestMessage>
 {
     /// <summary>
     /// 
@@ -70,14 +70,28 @@ public sealed class DescribeProducersRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicRequestMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeProducersRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeProducersRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicRequestMessage: Message, IEquatable<TopicRequestMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The indexes of the partitions to list producers for.
@@ -115,6 +129,20 @@ public sealed class DescribeProducersRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicRequestMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicRequestMessage? other)
+        {
+            return true;
         }
     }
 }

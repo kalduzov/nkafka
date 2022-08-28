@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateTopicsResponseMessage: ResponseMessage
+public sealed class CreateTopicsResponseMessage: ResponseMessage, IEquatable<CreateTopicsResponseMessage>
 {
     /// <summary>
     /// Results for each topic we tried to create.
@@ -83,14 +83,38 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CreatableTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateTopicsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateTopicsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CreatableTopicResultMessage: Message, IEquatable<CreatableTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique topic ID
@@ -105,7 +129,7 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// Optional topic config error returned if configs are not returned in the response.
@@ -222,20 +246,53 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
                     }
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                {
+                    if (TopicConfigErrorCode != 0)
+                    {
+                        writer.WriteVarUInt(0);
+                        writer.WriteVarUInt(2);
+                        writer.WriteShort(TopicConfigErrorCode);
+                    }
+                }
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatableTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatableTopicResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class CreatableTopicConfigsMessage: Message
+    public sealed class CreatableTopicConfigsMessage: Message, IEquatable<CreatableTopicConfigsMessage>
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; } = "";
+        public string Value { get; set; } = string.Empty;
 
         /// <summary>
         /// True if the configuration is read-only.
@@ -295,6 +352,20 @@ public sealed class CreateTopicsResponseMessage: ResponseMessage
             writer.WriteBool(ReadOnly);
             writer.WriteSByte(ConfigSource);
             writer.WriteBool(IsSensitive);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatableTopicConfigsMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatableTopicConfigsMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
+public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatable<AlterReplicaLogDirsRequestMessage>
 {
     /// <summary>
     /// The alterations to make for each directory.
@@ -81,14 +81,38 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AlterReplicaLogDirMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterReplicaLogDirsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterReplicaLogDirsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AlterReplicaLogDirMessage: Message, IEquatable<AlterReplicaLogDirMessage>
     {
         /// <summary>
         /// The absolute directory path.
         /// </summary>
-        public string Path { get; set; } = "";
+        public string Path { get; set; } = string.Empty;
 
         /// <summary>
         /// The topics to add to the directory.
@@ -144,15 +168,40 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterReplicaLogDirMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterReplicaLogDirMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class AlterReplicaLogDirTopicMessage: Message
+    public sealed class AlterReplicaLogDirTopicMessage: Message, IEquatable<AlterReplicaLogDirTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes.
@@ -204,6 +253,31 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterReplicaLogDirTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterReplicaLogDirTopicMessage? other)
+        {
+            return true;
         }
     }
 

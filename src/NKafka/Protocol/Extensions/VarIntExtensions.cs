@@ -22,6 +22,7 @@
  */
 
 using System.IO;
+using System.Numerics;
 using System.Text;
 
 namespace NKafka.Protocol.Extensions;
@@ -147,5 +148,13 @@ internal static class VarIntExtensions
             shift += 7;
             i++;
         }
+    }
+
+    internal static int SizeOfVarUInt(this int value)
+    {
+        var leadingZeros = BitOperations.LeadingZeroCount((uint)value);
+        var leadingZerosBelow38DividedBy7 = ((38 - leadingZeros) * 0b10010010010010011) >> 19;
+
+        return leadingZerosBelow38DividedBy7 + (leadingZeros >> 5);
     }
 }

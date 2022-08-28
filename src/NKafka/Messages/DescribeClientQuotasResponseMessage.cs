@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
+public sealed class DescribeClientQuotasResponseMessage: ResponseMessage, IEquatable<DescribeClientQuotasResponseMessage>
 {
     /// <summary>
     /// The error code, or `0` if the quota description succeeded.
@@ -45,7 +45,7 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
     /// <summary>
     /// The error message, or `null` if the quota description succeeded.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// A result entry.
@@ -129,9 +129,33 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
                 }
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class EntryDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeClientQuotasResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeClientQuotasResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class EntryDataMessage: Message, IEquatable<EntryDataMessage>
     {
         /// <summary>
         /// The quota entity description.
@@ -196,20 +220,44 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntryDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntryDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class EntityDataMessage: Message
+    public sealed class EntityDataMessage: Message, IEquatable<EntityDataMessage>
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; } = "";
+        public string EntityType { get; set; } = string.Empty;
 
         /// <summary>
         /// The entity name, or null if the default.
         /// </summary>
-        public string EntityName { get; set; } = "";
+        public string EntityName { get; set; } = string.Empty;
 
         public EntityDataMessage()
         {
@@ -268,15 +316,39 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntityDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntityDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ValueDataMessage: Message
+    public sealed class ValueDataMessage: Message, IEquatable<ValueDataMessage>
     {
         /// <summary>
         /// The quota configuration key.
         /// </summary>
-        public string Key { get; set; } = "";
+        public string Key { get; set; } = string.Empty;
 
         /// <summary>
         /// The quota configuration value.
@@ -317,6 +389,30 @@ public sealed class DescribeClientQuotasResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteDouble(Value);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ValueDataMessage other && Equals(other);
+        }
+
+        public bool Equals(ValueDataMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -28,22 +28,22 @@ public abstract class Message
     /// <summary>
     /// Returns the number of bytes it would take to write out this message.
     /// </summary>
-    public int MessageSize { get; set; }
+    internal int MessageSize { get; set; }
 
     /// <summary>
     /// Returns the lowest supported API key of this message, inclusive.
     /// </summary>
-    public ApiVersions LowestSupportedVersion { get; init; }
+    internal ApiVersions LowestSupportedVersion { get; init; }
 
     /// <summary>
     /// Returns the highest supported API key of this message, inclusive.
     /// </summary>
-    public ApiVersions HighestSupportedVersion { get; init; }
+    internal ApiVersions HighestSupportedVersion { get; init; }
 
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand.
     /// </summary>
-    public List<TaggedField>? UnknownTaggedFields { get; set; }
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
     protected Message()
     {

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ExpireDelegationTokenResponseMessage: ResponseMessage
+public sealed class ExpireDelegationTokenResponseMessage: ResponseMessage, IEquatable<ExpireDelegationTokenResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -72,5 +72,29 @@ public sealed class ExpireDelegationTokenResponseMessage: ResponseMessage
         writer.WriteShort(ErrorCode);
         writer.WriteLong(ExpiryTimestampMs);
         writer.WriteInt(ThrottleTimeMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ExpireDelegationTokenResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ExpireDelegationTokenResponseMessage? other)
+    {
+        return true;
     }
 }

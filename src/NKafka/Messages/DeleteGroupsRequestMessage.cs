@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteGroupsRequestMessage: RequestMessage
+public sealed class DeleteGroupsRequestMessage: RequestMessage, IEquatable<DeleteGroupsRequestMessage>
 {
     /// <summary>
     /// The group names to delete.
@@ -89,5 +89,29 @@ public sealed class DeleteGroupsRequestMessage: RequestMessage
                 }
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteGroupsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteGroupsRequestMessage? other)
+    {
+        return true;
     }
 }

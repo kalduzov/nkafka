@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaderAndIsrResponseMessage: ResponseMessage
+public sealed class LeaderAndIsrResponseMessage: ResponseMessage, IEquatable<LeaderAndIsrResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -115,9 +115,33 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class LeaderAndIsrTopicErrorMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is LeaderAndIsrResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(LeaderAndIsrResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class LeaderAndIsrTopicErrorMessage: Message, IEquatable<LeaderAndIsrTopicErrorMessage>
     {
         /// <summary>
         /// The unique topic ID
@@ -160,6 +184,21 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderAndIsrTopicErrorMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderAndIsrTopicErrorMessage? other)
+        {
+            return true;
         }
     }
 
@@ -175,12 +214,12 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
         }
     }
 
-    public sealed class LeaderAndIsrPartitionErrorMessage: Message
+    public sealed class LeaderAndIsrPartitionErrorMessage: Message, IEquatable<LeaderAndIsrPartitionErrorMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition index.
@@ -230,6 +269,30 @@ public sealed class LeaderAndIsrResponseMessage: ResponseMessage
             }
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderAndIsrPartitionErrorMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderAndIsrPartitionErrorMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetCommitRequestMessage: RequestMessage
+public sealed class OffsetCommitRequestMessage: RequestMessage, IEquatable<OffsetCommitRequestMessage>
 {
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The generation of the group.
@@ -50,7 +50,7 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
@@ -175,14 +175,38 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version8)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class OffsetCommitRequestTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetCommitRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetCommitRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetCommitRequestTopicMessage: Message, IEquatable<OffsetCommitRequestTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition to commit offsets for.
@@ -238,10 +262,34 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version8)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetCommitRequestTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetCommitRequestTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetCommitRequestPartitionMessage: Message
+    public sealed class OffsetCommitRequestPartitionMessage: Message, IEquatable<OffsetCommitRequestPartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -266,7 +314,7 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
         /// <summary>
         /// Any associated metadata the client wants to keep.
         /// </summary>
-        public string CommittedMetadata { get; set; } = "";
+        public string CommittedMetadata { get; set; } = string.Empty;
 
         public OffsetCommitRequestPartitionMessage()
         {
@@ -330,6 +378,30 @@ public sealed class OffsetCommitRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version8)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetCommitRequestPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetCommitRequestPartitionMessage? other)
+        {
+            return true;
         }
     }
 }

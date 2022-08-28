@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class VoteResponseMessage: ResponseMessage
+public sealed class VoteResponseMessage: ResponseMessage, IEquatable<VoteResponseMessage>
 {
     /// <summary>
     /// The top level error code.
@@ -74,14 +74,28 @@ public sealed class VoteResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is VoteResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(VoteResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicDataMessage: Message, IEquatable<TopicDataMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -119,10 +133,24 @@ public sealed class VoteResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicDataMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionDataMessage: Message
+    public sealed class PartitionDataMessage: Message, IEquatable<PartitionDataMessage>
     {
         /// <summary>
         /// The partition index.
@@ -175,6 +203,20 @@ public sealed class VoteResponseMessage: ResponseMessage
             writer.WriteInt(LeaderId);
             writer.WriteInt(LeaderEpoch);
             writer.WriteBool(VoteGranted);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionDataMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionDataMessage? other)
+        {
+            return true;
         }
     }
 }

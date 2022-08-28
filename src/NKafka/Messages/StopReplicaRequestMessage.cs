@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class StopReplicaRequestMessage: RequestMessage
+public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopReplicaRequestMessage>
 {
     /// <summary>
     /// The controller id.
@@ -168,14 +168,38 @@ public sealed class StopReplicaRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default TopicStates at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class StopReplicaPartitionV0Message: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is StopReplicaRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(StopReplicaRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class StopReplicaPartitionV0Message: Message, IEquatable<StopReplicaPartitionV0Message>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition index.
@@ -213,15 +237,31 @@ public sealed class StopReplicaRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(PartitionIndex);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is StopReplicaPartitionV0Message other && Equals(other);
+        }
+
+        public bool Equals(StopReplicaPartitionV0Message? other)
+        {
+            return true;
         }
     }
 
-    public sealed class StopReplicaTopicV1Message: Message
+    public sealed class StopReplicaTopicV1Message: Message, IEquatable<StopReplicaTopicV1Message>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes.
@@ -277,15 +317,39 @@ public sealed class StopReplicaRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is StopReplicaTopicV1Message other && Equals(other);
+        }
+
+        public bool Equals(StopReplicaTopicV1Message? other)
+        {
+            return true;
         }
     }
 
-    public sealed class StopReplicaTopicStateMessage: Message
+    public sealed class StopReplicaTopicStateMessage: Message, IEquatable<StopReplicaTopicStateMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The state of each partition
@@ -327,10 +391,24 @@ public sealed class StopReplicaRequestMessage: RequestMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is StopReplicaTopicStateMessage other && Equals(other);
+        }
+
+        public bool Equals(StopReplicaTopicStateMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class StopReplicaPartitionStateMessage: Message
+    public sealed class StopReplicaPartitionStateMessage: Message, IEquatable<StopReplicaPartitionStateMessage>
     {
         /// <summary>
         /// The partition index.
@@ -371,6 +449,20 @@ public sealed class StopReplicaRequestMessage: RequestMessage
             writer.WriteInt(PartitionIndex);
             writer.WriteInt(LeaderEpoch);
             writer.WriteBool(DeletePartition);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is StopReplicaPartitionStateMessage other && Equals(other);
+        }
+
+        public bool Equals(StopReplicaPartitionStateMessage? other)
+        {
+            return true;
         }
     }
 }

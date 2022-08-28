@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FetchResponseMessage: ResponseMessage
+public sealed class FetchResponseMessage: ResponseMessage, IEquatable<FetchResponseMessage>
 {
     /// <summary>
     /// The top level response error code.
@@ -108,14 +108,38 @@ public sealed class FetchResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version12)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class FetchableTopicResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FetchResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(FetchResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class FetchableTopicResponseMessage: Message, IEquatable<FetchableTopicResponseMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique topic ID
@@ -183,10 +207,34 @@ public sealed class FetchResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FetchableTopicResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(FetchableTopicResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionDataMessage: Message
+    public sealed class PartitionDataMessage: Message, IEquatable<PartitionDataMessage>
     {
         /// <summary>
         /// The partition index.
@@ -277,42 +325,42 @@ public sealed class FetchResponseMessage: ResponseMessage
             }
             if (version >= ApiVersions.Version12)
             {
-                if (DivergingEpoch.Equals(new ()))
+                if (!DivergingEpoch.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (DivergingEpoch.Equals(new ()))
+                if (!DivergingEpoch.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default DivergingEpoch at version {version}");
                 }
             }
             if (version >= ApiVersions.Version12)
             {
-                if (CurrentLeader.Equals(new ()))
+                if (!CurrentLeader.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (CurrentLeader.Equals(new ()))
+                if (!CurrentLeader.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default CurrentLeader at version {version}");
                 }
             }
             if (version >= ApiVersions.Version12)
             {
-                if (SnapshotId.Equals(new ()))
+                if (!SnapshotId.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (SnapshotId.Equals(new ()))
+                if (!SnapshotId.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default SnapshotId at version {version}");
                 }
@@ -384,10 +432,55 @@ public sealed class FetchResponseMessage: ResponseMessage
                 }
                 writer.WriteRecords(Records);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                {
+                    if (!DivergingEpoch.Equals(new ()))
+                    {
+                        writer.WriteVarUInt(0);
+                        DivergingEpoch.Write(writer, version);
+                    }
+                }
+                {
+                    if (!CurrentLeader.Equals(new ()))
+                    {
+                        writer.WriteVarUInt(1);
+                        CurrentLeader.Write(writer, version);
+                    }
+                }
+                {
+                    if (!SnapshotId.Equals(new ()))
+                    {
+                        writer.WriteVarUInt(2);
+                        SnapshotId.Write(writer, version);
+                    }
+                }
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionDataMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class EpochEndOffsetMessage: Message
+    public sealed class EpochEndOffsetMessage: Message, IEquatable<EpochEndOffsetMessage>
     {
         /// <summary>
         /// 
@@ -426,10 +519,24 @@ public sealed class FetchResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(Epoch);
             writer.WriteLong(EndOffset);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EpochEndOffsetMessage other && Equals(other);
+        }
+
+        public bool Equals(EpochEndOffsetMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class LeaderIdAndEpochMessage: Message
+    public sealed class LeaderIdAndEpochMessage: Message, IEquatable<LeaderIdAndEpochMessage>
     {
         /// <summary>
         /// The ID of the current leader or -1 if the leader is unknown.
@@ -468,10 +575,24 @@ public sealed class FetchResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(LeaderId);
             writer.WriteInt(LeaderEpoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderIdAndEpochMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderIdAndEpochMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class SnapshotIdMessage: Message
+    public sealed class SnapshotIdMessage: Message, IEquatable<SnapshotIdMessage>
     {
         /// <summary>
         /// 
@@ -510,10 +631,24 @@ public sealed class FetchResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);
             writer.WriteInt(Epoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is SnapshotIdMessage other && Equals(other);
+        }
+
+        public bool Equals(SnapshotIdMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class AbortedTransactionMessage: Message
+    public sealed class AbortedTransactionMessage: Message, IEquatable<AbortedTransactionMessage>
     {
         /// <summary>
         /// The producer id associated with the aborted transaction.
@@ -552,6 +687,30 @@ public sealed class FetchResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteLong(ProducerId);
             writer.WriteLong(FirstOffset);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AbortedTransactionMessage other && Equals(other);
+        }
+
+        public bool Equals(AbortedTransactionMessage? other)
+        {
+            return true;
         }
     }
 }

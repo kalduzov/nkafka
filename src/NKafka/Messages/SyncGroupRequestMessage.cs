@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SyncGroupRequestMessage: RequestMessage
+public sealed class SyncGroupRequestMessage: RequestMessage, IEquatable<SyncGroupRequestMessage>
 {
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The generation of the group.
@@ -50,7 +50,7 @@ public sealed class SyncGroupRequestMessage: RequestMessage
     /// <summary>
     /// The member ID assigned by the group.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
@@ -196,14 +196,38 @@ public sealed class SyncGroupRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class SyncGroupRequestAssignmentMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is SyncGroupRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(SyncGroupRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class SyncGroupRequestAssignmentMessage: Message, IEquatable<SyncGroupRequestAssignmentMessage>
     {
         /// <summary>
         /// The ID of the member to assign.
         /// </summary>
-        public string MemberId { get; set; } = "";
+        public string MemberId { get; set; } = string.Empty;
 
         /// <summary>
         /// The member assignment.
@@ -252,6 +276,30 @@ public sealed class SyncGroupRequestMessage: RequestMessage
                 writer.WriteInt(Assignment.Length);
             }
             writer.WriteBytes(Assignment);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is SyncGroupRequestAssignmentMessage other && Equals(other);
+        }
+
+        public bool Equals(SyncGroupRequestAssignmentMessage? other)
+        {
+            return true;
         }
     }
 }

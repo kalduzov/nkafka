@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeClusterResponseMessage: ResponseMessage
+public sealed class DescribeClusterResponseMessage: ResponseMessage, IEquatable<DescribeClusterResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error
@@ -50,7 +50,7 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
     /// <summary>
     /// The cluster ID that responding broker belongs to.
     /// </summary>
-    public string ClusterId { get; set; } = "";
+    public string ClusterId { get; set; } = string.Empty;
 
     /// <summary>
     /// The ID of the controller broker.
@@ -112,9 +112,23 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
             element.Write(writer, version);
         }
         writer.WriteInt(ClusterAuthorizedOperations);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class DescribeClusterBrokerMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeClusterResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeClusterResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeClusterBrokerMessage: Message, IEquatable<DescribeClusterBrokerMessage>
     {
         /// <summary>
         /// The broker ID.
@@ -124,7 +138,7 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
         /// <summary>
         /// The broker hostname.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The broker port.
@@ -174,6 +188,21 @@ public sealed class DescribeClusterResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeClusterBrokerMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeClusterBrokerMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteGroupsResponseMessage: ResponseMessage
+public sealed class DeleteGroupsResponseMessage: ResponseMessage, IEquatable<DeleteGroupsResponseMessage>
 {
     /// <summary>
     /// The deletion results
@@ -80,14 +80,38 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DeletableGroupResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteGroupsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteGroupsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DeletableGroupResultMessage: Message, IEquatable<DeletableGroupResultMessage>
     {
         /// <summary>
         /// The group id
         /// </summary>
-        public string GroupId { get; set; } = "";
+        public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The deletion error, or 0 if the deletion succeeded.
@@ -128,6 +152,31 @@ public sealed class DeleteGroupsResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeletableGroupResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DeletableGroupResultMessage? other)
+        {
+            return true;
         }
     }
 

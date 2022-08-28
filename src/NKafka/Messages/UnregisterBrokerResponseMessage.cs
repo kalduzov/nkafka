@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UnregisterBrokerResponseMessage: ResponseMessage
+public sealed class UnregisterBrokerResponseMessage: ResponseMessage, IEquatable<UnregisterBrokerResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -45,7 +45,7 @@ public sealed class UnregisterBrokerResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     public UnregisterBrokerResponseMessage()
     {
@@ -80,5 +80,19 @@ public sealed class UnregisterBrokerResponseMessage: ResponseMessage
             writer.WriteVarUInt(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UnregisterBrokerResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(UnregisterBrokerResponseMessage? other)
+    {
+        return true;
     }
 }

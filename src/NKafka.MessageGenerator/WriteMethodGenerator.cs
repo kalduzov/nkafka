@@ -123,7 +123,129 @@ internal class WriteMethodGenerator: IWriteMethodGenerator
             cond.Generate(_codeBuffer);
         }
 
-        //_codeBuffer.
+        _codeBuffer.AppendLine("var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);");
+        _codeBuffer.AppendLine("numTaggedFields += rawWriter.FieldsCount;");
+
+        VersionConditional.ForVersions(messageFlexibleVersions, curVersions)
+            .IfNotMember(_ => { GenerateCheckForUnsupportedNumTaggedFields("numTaggedFields > 0"); })
+            .IfMember(
+                _ =>
+                {
+                    _codeBuffer.AppendLine("writer.WriteVarUInt(numTaggedFields);");
+                    var prevTag = -1;
+
+                    foreach (var field in taggedFields.Values)
+                    {
+                        if (prevTag + 1 != field.Tag)
+                        {
+                            _codeBuffer.AppendLine($"rawWriter.WriteRawTags(writer,{field.Tag});");
+                        }
+
+                        VersionConditional
+                            .ForVersions(field.Versions, field.TaggedVersions.Intersect(field.Versions))
+                            .AllowMembershipCheckAlwaysFalse(false)
+                            .IfMember(
+                                presentAndTaggedVersions =>
+                                {
+                                    var cond = IsNullConditional.ForName(field.Name)
+                                        .NullableVersions(field.NullableVersions)
+                                        .PossibleVersions(presentAndTaggedVersions)
+                                        .AlwaysEmitBlockScope(true)
+                                        .IfShouldNotBeNull(
+                                            () =>
+                                            {
+                                                if (!field.Default.Equals("null"))
+                                                {
+                                                    field.GenerateNonDefaultValueCheck(_structRegistry, _codeBuffer, Versions.None);
+                                                    _codeBuffer.IncrementIndent();
+                                                }
+
+                                                _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Tag});");
+
+                                                if (field.Type.IsString)
+                                                {
+                                                    _codeBuffer.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({field.Name});");
+                                                    _codeBuffer.AppendLine(
+                                                        "writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());");
+                                                    _codeBuffer.AppendLine("writer.WriteVarUInt(stringBytes.Length + 1);");
+                                                    _codeBuffer.AppendLine("writer.WriteBytes(stringBytes);");
+                                                }
+                                                else if (field.Type.IsBytes)
+                                                {
+                                                    _codeBuffer.AppendLine(
+                                                        $"writer.WriteVarUInt({field.Name}.Length + ({field.Name}.Length + 1).SizeOfVarUInt());");
+                                                    _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Name}.Length + 1);");
+                                                    _codeBuffer.AppendLine($"writer.WriteBytes({field.Name});");
+                                                }
+                                                else if (field.Type.IsArray)
+                                                {
+                                                    //todo тут проблема с рассчетом размера - надо подумать как сделать    
+                                                    GenerateVariableLengthWriter(
+                                                        FieldFlexibleVersions(field),
+                                                        field.Name,
+                                                        field.Type,
+                                                        presentAndTaggedVersions,
+                                                        Versions.None,
+                                                        field.ZeroCopy);
+                                                }
+                                                else if (field.Type.IsStruct)
+                                                {
+                                                    //todo тут проблема с рассчетом размера - надо подумать как сделать
+                                                    _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                                }
+                                                else if (field.Type.IsRecords)
+                                                {
+                                                    throw new Exception(
+                                                        $"Unsupported attempt to declare field `{field.Name}` with `records` type as a tagged field.");
+                                                }
+                                                else
+                                                {
+                                                    _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Type.Size});");
+                                                    _codeBuffer.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
+                                                }
+
+                                                if (!field.Default.Equals("null"))
+                                                {
+                                                    _codeBuffer.DecrementIndent();
+                                                    _codeBuffer.AppendLine("}");
+                                                }
+                                            });
+
+                                    if (!field.Default.Equals("null"))
+                                    {
+                                        cond.IfNull(
+                                            () =>
+                                            {
+                                                _codeBuffer.AppendLine($"writer.WriteVarUInt({field.Tag});");
+                                                _codeBuffer.AppendLine("writer.WriteVarUInt(1);");
+                                                _codeBuffer.AppendLine("writer.WriteVarUInt(0);");
+                                            });
+                                    }
+
+                                    cond.Generate(_codeBuffer);
+                                })
+                            .Generate(_codeBuffer);
+                        prevTag = field.Tag.Value;
+                    }
+
+                    if (prevTag < int.MaxValue)
+                    {
+                        _codeBuffer.AppendLine("rawWriter.WriteRawTags(writer, int.MaxValue);");
+                    }
+                })
+            .Generate(_codeBuffer);
+        _codeBuffer.DecrementIndent();
+        _codeBuffer.AppendLine("}");
+    }
+
+    private void GenerateCheckForUnsupportedNumTaggedFields(string conditional)
+    {
+        _codeBuffer.AppendLine($"if ({conditional})");
+        _codeBuffer.AppendLine("{");
+        _codeBuffer.IncrementIndent();
+        _codeBuffer.AppendLine(
+            "throw new UnsupportedVersionException($\"Tagged fields were set, "
+            + "but version {version} of this message does not support them.\");");
         _codeBuffer.DecrementIndent();
         _codeBuffer.AppendLine("}");
     }

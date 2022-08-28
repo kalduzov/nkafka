@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetFetchResponseMessage: ResponseMessage
+public sealed class OffsetFetchResponseMessage: ResponseMessage, IEquatable<OffsetFetchResponseMessage>
 {
     /// <summary>
     /// The responses per topic.
@@ -122,14 +122,38 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default Groups at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class OffsetFetchResponseTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetFetchResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetFetchResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetFetchResponseTopicMessage: Message, IEquatable<OffsetFetchResponseTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses per partition
@@ -189,10 +213,34 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchResponseTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchResponseTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchResponsePartitionMessage: Message
+    public sealed class OffsetFetchResponsePartitionMessage: Message, IEquatable<OffsetFetchResponsePartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -212,7 +260,7 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
         /// <summary>
         /// The partition metadata.
         /// </summary>
-        public string Metadata { get; set; } = "";
+        public string Metadata { get; set; } = string.Empty;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
@@ -271,15 +319,39 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchResponsePartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchResponsePartitionMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchResponseGroupMessage: Message
+    public sealed class OffsetFetchResponseGroupMessage: Message, IEquatable<OffsetFetchResponseGroupMessage>
     {
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = "";
+        public string groupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses per topic.
@@ -327,15 +399,29 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchResponseGroupMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchResponseGroupMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchResponseTopicsMessage: Message
+    public sealed class OffsetFetchResponseTopicsMessage: Message, IEquatable<OffsetFetchResponseTopicsMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses per partition
@@ -373,10 +459,24 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchResponseTopicsMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchResponseTopicsMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetFetchResponsePartitionsMessage: Message
+    public sealed class OffsetFetchResponsePartitionsMessage: Message, IEquatable<OffsetFetchResponsePartitionsMessage>
     {
         /// <summary>
         /// The partition index.
@@ -396,7 +496,7 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
         /// <summary>
         /// The partition metadata.
         /// </summary>
-        public string Metadata { get; set; } = "";
+        public string Metadata { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition-level error code, or 0 if there was no error.
@@ -438,6 +538,20 @@ public sealed class OffsetFetchResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetFetchResponsePartitionsMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetFetchResponsePartitionsMessage? other)
+        {
+            return true;
         }
     }
 }

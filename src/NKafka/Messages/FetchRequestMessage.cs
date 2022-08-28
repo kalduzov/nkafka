@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FetchRequestMessage: RequestMessage
+public sealed class FetchRequestMessage: RequestMessage, IEquatable<FetchRequestMessage>
 {
     /// <summary>
     /// The clusterId if known. This is used to validate metadata fetches prior to broker registration.
@@ -90,7 +90,7 @@ public sealed class FetchRequestMessage: RequestMessage
     /// <summary>
     /// Rack ID of the consumer making this request
     /// </summary>
-    public string RackId { get; set; } = "";
+    public string RackId { get; set; } = string.Empty;
 
     public FetchRequestMessage()
     {
@@ -198,14 +198,46 @@ public sealed class FetchRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version12)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            if (ClusterId is not null)
+            {
+                writer.WriteVarUInt(0);
+                var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+                writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class FetchTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FetchRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(FetchRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class FetchTopicMessage: Message, IEquatable<FetchTopicMessage>
     {
         /// <summary>
         /// The name of the topic to fetch.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique topic ID
@@ -273,10 +305,34 @@ public sealed class FetchRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FetchTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(FetchTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class FetchPartitionMessage: Message
+    public sealed class FetchPartitionMessage: Message, IEquatable<FetchPartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -351,15 +407,39 @@ public sealed class FetchRequestMessage: RequestMessage
                 writer.WriteLong(LogStartOffset);
             }
             writer.WriteInt(PartitionMaxBytes);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FetchPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(FetchPartitionMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ForgottenTopicMessage: Message
+    public sealed class ForgottenTopicMessage: Message, IEquatable<ForgottenTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique topic ID
@@ -427,6 +507,30 @@ public sealed class FetchRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version12)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ForgottenTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(ForgottenTopicMessage? other)
+        {
+            return true;
         }
     }
 }

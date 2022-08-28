@@ -35,25 +35,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<AddOffsetsToTxnResponseMessage>
+public sealed class ResponseHeader: ResponseMessage, IEquatable<ResponseHeader>
 {
     /// <summary>
-    /// The response error code, or 0 if there was no error.
+    /// The correlation ID of this response.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public int CorrelationId { get; set; } = 0;
 
-    public AddOffsetsToTxnResponseMessage()
+    public ResponseHeader()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
+        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    public AddOffsetsToTxnResponseMessage(BufferReader reader, ApiVersions version)
+    public ResponseHeader(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
         Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
+        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     internal override void Read(BufferReader reader, ApiVersions version)
@@ -63,11 +63,10 @@ public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteInt(ThrottleTimeMs);
-        writer.WriteShort(ErrorCode);
+        writer.WriteInt(CorrelationId);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersions.Version1)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -83,10 +82,10 @@ public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is AddOffsetsToTxnResponseMessage other && Equals(other);
+        return ReferenceEquals(this, obj) || obj is ResponseHeader other && Equals(other);
     }
 
-    public bool Equals(AddOffsetsToTxnResponseMessage? other)
+    public bool Equals(ResponseHeader? other)
     {
         return true;
     }

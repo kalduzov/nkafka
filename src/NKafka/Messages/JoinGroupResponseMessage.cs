@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class JoinGroupResponseMessage: ResponseMessage
+public sealed class JoinGroupResponseMessage: ResponseMessage, IEquatable<JoinGroupResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -55,12 +55,12 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The group protocol selected by the coordinator.
     /// </summary>
-    public string ProtocolName { get; set; } = "";
+    public string ProtocolName { get; set; } = string.Empty;
 
     /// <summary>
     /// The leader of the group.
     /// </summary>
-    public string Leader { get; set; } = "";
+    public string Leader { get; set; } = string.Empty;
 
     /// <summary>
     /// True if the leader must skip running the assignment.
@@ -70,7 +70,7 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// 
@@ -191,14 +191,38 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class JoinGroupResponseMemberMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is JoinGroupResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(JoinGroupResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class JoinGroupResponseMemberMessage: Message, IEquatable<JoinGroupResponseMemberMessage>
     {
         /// <summary>
         /// The group member ID.
         /// </summary>
-        public string MemberId { get; set; } = "";
+        public string MemberId { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
@@ -286,6 +310,30 @@ public sealed class JoinGroupResponseMessage: ResponseMessage
                 writer.WriteInt(Metadata.Length);
             }
             writer.WriteBytes(Metadata);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is JoinGroupResponseMemberMessage other && Equals(other);
+        }
+
+        public bool Equals(JoinGroupResponseMemberMessage? other)
+        {
+            return true;
         }
     }
 }

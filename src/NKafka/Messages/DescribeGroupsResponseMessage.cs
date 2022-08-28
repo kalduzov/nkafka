@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeGroupsResponseMessage: ResponseMessage
+public sealed class DescribeGroupsResponseMessage: ResponseMessage, IEquatable<DescribeGroupsResponseMessage>
 {
     /// <summary>
     /// Each described group.
@@ -83,9 +83,33 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribedGroupMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeGroupsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeGroupsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribedGroupMessage: Message, IEquatable<DescribedGroupMessage>
     {
         /// <summary>
         /// The describe error, or 0 if there was no error.
@@ -95,22 +119,22 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         /// <summary>
         /// The group ID string.
         /// </summary>
-        public string GroupId { get; set; } = "";
+        public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The group state string, or the empty string.
         /// </summary>
-        public string GroupState { get; set; } = "";
+        public string GroupState { get; set; } = string.Empty;
 
         /// <summary>
         /// The group protocol type, or the empty string.
         /// </summary>
-        public string ProtocolType { get; set; } = "";
+        public string ProtocolType { get; set; } = string.Empty;
 
         /// <summary>
         /// The group protocol data, or the empty string.
         /// </summary>
-        public string ProtocolData { get; set; } = "";
+        public string ProtocolData { get; set; } = string.Empty;
 
         /// <summary>
         /// The group members.
@@ -219,15 +243,39 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
                     throw new UnsupportedVersionException($"Attempted to write a non-default AuthorizedOperations at version {version}");
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribedGroupMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribedGroupMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribedGroupMemberMessage: Message
+    public sealed class DescribedGroupMemberMessage: Message, IEquatable<DescribedGroupMemberMessage>
     {
         /// <summary>
         /// The member ID assigned by the group coordinator.
         /// </summary>
-        public string MemberId { get; set; } = "";
+        public string MemberId { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique identifier of the consumer instance provided by end user.
@@ -237,12 +285,12 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
         /// <summary>
         /// The client ID used in the member's latest join group request.
         /// </summary>
-        public string ClientId { get; set; } = "";
+        public string ClientId { get; set; } = string.Empty;
 
         /// <summary>
         /// The client host.
         /// </summary>
-        public string ClientHost { get; set; } = "";
+        public string ClientHost { get; set; } = string.Empty;
 
         /// <summary>
         /// The metadata corresponding to the current group protocol in use.
@@ -356,6 +404,30 @@ public sealed class DescribeGroupsResponseMessage: ResponseMessage
                 writer.WriteInt(MemberAssignment.Length);
             }
             writer.WriteBytes(MemberAssignment);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version5)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribedGroupMemberMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribedGroupMemberMessage? other)
+        {
+            return true;
         }
     }
 }

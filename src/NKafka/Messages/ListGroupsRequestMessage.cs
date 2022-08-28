@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListGroupsRequestMessage: RequestMessage
+public sealed class ListGroupsRequestMessage: RequestMessage, IEquatable<ListGroupsRequestMessage>
 {
     /// <summary>
     /// The states of the groups we want to list. If empty all groups are returned with their state.
@@ -84,5 +84,29 @@ public sealed class ListGroupsRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default StatesFilter at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListGroupsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ListGroupsRequestMessage? other)
+    {
+        return true;
     }
 }

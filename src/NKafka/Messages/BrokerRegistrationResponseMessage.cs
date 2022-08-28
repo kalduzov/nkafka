@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerRegistrationResponseMessage: ResponseMessage
+public sealed class BrokerRegistrationResponseMessage: ResponseMessage, IEquatable<BrokerRegistrationResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -71,5 +71,19 @@ public sealed class BrokerRegistrationResponseMessage: ResponseMessage
         writer.WriteInt(ThrottleTimeMs);
         writer.WriteShort(ErrorCode);
         writer.WriteLong(BrokerEpoch);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is BrokerRegistrationResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(BrokerRegistrationResponseMessage? other)
+    {
+        return true;
     }
 }

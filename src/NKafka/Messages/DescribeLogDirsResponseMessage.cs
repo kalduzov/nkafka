@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeLogDirsResponseMessage: ResponseMessage
+public sealed class DescribeLogDirsResponseMessage: ResponseMessage, IEquatable<DescribeLogDirsResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -89,9 +89,33 @@ public sealed class DescribeLogDirsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribeLogDirsResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeLogDirsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeLogDirsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeLogDirsResultMessage: Message, IEquatable<DescribeLogDirsResultMessage>
     {
         /// <summary>
         /// The error code, or 0 if there was no error.
@@ -101,7 +125,7 @@ public sealed class DescribeLogDirsResponseMessage: ResponseMessage
         /// <summary>
         /// The absolute log directory path.
         /// </summary>
-        public string LogDir { get; set; } = "";
+        public string LogDir { get; set; } = string.Empty;
 
         /// <summary>
         /// Each topic.
@@ -176,15 +200,39 @@ public sealed class DescribeLogDirsResponseMessage: ResponseMessage
             {
                 writer.WriteLong(UsableBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeLogDirsResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeLogDirsResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribeLogDirsTopicMessage: Message
+    public sealed class DescribeLogDirsTopicMessage: Message, IEquatable<DescribeLogDirsTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -240,10 +288,34 @@ public sealed class DescribeLogDirsResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeLogDirsTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeLogDirsTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribeLogDirsPartitionMessage: Message
+    public sealed class DescribeLogDirsPartitionMessage: Message, IEquatable<DescribeLogDirsPartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -290,6 +362,30 @@ public sealed class DescribeLogDirsResponseMessage: ResponseMessage
             writer.WriteLong(PartitionSize);
             writer.WriteLong(OffsetLag);
             writer.WriteBool(IsFutureKey);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeLogDirsPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeLogDirsPartitionMessage? other)
+        {
+            return true;
         }
     }
 }

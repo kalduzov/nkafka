@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
+public sealed class TxnOffsetCommitResponseMessage: ResponseMessage, IEquatable<TxnOffsetCommitResponseMessage>
 {
     /// <summary>
     /// The responses for each topic.
@@ -80,14 +80,38 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class TxnOffsetCommitResponseTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is TxnOffsetCommitResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(TxnOffsetCommitResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TxnOffsetCommitResponseTopicMessage: Message, IEquatable<TxnOffsetCommitResponseTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses for each partition in the topic.
@@ -143,10 +167,34 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TxnOffsetCommitResponseTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(TxnOffsetCommitResponseTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class TxnOffsetCommitResponsePartitionMessage: Message
+    public sealed class TxnOffsetCommitResponsePartitionMessage: Message, IEquatable<TxnOffsetCommitResponsePartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -181,6 +229,30 @@ public sealed class TxnOffsetCommitResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TxnOffsetCommitResponsePartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(TxnOffsetCommitResponsePartitionMessage? other)
+        {
+            return true;
         }
     }
 }

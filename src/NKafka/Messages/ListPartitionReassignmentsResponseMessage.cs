@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
+public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage, IEquatable<ListPartitionReassignmentsResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error
@@ -45,7 +45,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// The ongoing reassignments for each topic.
@@ -90,14 +90,28 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class OngoingTopicReassignmentMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListPartitionReassignmentsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ListPartitionReassignmentsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OngoingTopicReassignmentMessage: Message, IEquatable<OngoingTopicReassignmentMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The ongoing reassignments for each partition.
@@ -135,10 +149,24 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OngoingTopicReassignmentMessage other && Equals(other);
+        }
+
+        public bool Equals(OngoingTopicReassignmentMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OngoingPartitionReassignmentMessage: Message
+    public sealed class OngoingPartitionReassignmentMessage: Message, IEquatable<OngoingPartitionReassignmentMessage>
     {
         /// <summary>
         /// The index of the partition.
@@ -197,6 +225,20 @@ public sealed class ListPartitionReassignmentsResponseMessage: ResponseMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OngoingPartitionReassignmentMessage other && Equals(other);
+        }
+
+        public bool Equals(OngoingPartitionReassignmentMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,17 +35,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ApiVersionsRequestMessage: RequestMessage
+public sealed class ApiVersionsRequestMessage: RequestMessage, IEquatable<ApiVersionsRequestMessage>
 {
     /// <summary>
     /// The name of the client.
     /// </summary>
-    public string ClientSoftwareName { get; set; } = "";
+    public string ClientSoftwareName { get; set; } = string.Empty;
 
     /// <summary>
     /// The version of the client.
     /// </summary>
-    public string ClientSoftwareVersion { get; set; } = "";
+    public string ClientSoftwareVersion { get; set; } = string.Empty;
 
     public ApiVersionsRequestMessage()
     {
@@ -86,5 +86,29 @@ public sealed class ApiVersionsRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ApiVersionsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ApiVersionsRequestMessage? other)
+    {
+        return true;
     }
 }

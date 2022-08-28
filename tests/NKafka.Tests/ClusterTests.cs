@@ -43,7 +43,7 @@ public class ClusterTests
             .ReturnsAsync(
                 () => new MetadataResponseMessage
                 {
-                    Brokers = new List<MetadataResponseMessage.MetadataResponseBrokerMessage>(2)
+                    Brokers = new MetadataResponseMessage.MetadataResponseBrokerCollection(2)
                     {
                         new()
                         {

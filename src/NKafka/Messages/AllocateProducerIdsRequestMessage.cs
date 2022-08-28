@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AllocateProducerIdsRequestMessage: RequestMessage
+public sealed class AllocateProducerIdsRequestMessage: RequestMessage, IEquatable<AllocateProducerIdsRequestMessage>
 {
     /// <summary>
     /// The ID of the requesting broker
@@ -72,5 +72,19 @@ public sealed class AllocateProducerIdsRequestMessage: RequestMessage
         var numTaggedFields = 0;
         writer.WriteInt(BrokerId);
         writer.WriteLong(BrokerEpoch);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AllocateProducerIdsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AllocateProducerIdsRequestMessage? other)
+    {
+        return true;
     }
 }

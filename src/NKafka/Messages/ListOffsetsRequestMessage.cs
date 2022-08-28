@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListOffsetsRequestMessage: RequestMessage
+public sealed class ListOffsetsRequestMessage: RequestMessage, IEquatable<ListOffsetsRequestMessage>
 {
     /// <summary>
     /// The broker ID of the requestor, or -1 if this request is being made by a normal consumer.
@@ -103,14 +103,38 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class ListOffsetsTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListOffsetsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ListOffsetsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ListOffsetsTopicMessage: Message, IEquatable<ListOffsetsTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition in the request.
@@ -166,10 +190,34 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ListOffsetsTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(ListOffsetsTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ListOffsetsPartitionMessage: Message
+    public sealed class ListOffsetsPartitionMessage: Message, IEquatable<ListOffsetsPartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -229,6 +277,30 @@ public sealed class ListOffsetsRequestMessage: RequestMessage
                     throw new UnsupportedVersionException($"Attempted to write a non-default MaxNumOffsets at version {version}");
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ListOffsetsPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(ListOffsetsPartitionMessage? other)
+        {
+            return true;
         }
     }
 }

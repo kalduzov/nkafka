@@ -35,25 +35,40 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<AddOffsetsToTxnResponseMessage>
+public sealed class RequestHeader: RequestMessage, IEquatable<RequestHeader>
 {
     /// <summary>
-    /// The response error code, or 0 if there was no error.
+    /// The API key of this request.
     /// </summary>
-    public short ErrorCode { get; set; } = 0;
+    public short RequestApiKey { get; set; } = 0;
 
-    public AddOffsetsToTxnResponseMessage()
+    /// <summary>
+    /// The API version of this request.
+    /// </summary>
+    public short RequestApiVersion { get; set; } = 0;
+
+    /// <summary>
+    /// The correlation ID of this request.
+    /// </summary>
+    public int CorrelationId { get; set; } = 0;
+
+    /// <summary>
+    /// The client ID string.
+    /// </summary>
+    public string ClientId { get; set; } = string.Empty;
+
+    public RequestHeader()
     {
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
+        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    public AddOffsetsToTxnResponseMessage(BufferReader reader, ApiVersions version)
+    public RequestHeader(BufferReader reader, ApiVersions version)
         : base(reader, version)
     {
         Read(reader, version);
         LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
+        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     internal override void Read(BufferReader reader, ApiVersions version)
@@ -63,11 +78,25 @@ public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<
     internal override void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteInt(ThrottleTimeMs);
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort(RequestApiKey);
+        writer.WriteShort(RequestApiVersion);
+        writer.WriteInt(CorrelationId);
+        if (version >= ApiVersions.Version1)
+        {
+            if (ClientId is null)
+            {
+                writer.WriteShort(-1);
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ClientId);
+                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteBytes(stringBytes);
+            }
+        }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersions.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -83,10 +112,10 @@ public sealed class AddOffsetsToTxnResponseMessage: ResponseMessage, IEquatable<
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is AddOffsetsToTxnResponseMessage other && Equals(other);
+        return ReferenceEquals(this, obj) || obj is RequestHeader other && Equals(other);
     }
 
-    public bool Equals(AddOffsetsToTxnResponseMessage? other)
+    public bool Equals(RequestHeader? other)
     {
         return true;
     }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class VoteRequestMessage: RequestMessage
+public sealed class VoteRequestMessage: RequestMessage, IEquatable<VoteRequestMessage>
 {
     /// <summary>
     /// 
@@ -85,14 +85,28 @@ public sealed class VoteRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is VoteRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(VoteRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicDataMessage: Message, IEquatable<TopicDataMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -130,10 +144,24 @@ public sealed class VoteRequestMessage: RequestMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicDataMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionDataMessage: Message
+    public sealed class PartitionDataMessage: Message, IEquatable<PartitionDataMessage>
     {
         /// <summary>
         /// The partition index.
@@ -186,6 +214,20 @@ public sealed class VoteRequestMessage: RequestMessage
             writer.WriteInt(CandidateId);
             writer.WriteInt(LastOffsetEpoch);
             writer.WriteLong(LastOffset);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionDataMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionDataMessage? other)
+        {
+            return true;
         }
     }
 }

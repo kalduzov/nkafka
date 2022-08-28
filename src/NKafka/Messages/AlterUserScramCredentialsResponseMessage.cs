@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
+public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage, IEquatable<AlterUserScramCredentialsResponseMessage>
 {
     /// <summary>
     /// The results for deletions and alterations, one per affected user.
@@ -69,14 +69,28 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class AlterUserScramCredentialsResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterUserScramCredentialsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterUserScramCredentialsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AlterUserScramCredentialsResultMessage: Message, IEquatable<AlterUserScramCredentialsResultMessage>
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string User { get; set; } = "";
+        public string User { get; set; } = string.Empty;
 
         /// <summary>
         /// The error code.
@@ -86,7 +100,7 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, if any.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public AlterUserScramCredentialsResultMessage()
         {
@@ -125,6 +139,20 @@ public sealed class AlterUserScramCredentialsResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AlterUserScramCredentialsResultMessage other && Equals(other);
+        }
+
+        public bool Equals(AlterUserScramCredentialsResultMessage? other)
+        {
+            return true;
         }
     }
 }

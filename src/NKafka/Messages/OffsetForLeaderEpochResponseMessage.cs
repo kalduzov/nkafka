@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
+public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
 {
     /// <summary>
     /// Each topic we fetched offsets for.
@@ -83,14 +83,38 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class OffsetForLeaderTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetForLeaderEpochResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetForLeaderEpochResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetForLeaderTopicResultMessage: Message, IEquatable<OffsetForLeaderTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition in the topic we fetched offsets for.
@@ -146,10 +170,35 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetForLeaderTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetForLeaderTopicResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class EpochEndOffsetMessage: Message
+    public sealed class EpochEndOffsetMessage: Message, IEquatable<EpochEndOffsetMessage>
     {
         /// <summary>
         /// The error code 0, or if there was no error.
@@ -199,6 +248,30 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage
                 writer.WriteInt(LeaderEpoch);
             }
             writer.WriteLong(EndOffset);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EpochEndOffsetMessage other && Equals(other);
+        }
+
+        public bool Equals(EpochEndOffsetMessage? other)
+        {
+            return true;
         }
     }
 

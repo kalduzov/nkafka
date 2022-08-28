@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class HeartbeatResponseMessage: ResponseMessage
+public sealed class HeartbeatResponseMessage: ResponseMessage, IEquatable<HeartbeatResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -68,5 +68,29 @@ public sealed class HeartbeatResponseMessage: ResponseMessage
             writer.WriteInt(ThrottleTimeMs);
         }
         writer.WriteShort(ErrorCode);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is HeartbeatResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(HeartbeatResponseMessage? other)
+    {
+        return true;
     }
 }

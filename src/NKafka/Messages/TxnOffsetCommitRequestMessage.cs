@@ -35,17 +35,17 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class TxnOffsetCommitRequestMessage: RequestMessage
+public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<TxnOffsetCommitRequestMessage>
 {
     /// <summary>
     /// The ID of the transaction.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// The ID of the group.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
     /// The current producer ID in use by the transactional ID.
@@ -65,7 +65,7 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
     /// <summary>
     /// The member ID assigned by the group coordinator.
     /// </summary>
-    public string MemberId { get; set; } = "";
+    public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
     /// The unique identifier of the consumer instance provided by end user.
@@ -147,7 +147,7 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         }
         else
         {
-            if (MemberId.Equals(""))
+            if (!MemberId.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default MemberId at version {version}");
             }
@@ -188,14 +188,38 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class TxnOffsetCommitRequestTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(TxnOffsetCommitRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TxnOffsetCommitRequestTopicMessage: Message, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions inside the topic that we want to committ offsets for.
@@ -251,10 +275,34 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(TxnOffsetCommitRequestTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class TxnOffsetCommitRequestPartitionMessage: Message
+    public sealed class TxnOffsetCommitRequestPartitionMessage: Message, IEquatable<TxnOffsetCommitRequestPartitionMessage>
     {
         /// <summary>
         /// The index of the partition within the topic.
@@ -274,7 +322,7 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
         /// <summary>
         /// Any associated metadata the client wants to keep.
         /// </summary>
-        public string CommittedMetadata { get; set; } = "";
+        public string CommittedMetadata { get; set; } = string.Empty;
 
         public TxnOffsetCommitRequestPartitionMessage()
         {
@@ -327,6 +375,30 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestPartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(TxnOffsetCommitRequestPartitionMessage? other)
+        {
+            return true;
         }
     }
 }

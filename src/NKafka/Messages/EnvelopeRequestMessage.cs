@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EnvelopeRequestMessage: RequestMessage
+public sealed class EnvelopeRequestMessage: RequestMessage, IEquatable<EnvelopeRequestMessage>
 {
     /// <summary>
     /// The embedded request header and data.
@@ -88,5 +88,19 @@ public sealed class EnvelopeRequestMessage: RequestMessage
         }
         writer.WriteVarUInt(ClientHostAddress.Length + 1);
         writer.WriteBytes(ClientHostAddress);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EnvelopeRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(EnvelopeRequestMessage? other)
+    {
+        return true;
     }
 }

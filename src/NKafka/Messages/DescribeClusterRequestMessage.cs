@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeClusterRequestMessage: RequestMessage
+public sealed class DescribeClusterRequestMessage: RequestMessage, IEquatable<DescribeClusterRequestMessage>
 {
     /// <summary>
     /// Whether to include cluster authorized operations.
@@ -66,5 +66,19 @@ public sealed class DescribeClusterRequestMessage: RequestMessage
     {
         var numTaggedFields = 0;
         writer.WriteBool(IncludeClusterAuthorizedOperations);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeClusterRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeClusterRequestMessage? other)
+    {
+        return true;
     }
 }

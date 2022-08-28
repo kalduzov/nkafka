@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FindCoordinatorRequestMessage: RequestMessage
+public sealed class FindCoordinatorRequestMessage: RequestMessage, IEquatable<FindCoordinatorRequestMessage>
 {
     /// <summary>
     /// The coordinator key.
     /// </summary>
-    public string Key { get; set; } = "";
+    public string Key { get; set; } = string.Empty;
 
     /// <summary>
     /// The coordinator key type. (Group, transaction, etc.)
@@ -92,7 +92,7 @@ public sealed class FindCoordinatorRequestMessage: RequestMessage
         }
         else
         {
-            if (Key.Equals(""))
+            if (!Key.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default Key at version {version}");
             }
@@ -127,5 +127,29 @@ public sealed class FindCoordinatorRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default CoordinatorKeys at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FindCoordinatorRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(FindCoordinatorRequestMessage? other)
+    {
+        return true;
     }
 }

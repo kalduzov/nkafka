@@ -38,27 +38,6 @@ internal static class ProtocolWriterExtensions
         writer.Write(value.ToBigEndian());
     }
 
-    public static void WriteHeader(this Stream writer, RequestHeader header)
-    {
-        writer.Write(header.ApiKey.AsShort());
-        writer.Write(header.ApiVersion.AsShort());
-        writer.Write(header.CorrelationId.ToBigEndian());
-
-        if (!_clientIdCache.TryGetValue(header.ClientId, out var data))
-        {
-            data = header.ClientId.AsNullableString();
-            _clientIdCache.TryAdd(header.ClientId, data);
-        }
-
-        writer.Write(data);
-    }
-
-    public static void WriteMessage(this Stream writer, RequestMessage content)
-    {
-        var bufferWriter = new BufferWriter(writer);
-        content.Write(bufferWriter, ApiVersions.LastVersion);
-    }
-
     public static byte[] AsNullableString(this string str)
     {
         var buf = new byte[0x2 + str.Length];

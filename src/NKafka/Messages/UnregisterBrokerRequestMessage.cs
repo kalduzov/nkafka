@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UnregisterBrokerRequestMessage: RequestMessage
+public sealed class UnregisterBrokerRequestMessage: RequestMessage, IEquatable<UnregisterBrokerRequestMessage>
 {
     /// <summary>
     /// The broker ID to unregister.
@@ -66,5 +66,19 @@ public sealed class UnregisterBrokerRequestMessage: RequestMessage
     {
         var numTaggedFields = 0;
         writer.WriteInt(BrokerId);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UnregisterBrokerRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(UnregisterBrokerRequestMessage? other)
+    {
+        return true;
     }
 }

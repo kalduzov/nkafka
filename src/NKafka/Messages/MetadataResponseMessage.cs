@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class MetadataResponseMessage: ResponseMessage
+public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<MetadataResponseMessage>
 {
     /// <summary>
     /// Each broker in the response.
@@ -161,9 +161,33 @@ public sealed class MetadataResponseMessage: ResponseMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default ClusterAuthorizedOperations at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class MetadataResponseBrokerMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is MetadataResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(MetadataResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class MetadataResponseBrokerMessage: Message, IEquatable<MetadataResponseBrokerMessage>
     {
         /// <summary>
         /// The broker ID.
@@ -173,7 +197,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// The broker hostname.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The broker port.
@@ -247,6 +271,31 @@ public sealed class MetadataResponseMessage: ResponseMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is MetadataResponseBrokerMessage other && Equals(other);
+        }
+
+        public bool Equals(MetadataResponseBrokerMessage? other)
+        {
+            return true;
         }
     }
 
@@ -262,7 +311,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
         }
     }
 
-    public sealed class MetadataResponseTopicMessage: Message
+    public sealed class MetadataResponseTopicMessage: Message, IEquatable<MetadataResponseTopicMessage>
     {
         /// <summary>
         /// The topic error, or 0 if there was no error.
@@ -272,7 +321,7 @@ public sealed class MetadataResponseMessage: ResponseMessage
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The topic id.
@@ -374,10 +423,35 @@ public sealed class MetadataResponseMessage: ResponseMessage
                     throw new UnsupportedVersionException($"Attempted to write a non-default TopicAuthorizedOperations at version {version}");
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is MetadataResponseTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(MetadataResponseTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class MetadataResponsePartitionMessage: Message
+    public sealed class MetadataResponsePartitionMessage: Message, IEquatable<MetadataResponsePartitionMessage>
     {
         /// <summary>
         /// The partition error, or 0 if there was no error.
@@ -481,6 +555,30 @@ public sealed class MetadataResponseMessage: ResponseMessage
                     writer.WriteInt(element);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is MetadataResponsePartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(MetadataResponsePartitionMessage? other)
+        {
+            return true;
         }
     }
 

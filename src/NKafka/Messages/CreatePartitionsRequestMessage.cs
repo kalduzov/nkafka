@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreatePartitionsRequestMessage: RequestMessage
+public sealed class CreatePartitionsRequestMessage: RequestMessage, IEquatable<CreatePartitionsRequestMessage>
 {
     /// <summary>
     /// Each topic that we want to create new partitions inside.
@@ -93,14 +93,38 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
         }
         writer.WriteInt(TimeoutMs);
         writer.WriteBool(ValidateOnly);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CreatePartitionsTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreatePartitionsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(CreatePartitionsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CreatePartitionsTopicMessage: Message, IEquatable<CreatePartitionsTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The new partition count.
@@ -176,10 +200,35 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
                     }
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatePartitionsTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatePartitionsTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class CreatePartitionsAssignmentMessage: Message
+    public sealed class CreatePartitionsAssignmentMessage: Message, IEquatable<CreatePartitionsAssignmentMessage>
     {
         /// <summary>
         /// The assigned broker IDs.
@@ -219,6 +268,30 @@ public sealed class CreatePartitionsRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatePartitionsAssignmentMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatePartitionsAssignmentMessage? other)
+        {
+            return true;
         }
     }
 

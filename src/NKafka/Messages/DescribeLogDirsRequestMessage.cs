@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeLogDirsRequestMessage: RequestMessage
+public sealed class DescribeLogDirsRequestMessage: RequestMessage, IEquatable<DescribeLogDirsRequestMessage>
 {
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
@@ -95,14 +95,38 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
                 }
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribableLogDirTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeLogDirsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeLogDirsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribableLogDirTopicMessage: Message, IEquatable<DescribableLogDirTopicMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes.
@@ -154,6 +178,31 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribableLogDirTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribableLogDirTopicMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ExpireDelegationTokenRequestMessage: RequestMessage
+public sealed class ExpireDelegationTokenRequestMessage: RequestMessage, IEquatable<ExpireDelegationTokenRequestMessage>
 {
     /// <summary>
     /// The HMAC of the delegation token to be expired.
@@ -80,5 +80,29 @@ public sealed class ExpireDelegationTokenRequestMessage: RequestMessage
         }
         writer.WriteBytes(Hmac);
         writer.WriteLong(ExpiryTimePeriodMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ExpireDelegationTokenRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ExpireDelegationTokenRequestMessage? other)
+    {
+        return true;
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
+public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage, IEquatable<DescribeUserScramCredentialsRequestMessage>
 {
     /// <summary>
     /// The users to describe, or null/empty to describe all users.
@@ -77,14 +77,28 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class UserNameMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeUserScramCredentialsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeUserScramCredentialsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class UserNameMessage: Message, IEquatable<UserNameMessage>
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         public UserNameMessage()
         {
@@ -112,6 +126,20 @@ public sealed class DescribeUserScramCredentialsRequestMessage: RequestMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UserNameMessage other && Equals(other);
+        }
+
+        public bool Equals(UserNameMessage? other)
+        {
+            return true;
         }
     }
 }

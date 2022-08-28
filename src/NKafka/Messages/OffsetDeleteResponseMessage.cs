@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetDeleteResponseMessage: ResponseMessage
+public sealed class OffsetDeleteResponseMessage: ResponseMessage, IEquatable<OffsetDeleteResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
@@ -75,14 +75,30 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (numTaggedFields > 0)
+        {
+            throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+        }
     }
 
-    public sealed class OffsetDeleteResponseTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is OffsetDeleteResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(OffsetDeleteResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class OffsetDeleteResponseTopicMessage: Message, IEquatable<OffsetDeleteResponseTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses for each partition in the topic.
@@ -120,10 +136,27 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetDeleteResponseTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetDeleteResponseTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class OffsetDeleteResponsePartitionMessage: Message
+    public sealed class OffsetDeleteResponsePartitionMessage: Message, IEquatable<OffsetDeleteResponsePartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -158,6 +191,23 @@ public sealed class OffsetDeleteResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is OffsetDeleteResponsePartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(OffsetDeleteResponsePartitionMessage? other)
+        {
+            return true;
         }
     }
 

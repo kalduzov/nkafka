@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeGroupsRequestMessage: RequestMessage
+public sealed class DescribeGroupsRequestMessage: RequestMessage, IEquatable<DescribeGroupsRequestMessage>
 {
     /// <summary>
     /// The names of the groups to describe
@@ -105,5 +105,29 @@ public sealed class DescribeGroupsRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default IncludeAuthorizedOperations at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version5)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeGroupsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeGroupsRequestMessage? other)
+    {
+        return true;
     }
 }

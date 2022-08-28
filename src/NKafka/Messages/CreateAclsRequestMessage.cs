@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateAclsRequestMessage: RequestMessage
+public sealed class CreateAclsRequestMessage: RequestMessage, IEquatable<CreateAclsRequestMessage>
 {
     /// <summary>
     /// The ACLs that we want to create.
@@ -81,9 +81,33 @@ public sealed class CreateAclsRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AclCreationMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateAclsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateAclsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AclCreationMessage: Message, IEquatable<AclCreationMessage>
     {
         /// <summary>
         /// The type of the resource.
@@ -93,7 +117,7 @@ public sealed class CreateAclsRequestMessage: RequestMessage
         /// <summary>
         /// The resource name for the ACL.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         /// <summary>
         /// The pattern type for the ACL.
@@ -103,12 +127,12 @@ public sealed class CreateAclsRequestMessage: RequestMessage
         /// <summary>
         /// The principal for the ACL.
         /// </summary>
-        public string Principal { get; set; } = "";
+        public string Principal { get; set; } = string.Empty;
 
         /// <summary>
         /// The host for the ACL.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The operation type for the ACL (read, write, etc.).
@@ -191,6 +215,30 @@ public sealed class CreateAclsRequestMessage: RequestMessage
             }
             writer.WriteSByte(Operation);
             writer.WriteSByte(PermissionType);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AclCreationMessage other && Equals(other);
+        }
+
+        public bool Equals(AclCreationMessage? other)
+        {
+            return true;
         }
     }
 }

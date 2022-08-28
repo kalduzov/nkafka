@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ElectLeadersRequestMessage: RequestMessage
+public sealed class ElectLeadersRequestMessage: RequestMessage, IEquatable<ElectLeadersRequestMessage>
 {
     /// <summary>
     /// Type of elections to conduct for the partition. A value of '0' elects the preferred replica. A value of '1' elects the first live replica if there are no in-sync replica.
@@ -117,14 +117,38 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
             }
         }
         writer.WriteInt(TimeoutMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class TopicPartitionsMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ElectLeadersRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ElectLeadersRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicPartitionsMessage: Message, IEquatable<TopicPartitionsMessage>
     {
         /// <summary>
         /// The name of a topic.
         /// </summary>
-        public string Topic { get; set; } = "";
+        public string Topic { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions of this topic whose leader should be elected.
@@ -176,6 +200,31 @@ public sealed class ElectLeadersRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicPartitionsMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicPartitionsMessage? other)
+        {
+            return true;
         }
     }
 

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
+public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage, IEquatable<AlterPartitionReassignmentsRequestMessage>
 {
     /// <summary>
     /// The time in ms to wait for the request to complete.
@@ -76,14 +76,28 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class ReassignableTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterPartitionReassignmentsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterPartitionReassignmentsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ReassignableTopicMessage: Message, IEquatable<ReassignableTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions to reassign.
@@ -121,10 +135,24 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReassignableTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(ReassignableTopicMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ReassignablePartitionMessage: Message
+    public sealed class ReassignablePartitionMessage: Message, IEquatable<ReassignablePartitionMessage>
     {
         /// <summary>
         /// The partition index.
@@ -170,6 +198,20 @@ public sealed class AlterPartitionReassignmentsRequestMessage: RequestMessage
                     writer.WriteInt(element);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReassignablePartitionMessage other && Equals(other);
+        }
+
+        public bool Equals(ReassignablePartitionMessage? other)
+        {
+            return true;
         }
     }
 }

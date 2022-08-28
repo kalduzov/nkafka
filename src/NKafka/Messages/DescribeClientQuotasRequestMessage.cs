@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeClientQuotasRequestMessage: RequestMessage
+public sealed class DescribeClientQuotasRequestMessage: RequestMessage, IEquatable<DescribeClientQuotasRequestMessage>
 {
     /// <summary>
     /// Filter components to apply to quota entities.
@@ -87,14 +87,38 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
             }
         }
         writer.WriteBool(Strict);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class ComponentDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeClientQuotasRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeClientQuotasRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ComponentDataMessage: Message, IEquatable<ComponentDataMessage>
     {
         /// <summary>
         /// The entity type that the filter component applies to.
         /// </summary>
-        public string EntityType { get; set; } = "";
+        public string EntityType { get; set; } = string.Empty;
 
         /// <summary>
         /// How to match the entity {0 = exact name, 1 = default name, 2 = any specified name}.
@@ -104,7 +128,7 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
         /// <summary>
         /// The string to match against, or null if unused for the match type.
         /// </summary>
-        public string Match { get; set; } = "";
+        public string Match { get; set; } = string.Empty;
 
         public ComponentDataMessage()
         {
@@ -164,6 +188,30 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ComponentDataMessage other && Equals(other);
+        }
+
+        public bool Equals(ComponentDataMessage? other)
+        {
+            return true;
         }
     }
 }

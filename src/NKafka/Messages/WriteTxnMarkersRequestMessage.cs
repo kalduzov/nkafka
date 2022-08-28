@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class WriteTxnMarkersRequestMessage: RequestMessage
+public sealed class WriteTxnMarkersRequestMessage: RequestMessage, IEquatable<WriteTxnMarkersRequestMessage>
 {
     /// <summary>
     /// The transaction markers to be written.
@@ -81,9 +81,33 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class WritableTxnMarkerMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is WriteTxnMarkersRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(WriteTxnMarkersRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class WritableTxnMarkerMessage: Message, IEquatable<WritableTxnMarkerMessage>
     {
         /// <summary>
         /// The current producer ID.
@@ -151,15 +175,39 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
                 }
             }
             writer.WriteInt(CoordinatorEpoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is WritableTxnMarkerMessage other && Equals(other);
+        }
+
+        public bool Equals(WritableTxnMarkerMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class WritableTxnMarkerTopicMessage: Message
+    public sealed class WritableTxnMarkerTopicMessage: Message, IEquatable<WritableTxnMarkerTopicMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The indexes of the partitions to write transaction markers for.
@@ -211,6 +259,30 @@ public sealed class WriteTxnMarkersRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is WritableTxnMarkerTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(WritableTxnMarkerTopicMessage? other)
+        {
+            return true;
         }
     }
 }

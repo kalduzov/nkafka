@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
+public sealed class CreateDelegationTokenResponseMessage: ResponseMessage, IEquatable<CreateDelegationTokenResponseMessage>
 {
     /// <summary>
     /// The top-level error, or zero if there was no error.
@@ -45,22 +45,22 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
     /// <summary>
     /// The principal type of the token owner.
     /// </summary>
-    public string PrincipalType { get; set; } = "";
+    public string PrincipalType { get; set; } = string.Empty;
 
     /// <summary>
     /// The name of the token owner.
     /// </summary>
-    public string PrincipalName { get; set; } = "";
+    public string PrincipalName { get; set; } = string.Empty;
 
     /// <summary>
     /// The principal type of the requester of the token.
     /// </summary>
-    public string TokenRequesterPrincipalType { get; set; } = "";
+    public string TokenRequesterPrincipalType { get; set; } = string.Empty;
 
     /// <summary>
     /// The principal type of the requester of the token.
     /// </summary>
-    public string TokenRequesterPrincipalName { get; set; } = "";
+    public string TokenRequesterPrincipalName { get; set; } = string.Empty;
 
     /// <summary>
     /// When this token was generated.
@@ -80,7 +80,7 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
     /// <summary>
     /// The token UUID.
     /// </summary>
-    public string TokenId { get; set; } = "";
+    public string TokenId { get; set; } = string.Empty;
 
     /// <summary>
     /// HMAC of the delegation token.
@@ -144,7 +144,7 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
         }
         else
         {
-            if (TokenRequesterPrincipalType.Equals(""))
+            if (!TokenRequesterPrincipalType.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalType at version {version}");
             }
@@ -159,7 +159,7 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
         }
         else
         {
-            if (TokenRequesterPrincipalName.Equals(""))
+            if (!TokenRequesterPrincipalName.Equals(string.Empty))
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalName at version {version}");
             }
@@ -189,5 +189,29 @@ public sealed class CreateDelegationTokenResponseMessage: ResponseMessage
         }
         writer.WriteBytes(Hmac);
         writer.WriteInt(ThrottleTimeMs);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateDelegationTokenResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateDelegationTokenResponseMessage? other)
+    {
+        return true;
     }
 }

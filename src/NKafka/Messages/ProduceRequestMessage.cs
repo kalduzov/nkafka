@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ProduceRequestMessage: RequestMessage
+public sealed class ProduceRequestMessage: RequestMessage, IEquatable<ProduceRequestMessage>
 {
     /// <summary>
     /// The transactional ID, or null if the producer is not transactional.
@@ -132,14 +132,38 @@ public sealed class ProduceRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version9)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class TopicProduceDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ProduceRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(ProduceRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicProduceDataMessage: Message, IEquatable<TopicProduceDataMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition to produce to.
@@ -195,10 +219,35 @@ public sealed class ProduceRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicProduceDataMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicProduceDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionProduceDataMessage: Message
+    public sealed class PartitionProduceDataMessage: Message, IEquatable<PartitionProduceDataMessage>
     {
         /// <summary>
         /// The partition index.
@@ -255,6 +304,30 @@ public sealed class ProduceRequestMessage: RequestMessage
                 }
                 writer.WriteRecords(Records);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version9)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionProduceDataMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionProduceDataMessage? other)
+        {
+            return true;
         }
     }
 

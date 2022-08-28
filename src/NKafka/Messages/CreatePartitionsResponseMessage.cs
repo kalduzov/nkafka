@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreatePartitionsResponseMessage: ResponseMessage
+public sealed class CreatePartitionsResponseMessage: ResponseMessage, IEquatable<CreatePartitionsResponseMessage>
 {
     /// <summary>
     /// The partition creation results for each topic.
@@ -80,14 +80,38 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class CreatePartitionsTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreatePartitionsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(CreatePartitionsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class CreatePartitionsTopicResultMessage: Message, IEquatable<CreatePartitionsTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The result error, or zero if there was no error.
@@ -157,6 +181,30 @@ public sealed class CreatePartitionsResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CreatePartitionsTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(CreatePartitionsTopicResultMessage? other)
+        {
+            return true;
         }
     }
 }

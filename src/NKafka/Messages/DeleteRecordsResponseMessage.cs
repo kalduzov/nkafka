@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteRecordsResponseMessage: ResponseMessage
+public sealed class DeleteRecordsResponseMessage: ResponseMessage, IEquatable<DeleteRecordsResponseMessage>
 {
     /// <summary>
     /// Each topic that we wanted to delete records from.
@@ -80,14 +80,38 @@ public sealed class DeleteRecordsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DeleteRecordsTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteRecordsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteRecordsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DeleteRecordsTopicResultMessage: Message, IEquatable<DeleteRecordsTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// Each partition that we wanted to delete records from.
@@ -143,10 +167,35 @@ public sealed class DeleteRecordsResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeleteRecordsTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DeleteRecordsTopicResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DeleteRecordsPartitionResultMessage: Message
+    public sealed class DeleteRecordsPartitionResultMessage: Message, IEquatable<DeleteRecordsPartitionResultMessage>
     {
         /// <summary>
         /// The partition index.
@@ -187,6 +236,31 @@ public sealed class DeleteRecordsResponseMessage: ResponseMessage
             writer.WriteInt(PartitionIndex);
             writer.WriteLong(LowWatermark);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeleteRecordsPartitionResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DeleteRecordsPartitionResultMessage? other)
+        {
+            return true;
         }
     }
 

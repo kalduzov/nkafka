@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddOffsetsToTxnRequestMessage: RequestMessage
+public sealed class AddOffsetsToTxnRequestMessage: RequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
 {
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// Current producer id in use by the transactional id.
@@ -55,7 +55,7 @@ public sealed class AddOffsetsToTxnRequestMessage: RequestMessage
     /// <summary>
     /// The unique group identifier.
     /// </summary>
-    public string GroupId { get; set; } = "";
+    public string GroupId { get; set; } = string.Empty;
 
     public AddOffsetsToTxnRequestMessage()
     {
@@ -106,5 +106,29 @@ public sealed class AddOffsetsToTxnRequestMessage: RequestMessage
             }
             writer.WriteBytes(stringBytes);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AddOffsetsToTxnRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AddOffsetsToTxnRequestMessage? other)
+    {
+        return true;
     }
 }

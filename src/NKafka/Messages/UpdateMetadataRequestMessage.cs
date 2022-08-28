@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UpdateMetadataRequestMessage: RequestMessage
+public sealed class UpdateMetadataRequestMessage: RequestMessage, IEquatable<UpdateMetadataRequestMessage>
 {
     /// <summary>
     /// The controller id.
@@ -153,14 +153,38 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version6)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class UpdateMetadataTopicStateMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is UpdateMetadataRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(UpdateMetadataRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class UpdateMetadataTopicStateMessage: Message, IEquatable<UpdateMetadataTopicStateMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The topic id.
@@ -229,10 +253,34 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UpdateMetadataTopicStateMessage other && Equals(other);
+        }
+
+        public bool Equals(UpdateMetadataTopicStateMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class UpdateMetadataBrokerMessage: Message
+    public sealed class UpdateMetadataBrokerMessage: Message, IEquatable<UpdateMetadataBrokerMessage>
     {
         /// <summary>
         /// The broker id.
@@ -242,7 +290,7 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
         /// <summary>
         /// The broker hostname.
         /// </summary>
-        public string V0Host { get; set; } = "";
+        public string V0Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The broker port.
@@ -257,7 +305,7 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
         /// <summary>
         /// The rack which this broker belongs to.
         /// </summary>
-        public string Rack { get; set; } = "";
+        public string Rack { get; set; } = string.Empty;
 
         public UpdateMetadataBrokerMessage()
         {
@@ -339,10 +387,34 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UpdateMetadataBrokerMessage other && Equals(other);
+        }
+
+        public bool Equals(UpdateMetadataBrokerMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class UpdateMetadataEndpointMessage: Message
+    public sealed class UpdateMetadataEndpointMessage: Message, IEquatable<UpdateMetadataEndpointMessage>
     {
         /// <summary>
         /// The port of this endpoint
@@ -352,12 +424,12 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
         /// <summary>
         /// The hostname of this endpoint
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The listener name.
         /// </summary>
-        public string Listener { get; set; } = "";
+        public string Listener { get; set; } = string.Empty;
 
         /// <summary>
         /// The security protocol type.
@@ -418,15 +490,39 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
                 }
             }
             writer.WriteShort(SecurityProtocol);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UpdateMetadataEndpointMessage other && Equals(other);
+        }
+
+        public bool Equals(UpdateMetadataEndpointMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class UpdateMetadataPartitionStateMessage: Message
+    public sealed class UpdateMetadataPartitionStateMessage: Message, IEquatable<UpdateMetadataPartitionStateMessage>
     {
         /// <summary>
         /// In older versions of this RPC, the topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition index.
@@ -541,6 +637,30 @@ public sealed class UpdateMetadataRequestMessage: RequestMessage
                     writer.WriteInt(element);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version6)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is UpdateMetadataPartitionStateMessage other && Equals(other);
+        }
+
+        public bool Equals(UpdateMetadataPartitionStateMessage? other)
+        {
+            return true;
         }
     }
 }

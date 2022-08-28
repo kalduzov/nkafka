@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeAclsResponseMessage: ResponseMessage
+public sealed class DescribeAclsResponseMessage: ResponseMessage, IEquatable<DescribeAclsResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -45,7 +45,7 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
     /// <summary>
     /// The error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// Each Resource that is referenced in an ACL.
@@ -115,9 +115,33 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribeAclsResourceMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeAclsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeAclsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeAclsResourceMessage: Message, IEquatable<DescribeAclsResourceMessage>
     {
         /// <summary>
         /// The resource type.
@@ -127,7 +151,7 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         /// <summary>
         /// The resource pattern type.
@@ -200,20 +224,44 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeAclsResourceMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeAclsResourceMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class AclDescriptionMessage: Message
+    public sealed class AclDescriptionMessage: Message, IEquatable<AclDescriptionMessage>
     {
         /// <summary>
         /// The ACL principal.
         /// </summary>
-        public string Principal { get; set; } = "";
+        public string Principal { get; set; } = string.Empty;
 
         /// <summary>
         /// The ACL host.
         /// </summary>
-        public string Host { get; set; } = "";
+        public string Host { get; set; } = string.Empty;
 
         /// <summary>
         /// The ACL operation.
@@ -272,6 +320,30 @@ public sealed class DescribeAclsResponseMessage: ResponseMessage
             }
             writer.WriteSByte(Operation);
             writer.WriteSByte(PermissionType);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AclDescriptionMessage other && Equals(other);
+        }
+
+        public bool Equals(AclDescriptionMessage? other)
+        {
+            return true;
         }
     }
 }

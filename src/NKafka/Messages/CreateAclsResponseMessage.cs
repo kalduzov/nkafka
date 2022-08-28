@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateAclsResponseMessage: ResponseMessage
+public sealed class CreateAclsResponseMessage: ResponseMessage, IEquatable<CreateAclsResponseMessage>
 {
     /// <summary>
     /// The results for each ACL creation.
@@ -80,9 +80,33 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AclCreationResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is CreateAclsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(CreateAclsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AclCreationResultMessage: Message, IEquatable<AclCreationResultMessage>
     {
         /// <summary>
         /// The result error, or zero if there was no error.
@@ -92,7 +116,7 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
         /// <summary>
         /// The result message, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public AclCreationResultMessage()
         {
@@ -140,6 +164,30 @@ public sealed class CreateAclsResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version2)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AclCreationResultMessage other && Equals(other);
+        }
+
+        public bool Equals(AclCreationResultMessage? other)
+        {
+            return true;
         }
     }
 }

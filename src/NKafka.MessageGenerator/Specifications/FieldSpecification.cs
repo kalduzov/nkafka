@@ -344,7 +344,7 @@ public class FieldSpecification
             }
             case IFieldType.StringFieldType:
             {
-                return $"\"{Default}\"";
+                return string.IsNullOrWhiteSpace(Default) ? "string.Empty" : $"\"{Default}\"";
             }
             case IFieldType.BytesFieldType:
             {
@@ -377,7 +377,7 @@ public class FieldSpecification
                 throw new ArgumentException($"Invalid default for struct field {Name}: custom defaults are not supported for struct fields.");
             }
 
-            return "new ()";
+            return $"new ()";
         }
 
         if (Type.IsArray)
@@ -395,7 +395,7 @@ public class FieldSpecification
                     $"Invalid default for array field {Name}. The only valid default for an array field is the empty array or null.");
             }
 
-            return "new ()";
+            return $"new ()";
         }
 
         throw new ArgumentException($"Unsupported field type {Type}");
@@ -484,7 +484,7 @@ public class FieldSpecification
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Count != 0)");
+                codeBuffer.AppendLine($"if ({Name} is null || {Name}.Count != 0)");
                 codeBuffer.AppendLine("{");
             }
         }
@@ -502,7 +502,7 @@ public class FieldSpecification
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Length != 0)");
+                codeBuffer.AppendLine($"if ({Name} is null || {Name}.Length != 0)");
                 codeBuffer.AppendLine("{");
             }
         }
@@ -515,12 +515,12 @@ public class FieldSpecification
             }
             else if (nullableVersions.IsEmpty)
             {
-                codeBuffer.AppendLine($"if ({Name}.Equals({fieldDefault}))");
+                codeBuffer.AppendLine($"if (!{Name}.Equals({fieldDefault}))");
                 codeBuffer.AppendLine("{");
             }
             else
             {
-                codeBuffer.AppendLine($"if ({Name} is not null || {Name}.Equals({fieldDefault}))");
+                codeBuffer.AppendLine($"if ({Name} is null || !{Name}.Equals({fieldDefault}))");
                 codeBuffer.AppendLine("{");
             }
         }

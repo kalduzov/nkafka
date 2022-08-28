@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddPartitionsToTxnRequestMessage: RequestMessage
+public sealed class AddPartitionsToTxnRequestMessage: RequestMessage, IEquatable<AddPartitionsToTxnRequestMessage>
 {
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// Current producer id in use by the transactional id.
@@ -110,14 +110,38 @@ public sealed class AddPartitionsToTxnRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class AddPartitionsToTxnTopicMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(AddPartitionsToTxnRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class AddPartitionsToTxnTopicMessage: Message, IEquatable<AddPartitionsToTxnTopicMessage>
     {
         /// <summary>
         /// The name of the topic.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition indexes to add to the transaction
@@ -169,6 +193,31 @@ public sealed class AddPartitionsToTxnRequestMessage: RequestMessage
             {
                 writer.WriteInt(element);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnTopicMessage other && Equals(other);
+        }
+
+        public bool Equals(AddPartitionsToTxnTopicMessage? other)
+        {
+            return true;
         }
     }
 

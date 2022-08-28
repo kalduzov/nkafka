@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
+public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage, IEquatable<DescribeUserScramCredentialsResponseMessage>
 {
     /// <summary>
     /// The message-level error code, 0 except for user authorization or infrastructure issues.
@@ -45,7 +45,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
     /// <summary>
     /// The message-level error message, if any.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// The results for descriptions, one per user.
@@ -90,14 +90,28 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class DescribeUserScramCredentialsResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeUserScramCredentialsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeUserScramCredentialsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeUserScramCredentialsResultMessage: Message, IEquatable<DescribeUserScramCredentialsResultMessage>
     {
         /// <summary>
         /// The user name.
         /// </summary>
-        public string User { get; set; } = "";
+        public string User { get; set; } = string.Empty;
 
         /// <summary>
         /// The user-level error code.
@@ -107,7 +121,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
         /// <summary>
         /// The user-level error message, if any.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// The mechanism and related information associated with the user's SCRAM credentials.
@@ -156,10 +170,24 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeUserScramCredentialsResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeUserScramCredentialsResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class CredentialInfoMessage: Message
+    public sealed class CredentialInfoMessage: Message, IEquatable<CredentialInfoMessage>
     {
         /// <summary>
         /// The SCRAM mechanism.
@@ -194,6 +222,20 @@ public sealed class DescribeUserScramCredentialsResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteSByte(Mechanism);
             writer.WriteInt(Iterations);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is CredentialInfoMessage other && Equals(other);
+        }
+
+        public bool Equals(CredentialInfoMessage? other)
+        {
+            return true;
         }
     }
 }

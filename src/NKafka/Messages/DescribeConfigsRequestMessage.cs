@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeConfigsRequestMessage: RequestMessage
+public sealed class DescribeConfigsRequestMessage: RequestMessage, IEquatable<DescribeConfigsRequestMessage>
 {
     /// <summary>
     /// The resources whose configurations we want to describe.
@@ -113,9 +113,33 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default IncludeDocumentation at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribeConfigsResourceMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeConfigsRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeConfigsRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeConfigsResourceMessage: Message, IEquatable<DescribeConfigsResourceMessage>
     {
         /// <summary>
         /// The resource type.
@@ -125,7 +149,7 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         /// <summary>
         /// The configuration keys to list, or null to list all configuration keys.
@@ -204,6 +228,30 @@ public sealed class DescribeConfigsRequestMessage: RequestMessage
                     }
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeConfigsResourceMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeConfigsResourceMessage? other)
+        {
+            return true;
         }
     }
 }

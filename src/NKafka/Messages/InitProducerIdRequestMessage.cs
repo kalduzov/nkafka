@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class InitProducerIdRequestMessage: RequestMessage
+public sealed class InitProducerIdRequestMessage: RequestMessage, IEquatable<InitProducerIdRequestMessage>
 {
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// The time in ms to wait before aborting idle transactions sent by this producer. This is only relevant if a TransactionalId has been defined.
@@ -127,5 +127,29 @@ public sealed class InitProducerIdRequestMessage: RequestMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default ProducerEpoch at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is InitProducerIdRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(InitProducerIdRequestMessage? other)
+    {
+        return true;
     }
 }

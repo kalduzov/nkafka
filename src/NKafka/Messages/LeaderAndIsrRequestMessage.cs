@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaderAndIsrRequestMessage: RequestMessage
+public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<LeaderAndIsrRequestMessage>
 {
     /// <summary>
     /// The current controller ID.
@@ -169,14 +169,38 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class LeaderAndIsrTopicStateMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is LeaderAndIsrRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(LeaderAndIsrRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class LeaderAndIsrTopicStateMessage: Message, IEquatable<LeaderAndIsrTopicStateMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The unique topic ID.
@@ -245,10 +269,34 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderAndIsrTopicStateMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderAndIsrTopicStateMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class LeaderAndIsrLiveLeaderMessage: Message
+    public sealed class LeaderAndIsrLiveLeaderMessage: Message, IEquatable<LeaderAndIsrLiveLeaderMessage>
     {
         /// <summary>
         /// The leader's broker ID.
@@ -258,7 +306,7 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
         /// <summary>
         /// The leader's hostname.
         /// </summary>
-        public string HostName { get; set; } = "";
+        public string HostName { get; set; } = string.Empty;
 
         /// <summary>
         /// The leader's port.
@@ -300,15 +348,39 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderAndIsrLiveLeaderMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderAndIsrLiveLeaderMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class LeaderAndIsrPartitionStateMessage: Message
+    public sealed class LeaderAndIsrPartitionStateMessage: Message, IEquatable<LeaderAndIsrPartitionStateMessage>
     {
         /// <summary>
         /// The topic name.  This is only present in v0 or v1.
         /// </summary>
-        public string TopicName { get; set; } = "";
+        public string TopicName { get; set; } = string.Empty;
 
         /// <summary>
         /// The partition index.
@@ -468,6 +540,30 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage
                     throw new UnsupportedVersionException($"Attempted to write a non-default LeaderRecoveryState at version {version}");
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is LeaderAndIsrPartitionStateMessage other && Equals(other);
+        }
+
+        public bool Equals(LeaderAndIsrPartitionStateMessage? other)
+        {
+            return true;
         }
     }
 }

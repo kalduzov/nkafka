@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslAuthenticateRequestMessage: RequestMessage
+public sealed class SaslAuthenticateRequestMessage: RequestMessage, IEquatable<SaslAuthenticateRequestMessage>
 {
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
@@ -74,5 +74,29 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage
             writer.WriteInt(AuthBytes.Length);
         }
         writer.WriteBytes(AuthBytes);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version2)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is SaslAuthenticateRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(SaslAuthenticateRequestMessage? other)
+    {
+        return true;
     }
 }

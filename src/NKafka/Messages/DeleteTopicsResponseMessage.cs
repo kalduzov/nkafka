@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteTopicsResponseMessage: ResponseMessage
+public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<DeleteTopicsResponseMessage>
 {
     /// <summary>
     /// The results for each topic we tried to delete.
@@ -83,14 +83,38 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DeletableTopicResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DeleteTopicsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DeleteTopicsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DeletableTopicResultMessage: Message, IEquatable<DeletableTopicResultMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// the unique topic ID
@@ -169,6 +193,31 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DeletableTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DeletableTopicResultMessage? other)
+        {
+            return true;
         }
     }
 

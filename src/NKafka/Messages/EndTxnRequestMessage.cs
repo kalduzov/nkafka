@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EndTxnRequestMessage: RequestMessage
+public sealed class EndTxnRequestMessage: RequestMessage, IEquatable<EndTxnRequestMessage>
 {
     /// <summary>
     /// The ID of the transaction to end.
     /// </summary>
-    public string TransactionalId { get; set; } = "";
+    public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// The producer ID.
@@ -95,5 +95,29 @@ public sealed class EndTxnRequestMessage: RequestMessage
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
         writer.WriteBool(Committed);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is EndTxnRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(EndTxnRequestMessage? other)
+    {
+        return true;
     }
 }

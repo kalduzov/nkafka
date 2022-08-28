@@ -11,7 +11,7 @@
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
 // 
-//      https://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-2.0
 // 
 //  Unless required by applicable law or agreed to in writing, software
 //  distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,40 +19,40 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using FluentAssertions;
+
 using NKafka.Messages;
-using NKafka.Protocol.Extensions;
+using NKafka.Protocol;
 
-namespace NKafka.Protocol;
+using Xunit;
 
-public class SendMessage
+namespace NKafka.Tests;
+
+public class SerializationTests
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public RequestHeader Header { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public RequestMessage Content { get; set; }
-
-    public SendMessage(RequestHeader header, RequestMessage content)
+    [Fact]
+    public void ApiVersionsRequestMessageTest()
     {
-        Header = header;
-        Content = content;
+        var request = new ApiVersionsRequestMessage
+        {
+            ClientSoftwareName = "test"
+        };
 
-        //RequestLength = header.Length + content.MessageSize;
-    }
+        var header = new RequestHeader
+        {
+            RequestApiKey = (short)request.ApiKey,
+            RequestApiVersion = (short)ApiVersions.Version1,
+            ClientId = "test",
+            CorrelationId = 1,
+        };
 
-    public void Write(Stream writableStream)
-    {
+        var sendMessage = new SendMessage(header, request);
+
         using var stream = new MemoryStream();
-        var writer = new BufferWriter(stream);
 
-        Header.Write(writer, (ApiVersions)Header.RequestApiVersion);
-        Content.Write(writer, (ApiVersions)Header.RequestApiVersion);
+        sendMessage.Write(stream);
 
-        writableStream.WriteLength((int)stream.Length);
-        stream.WriteTo(writableStream);
+        var str = Convert.ToHexString(stream.ToArray());
+        stream.Length.Should().Be(6);
     }
 }

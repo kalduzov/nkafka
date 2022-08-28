@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
+public sealed class BrokerHeartbeatResponseMessage: ResponseMessage, IEquatable<BrokerHeartbeatResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -83,5 +83,19 @@ public sealed class BrokerHeartbeatResponseMessage: ResponseMessage
         writer.WriteBool(IsCaughtUp);
         writer.WriteBool(IsFenced);
         writer.WriteBool(ShouldShutDown);
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is BrokerHeartbeatResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(BrokerHeartbeatResponseMessage? other)
+    {
+        return true;
     }
 }

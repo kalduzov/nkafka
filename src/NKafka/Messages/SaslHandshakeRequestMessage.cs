@@ -35,12 +35,12 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslHandshakeRequestMessage: RequestMessage
+public sealed class SaslHandshakeRequestMessage: RequestMessage, IEquatable<SaslHandshakeRequestMessage>
 {
     /// <summary>
     /// The SASL mechanism chosen by the client.
     /// </summary>
-    public string Mechanism { get; set; } = "";
+    public string Mechanism { get; set; } = string.Empty;
 
     public SaslHandshakeRequestMessage()
     {
@@ -70,5 +70,21 @@ public sealed class SaslHandshakeRequestMessage: RequestMessage
             writer.WriteShort((short)stringBytes.Length);
             writer.WriteBytes(stringBytes);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (numTaggedFields > 0)
+        {
+            throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+        }
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is SaslHandshakeRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(SaslHandshakeRequestMessage? other)
+    {
+        return true;
     }
 }

@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
+public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<WriteTxnMarkersResponseMessage>
 {
     /// <summary>
     /// The results for writing makers.
@@ -79,9 +79,33 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class WritableTxnMarkerResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is WriteTxnMarkersResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(WriteTxnMarkersResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class WritableTxnMarkerResultMessage: Message, IEquatable<WritableTxnMarkerResultMessage>
     {
         /// <summary>
         /// The current producer ID in use by the transactional ID.
@@ -131,15 +155,39 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is WritableTxnMarkerResultMessage other && Equals(other);
+        }
+
+        public bool Equals(WritableTxnMarkerResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class WritableTxnMarkerTopicResultMessage: Message
+    public sealed class WritableTxnMarkerTopicResultMessage: Message, IEquatable<WritableTxnMarkerTopicResultMessage>
     {
         /// <summary>
         /// The topic name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The results by partition.
@@ -195,10 +243,34 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is WritableTxnMarkerTopicResultMessage other && Equals(other);
+        }
+
+        public bool Equals(WritableTxnMarkerTopicResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class WritableTxnMarkerPartitionResultMessage: Message
+    public sealed class WritableTxnMarkerPartitionResultMessage: Message, IEquatable<WritableTxnMarkerPartitionResultMessage>
     {
         /// <summary>
         /// The partition index.
@@ -233,6 +305,30 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is WritableTxnMarkerPartitionResultMessage other && Equals(other);
+        }
+
+        public bool Equals(WritableTxnMarkerPartitionResultMessage? other)
+        {
+            return true;
         }
     }
 }

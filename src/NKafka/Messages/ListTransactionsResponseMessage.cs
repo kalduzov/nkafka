@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListTransactionsResponseMessage: ResponseMessage
+public sealed class ListTransactionsResponseMessage: ResponseMessage, IEquatable<ListTransactionsResponseMessage>
 {
     /// <summary>
     /// 
@@ -89,14 +89,28 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TransactionStateMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ListTransactionsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ListTransactionsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TransactionStateMessage: Message, IEquatable<TransactionStateMessage>
     {
         /// <summary>
         /// 
         /// </summary>
-        public string TransactionalId { get; set; } = "";
+        public string TransactionalId { get; set; } = string.Empty;
 
         /// <summary>
         /// 
@@ -106,7 +120,7 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
         /// <summary>
         /// The current transaction state of the producer
         /// </summary>
-        public string TransactionState { get; set; } = "";
+        public string TransactionState { get; set; } = string.Empty;
 
         public TransactionStateMessage()
         {
@@ -140,6 +154,20 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TransactionStateMessage other && Equals(other);
+        }
+
+        public bool Equals(TransactionStateMessage? other)
+        {
+            return true;
         }
     }
 }

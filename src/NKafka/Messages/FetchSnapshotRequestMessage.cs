@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FetchSnapshotRequestMessage: RequestMessage
+public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<FetchSnapshotRequestMessage>
 {
     /// <summary>
     /// The clusterId if known, this is used to validate metadata fetches prior to broker registration
@@ -91,14 +91,36 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        if (ClusterId is not null)
+        {
+            writer.WriteVarUInt(0);
+            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+            writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
+            writer.WriteVarUInt(stringBytes.Length + 1);
+            writer.WriteBytes(stringBytes);
+        }
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class TopicSnapshotMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is FetchSnapshotRequestMessage other && Equals(other);
+    }
+
+    public bool Equals(FetchSnapshotRequestMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class TopicSnapshotMessage: Message, IEquatable<TopicSnapshotMessage>
     {
         /// <summary>
         /// The name of the topic to fetch
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The partitions to fetch
@@ -136,10 +158,24 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is TopicSnapshotMessage other && Equals(other);
+        }
+
+        public bool Equals(TopicSnapshotMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class PartitionSnapshotMessage: Message
+    public sealed class PartitionSnapshotMessage: Message, IEquatable<PartitionSnapshotMessage>
     {
         /// <summary>
         /// The partition index
@@ -186,10 +222,24 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
             writer.WriteInt(CurrentLeaderEpoch);
             SnapshotId.Write(writer, version);
             writer.WriteLong(Position);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PartitionSnapshotMessage other && Equals(other);
+        }
+
+        public bool Equals(PartitionSnapshotMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class SnapshotIdMessage: Message
+    public sealed class SnapshotIdMessage: Message, IEquatable<SnapshotIdMessage>
     {
         /// <summary>
         /// 
@@ -224,6 +274,20 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);
             writer.WriteInt(Epoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is SnapshotIdMessage other && Equals(other);
+        }
+
+        public bool Equals(SnapshotIdMessage? other)
+        {
+            return true;
         }
     }
 }

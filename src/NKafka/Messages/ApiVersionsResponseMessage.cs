@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ApiVersionsResponseMessage: ResponseMessage
+public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiVersionsResponseMessage>
 {
     /// <summary>
     /// The top-level error code.
@@ -125,9 +125,63 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
                 numTaggedFields++;
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version3)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            {
+                if (SupportedFeatures.Count != 0)
+                {
+                    writer.WriteVarUInt(0);
+                    writer.WriteVarUInt(SupportedFeatures.Count + 1);
+                    foreach (var element in SupportedFeatures)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            {
+                if (FinalizedFeaturesEpoch != -1)
+                {
+                    writer.WriteVarUInt(1);
+                    writer.WriteVarUInt(8);
+                    writer.WriteLong(FinalizedFeaturesEpoch);
+                }
+            }
+            {
+                if (FinalizedFeatures.Count != 0)
+                {
+                    writer.WriteVarUInt(2);
+                    writer.WriteVarUInt(FinalizedFeatures.Count + 1);
+                    foreach (var element in FinalizedFeatures)
+                    {
+                        element.Write(writer, version);
+                    }
+                }
+            }
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class ApiVersionMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is ApiVersionsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(ApiVersionsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ApiVersionMessage: Message, IEquatable<ApiVersionMessage>
     {
         /// <summary>
         /// The API index.
@@ -168,6 +222,31 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
             writer.WriteShort(ApiKey);
             writer.WriteShort(MinVersion);
             writer.WriteShort(MaxVersion);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version3)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ApiVersionMessage other && Equals(other);
+        }
+
+        public bool Equals(ApiVersionMessage? other)
+        {
+            return true;
         }
     }
 
@@ -183,12 +262,12 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
         }
     }
 
-    public sealed class SupportedFeatureKeyMessage: Message
+    public sealed class SupportedFeatureKeyMessage: Message, IEquatable<SupportedFeatureKeyMessage>
     {
         /// <summary>
         /// The name of the feature.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The minimum supported version for the feature.
@@ -232,6 +311,21 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
             }
             writer.WriteShort(MinVersion);
             writer.WriteShort(MaxVersion);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is SupportedFeatureKeyMessage other && Equals(other);
+        }
+
+        public bool Equals(SupportedFeatureKeyMessage? other)
+        {
+            return true;
         }
     }
 
@@ -247,12 +341,12 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
         }
     }
 
-    public sealed class FinalizedFeatureKeyMessage: Message
+    public sealed class FinalizedFeatureKeyMessage: Message, IEquatable<FinalizedFeatureKeyMessage>
     {
         /// <summary>
         /// The name of the feature.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The cluster-wide finalized max version level for the feature.
@@ -296,6 +390,21 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage
             }
             writer.WriteShort(MaxVersionLevel);
             writer.WriteShort(MinVersionLevel);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is FinalizedFeatureKeyMessage other && Equals(other);
+        }
+
+        public bool Equals(FinalizedFeatureKeyMessage? other)
+        {
+            return true;
         }
     }
 

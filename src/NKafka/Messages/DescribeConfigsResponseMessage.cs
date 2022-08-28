@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeConfigsResponseMessage: ResponseMessage
+public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<DescribeConfigsResponseMessage>
 {
     /// <summary>
     /// The results for each resource.
@@ -80,9 +80,33 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class DescribeConfigsResultMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is DescribeConfigsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(DescribeConfigsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class DescribeConfigsResultMessage: Message, IEquatable<DescribeConfigsResultMessage>
     {
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
@@ -92,7 +116,7 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, or null if we were able to successfully describe the configurations.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// The resource type.
@@ -102,7 +126,7 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The resource name.
         /// </summary>
-        public string ResourceName { get; set; } = "";
+        public string ResourceName { get; set; } = string.Empty;
 
         /// <summary>
         /// Each listed configuration.
@@ -184,20 +208,44 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeConfigsResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeConfigsResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribeConfigsResourceResultMessage: Message
+    public sealed class DescribeConfigsResourceResultMessage: Message, IEquatable<DescribeConfigsResourceResultMessage>
     {
         /// <summary>
         /// The configuration name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The configuration value.
         /// </summary>
-        public string Value { get; set; } = "";
+        public string Value { get; set; } = string.Empty;
 
         /// <summary>
         /// True if the configuration is read-only.
@@ -232,7 +280,7 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
         /// <summary>
         /// The configuration documentation.
         /// </summary>
-        public string Documentation { get; set; } = "";
+        public string Documentation { get; set; } = string.Empty;
 
         public DescribeConfigsResourceResultMessage()
         {
@@ -358,20 +406,44 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
                     writer.WriteBytes(stringBytes);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeConfigsResourceResultMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeConfigsResourceResultMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class DescribeConfigsSynonymMessage: Message
+    public sealed class DescribeConfigsSynonymMessage: Message, IEquatable<DescribeConfigsSynonymMessage>
     {
         /// <summary>
         /// The synonym name.
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The synonym value.
         /// </summary>
-        public string Value { get; set; } = "";
+        public string Value { get; set; } = string.Empty;
 
         /// <summary>
         /// The synonym source.
@@ -440,6 +512,30 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(Source);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DescribeConfigsSynonymMessage other && Equals(other);
+        }
+
+        public bool Equals(DescribeConfigsSynonymMessage? other)
+        {
+            return true;
         }
     }
 }

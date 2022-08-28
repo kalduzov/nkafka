@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterClientQuotasResponseMessage: ResponseMessage
+public sealed class AlterClientQuotasResponseMessage: ResponseMessage, IEquatable<AlterClientQuotasResponseMessage>
 {
     /// <summary>
     /// The quota configuration entries to alter.
@@ -80,9 +80,33 @@ public sealed class AlterClientQuotasResponseMessage: ResponseMessage
                 element.Write(writer, version);
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version1)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class EntryDataMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterClientQuotasResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterClientQuotasResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class EntryDataMessage: Message, IEquatable<EntryDataMessage>
     {
         /// <summary>
         /// The error code, or `0` if the quota alteration succeeded.
@@ -92,7 +116,7 @@ public sealed class AlterClientQuotasResponseMessage: ResponseMessage
         /// <summary>
         /// The error message, or `null` if the quota alteration succeeded.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         /// <summary>
         /// The quota entity to alter.
@@ -161,20 +185,44 @@ public sealed class AlterClientQuotasResponseMessage: ResponseMessage
                     element.Write(writer, version);
                 }
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntryDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntryDataMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class EntityDataMessage: Message
+    public sealed class EntityDataMessage: Message, IEquatable<EntityDataMessage>
     {
         /// <summary>
         /// The entity type.
         /// </summary>
-        public string EntityType { get; set; } = "";
+        public string EntityType { get; set; } = string.Empty;
 
         /// <summary>
         /// The name of the entity, or null if the default.
         /// </summary>
-        public string EntityName { get; set; } = "";
+        public string EntityName { get; set; } = string.Empty;
 
         public EntityDataMessage()
         {
@@ -233,6 +281,30 @@ public sealed class AlterClientQuotasResponseMessage: ResponseMessage
                 }
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version1)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is EntityDataMessage other && Equals(other);
+        }
+
+        public bool Equals(EntityDataMessage? other)
+        {
+            return true;
         }
     }
 }

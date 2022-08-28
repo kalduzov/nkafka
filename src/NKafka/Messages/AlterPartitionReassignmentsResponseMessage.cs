@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
+public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage, IEquatable<AlterPartitionReassignmentsResponseMessage>
 {
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
@@ -45,7 +45,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
     /// <summary>
     /// The top-level error message, or null if there was no error.
     /// </summary>
-    public string ErrorMessage { get; set; } = "";
+    public string ErrorMessage { get; set; } = string.Empty;
 
     /// <summary>
     /// The responses to topics to reassign.
@@ -90,14 +90,28 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         {
             element.Write(writer, version);
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        writer.WriteVarUInt(numTaggedFields);
+        rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
-    public sealed class ReassignableTopicResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is AlterPartitionReassignmentsResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(AlterPartitionReassignmentsResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class ReassignableTopicResponseMessage: Message, IEquatable<ReassignableTopicResponseMessage>
     {
         /// <summary>
         /// The topic name
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses to partitions to reassign
@@ -135,10 +149,24 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
             {
                 element.Write(writer, version);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReassignableTopicResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(ReassignableTopicResponseMessage? other)
+        {
+            return true;
         }
     }
 
-    public sealed class ReassignablePartitionResponseMessage: Message
+    public sealed class ReassignablePartitionResponseMessage: Message, IEquatable<ReassignablePartitionResponseMessage>
     {
         /// <summary>
         /// The partition index.
@@ -153,7 +181,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
         /// <summary>
         /// The error message for this partition, or null if there was no error.
         /// </summary>
-        public string ErrorMessage { get; set; } = "";
+        public string ErrorMessage { get; set; } = string.Empty;
 
         public ReassignablePartitionResponseMessage()
         {
@@ -188,6 +216,20 @@ public sealed class AlterPartitionReassignmentsResponseMessage: ResponseMessage
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReassignablePartitionResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(ReassignablePartitionResponseMessage? other)
+        {
+            return true;
         }
     }
 }

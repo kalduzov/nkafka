@@ -35,7 +35,7 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaveGroupResponseMessage: ResponseMessage
+public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<LeaveGroupResponseMessage>
 {
     /// <summary>
     /// The error code, or 0 if there was no error.
@@ -99,19 +99,43 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage
                 throw new UnsupportedVersionException($"Attempted to write a non-default Members at version {version}");
             }
         }
+        var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+        numTaggedFields += rawWriter.FieldsCount;
+        if (version >= ApiVersions.Version4)
+        {
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+        else
+        {
+            if (numTaggedFields > 0)
+            {
+                throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+            }
+        }
     }
 
-    public sealed class MemberResponseMessage: Message
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is LeaveGroupResponseMessage other && Equals(other);
+    }
+
+    public bool Equals(LeaveGroupResponseMessage? other)
+    {
+        return true;
+    }
+
+    public sealed class MemberResponseMessage: Message, IEquatable<MemberResponseMessage>
     {
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
-        public string MemberId { get; set; } = "";
+        public string MemberId { get; set; } = string.Empty;
 
         /// <summary>
         /// The group instance ID to remove from the group.
         /// </summary>
-        public string GroupInstanceId { get; set; } = "";
+        public string GroupInstanceId { get; set; } = string.Empty;
 
         /// <summary>
         /// The error code, or 0 if there was no error.
@@ -180,6 +204,30 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(ErrorCode);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            if (version >= ApiVersions.Version4)
+            {
+                writer.WriteVarUInt(numTaggedFields);
+                rawWriter.WriteRawTags(writer, int.MaxValue);
+            }
+            else
+            {
+                if (numTaggedFields > 0)
+                {
+                    throw new UnsupportedVersionException($"Tagged fields were set, but version {version} of this message does not support them.");
+                }
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is MemberResponseMessage other && Equals(other);
+        }
+
+        public bool Equals(MemberResponseMessage? other)
+        {
+            return true;
         }
     }
 }

@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ApiVersionsRequestMessage: RequestMessage, IEquatable<ApiVersionsRequestMessage>
+public sealed class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVersionsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.ApiVersions;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The name of the client.
     /// </summary>
@@ -49,25 +59,77 @@ public sealed class ApiVersionsRequestMessage: RequestMessage, IEquatable<ApiVer
 
     public ApiVersionsRequestMessage()
     {
-        ApiKey = ApiKeys.ApiVersions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public ApiVersionsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ApiVersions;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version3)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field ClientSoftwareName was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ClientSoftwareName had invalid length {length}");
+            }
+            else
+            {
+                ClientSoftwareName = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ClientSoftwareName = string.Empty;
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field ClientSoftwareVersion was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ClientSoftwareVersion had invalid length {length}");
+            }
+            else
+            {
+                ClientSoftwareVersion = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ClientSoftwareVersion = string.Empty;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version3)

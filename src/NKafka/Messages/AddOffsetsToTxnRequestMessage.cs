@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AddOffsetsToTxnRequestMessage: RequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
+public sealed class AddOffsetsToTxnRequestMessage: IRequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.AddOffsetsToTxn;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
@@ -59,25 +69,83 @@ public sealed class AddOffsetsToTxnRequestMessage: RequestMessage, IEquatable<Ad
 
     public AddOffsetsToTxnRequestMessage()
     {
-        ApiKey = ApiKeys.AddOffsetsToTxn;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public AddOffsetsToTxnRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AddOffsetsToTxn;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field TransactionalId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field TransactionalId had invalid length {length}");
+            }
+            else
+            {
+                TransactionalId = reader.ReadString(length);
+            }
+        }
+        ProducerId = reader.ReadLong();
+        ProducerEpoch = reader.ReadShort();
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field GroupId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupId had invalid length {length}");
+            }
+            else
+            {
+                GroupId = reader.ReadString(length);
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         {

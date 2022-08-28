@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<WriteTxnMarkersResponseMessage>
+public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable<WriteTxnMarkersResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The results for writing makers.
     /// </summary>
@@ -44,23 +54,73 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
 
     public WriteTxnMarkersResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public WriteTxnMarkersResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version1)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Markers was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<WritableTxnMarkerResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new WritableTxnMarkerResultMessage(reader, version));
+                    }
+                    Markers = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Markers was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<WritableTxnMarkerResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new WritableTxnMarkerResultMessage(reader, version));
+                    }
+                    Markers = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version1)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -105,8 +165,16 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
         return true;
     }
 
-    public sealed class WritableTxnMarkerResultMessage: Message, IEquatable<WritableTxnMarkerResultMessage>
+    public sealed class WritableTxnMarkerResultMessage: IMessage, IEquatable<WritableTxnMarkerResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The current producer ID in use by the transactional ID.
         /// </summary>
@@ -119,23 +187,78 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
 
         public WritableTxnMarkerResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of WritableTxnMarkerResultMessage");
+            }
+            ProducerId = reader.ReadLong();
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<WritableTxnMarkerTopicResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new WritableTxnMarkerTopicResultMessage(reader, version));
+                        }
+                        Topics = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<WritableTxnMarkerTopicResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new WritableTxnMarkerTopicResultMessage(reader, version));
+                        }
+                        Topics = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteLong(ProducerId);
@@ -182,8 +305,16 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
         }
     }
 
-    public sealed class WritableTxnMarkerTopicResultMessage: Message, IEquatable<WritableTxnMarkerTopicResultMessage>
+    public sealed class WritableTxnMarkerTopicResultMessage: IMessage, IEquatable<WritableTxnMarkerTopicResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -196,23 +327,100 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
 
         public WritableTxnMarkerTopicResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of WritableTxnMarkerTopicResultMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<WritableTxnMarkerPartitionResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new WritableTxnMarkerPartitionResultMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<WritableTxnMarkerPartitionResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new WritableTxnMarkerPartitionResultMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -270,8 +478,16 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
         }
     }
 
-    public sealed class WritableTxnMarkerPartitionResultMessage: Message, IEquatable<WritableTxnMarkerPartitionResultMessage>
+    public sealed class WritableTxnMarkerPartitionResultMessage: IMessage, IEquatable<WritableTxnMarkerPartitionResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index.
         /// </summary>
@@ -282,29 +498,50 @@ public sealed class WriteTxnMarkersResponseMessage: ResponseMessage, IEquatable<
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
         public WritableTxnMarkerPartitionResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public WritableTxnMarkerPartitionResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of WritableTxnMarkerPartitionResultMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            ErrorCode = reader.ReadShort();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersions.Version1)

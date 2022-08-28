@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeLogDirsRequestMessage: RequestMessage, IEquatable<DescribeLogDirsRequestMessage>
+public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<DescribeLogDirsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiKeys ApiKey => ApiKeys.DescribeLogDirs;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
@@ -44,25 +54,73 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage, IEquatable<De
 
     public DescribeLogDirsRequestMessage()
     {
-        ApiKey = ApiKeys.DescribeLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public DescribeLogDirsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    Topics = null;
+                }
+                else
+                {
+                    DescribableLogDirTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribableLogDirTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    Topics = null;
+                }
+                else
+                {
+                    DescribableLogDirTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribableLogDirTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)
@@ -121,8 +179,16 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage, IEquatable<De
         return true;
     }
 
-    public sealed class DescribableLogDirTopicMessage: Message, IEquatable<DescribableLogDirTopicMessage>
+    public sealed class DescribableLogDirTopicMessage: IMessage, IEquatable<DescribableLogDirTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name
         /// </summary>
@@ -135,23 +201,86 @@ public sealed class DescribeLogDirsRequestMessage: RequestMessage, IEquatable<De
 
         public DescribableLogDirTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribableLogDirTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribableLogDirTopicMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Topic was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Topic had invalid length {length}");
+                }
+                else
+                {
+                    Topic = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version2)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Partitions was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    Partitions = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

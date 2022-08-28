@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteAclsRequestMessage: RequestMessage, IEquatable<DeleteAclsRequestMessage>
+public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<DeleteAclsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.DeleteAcls;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The filters to use when deleting ACLs.
     /// </summary>
@@ -44,25 +54,73 @@ public sealed class DeleteAclsRequestMessage: RequestMessage, IEquatable<DeleteA
 
     public DeleteAclsRequestMessage()
     {
-        ApiKey = ApiKeys.DeleteAcls;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DeleteAclsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DeleteAcls;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Filters was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DeleteAclsFilterMessage(reader, version));
+                    }
+                    Filters = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Filters was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DeleteAclsFilterMessage(reader, version));
+                    }
+                    Filters = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)
@@ -107,8 +165,16 @@ public sealed class DeleteAclsRequestMessage: RequestMessage, IEquatable<DeleteA
         return true;
     }
 
-    public sealed class DeleteAclsFilterMessage: Message, IEquatable<DeleteAclsFilterMessage>
+    public sealed class DeleteAclsFilterMessage: IMessage, IEquatable<DeleteAclsFilterMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The resource type.
         /// </summary>
@@ -146,23 +212,119 @@ public sealed class DeleteAclsRequestMessage: RequestMessage, IEquatable<DeleteA
 
         public DeleteAclsFilterMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DeleteAclsFilterMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DeleteAclsFilterMessage");
+            }
+            ResourceTypeFilter = reader.ReadSByte();
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    ResourceNameFilter = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ResourceNameFilter had invalid length {length}");
+                }
+                else
+                {
+                    ResourceNameFilter = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                PatternTypeFilter = reader.ReadSByte();
+            }
+            else
+            {
+                PatternTypeFilter = 3;
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    PrincipalFilter = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalFilter had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalFilter = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    HostFilter = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field HostFilter had invalid length {length}");
+                }
+                else
+                {
+                    HostFilter = reader.ReadString(length);
+                }
+            }
+            Operation = reader.ReadSByte();
+            PermissionType = reader.ReadSByte();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteSByte(ResourceTypeFilter);

@@ -35,41 +35,71 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ExpireDelegationTokenResponseMessage: ResponseMessage, IEquatable<ExpireDelegationTokenResponseMessage>
+public sealed class ExpireDelegationTokenResponseMessage: IResponseMessage, IEquatable<ExpireDelegationTokenResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The timestamp in milliseconds at which this token expires.
     /// </summary>
     public long ExpiryTimestampMs { get; set; } = 0;
 
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
 
     public ExpireDelegationTokenResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public ExpireDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ErrorCode = reader.ReadShort();
+        ExpiryTimestampMs = reader.ReadLong();
+        ThrottleTimeMs = reader.ReadInt();
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         writer.WriteLong(ExpiryTimestampMs);
         writer.WriteInt(ThrottleTimeMs);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

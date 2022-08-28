@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListTransactionsResponseMessage: ResponseMessage, IEquatable<ListTransactionsResponseMessage>
+public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatable<ListTransactionsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// 
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// Set of state filters provided in the request which were unknown to the transaction coordinator
@@ -54,27 +70,85 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage, IEquatable
 
     public ListTransactionsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public ListTransactionsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        ErrorCode = reader.ReadShort();
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field UnknownStateFilters was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<string>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    int length;
+                    length = reader.ReadVarUInt() - 1;
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field UnknownStateFilters element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field UnknownStateFilters element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
+                }
+                UnknownStateFilters = newCollection;
+            }
+        }
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field TransactionStates was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<TransactionStateMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new TransactionStateMessage(reader, version));
+                }
+                TransactionStates = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         writer.WriteVarUInt(UnknownStateFilters.Count + 1);
         foreach (var element in UnknownStateFilters)
         {
@@ -105,8 +179,16 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage, IEquatable
         return true;
     }
 
-    public sealed class TransactionStateMessage: Message, IEquatable<TransactionStateMessage>
+    public sealed class TransactionStateMessage: IMessage, IEquatable<TransactionStateMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// 
         /// </summary>
@@ -124,23 +206,69 @@ public sealed class ListTransactionsResponseMessage: ResponseMessage, IEquatable
 
         public TransactionStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TransactionStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of TransactionStateMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TransactionalId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TransactionalId had invalid length {length}");
+                }
+                else
+                {
+                    TransactionalId = reader.ReadString(length);
+                }
+            }
+            ProducerId = reader.ReadLong();
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TransactionState was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TransactionState had invalid length {length}");
+                }
+                else
+                {
+                    TransactionState = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

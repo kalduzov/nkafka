@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerRegistrationResponseMessage: ResponseMessage, IEquatable<BrokerRegistrationResponseMessage>
+public sealed class BrokerRegistrationResponseMessage: IResponseMessage, IEquatable<BrokerRegistrationResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// Duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The broker's assigned epoch, or -1 if none was assigned.
@@ -49,27 +65,39 @@ public sealed class BrokerRegistrationResponseMessage: ResponseMessage, IEquatab
 
     public BrokerRegistrationResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public BrokerRegistrationResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        ErrorCode = reader.ReadShort();
+        BrokerEpoch = reader.ReadLong();
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         writer.WriteLong(BrokerEpoch);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

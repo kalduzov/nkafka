@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UpdateFeaturesRequestMessage: RequestMessage, IEquatable<UpdateFeaturesRequestMessage>
+public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<UpdateFeaturesRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiKeys ApiKey => ApiKeys.UpdateFeatures;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
     /// </summary>
@@ -54,25 +64,58 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage, IEquatable<Upd
 
     public UpdateFeaturesRequestMessage()
     {
-        ApiKey = ApiKeys.UpdateFeatures;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public UpdateFeaturesRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.UpdateFeatures;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        timeoutMs = reader.ReadInt();
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field FeatureUpdates was serialized as null");
+            }
+            else
+            {
+                FeatureUpdateKeyCollection newCollection = new(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new FeatureUpdateKeyMessage(reader, version));
+                }
+                FeatureUpdates = newCollection;
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            ValidateOnly = reader.ReadByte() != 0;
+        }
+        else
+        {
+            ValidateOnly = false;
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(timeoutMs);
@@ -108,8 +151,16 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage, IEquatable<Upd
         return true;
     }
 
-    public sealed class FeatureUpdateKeyMessage: Message, IEquatable<FeatureUpdateKeyMessage>
+    public sealed class FeatureUpdateKeyMessage: IMessage, IEquatable<FeatureUpdateKeyMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The name of the finalized feature to be updated.
         /// </summary>
@@ -132,23 +183,69 @@ public sealed class UpdateFeaturesRequestMessage: RequestMessage, IEquatable<Upd
 
         public FeatureUpdateKeyMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public FeatureUpdateKeyMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of FeatureUpdateKeyMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Feature was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Feature had invalid length {length}");
+                }
+                else
+                {
+                    Feature = reader.ReadString(length);
+                }
+            }
+            MaxVersionLevel = reader.ReadShort();
+            if (version <= ApiVersions.Version0)
+            {
+                AllowDowngrade = reader.ReadByte() != 0;
+            }
+            else
+            {
+                AllowDowngrade = false;
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                UpgradeType = reader.ReadSByte();
+            }
+            else
+            {
+                UpgradeType = 1;
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

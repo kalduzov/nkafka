@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateAclsResponseMessage: ResponseMessage, IEquatable<CreateAclsResponseMessage>
+public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<CreateAclsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The results for each ACL creation.
     /// </summary>
@@ -44,23 +57,74 @@ public sealed class CreateAclsResponseMessage: ResponseMessage, IEquatable<Creat
 
     public CreateAclsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public CreateAclsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<AclCreationResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AclCreationResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<AclCreationResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AclCreationResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -106,12 +170,23 @@ public sealed class CreateAclsResponseMessage: ResponseMessage, IEquatable<Creat
         return true;
     }
 
-    public sealed class AclCreationResultMessage: Message, IEquatable<AclCreationResultMessage>
+    public sealed class AclCreationResultMessage: IMessage, IEquatable<AclCreationResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The result error, or zero if there was no error.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
+
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
         /// The result message, or null if there was no error.
@@ -120,26 +195,66 @@ public sealed class CreateAclsResponseMessage: ResponseMessage, IEquatable<Creat
 
         public AclCreationResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public AclCreationResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AclCreationResultMessage");
+            }
+            ErrorCode = reader.ReadShort();
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    ErrorMessage = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ErrorMessage had invalid length {length}");
+                }
+                else
+                {
+                    ErrorMessage = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
                 if (version >= ApiVersions.Version2)

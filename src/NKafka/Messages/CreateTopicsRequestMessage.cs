@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<CreateTopicsRequestMessage>
+public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<CreateTopicsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+
+    public ApiKeys ApiKey => ApiKeys.CreateTopics;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The topics to create.
     /// </summary>
@@ -54,25 +64,82 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
 
     public CreateTopicsRequestMessage()
     {
-        ApiKey = ApiKeys.CreateTopics;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version7;
     }
 
     public CreateTopicsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.CreateTopics;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version7;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version5)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    CreatableTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new CreatableTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    CreatableTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new CreatableTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        timeoutMs = reader.ReadInt();
+        if (version >= ApiVersions.Version1)
+        {
+            validateOnly = reader.ReadByte() != 0;
+        }
+        else
+        {
+            validateOnly = false;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version5)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version5)
@@ -129,8 +196,16 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
         return true;
     }
 
-    public sealed class CreatableTopicMessage: Message, IEquatable<CreatableTopicMessage>
+    public sealed class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -158,23 +233,140 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
 
         public CreatableTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreatableTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of CreatableTopicMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version5)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            NumPartitions = reader.ReadInt();
+            ReplicationFactor = reader.ReadShort();
+            {
+                if (version >= ApiVersions.Version5)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Assignments was serialized as null");
+                    }
+                    else
+                    {
+                        CreatableReplicaAssignmentCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
+                        }
+                        Assignments = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Assignments was serialized as null");
+                    }
+                    else
+                    {
+                        CreatableReplicaAssignmentCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
+                        }
+                        Assignments = newCollection;
+                    }
+                }
+            }
+            {
+                if (version >= ApiVersions.Version5)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        CreateableTopicConfigCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new CreateableTopicConfigMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        CreateableTopicConfigCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new CreateableTopicConfigMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version5)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -251,8 +443,16 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
         }
     }
 
-    public sealed class CreatableReplicaAssignmentMessage: Message, IEquatable<CreatableReplicaAssignmentMessage>
+    public sealed class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index.
         /// </summary>
@@ -265,23 +465,64 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
 
         public CreatableReplicaAssignmentMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of CreatableReplicaAssignmentMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version5)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field BrokerIds was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    BrokerIds = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version5)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -337,8 +578,16 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
         }
     }
 
-    public sealed class CreateableTopicConfigMessage: Message, IEquatable<CreateableTopicConfigMessage>
+    public sealed class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The configuration name.
         /// </summary>
@@ -351,23 +600,85 @@ public sealed class CreateTopicsRequestMessage: RequestMessage, IEquatable<Creat
 
         public CreateableTopicConfigMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
         public CreateableTopicConfigMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version7;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version7)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of CreateableTopicConfigMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version5)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version5)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Value = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Value had invalid length {length}");
+                }
+                else
+                {
+                    Value = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version5)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

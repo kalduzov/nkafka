@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FindCoordinatorRequestMessage: RequestMessage, IEquatable<FindCoordinatorRequestMessage>
+public sealed class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<FindCoordinatorRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiKeys ApiKey => ApiKeys.FindCoordinator;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The coordinator key.
     /// </summary>
@@ -54,25 +64,106 @@ public sealed class FindCoordinatorRequestMessage: RequestMessage, IEquatable<Fi
 
     public FindCoordinatorRequestMessage()
     {
-        ApiKey = ApiKeys.FindCoordinator;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public FindCoordinatorRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.FindCoordinator;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version <= ApiVersions.Version3)
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field Key was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field Key had invalid length {length}");
+            }
+            else
+            {
+                Key = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            Key = string.Empty;
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            KeyType = reader.ReadSByte();
+        }
+        else
+        {
+            KeyType = 0;
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field CoordinatorKeys was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<string>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    int length;
+                    length = reader.ReadVarUInt() - 1;
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field CoordinatorKeys element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field CoordinatorKeys element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
+                }
+                CoordinatorKeys = newCollection;
+            }
+        }
+        else
+        {
+            CoordinatorKeys = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version <= ApiVersions.Version3)

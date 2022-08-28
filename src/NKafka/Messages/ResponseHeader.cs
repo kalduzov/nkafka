@@ -35,8 +35,16 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ResponseHeader: ResponseMessage, IEquatable<ResponseHeader>
+public sealed class ResponseHeader: IMessage, IEquatable<ResponseHeader>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The correlation ID of this response.
     /// </summary>
@@ -44,23 +52,36 @@ public sealed class ResponseHeader: ResponseMessage, IEquatable<ResponseHeader>
 
     public ResponseHeader()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public ResponseHeader(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        CorrelationId = reader.ReadInt();
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version1)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(CorrelationId);

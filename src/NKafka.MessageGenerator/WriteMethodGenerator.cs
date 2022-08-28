@@ -25,12 +25,11 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-internal class WriteMethodGenerator: IWriteMethodGenerator
+internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
 {
     private readonly IHeaderGenerator _headerGenerator;
     private readonly StructRegistry _structRegistry;
     private readonly CodeBuffer _codeBuffer;
-    private Versions _messageFlexibleVersions = Versions.None;
 
     public WriteMethodGenerator(IHeaderGenerator headerGenerator, StructRegistry structRegistry, CodeBuffer codeBuffer)
     {
@@ -41,9 +40,9 @@ internal class WriteMethodGenerator: IWriteMethodGenerator
 
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions)
     {
-        _messageFlexibleVersions = messageFlexibleVersions;
+        MessageFlexibleVersions = messageFlexibleVersions;
 
-        _codeBuffer.AppendLine("internal override void Write(BufferWriter writer, ApiVersions version)");
+        _codeBuffer.AppendLine("public void Write(BufferWriter writer, ApiVersions version)");
         _codeBuffer.AppendLine("{");
         _codeBuffer.IncrementIndent();
 
@@ -256,7 +255,7 @@ internal class WriteMethodGenerator: IWriteMethodGenerator
         {
             IFieldType.BoolFieldType => $"writer.WriteBool({name})",
             IFieldType.Int8FieldType => $"writer.WriteSByte({name})",
-            IFieldType.Int16FieldType => $"writer.WriteShort({name})",
+            IFieldType.Int16FieldType => $"writer.WriteShort({(name.Equals("ErrorCode") ? "(short)" : "") + name})",
             IFieldType.UInt16FieldType => $"writer.WriteUShort({name})",
             IFieldType.Int32FieldType => $"writer.WriteInt({name})",
             IFieldType.UInt32FieldType => $"writer.WriteUInt({name})",
@@ -266,23 +265,6 @@ internal class WriteMethodGenerator: IWriteMethodGenerator
             IFieldType.StructType => $"{name}.Write(writer, version)",
             _ => throw new Exception($"Unsupported field type {type}")
         };
-    }
-
-    private Versions FieldFlexibleVersions(FieldSpecification field)
-    {
-        if (field.FlexibleVersions is null)
-        {
-            return _messageFlexibleVersions;
-        }
-
-        if (!_messageFlexibleVersions.Intersect(field.FlexibleVersions).Equals(field.FlexibleVersions))
-        {
-            throw new Exception(
-                $"The flexible versions for field {field.Name} are {field.FlexibleVersions}, "
-                + $"which are not a subset of the flexible versions for the message as a whole, which are {_messageFlexibleVersions}");
-        }
-
-        return field.FlexibleVersions;
     }
 
     private void GenerateVariableLengthWriter(

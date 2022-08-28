@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatable<AlterReplicaLogDirsRequestMessage>
+public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatable<AlterReplicaLogDirsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiKeys ApiKey => ApiKeys.AlterReplicaLogDirs;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The alterations to make for each directory.
     /// </summary>
@@ -44,25 +54,73 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatabl
 
     public AlterReplicaLogDirsRequestMessage()
     {
-        ApiKey = ApiKeys.AlterReplicaLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public AlterReplicaLogDirsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterReplicaLogDirs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Dirs was serialized as null");
+                }
+                else
+                {
+                    AlterReplicaLogDirCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterReplicaLogDirMessage(reader, version));
+                    }
+                    Dirs = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Dirs was serialized as null");
+                }
+                else
+                {
+                    AlterReplicaLogDirCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterReplicaLogDirMessage(reader, version));
+                    }
+                    Dirs = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)
@@ -107,8 +165,16 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatabl
         return true;
     }
 
-    public sealed class AlterReplicaLogDirMessage: Message, IEquatable<AlterReplicaLogDirMessage>
+    public sealed class AlterReplicaLogDirMessage: IMessage, IEquatable<AlterReplicaLogDirMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The absolute directory path.
         /// </summary>
@@ -121,23 +187,100 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatabl
 
         public AlterReplicaLogDirMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version2)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Path was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Path had invalid length {length}");
+                }
+                else
+                {
+                    Path = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                    else
+                    {
+                        AlterReplicaLogDirTopicCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterReplicaLogDirTopicMessage(reader, version));
+                        }
+                        Topics = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                    else
+                    {
+                        AlterReplicaLogDirTopicCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterReplicaLogDirTopicMessage(reader, version));
+                        }
+                        Topics = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -196,8 +339,16 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatabl
         }
     }
 
-    public sealed class AlterReplicaLogDirTopicMessage: Message, IEquatable<AlterReplicaLogDirTopicMessage>
+    public sealed class AlterReplicaLogDirTopicMessage: IMessage, IEquatable<AlterReplicaLogDirTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -210,23 +361,86 @@ public sealed class AlterReplicaLogDirsRequestMessage: RequestMessage, IEquatabl
 
         public AlterReplicaLogDirTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version2)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirTopicMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version2)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Partitions was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    Partitions = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

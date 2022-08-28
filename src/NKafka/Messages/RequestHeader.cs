@@ -35,8 +35,16 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class RequestHeader: RequestMessage, IEquatable<RequestHeader>
+public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The API key of this request.
     /// </summary>
@@ -59,23 +67,59 @@ public sealed class RequestHeader: RequestMessage, IEquatable<RequestHeader>
 
     public RequestHeader()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public RequestHeader(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        RequestApiKey = reader.ReadShort();
+        RequestApiVersion = reader.ReadShort();
+        CorrelationId = reader.ReadInt();
+        if (version >= ApiVersions.Version1)
+        {
+            int length;
+            length = reader.ReadShort();
+            if (length < 0)
+            {
+                ClientId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ClientId had invalid length {length}");
+            }
+            else
+            {
+                ClientId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ClientId = string.Empty;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteShort(RequestApiKey);

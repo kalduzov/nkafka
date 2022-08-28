@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<FindCoordinatorResponseMessage>
+public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable<FindCoordinatorResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The error message, or null if there was no error.
@@ -69,23 +85,145 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
 
     public FindCoordinatorResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public FindCoordinatorResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version1)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            ErrorCode = reader.ReadShort();
+        }
+        else
+        {
+            ErrorCode = 0;
+        }
+        if (version >= ApiVersions.Version1 && version <= ApiVersions.Version3)
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                ErrorMessage = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ErrorMessage had invalid length {length}");
+            }
+            else
+            {
+                ErrorMessage = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ErrorMessage = string.Empty;
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            NodeId = reader.ReadInt();
+        }
+        else
+        {
+            NodeId = 0;
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field Host was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field Host had invalid length {length}");
+            }
+            else
+            {
+                Host = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            Host = string.Empty;
+        }
+        if (version <= ApiVersions.Version3)
+        {
+            Port = reader.ReadInt();
+        }
+        else
+        {
+            Port = 0;
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Coordinators was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<CoordinatorMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new CoordinatorMessage(reader, version));
+                }
+                Coordinators = newCollection;
+            }
+        }
+        else
+        {
+            Coordinators = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -94,7 +232,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
         }
         if (version <= ApiVersions.Version3)
         {
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
         }
         else
         {
@@ -215,8 +353,16 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
         return true;
     }
 
-    public sealed class CoordinatorMessage: Message, IEquatable<CoordinatorMessage>
+    public sealed class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The coordinator key.
         /// </summary>
@@ -242,6 +388,9 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
@@ -249,23 +398,87 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
 
         public CoordinatorMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public CoordinatorMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of CoordinatorMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Key was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Key had invalid length {length}");
+                }
+                else
+                {
+                    Key = reader.ReadString(length);
+                }
+            }
+            NodeId = reader.ReadInt();
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Host was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Host had invalid length {length}");
+                }
+                else
+                {
+                    Host = reader.ReadString(length);
+                }
+            }
+            Port = reader.ReadInt();
+            ErrorCode = reader.ReadShort();
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    ErrorMessage = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ErrorMessage had invalid length {length}");
+                }
+                else
+                {
+                    ErrorMessage = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version4)
             {
@@ -284,7 +497,7 @@ public sealed class FindCoordinatorResponseMessage: ResponseMessage, IEquatable<
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
                 writer.WriteVarUInt(0);

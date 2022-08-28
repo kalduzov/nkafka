@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EnvelopeRequestMessage: RequestMessage, IEquatable<EnvelopeRequestMessage>
+public sealed class EnvelopeRequestMessage: IRequestMessage, IEquatable<EnvelopeRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.Envelope;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The embedded request header and data.
     /// </summary>
@@ -54,25 +64,68 @@ public sealed class EnvelopeRequestMessage: RequestMessage, IEquatable<EnvelopeR
 
     public EnvelopeRequestMessage()
     {
-        ApiKey = ApiKeys.Envelope;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public EnvelopeRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.Envelope;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field RequestData was serialized as null");
+            }
+            else
+            {
+                RequestData = reader.ReadBytes(length);
+            }
+        }
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                RequestPrincipal = null;
+            }
+            else
+            {
+                RequestPrincipal = reader.ReadBytes(length);
+            }
+        }
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field ClientHostAddress was serialized as null");
+            }
+            else
+            {
+                ClientHostAddress = reader.ReadBytes(length);
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteVarUInt(RequestData.Length + 1);

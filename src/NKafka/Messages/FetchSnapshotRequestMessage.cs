@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<FetchSnapshotRequestMessage>
+public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<FetchSnapshotRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.FetchSnapshot;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The clusterId if known, this is used to validate metadata fetches prior to broker registration
     /// </summary>
@@ -59,25 +69,72 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
 
     public FetchSnapshotRequestMessage()
     {
-        ApiKey = ApiKeys.FetchSnapshot;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public FetchSnapshotRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.FetchSnapshot;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            ClusterId = null;
+        }
+        ReplicaId = reader.ReadInt();
+        MaxBytes = reader.ReadInt();
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Topics was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<TopicSnapshotMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new TopicSnapshotMessage(reader, version));
+                }
+                Topics = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                case 0:
+                {
+                    int length;
+                    length = reader.ReadVarUInt() - 1;
+                    if (length < 0)
+                    {
+                        ClusterId = null;
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field ClusterId had invalid length {length}");
+                    }
+                    else
+                    {
+                        ClusterId = reader.ReadString(length);
+                    }
+                    break;
+                }
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (ClusterId is not null)
@@ -115,8 +172,16 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
         return true;
     }
 
-    public sealed class TopicSnapshotMessage: Message, IEquatable<TopicSnapshotMessage>
+    public sealed class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The name of the topic to fetch
         /// </summary>
@@ -129,23 +194,69 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
 
         public TopicSnapshotMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TopicSnapshotMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of TopicSnapshotMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Partitions was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<PartitionSnapshotMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new PartitionSnapshotMessage(reader, version));
+                    }
+                    Partitions = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -175,8 +286,16 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
         }
     }
 
-    public sealed class PartitionSnapshotMessage: Message, IEquatable<PartitionSnapshotMessage>
+    public sealed class PartitionSnapshotMessage: IMessage, IEquatable<PartitionSnapshotMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index
         /// </summary>
@@ -199,23 +318,42 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
 
         public PartitionSnapshotMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public PartitionSnapshotMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of PartitionSnapshotMessage");
+            }
+            Partition = reader.ReadInt();
+            CurrentLeaderEpoch = reader.ReadInt();
+            {
+                SnapshotId = new SnapshotIdMessage(reader, version);
+            }
+            Position = reader.ReadLong();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(Partition);
@@ -239,8 +377,16 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
         }
     }
 
-    public sealed class SnapshotIdMessage: Message, IEquatable<SnapshotIdMessage>
+    public sealed class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// 
         /// </summary>
@@ -253,23 +399,38 @@ public sealed class FetchSnapshotRequestMessage: RequestMessage, IEquatable<Fetc
 
         public SnapshotIdMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public SnapshotIdMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
+            }
+            EndOffset = reader.ReadLong();
+            Epoch = reader.ReadInt();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);

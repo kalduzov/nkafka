@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class UnregisterBrokerResponseMessage: ResponseMessage, IEquatable<UnregisterBrokerResponseMessage>
+public sealed class UnregisterBrokerResponseMessage: IResponseMessage, IEquatable<UnregisterBrokerResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// Duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The top-level error message, or `null` if there was no top-level error.
@@ -49,27 +65,54 @@ public sealed class UnregisterBrokerResponseMessage: ResponseMessage, IEquatable
 
     public UnregisterBrokerResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public UnregisterBrokerResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        ErrorCode = reader.ReadShort();
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ErrorMessage = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ErrorMessage had invalid length {length}");
+            }
+            else
+            {
+                ErrorMessage = reader.ReadString(length);
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
             writer.WriteVarUInt(0);

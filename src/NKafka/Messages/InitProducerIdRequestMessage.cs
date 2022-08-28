@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class InitProducerIdRequestMessage: RequestMessage, IEquatable<InitProducerIdRequestMessage>
+public sealed class InitProducerIdRequestMessage: IRequestMessage, IEquatable<InitProducerIdRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiKeys ApiKey => ApiKeys.InitProducerId;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
     /// </summary>
@@ -59,25 +69,75 @@ public sealed class InitProducerIdRequestMessage: RequestMessage, IEquatable<Ini
 
     public InitProducerIdRequestMessage()
     {
-        ApiKey = ApiKeys.InitProducerId;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public InitProducerIdRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.InitProducerId;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version2)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                TransactionalId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field TransactionalId had invalid length {length}");
+            }
+            else
+            {
+                TransactionalId = reader.ReadString(length);
+            }
+        }
+        TransactionTimeoutMs = reader.ReadInt();
+        if (version >= ApiVersions.Version3)
+        {
+            ProducerId = reader.ReadLong();
+        }
+        else
+        {
+            ProducerId = -1;
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            ProducerEpoch = reader.ReadShort();
+        }
+        else
+        {
+            ProducerEpoch = -1;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (TransactionalId is null)

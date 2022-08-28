@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage, IEquatable<ListPartitionReassignmentsRequestMessage>
+public sealed class ListPartitionReassignmentsRequestMessage: IRequestMessage, IEquatable<ListPartitionReassignmentsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.ListPartitionReassignments;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The time in ms to wait for the request to complete.
     /// </summary>
@@ -49,25 +59,50 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage, IE
 
     public ListPartitionReassignmentsRequestMessage()
     {
-        ApiKey = ApiKeys.ListPartitionReassignments;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public ListPartitionReassignmentsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ListPartitionReassignments;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        TimeoutMs = reader.ReadInt();
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                Topics = null;
+            }
+            else
+            {
+                var newCollection = new List<ListPartitionReassignmentsTopicsMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new ListPartitionReassignmentsTopicsMessage(reader, version));
+                }
+                Topics = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(TimeoutMs);
@@ -99,8 +134,16 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage, IE
         return true;
     }
 
-    public sealed class ListPartitionReassignmentsTopicsMessage: Message, IEquatable<ListPartitionReassignmentsTopicsMessage>
+    public sealed class ListPartitionReassignmentsTopicsMessage: IMessage, IEquatable<ListPartitionReassignmentsTopicsMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name
         /// </summary>
@@ -113,23 +156,69 @@ public sealed class ListPartitionReassignmentsRequestMessage: RequestMessage, IE
 
         public ListPartitionReassignmentsTopicsMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ListPartitionReassignmentsTopicsMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ListPartitionReassignmentsTopicsMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field PartitionIndexes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    PartitionIndexes = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

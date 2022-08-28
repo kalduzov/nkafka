@@ -34,9 +34,9 @@ public class SendMessage
     /// <summary>
     /// 
     /// </summary>
-    public RequestMessage Content { get; set; }
+    public IRequestMessage Content { get; set; }
 
-    public SendMessage(RequestHeader header, RequestMessage content)
+    public SendMessage(RequestHeader header, IRequestMessage content)
     {
         Header = header;
         Content = content;

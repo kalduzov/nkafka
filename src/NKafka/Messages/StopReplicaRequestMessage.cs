@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopReplicaRequestMessage>
+public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopReplicaRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.StopReplica;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The controller id.
     /// </summary>
@@ -74,25 +84,140 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
 
     public StopReplicaRequestMessage()
     {
-        ApiKey = ApiKeys.StopReplica;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public StopReplicaRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.StopReplica;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ControllerId = reader.ReadInt();
+        ControllerEpoch = reader.ReadInt();
+        if (version >= ApiVersions.Version1)
+        {
+            BrokerEpoch = reader.ReadLong();
+        }
+        else
+        {
+            BrokerEpoch = -1;
+        }
+        if (version <= ApiVersions.Version2)
+        {
+            DeletePartitions = reader.ReadByte() != 0;
+        }
+        else
+        {
+            DeletePartitions = false;
+        }
+        if (version <= ApiVersions.Version0)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadInt();
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field UngroupedPartitions was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<StopReplicaPartitionV0Message>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new StopReplicaPartitionV0Message(reader, version));
+                }
+                UngroupedPartitions = newCollection;
+            }
+        }
+        else
+        {
+            UngroupedPartitions = new ();
+        }
+        if (version >= ApiVersions.Version1 && version <= ApiVersions.Version2)
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<StopReplicaTopicV1Message>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new StopReplicaTopicV1Message(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<StopReplicaTopicV1Message>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new StopReplicaTopicV1Message(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        else
+        {
+            Topics = new ();
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field TopicStates was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<StopReplicaTopicStateMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new StopReplicaTopicStateMessage(reader, version));
+                }
+                TopicStates = newCollection;
+            }
+        }
+        else
+        {
+            TopicStates = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ControllerId);
@@ -194,8 +319,16 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
         return true;
     }
 
-    public sealed class StopReplicaPartitionV0Message: Message, IEquatable<StopReplicaPartitionV0Message>
+    public sealed class StopReplicaPartitionV0Message: IMessage, IEquatable<StopReplicaPartitionV0Message>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -208,23 +341,37 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
 
         public StopReplicaPartitionV0Message()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public StopReplicaPartitionV0Message(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            {
+                int length;
+                length = reader.ReadShort();
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            PartitionIndex = reader.ReadInt();
+            UnknownTaggedFields = null;
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version > ApiVersions.Version0)
             {
@@ -256,8 +403,16 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
         }
     }
 
-    public sealed class StopReplicaTopicV1Message: Message, IEquatable<StopReplicaTopicV1Message>
+    public sealed class StopReplicaTopicV1Message: IMessage, IEquatable<StopReplicaTopicV1Message>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -270,23 +425,82 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
 
         public StopReplicaTopicV1Message()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public StopReplicaTopicV1Message(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version2)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field PartitionIndexes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    PartitionIndexes = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version1 || version > ApiVersions.Version2)
             {
@@ -344,8 +558,16 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
         }
     }
 
-    public sealed class StopReplicaTopicStateMessage: Message, IEquatable<StopReplicaTopicStateMessage>
+    public sealed class StopReplicaTopicStateMessage: IMessage, IEquatable<StopReplicaTopicStateMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -358,23 +580,69 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
 
         public StopReplicaTopicStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public StopReplicaTopicStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of StopReplicaTopicStateMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field PartitionStates was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<StopReplicaPartitionStateMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new StopReplicaPartitionStateMessage(reader, version));
+                    }
+                    PartitionStates = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version3)
             {
@@ -408,8 +676,16 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
         }
     }
 
-    public sealed class StopReplicaPartitionStateMessage: Message, IEquatable<StopReplicaPartitionStateMessage>
+    public sealed class StopReplicaPartitionStateMessage: IMessage, IEquatable<StopReplicaPartitionStateMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index.
         /// </summary>
@@ -427,23 +703,39 @@ public sealed class StopReplicaRequestMessage: RequestMessage, IEquatable<StopRe
 
         public StopReplicaPartitionStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version3;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public StopReplicaPartitionStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version3;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of StopReplicaPartitionStateMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            LeaderEpoch = reader.ReadInt();
+            DeletePartition = reader.ReadByte() != 0;
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

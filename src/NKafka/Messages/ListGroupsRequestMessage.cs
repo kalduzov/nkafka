@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ListGroupsRequestMessage: RequestMessage, IEquatable<ListGroupsRequestMessage>
+public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGroupsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiKeys ApiKey => ApiKeys.ListGroups;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The states of the groups we want to list. If empty all groups are returned with their state.
     /// </summary>
@@ -44,25 +54,70 @@ public sealed class ListGroupsRequestMessage: RequestMessage, IEquatable<ListGro
 
     public ListGroupsRequestMessage()
     {
-        ApiKey = ApiKeys.ListGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public ListGroupsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ListGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version4)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field StatesFilter was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<string>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    int length;
+                    length = reader.ReadVarUInt() - 1;
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field StatesFilter element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field StatesFilter element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
+                }
+                StatesFilter = newCollection;
+            }
+        }
+        else
+        {
+            StatesFilter = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version4)

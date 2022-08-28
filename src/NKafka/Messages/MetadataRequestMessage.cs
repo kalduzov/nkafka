@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class MetadataRequestMessage: RequestMessage, IEquatable<MetadataRequestMessage>
+public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<MetadataRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+    public ApiKeys ApiKey => ApiKeys.Metadata;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The topics to fetch metadata for.
     /// </summary>
@@ -59,25 +69,104 @@ public sealed class MetadataRequestMessage: RequestMessage, IEquatable<MetadataR
 
     public MetadataRequestMessage()
     {
-        ApiKey = ApiKeys.Metadata;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
     }
 
     public MetadataRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.Metadata;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version9)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    Topics = null;
+                }
+                else
+                {
+                    var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    if (version >= ApiVersions.Version1)
+                    {
+                        Topics = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                }
+                else
+                {
+                    var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        if (version >= ApiVersions.Version4)
+        {
+            AllowAutoTopicCreation = reader.ReadByte() != 0;
+        }
+        else
+        {
+            AllowAutoTopicCreation = true;
+        }
+        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        {
+            IncludeClusterAuthorizedOperations = reader.ReadByte() != 0;
+        }
+        else
+        {
+            IncludeClusterAuthorizedOperations = false;
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            IncludeTopicAuthorizedOperations = reader.ReadByte() != 0;
+        }
+        else
+        {
+            IncludeTopicAuthorizedOperations = false;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version9)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version9)
@@ -175,8 +264,16 @@ public sealed class MetadataRequestMessage: RequestMessage, IEquatable<MetadataR
         return true;
     }
 
-    public sealed class MetadataRequestTopicMessage: Message, IEquatable<MetadataRequestTopicMessage>
+    public sealed class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic id.
         /// </summary>
@@ -189,23 +286,77 @@ public sealed class MetadataRequestMessage: RequestMessage, IEquatable<MetadataR
 
         public MetadataRequestTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
         public MetadataRequestTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MetadataRequestTopicMessage");
+            }
+            if (version >= ApiVersions.Version10)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version9)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    if (version >= ApiVersions.Version10)
+                    {
+                        Name = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Name was serialized as null");
+                    }
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version9)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             if (version >= ApiVersions.Version10)

@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class EnvelopeResponseMessage: ResponseMessage, IEquatable<EnvelopeResponseMessage>
+public sealed class EnvelopeResponseMessage: IResponseMessage, IEquatable<EnvelopeResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The embedded response header and data.
     /// </summary>
@@ -47,25 +57,50 @@ public sealed class EnvelopeResponseMessage: ResponseMessage, IEquatable<Envelop
     /// </summary>
     public short ErrorCode { get; set; } = 0;
 
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
     public EnvelopeResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public EnvelopeResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ResponseData = null;
+            }
+            else
+            {
+                ResponseData = reader.ReadBytes(length);
+            }
+        }
+        ErrorCode = reader.ReadShort();
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (ResponseData is null)
@@ -77,7 +112,7 @@ public sealed class EnvelopeResponseMessage: ResponseMessage, IEquatable<Envelop
             writer.WriteVarUInt(ResponseData.Length + 1);
             writer.WriteBytes(ResponseData);
         }
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt(numTaggedFields);

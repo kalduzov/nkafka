@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
+public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.AlterUserScramCredentials;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The SCRAM credentials to remove.
     /// </summary>
@@ -49,25 +59,66 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEq
 
     public AlterUserScramCredentialsRequestMessage()
     {
-        ApiKey = ApiKeys.AlterUserScramCredentials;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public AlterUserScramCredentialsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterUserScramCredentials;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Deletions was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<ScramCredentialDeletionMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new ScramCredentialDeletionMessage(reader, version));
+                }
+                Deletions = newCollection;
+            }
+        }
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Upsertions was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<ScramCredentialUpsertionMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new ScramCredentialUpsertionMessage(reader, version));
+                }
+                Upsertions = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteVarUInt(Deletions.Count + 1);
@@ -96,8 +147,16 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEq
         return true;
     }
 
-    public sealed class ScramCredentialDeletionMessage: Message, IEquatable<ScramCredentialDeletionMessage>
+    public sealed class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The user name.
         /// </summary>
@@ -110,23 +169,53 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEq
 
         public ScramCredentialDeletionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ScramCredentialDeletionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ScramCredentialDeletionMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            Mechanism = reader.ReadSByte();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -152,8 +241,16 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEq
         }
     }
 
-    public sealed class ScramCredentialUpsertionMessage: Message, IEquatable<ScramCredentialUpsertionMessage>
+    public sealed class ScramCredentialUpsertionMessage: IMessage, IEquatable<ScramCredentialUpsertionMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The user name.
         /// </summary>
@@ -181,23 +278,78 @@ public sealed class AlterUserScramCredentialsRequestMessage: RequestMessage, IEq
 
         public ScramCredentialUpsertionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public ScramCredentialUpsertionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ScramCredentialUpsertionMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            Mechanism = reader.ReadSByte();
+            Iterations = reader.ReadInt();
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Salt was serialized as null");
+                }
+                else
+                {
+                    Salt = reader.ReadBytes(length);
+                }
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field SaltedPassword was serialized as null");
+                }
+                else
+                {
+                    SaltedPassword = reader.ReadBytes(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

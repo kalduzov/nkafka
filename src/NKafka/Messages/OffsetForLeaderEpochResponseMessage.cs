@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
+public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// Each topic we fetched offsets for.
     /// </summary>
@@ -44,23 +57,81 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquat
 
     public OffsetForLeaderEpochResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public OffsetForLeaderEpochResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version2)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    OffsetForLeaderTopicResultCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    OffsetForLeaderTopicResultCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)
@@ -109,8 +180,16 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquat
         return true;
     }
 
-    public sealed class OffsetForLeaderTopicResultMessage: Message, IEquatable<OffsetForLeaderTopicResultMessage>
+    public sealed class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -123,23 +202,100 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquat
 
         public OffsetForLeaderTopicResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public OffsetForLeaderTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetForLeaderTopicResultMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Topic was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Topic had invalid length {length}");
+                }
+                else
+                {
+                    Topic = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new EpochEndOffsetMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new EpochEndOffsetMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -198,12 +354,23 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquat
         }
     }
 
-    public sealed class EpochEndOffsetMessage: Message, IEquatable<EpochEndOffsetMessage>
+    public sealed class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The error code 0, or if there was no error.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
+
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
         /// The partition index.
@@ -222,26 +389,53 @@ public sealed class OffsetForLeaderEpochResponseMessage: ResponseMessage, IEquat
 
         public EpochEndOffsetMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public EpochEndOffsetMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of EpochEndOffsetMessage");
+            }
+            ErrorCode = reader.ReadShort();
+            Partition = reader.ReadInt();
+            if (version >= ApiVersions.Version1)
+            {
+                LeaderEpoch = reader.ReadInt();
+            }
+            else
+            {
+                LeaderEpoch = -1;
+            }
+            EndOffset = reader.ReadLong();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             writer.WriteInt(Partition);
             if (version >= ApiVersions.Version1)
             {

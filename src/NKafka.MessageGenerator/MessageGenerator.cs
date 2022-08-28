@@ -22,7 +22,7 @@ public class MessageGenerator: IMessageGenerator
         _headerGenerator = new HeaderGenerator(ns);
         _codeBuffer = new CodeBuffer();
         _structRegistry = new StructRegistry();
-        _readMethodGenerator = new ReadMethodGenerator(_codeBuffer);
+        _readMethodGenerator = new ReadMethodGenerator(_headerGenerator, _structRegistry, _codeBuffer);
         _writeMethodGenerator = new WriteMethodGenerator(_headerGenerator, _structRegistry, _codeBuffer);
     }
 
@@ -65,11 +65,11 @@ public class MessageGenerator: IMessageGenerator
 
         GenerateClassHeader(className, isTopLevel, topLevelMessage?.Type);
         _codeBuffer.IncrementIndent();
-        GenerateProperties(@struct, topLevelMessage?.Type);
+        GenerateProperties(@struct, isTopLevel, topLevelMessage, parentVersions);
         _codeBuffer.AppendLine();
         GenerateCtor(className, topLevelMessage, parentVersions);
         _codeBuffer.AppendLine();
-        _readMethodGenerator.Generate(className, @struct, parentVersions);
+        _readMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
         _codeBuffer.AppendLine();
         _writeMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
 
@@ -195,41 +195,18 @@ public class MessageGenerator: IMessageGenerator
     {
         _codeBuffer.AppendLine($"public {className}()");
         _codeBuffer.AppendLine("{");
-
-        if (topLevelMessage is not null && topLevelMessage.Type == MessageType.Request)
-        {
-            _codeBuffer.IncrementIndent();
-            var apiKey = (ApiKeys)topLevelMessage.ApiKey;
-            _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
-            _codeBuffer.DecrementIndent();
-        }
-
-        _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{versions.Lowest};");
-        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{versions.Highest};");
-        _codeBuffer.DecrementIndent();
-
         _codeBuffer.AppendLine("}");
         _codeBuffer.AppendLine();
         _codeBuffer.AppendLine($"public {className}(BufferReader reader, ApiVersions version)");
 
         _codeBuffer.IncrementIndent();
-        _codeBuffer.AppendLine(": base(reader, version)");
+        _codeBuffer.AppendLine(": this()");
         _codeBuffer.DecrementIndent();
 
         _codeBuffer.AppendLine("{");
 
         _codeBuffer.IncrementIndent();
         _codeBuffer.AppendLine("Read(reader, version);");
-
-        if (topLevelMessage is not null && topLevelMessage.Type == MessageType.Request)
-        {
-            var apiKey = (ApiKeys)topLevelMessage.ApiKey;
-            _codeBuffer.AppendLine($"ApiKey = ApiKeys.{apiKey};");
-        }
-
-        _codeBuffer.AppendLine($"LowestSupportedVersion = ApiVersions.Version{versions.Lowest};");
-        _codeBuffer.AppendLine($"HighestSupportedVersion = ApiVersions.Version{versions.Highest};");
         _codeBuffer.DecrementIndent();
 
         _codeBuffer.AppendLine("}");
@@ -237,20 +214,51 @@ public class MessageGenerator: IMessageGenerator
 
     private void GenerateProperties(
         StructSpecification structSpecification,
-        MessageType? messageType)
+        bool isTopLevel,
+        MessageSpecification topLevelMessage,
+        Versions versions)
     {
         var lastField = structSpecification.Fields.Last();
 
-        foreach (var fieldDescriptor in structSpecification.Fields)
+        _codeBuffer.AppendLine($"public ApiVersions LowestSupportedVersion => ApiVersions.Version{versions.Lowest};");
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine($"public ApiVersions HighestSupportedVersion => ApiVersions.Version{versions.Highest};");
+        _codeBuffer.AppendLine();
+
+        if (isTopLevel)
         {
-            if (messageType is MessageType.Response && fieldDescriptor.Name == "ThrottleTimeMs")
+            switch (topLevelMessage.Type)
             {
-                continue; //Данное поле есть в базовом классе
+                //Данные поля есть в базовом классе
+                case MessageType.Request:
+                {
+                    var apiKey = (ApiKeys)topLevelMessage.ApiKey;
+                    _codeBuffer.AppendLine($"public ApiKeys ApiKey => ApiKeys.{apiKey};");
+                    _codeBuffer.AppendLine();
+
+                    break;
+                }
             }
+        }
 
-            GenerateProperty(fieldDescriptor);
+        _codeBuffer.AppendLine("public ApiVersions Version {get; set;}");
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine("public List<TaggedField>? UnknownTaggedFields { get; set; } = null;");
+        _codeBuffer.AppendLine();
 
-            if (fieldDescriptor != lastField)
+        var containsThrottleTimeField = structSpecification.Fields.Any(x => x.Name == "ThrottleTimeMs");
+        
+        if (isTopLevel && topLevelMessage.Type == MessageType.Response && !containsThrottleTimeField)
+        {
+            _codeBuffer.AppendLine("public int ThrottleTimeMs { get; set; } = 0;");
+            _codeBuffer.AppendLine();
+        }
+
+        foreach (var field in structSpecification.Fields)
+        {
+            GenerateProperty(field);
+
+            if (field != lastField)
             {
                 _codeBuffer.AppendLine();
             }
@@ -267,6 +275,15 @@ public class MessageGenerator: IMessageGenerator
         var defaultValue = field.FieldDefault();
         var nullableMarker = defaultValue.Equals("null") ? "?" : string.Empty;
         _codeBuffer.AppendLine($"public {type}{nullableMarker} {field.Name} {{ get; set; }} = {defaultValue};");
+
+        if (field.Name != "ErrorCode")
+        {
+            return;
+        }
+
+        _codeBuffer.AppendLine();
+        _codeBuffer.AppendLine($"/// <inheritdoc />");
+        _codeBuffer.AppendLine("public ErrorCodes Code => (ErrorCodes)ErrorCode;");
     }
 
     private void GenerateClassHeader(string className, bool isTopLevel, MessageType? messageType)
@@ -279,14 +296,14 @@ public class MessageGenerator: IMessageGenerator
             {
                 MessageType.Request => "Request",
                 MessageType.Response => "Response",
-                MessageType.Header => className.StartsWith("Request") ? "Request" : "Response",
+                MessageType.Header => "",
                 _ => throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null)
             };
-            implementedInterfaces.Add(baseType + "Message");
+            implementedInterfaces.Add($"I{baseType}Message");
         }
         else
         {
-            implementedInterfaces.Add("Message");
+            implementedInterfaces.Add("IMessage");
         }
 
         implementedInterfaces.Add($"IEquatable<{className}>");

@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEquatable<IncrementalAlterConfigsRequestMessage>
+public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEquatable<IncrementalAlterConfigsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiKeys ApiKey => ApiKeys.IncrementalAlterConfigs;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The incremental updates for each resource.
     /// </summary>
@@ -49,25 +59,74 @@ public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEqua
 
     public IncrementalAlterConfigsRequestMessage()
     {
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public IncrementalAlterConfigsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.IncrementalAlterConfigs;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version1)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Resources was serialized as null");
+                }
+                else
+                {
+                    AlterConfigsResourceCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterConfigsResourceMessage(reader, version));
+                    }
+                    Resources = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Resources was serialized as null");
+                }
+                else
+                {
+                    AlterConfigsResourceCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterConfigsResourceMessage(reader, version));
+                    }
+                    Resources = newCollection;
+                }
+            }
+        }
+        ValidateOnly = reader.ReadByte() != 0;
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version1)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -113,8 +172,16 @@ public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEqua
         return true;
     }
 
-    public sealed class AlterConfigsResourceMessage: Message, IEquatable<AlterConfigsResourceMessage>
+    public sealed class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The resource type.
         /// </summary>
@@ -132,23 +199,101 @@ public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEqua
 
         public AlterConfigsResourceMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public AlterConfigsResourceMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterConfigsResourceMessage");
+            }
+            ResourceType = reader.ReadSByte();
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field ResourceName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ResourceName had invalid length {length}");
+                }
+                else
+                {
+                    ResourceName = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        AlterableConfigCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterableConfigMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        AlterableConfigCollection newCollection = new(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterableConfigMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteSByte(ResourceType);
@@ -208,8 +353,16 @@ public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEqua
         }
     }
 
-    public sealed class AlterableConfigMessage: Message, IEquatable<AlterableConfigMessage>
+    public sealed class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The configuration key name.
         /// </summary>
@@ -227,23 +380,86 @@ public sealed class IncrementalAlterConfigsRequestMessage: RequestMessage, IEqua
 
         public AlterableConfigMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public AlterableConfigMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterableConfigMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            ConfigOperation = reader.ReadSByte();
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Value = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Value had invalid length {length}");
+                }
+                else
+                {
+                    Value = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

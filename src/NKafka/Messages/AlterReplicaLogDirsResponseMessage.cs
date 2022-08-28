@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquatable<AlterReplicaLogDirsResponseMessage>
+public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquatable<AlterReplicaLogDirsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// Duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The results for each topic.
     /// </summary>
@@ -44,23 +57,74 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquata
 
     public AlterReplicaLogDirsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public AlterReplicaLogDirsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<AlterReplicaLogDirTopicResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterReplicaLogDirTopicResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<AlterReplicaLogDirTopicResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new AlterReplicaLogDirTopicResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -106,8 +170,16 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquata
         return true;
     }
 
-    public sealed class AlterReplicaLogDirTopicResultMessage: Message, IEquatable<AlterReplicaLogDirTopicResultMessage>
+    public sealed class AlterReplicaLogDirTopicResultMessage: IMessage, IEquatable<AlterReplicaLogDirTopicResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The name of the topic.
         /// </summary>
@@ -120,23 +192,100 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquata
 
         public AlterReplicaLogDirTopicResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version2)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirTopicResultMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<AlterReplicaLogDirPartitionResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterReplicaLogDirPartitionResultMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<AlterReplicaLogDirPartitionResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new AlterReplicaLogDirPartitionResultMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -194,8 +343,16 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquata
         }
     }
 
-    public sealed class AlterReplicaLogDirPartitionResultMessage: Message, IEquatable<AlterReplicaLogDirPartitionResultMessage>
+    public sealed class AlterReplicaLogDirPartitionResultMessage: IMessage, IEquatable<AlterReplicaLogDirPartitionResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index.
         /// </summary>
@@ -206,29 +363,50 @@ public sealed class AlterReplicaLogDirsResponseMessage: ResponseMessage, IEquata
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
         public AlterReplicaLogDirPartitionResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
         public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version2;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version2)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirPartitionResultMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            ErrorCode = reader.ReadShort();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersions.Version2)

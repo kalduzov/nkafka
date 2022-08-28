@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ControlledShutdownRequestMessage: RequestMessage, IEquatable<ControlledShutdownRequestMessage>
+public sealed class ControlledShutdownRequestMessage: IRequestMessage, IEquatable<ControlledShutdownRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.ControlledShutdown;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The id of the broker for which controlled shutdown has been requested.
     /// </summary>
@@ -49,25 +59,44 @@ public sealed class ControlledShutdownRequestMessage: RequestMessage, IEquatable
 
     public ControlledShutdownRequestMessage()
     {
-        ApiKey = ApiKeys.ControlledShutdown;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public ControlledShutdownRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ControlledShutdown;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        BrokerId = reader.ReadInt();
+        if (version >= ApiVersions.Version2)
+        {
+            BrokerEpoch = reader.ReadLong();
+        }
+        else
+        {
+            BrokerEpoch = -1;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(BrokerId);

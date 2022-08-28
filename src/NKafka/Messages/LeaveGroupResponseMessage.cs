@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<LeaveGroupResponseMessage>
+public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<LeaveGroupResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// List of leaving member responses.
@@ -49,30 +65,94 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<Leave
 
     public LeaveGroupResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public LeaveGroupResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version1)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        ErrorCode = reader.ReadShort();
+        if (version >= ApiVersions.Version3)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Members was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<MemberResponseMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MemberResponseMessage(reader, version));
+                    }
+                    Members = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Members was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<MemberResponseMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MemberResponseMessage(reader, version));
+                    }
+                    Members = newCollection;
+                }
+            }
+        }
+        else
+        {
+            Members = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersions.Version3)
         {
             if (version >= ApiVersions.Version4)
@@ -125,8 +205,16 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<Leave
         return true;
     }
 
-    public sealed class MemberResponseMessage: Message, IEquatable<MemberResponseMessage>
+    public sealed class MemberResponseMessage: IMessage, IEquatable<MemberResponseMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
@@ -142,25 +230,91 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<Leave
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
         public MemberResponseMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public MemberResponseMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MemberResponseMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field MemberId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field MemberId had invalid length {length}");
+                }
+                else
+                {
+                    MemberId = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    GroupInstanceId = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field GroupInstanceId had invalid length {length}");
+                }
+                else
+                {
+                    GroupInstanceId = reader.ReadString(length);
+                }
+            }
+            ErrorCode = reader.ReadShort();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version3)
             {
@@ -203,7 +357,7 @@ public sealed class LeaveGroupResponseMessage: ResponseMessage, IEquatable<Leave
                 }
                 writer.WriteBytes(stringBytes);
             }
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersions.Version4)

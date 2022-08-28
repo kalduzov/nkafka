@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeDelegationTokenRequestMessage: RequestMessage, IEquatable<DescribeDelegationTokenRequestMessage>
+public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEquatable<DescribeDelegationTokenRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.DescribeDelegationToken;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
@@ -44,25 +54,73 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage, IEqua
 
     public DescribeDelegationTokenRequestMessage()
     {
-        ApiKey = ApiKeys.DescribeDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DescribeDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    Owners = null;
+                }
+                else
+                {
+                    var newCollection = new List<DescribeDelegationTokenOwnerMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribeDelegationTokenOwnerMessage(reader, version));
+                    }
+                    Owners = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    Owners = null;
+                }
+                else
+                {
+                    var newCollection = new List<DescribeDelegationTokenOwnerMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribeDelegationTokenOwnerMessage(reader, version));
+                    }
+                    Owners = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)
@@ -121,8 +179,16 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage, IEqua
         return true;
     }
 
-    public sealed class DescribeDelegationTokenOwnerMessage: Message, IEquatable<DescribeDelegationTokenOwnerMessage>
+    public sealed class DescribeDelegationTokenOwnerMessage: IMessage, IEquatable<DescribeDelegationTokenOwnerMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The owner principal type.
         /// </summary>
@@ -135,23 +201,85 @@ public sealed class DescribeDelegationTokenRequestMessage: RequestMessage, IEqua
 
         public DescribeDelegationTokenOwnerMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DescribeDelegationTokenOwnerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribeDelegationTokenOwnerMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalType had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalType = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalName had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalName = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

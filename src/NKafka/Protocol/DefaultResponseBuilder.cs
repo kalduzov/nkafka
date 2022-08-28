@@ -27,7 +27,7 @@ namespace NKafka.Protocol
 {
     internal static partial class DefaultResponseBuilder
     {
-        public static ResponseMessage Build(ApiKeys apiKey, ApiVersions apiVersion, int responseLength, ReadOnlySpan<byte> span)
+        public static IResponseMessage Build(ApiKeys apiKey, ApiVersions apiVersion, int responseLength, ReadOnlySpan<byte> span)
         {
             var reader = new BufferReader(span);
 

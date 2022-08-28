@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<DescribeConfigsResponseMessage>
+public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable<DescribeConfigsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The results for each resource.
     /// </summary>
@@ -44,23 +57,74 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
 
     public DescribeConfigsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
     public DescribeConfigsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version4;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ThrottleTimeMs = reader.ReadInt();
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribeConfigsResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Results was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribeConfigsResultMessage(reader, version));
+                    }
+                    Results = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -106,12 +170,23 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
         return true;
     }
 
-    public sealed class DescribeConfigsResultMessage: Message, IEquatable<DescribeConfigsResultMessage>
+    public sealed class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
+
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
         /// The error message, or null if we were able to successfully describe the configurations.
@@ -135,26 +210,128 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
 
         public DescribeConfigsResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResultMessage");
+            }
+            ErrorCode = reader.ReadShort();
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    ErrorMessage = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ErrorMessage had invalid length {length}");
+                }
+                else
+                {
+                    ErrorMessage = reader.ReadString(length);
+                }
+            }
+            ResourceType = reader.ReadSByte();
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field ResourceName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ResourceName had invalid length {length}");
+                }
+                else
+                {
+                    ResourceName = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Configs was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
+                        }
+                        Configs = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
                 if (version >= ApiVersions.Version4)
@@ -235,8 +412,16 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
         }
     }
 
-    public sealed class DescribeConfigsResourceResultMessage: Message, IEquatable<DescribeConfigsResourceResultMessage>
+    public sealed class DescribeConfigsResourceResultMessage: IMessage, IEquatable<DescribeConfigsResourceResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The configuration name.
         /// </summary>
@@ -284,23 +469,182 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
 
         public DescribeConfigsResourceResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResourceResultMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Value = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Value had invalid length {length}");
+                }
+                else
+                {
+                    Value = reader.ReadString(length);
+                }
+            }
+            ReadOnly = reader.ReadByte() != 0;
+            if (version <= ApiVersions.Version0)
+            {
+                IsDefault = reader.ReadByte() != 0;
+            }
+            else
+            {
+                IsDefault = false;
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                ConfigSource = reader.ReadSByte();
+            }
+            else
+            {
+                ConfigSource = -1;
+            }
+            IsSensitive = reader.ReadByte() != 0;
+            if (version >= ApiVersions.Version1)
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Synonyms was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
+                        }
+                        Synonyms = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Synonyms was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
+                        }
+                        Synonyms = newCollection;
+                    }
+                }
+            }
+            else
+            {
+                Synonyms = new ();
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                ConfigType = reader.ReadSByte();
+            }
+            else
+            {
+                ConfigType = 0;
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Documentation = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Documentation had invalid length {length}");
+                }
+                else
+                {
+                    Documentation = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                Documentation = string.Empty;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -433,8 +777,16 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
         }
     }
 
-    public sealed class DescribeConfigsSynonymMessage: Message, IEquatable<DescribeConfigsSynonymMessage>
+    public sealed class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The synonym name.
         /// </summary>
@@ -452,23 +804,86 @@ public sealed class DescribeConfigsResponseMessage: ResponseMessage, IEquatable<
 
         public DescribeConfigsSynonymMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
         public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version4;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsSynonymMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Value = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Value had invalid length {length}");
+                }
+                else
+                {
+                    Value = reader.ReadString(length);
+                }
+            }
+            Source = reader.ReadSByte();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version1)
             {

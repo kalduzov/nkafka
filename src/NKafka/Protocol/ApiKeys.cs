@@ -24,6 +24,7 @@ namespace NKafka.Protocol;
 
 public enum ApiKeys : short
 {
+    None = -1,
     Produce = 0,
     Fetch = 1,
     ListOffsets = 2,

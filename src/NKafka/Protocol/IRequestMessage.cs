@@ -23,23 +23,7 @@
 
 namespace NKafka.Protocol;
 
-public abstract class RequestMessage: Message
+public interface IRequestMessage: IMessage
 {
-    /// <summary>
-    /// </summary>
-    public ApiKeys ApiKey { get; protected init; }
-
-    /// <summary>
-    /// Size payload after call <see cref="Message.Write"/> method
-    /// </summary>
-    public int Size { get; protected set; }
-
-    protected RequestMessage()
-    {
-    }
-
-    protected RequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-    }
+    public ApiKeys ApiKey { get; }
 }

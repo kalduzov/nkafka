@@ -35,12 +35,25 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslHandshakeResponseMessage: ResponseMessage, IEquatable<SaslHandshakeResponseMessage>
+public sealed class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<SaslHandshakeResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The mechanisms enabled in the server.
@@ -49,26 +62,54 @@ public sealed class SaslHandshakeResponseMessage: ResponseMessage, IEquatable<Sa
 
     public SaslHandshakeResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public SaslHandshakeResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ErrorCode = reader.ReadShort();
+        {
+            int arrayLength;
+            arrayLength = reader.ReadInt();
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Mechanisms was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<string>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    int length;
+                    length = reader.ReadShort();
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field Mechanisms element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field Mechanisms element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
+                }
+                Mechanisms = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         writer.WriteInt(Mechanisms.Count);
         foreach (var element in Mechanisms)
         {

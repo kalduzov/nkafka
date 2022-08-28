@@ -35,41 +35,108 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEquatable<DescribeDelegationTokenResponseMessage>
+public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IEquatable<DescribeDelegationTokenResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The tokens.
     /// </summary>
     public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new ();
 
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
 
     public DescribeDelegationTokenResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public DescribeDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ErrorCode = reader.ReadShort();
+        {
+            if (version >= ApiVersions.Version2)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Tokens was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DescribedDelegationTokenMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribedDelegationTokenMessage(reader, version));
+                    }
+                    Tokens = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Tokens was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<DescribedDelegationTokenMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DescribedDelegationTokenMessage(reader, version));
+                    }
+                    Tokens = newCollection;
+                }
+            }
+        }
+        ThrottleTimeMs = reader.ReadInt();
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersions.Version2)
         {
             writer.WriteVarUInt(Tokens.Count + 1);
@@ -113,8 +180,16 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEq
         return true;
     }
 
-    public sealed class DescribedDelegationTokenMessage: Message, IEquatable<DescribedDelegationTokenMessage>
+    public sealed class DescribedDelegationTokenMessage: IMessage, IEquatable<DescribedDelegationTokenMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The token principal type.
         /// </summary>
@@ -167,23 +242,210 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEq
 
         public DescribedDelegationTokenMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DescribedDelegationTokenMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribedDelegationTokenMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalType had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalType = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalName had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalName = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TokenRequesterPrincipalType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TokenRequesterPrincipalType had invalid length {length}");
+                }
+                else
+                {
+                    TokenRequesterPrincipalType = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                TokenRequesterPrincipalType = string.Empty;
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TokenRequesterPrincipalName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TokenRequesterPrincipalName had invalid length {length}");
+                }
+                else
+                {
+                    TokenRequesterPrincipalName = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                TokenRequesterPrincipalName = string.Empty;
+            }
+            IssueTimestamp = reader.ReadLong();
+            ExpiryTimestamp = reader.ReadLong();
+            MaxTimestamp = reader.ReadLong();
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TokenId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TokenId had invalid length {length}");
+                }
+                else
+                {
+                    TokenId = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadInt();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Hmac was serialized as null");
+                }
+                else
+                {
+                    Hmac = reader.ReadBytes(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version2)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Renewers was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribedDelegationTokenRenewerMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribedDelegationTokenRenewerMessage(reader, version));
+                        }
+                        Renewers = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Renewers was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<DescribedDelegationTokenRenewerMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new DescribedDelegationTokenRenewerMessage(reader, version));
+                        }
+                        Renewers = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -307,8 +569,16 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEq
         }
     }
 
-    public sealed class DescribedDelegationTokenRenewerMessage: Message, IEquatable<DescribedDelegationTokenRenewerMessage>
+    public sealed class DescribedDelegationTokenRenewerMessage: IMessage, IEquatable<DescribedDelegationTokenRenewerMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The renewer principal type
         /// </summary>
@@ -321,23 +591,85 @@ public sealed class DescribeDelegationTokenResponseMessage: ResponseMessage, IEq
 
         public DescribedDelegationTokenRenewerMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public DescribedDelegationTokenRenewerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DescribedDelegationTokenRenewerMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalType had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalType = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version2)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field PrincipalName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field PrincipalName had invalid length {length}");
+                }
+                else
+                {
+                    PrincipalName = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version2)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<LeaderAndIsrRequestMessage>
+public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<LeaderAndIsrRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+    public ApiKeys ApiKey => ApiKeys.LeaderAndIsr;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The current controller ID.
     /// </summary>
@@ -74,25 +84,156 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
 
     public LeaderAndIsrRequestMessage()
     {
-        ApiKey = ApiKeys.LeaderAndIsr;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
     }
 
     public LeaderAndIsrRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.LeaderAndIsr;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ControllerId = reader.ReadInt();
+        ControllerEpoch = reader.ReadInt();
+        if (version >= ApiVersions.Version2)
+        {
+            BrokerEpoch = reader.ReadLong();
+        }
+        else
+        {
+            BrokerEpoch = -1;
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            Type = reader.ReadSByte();
+        }
+        else
+        {
+            Type = 0;
+        }
+        if (version <= ApiVersions.Version1)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadInt();
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field UngroupedPartitionStates was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
+                }
+                UngroupedPartitionStates = newCollection;
+            }
+        }
+        else
+        {
+            UngroupedPartitionStates = new ();
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field TopicStates was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<LeaderAndIsrTopicStateMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new LeaderAndIsrTopicStateMessage(reader, version));
+                    }
+                    TopicStates = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field TopicStates was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<LeaderAndIsrTopicStateMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new LeaderAndIsrTopicStateMessage(reader, version));
+                    }
+                    TopicStates = newCollection;
+                }
+            }
+        }
+        else
+        {
+            TopicStates = new ();
+        }
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field LiveLeaders was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<LeaderAndIsrLiveLeaderMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new LeaderAndIsrLiveLeaderMessage(reader, version));
+                    }
+                    LiveLeaders = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field LiveLeaders was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<LeaderAndIsrLiveLeaderMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new LeaderAndIsrLiveLeaderMessage(reader, version));
+                    }
+                    LiveLeaders = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ControllerId);
@@ -195,8 +336,16 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
         return true;
     }
 
-    public sealed class LeaderAndIsrTopicStateMessage: Message, IEquatable<LeaderAndIsrTopicStateMessage>
+    public sealed class LeaderAndIsrTopicStateMessage: IMessage, IEquatable<LeaderAndIsrTopicStateMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -214,23 +363,108 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
 
         public LeaderAndIsrTopicStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrTopicStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version6)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrTopicStateMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
+            }
+            {
+                if (version >= ApiVersions.Version4)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field PartitionStates was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
+                        }
+                        PartitionStates = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field PartitionStates was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<LeaderAndIsrPartitionStateMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new LeaderAndIsrPartitionStateMessage(reader, version));
+                        }
+                        PartitionStates = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version2)
             {
@@ -296,8 +530,16 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
         }
     }
 
-    public sealed class LeaderAndIsrLiveLeaderMessage: Message, IEquatable<LeaderAndIsrLiveLeaderMessage>
+    public sealed class LeaderAndIsrLiveLeaderMessage: IMessage, IEquatable<LeaderAndIsrLiveLeaderMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The leader's broker ID.
         /// </summary>
@@ -315,23 +557,64 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
 
         public LeaderAndIsrLiveLeaderMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrLiveLeaderMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version6)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrLiveLeaderMessage");
+            }
+            BrokerId = reader.ReadInt();
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field HostName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field HostName had invalid length {length}");
+                }
+                else
+                {
+                    HostName = reader.ReadString(length);
+                }
+            }
+            Port = reader.ReadInt();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(BrokerId);
@@ -375,8 +658,16 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
         }
     }
 
-    public sealed class LeaderAndIsrPartitionStateMessage: Message, IEquatable<LeaderAndIsrPartitionStateMessage>
+    public sealed class LeaderAndIsrPartitionStateMessage: IMessage, IEquatable<LeaderAndIsrPartitionStateMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.  This is only present in v0 or v1.
         /// </summary>
@@ -439,23 +730,187 @@ public sealed class LeaderAndIsrRequestMessage: RequestMessage, IEquatable<Leade
 
         public LeaderAndIsrPartitionStateMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public LeaderAndIsrPartitionStateMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version6)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrPartitionStateMessage");
+            }
+            if (version <= ApiVersions.Version1)
+            {
+                int length;
+                length = reader.ReadShort();
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                TopicName = string.Empty;
+            }
+            PartitionIndex = reader.ReadInt();
+            ControllerEpoch = reader.ReadInt();
+            Leader = reader.ReadInt();
+            LeaderEpoch = reader.ReadInt();
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version4)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Isr was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    Isr = newCollection;
+                }
+            }
+            PartitionEpoch = reader.ReadInt();
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version4)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Replicas was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    Replicas = newCollection;
+                }
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version4)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field AddingReplicas was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    AddingReplicas = newCollection;
+                }
+            }
+            else
+            {
+                AddingReplicas = new ();
+            }
+            if (version >= ApiVersions.Version3)
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version4)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field RemovingReplicas was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    RemovingReplicas = newCollection;
+                }
+            }
+            else
+            {
+                RemovingReplicas = new ();
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                IsNew = reader.ReadByte() != 0;
+            }
+            else
+            {
+                IsNew = false;
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                LeaderRecoveryState = reader.ReadSByte();
+            }
+            else
+            {
+                LeaderRecoveryState = 0;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             if (version <= ApiVersions.Version1)

@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<TxnOffsetCommitRequestMessage>
+public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<TxnOffsetCommitRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiKeys ApiKey => ApiKeys.TxnOffsetCommit;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The ID of the transaction.
     /// </summary>
@@ -79,25 +89,171 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<Tx
 
     public TxnOffsetCommitRequestMessage()
     {
-        ApiKey = ApiKeys.TxnOffsetCommit;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public TxnOffsetCommitRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.TxnOffsetCommit;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field TransactionalId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field TransactionalId had invalid length {length}");
+            }
+            else
+            {
+                TransactionalId = reader.ReadString(length);
+            }
+        }
+        {
+            int length;
+            if (version >= ApiVersions.Version3)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field GroupId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupId had invalid length {length}");
+            }
+            else
+            {
+                GroupId = reader.ReadString(length);
+            }
+        }
+        ProducerId = reader.ReadLong();
+        ProducerEpoch = reader.ReadShort();
+        if (version >= ApiVersions.Version3)
+        {
+            GenerationId = reader.ReadInt();
+        }
+        else
+        {
+            GenerationId = -1;
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field MemberId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field MemberId had invalid length {length}");
+            }
+            else
+            {
+                MemberId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            MemberId = string.Empty;
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                GroupInstanceId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupInstanceId had invalid length {length}");
+            }
+            else
+            {
+                GroupInstanceId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            GroupInstanceId = null;
+        }
+        {
+            if (version >= ApiVersions.Version3)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         {
@@ -214,8 +370,16 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<Tx
         return true;
     }
 
-    public sealed class TxnOffsetCommitRequestTopicMessage: Message, IEquatable<TxnOffsetCommitRequestTopicMessage>
+    public sealed class TxnOffsetCommitRequestTopicMessage: IMessage, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -228,23 +392,100 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<Tx
 
         public TxnOffsetCommitRequestTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestTopicMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version3)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                if (version >= ApiVersions.Version3)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version3)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -302,8 +543,16 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<Tx
         }
     }
 
-    public sealed class TxnOffsetCommitRequestPartitionMessage: Message, IEquatable<TxnOffsetCommitRequestPartitionMessage>
+    public sealed class TxnOffsetCommitRequestPartitionMessage: IMessage, IEquatable<TxnOffsetCommitRequestPartitionMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The index of the partition within the topic.
         /// </summary>
@@ -326,23 +575,72 @@ public sealed class TxnOffsetCommitRequestMessage: RequestMessage, IEquatable<Tx
 
         public TxnOffsetCommitRequestPartitionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestPartitionMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            CommittedOffset = reader.ReadLong();
+            if (version >= ApiVersions.Version2)
+            {
+                CommittedLeaderEpoch = reader.ReadInt();
+            }
+            else
+            {
+                CommittedLeaderEpoch = -1;
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version3)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    CommittedMetadata = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field CommittedMetadata had invalid length {length}");
+                }
+                else
+                {
+                    CommittedMetadata = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version3)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

@@ -78,14 +78,14 @@ public interface IBroker : IDisposable, IAsyncDisposable
     /// Отправка сообщений брокеру по типу fire and forget
     /// </summary>
     internal void Send<TRequestMessage>(TRequestMessage message)
-        where TRequestMessage : RequestMessage;
+        where TRequestMessage : IRequestMessage;
 
     /// <summary>
     /// Отправка сообщения брокеру и ожидание получения результата этого сообщения
     /// </summary>
     internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-        where TResponseMessage : ResponseMessage
-        where TRequestMessage : RequestMessage;
+        where TResponseMessage : IResponseMessage
+        where TRequestMessage : IRequestMessage;
 
     /// <summary>
     /// Обновляет информацию о брокере

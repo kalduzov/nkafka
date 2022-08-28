@@ -42,6 +42,6 @@ internal interface IKafkaConnector: IDisposable
         TRequestMessage message,
         bool isInternalRequest,
         CancellationToken token)
-        where TResponseMessage : ResponseMessage
-        where TRequestMessage : RequestMessage;
+        where TResponseMessage : IResponseMessage
+        where TRequestMessage : IRequestMessage;
 }

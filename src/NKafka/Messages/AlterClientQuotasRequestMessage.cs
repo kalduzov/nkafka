@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<AlterClientQuotasRequestMessage>
+public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable<AlterClientQuotasRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiKeys ApiKey => ApiKeys.AlterClientQuotas;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The quota configuration entries to alter.
     /// </summary>
@@ -49,25 +59,74 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
 
     public AlterClientQuotasRequestMessage()
     {
-        ApiKey = ApiKeys.AlterClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public AlterClientQuotasRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.AlterClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version1)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Entries was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<EntryDataMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new EntryDataMessage(reader, version));
+                    }
+                    Entries = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Entries was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<EntryDataMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new EntryDataMessage(reader, version));
+                    }
+                    Entries = newCollection;
+                }
+            }
+        }
+        ValidateOnly = reader.ReadByte() != 0;
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version1)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -113,8 +172,16 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
         return true;
     }
 
-    public sealed class EntryDataMessage: Message, IEquatable<EntryDataMessage>
+    public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The quota entity to alter.
         /// </summary>
@@ -127,23 +194,115 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
 
         public EntryDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntryDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of EntryDataMessage");
+            }
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Entity was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<EntityDataMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new EntityDataMessage(reader, version));
+                        }
+                        Entity = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Entity was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<EntityDataMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new EntityDataMessage(reader, version));
+                        }
+                        Entity = newCollection;
+                    }
+                }
+            }
+            {
+                if (version >= ApiVersions.Version1)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Ops was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<OpDataMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new OpDataMessage(reader, version));
+                        }
+                        Ops = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Ops was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<OpDataMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new OpDataMessage(reader, version));
+                        }
+                        Ops = newCollection;
+                    }
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             if (version >= ApiVersions.Version1)
@@ -205,8 +364,16 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
         }
     }
 
-    public sealed class EntityDataMessage: Message, IEquatable<EntityDataMessage>
+    public sealed class EntityDataMessage: IMessage, IEquatable<EntityDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The entity type.
         /// </summary>
@@ -219,23 +386,85 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
 
         public EntityDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public EntityDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of EntityDataMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field EntityType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field EntityType had invalid length {length}");
+                }
+                else
+                {
+                    EntityType = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    EntityName = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field EntityName had invalid length {length}");
+                }
+                else
+                {
+                    EntityName = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -301,8 +530,16 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
         }
     }
 
-    public sealed class OpDataMessage: Message, IEquatable<OpDataMessage>
+    public sealed class OpDataMessage: IMessage, IEquatable<OpDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The quota configuration key.
         /// </summary>
@@ -320,23 +557,64 @@ public sealed class AlterClientQuotasRequestMessage: RequestMessage, IEquatable<
 
         public OpDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public OpDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OpDataMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Key was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Key had invalid length {length}");
+                }
+                else
+                {
+                    Key = reader.ReadString(length);
+                }
+            }
+            Value = reader.ReadDouble();
+            Remove = reader.ReadByte() != 0;
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

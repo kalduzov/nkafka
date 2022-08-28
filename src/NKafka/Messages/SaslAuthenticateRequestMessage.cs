@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslAuthenticateRequestMessage: RequestMessage, IEquatable<SaslAuthenticateRequestMessage>
+public sealed class SaslAuthenticateRequestMessage: IRequestMessage, IEquatable<SaslAuthenticateRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiKeys ApiKey => ApiKeys.SaslAuthenticate;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
     /// </summary>
@@ -44,25 +54,54 @@ public sealed class SaslAuthenticateRequestMessage: RequestMessage, IEquatable<S
 
     public SaslAuthenticateRequestMessage()
     {
-        ApiKey = ApiKeys.SaslAuthenticate;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public SaslAuthenticateRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.SaslAuthenticate;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version2)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadInt();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field AuthBytes was serialized as null");
+            }
+            else
+            {
+                AuthBytes = reader.ReadBytes(length);
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)

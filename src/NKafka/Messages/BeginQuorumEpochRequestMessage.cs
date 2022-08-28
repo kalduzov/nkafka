@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<BeginQuorumEpochRequestMessage>
+public sealed class BeginQuorumEpochRequestMessage: IRequestMessage, IEquatable<BeginQuorumEpochRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.BeginQuorumEpoch;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// 
     /// </summary>
@@ -49,25 +59,53 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<B
 
     public BeginQuorumEpochRequestMessage()
     {
-        ApiKey = ApiKeys.BeginQuorumEpoch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public BeginQuorumEpochRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.BeginQuorumEpoch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            length = reader.ReadShort();
+            if (length < 0)
+            {
+                ClusterId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ClusterId had invalid length {length}");
+            }
+            else
+            {
+                ClusterId = reader.ReadString(length);
+            }
+        }
+        {
+            int arrayLength;
+            arrayLength = reader.ReadInt();
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Topics was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<TopicDataMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new TopicDataMessage(reader, version));
+                }
+                Topics = newCollection;
+            }
+        }
+        UnknownTaggedFields = null;
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (ClusterId is null)
@@ -103,8 +141,16 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<B
         return true;
     }
 
-    public sealed class TopicDataMessage: Message, IEquatable<TopicDataMessage>
+    public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -117,23 +163,57 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<B
 
         public TopicDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public TopicDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of TopicDataMessage");
+            }
+            {
+                int length;
+                length = reader.ReadShort();
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TopicName was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TopicName had invalid length {length}");
+                }
+                else
+                {
+                    TopicName = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Partitions was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<PartitionDataMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new PartitionDataMessage(reader, version));
+                    }
+                    Partitions = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {
@@ -165,8 +245,16 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<B
         }
     }
 
-    public sealed class PartitionDataMessage: Message, IEquatable<PartitionDataMessage>
+    public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition index.
         /// </summary>
@@ -184,23 +272,27 @@ public sealed class BeginQuorumEpochRequestMessage: RequestMessage, IEquatable<B
 
         public PartitionDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
         public PartitionDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version0;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version0)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
+            }
+            PartitionIndex = reader.ReadInt();
+            LeaderId = reader.ReadInt();
+            LeaderEpoch = reader.ReadInt();
+            UnknownTaggedFields = null;
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

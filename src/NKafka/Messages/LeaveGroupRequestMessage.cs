@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class LeaveGroupRequestMessage: RequestMessage, IEquatable<LeaveGroupRequestMessage>
+public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveGroupRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+    public ApiKeys ApiKey => ApiKeys.LeaveGroup;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The ID of the group to leave.
     /// </summary>
@@ -54,25 +64,122 @@ public sealed class LeaveGroupRequestMessage: RequestMessage, IEquatable<LeaveGr
 
     public LeaveGroupRequestMessage()
     {
-        ApiKey = ApiKeys.LeaveGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public LeaveGroupRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.LeaveGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version4)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field GroupId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupId had invalid length {length}");
+            }
+            else
+            {
+                GroupId = reader.ReadString(length);
+            }
+        }
+        if (version <= ApiVersions.Version2)
+        {
+            int length;
+            length = reader.ReadShort();
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field MemberId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field MemberId had invalid length {length}");
+            }
+            else
+            {
+                MemberId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            MemberId = string.Empty;
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Members was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<MemberIdentityMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MemberIdentityMessage(reader, version));
+                    }
+                    Members = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Members was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<MemberIdentityMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MemberIdentityMessage(reader, version));
+                    }
+                    Members = newCollection;
+                }
+            }
+        }
+        else
+        {
+            Members = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         {
@@ -154,8 +261,16 @@ public sealed class LeaveGroupRequestMessage: RequestMessage, IEquatable<LeaveGr
         return true;
     }
 
-    public sealed class MemberIdentityMessage: Message, IEquatable<MemberIdentityMessage>
+    public sealed class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The member ID to remove from the group.
         /// </summary>
@@ -173,23 +288,106 @@ public sealed class LeaveGroupRequestMessage: RequestMessage, IEquatable<LeaveGr
 
         public MemberIdentityMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public MemberIdentityMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MemberIdentityMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field MemberId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field MemberId had invalid length {length}");
+                }
+                else
+                {
+                    MemberId = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    GroupInstanceId = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field GroupInstanceId had invalid length {length}");
+                }
+                else
+                {
+                    GroupInstanceId = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    Reason = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Reason had invalid length {length}");
+                }
+                else
+                {
+                    Reason = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                Reason = null;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version3)
             {

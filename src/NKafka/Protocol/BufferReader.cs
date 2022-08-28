@@ -23,6 +23,8 @@
 
 using System.Text;
 
+using NKafka.Protocol.Records;
+
 using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Protocol;
@@ -46,6 +48,13 @@ public ref struct BufferReader
         ThrowIfInsufficientData(sizeof(byte));
 
         return _body[_offset++];
+    }
+
+    public sbyte ReadSByte()
+    {
+        ThrowIfInsufficientData(sizeof(byte));
+
+        return unchecked((sbyte)_body[_offset++]);
     }
 
     public short ReadShort()
@@ -189,6 +198,21 @@ public ref struct BufferReader
         return buf;
     }
 
+    public byte[] ReadBytes(int length)
+    {
+        ThrowIfInsufficientData(length);
+
+        var buf = _body[_offset..(_offset + length)];
+        _offset += length;
+
+        return buf.ToArray();
+    }
+
+    public RecordBatch ReadRecords(int length)
+    {
+        return new RecordBatch();
+    }
+
     public ReadOnlySpan<byte> ReadCompactBytes()
     {
         var length = (int)ReadVarLong();
@@ -201,18 +225,11 @@ public ref struct BufferReader
         return buf;
     }
 
-    public string ReadString()
+    public string ReadString(int length)
     {
-        var stringLength = ReadStringLength();
-
-        if (stringLength == -1)
-        {
-            throw new InvalidDataException("Формат данных для простого строкового типа неверен");
-        }
-
-        var byteSting = _body.Slice(_offset, stringLength);
+        var byteSting = _body.Slice(_offset, length);
         var value = Encoding.UTF8.GetString(byteSting);
-        _offset += stringLength;
+        _offset += length;
 
         return value;
     }
@@ -281,6 +298,13 @@ public ref struct BufferReader
         var arrayLength = ReadCompactArrayLength();
 
         return arrayLength == 0 ? Array.Empty<int>() : ReadIntArray(arrayLength);
+    }
+
+    public Guid ReadGuid()
+    {
+        ThrowIfInsufficientData(16);
+
+        throw new NotImplementedException();
     }
 
     private int ReadStringLength()
@@ -377,5 +401,17 @@ public ref struct BufferReader
         }
 
         return result;
+    }
+
+    public int ReadVarUInt()
+    {
+        var value = ReadUnsignedVarLong();
+
+        return (int)value;
+    }
+
+    public List<TaggedField>? ReadUnknownTaggedField(List<TaggedField>? unknownTaggedFields, int tag, int size)
+    {
+        return null;
     }
 }

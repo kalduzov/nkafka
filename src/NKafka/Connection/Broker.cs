@@ -417,8 +417,8 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         TRequestMessage content,
         bool isInternalRequest,
         CancellationToken token)
-        where TResponseMessage : ResponseMessage
-        where TRequestMessage : RequestMessage
+        where TResponseMessage : IResponseMessage
+        where TRequestMessage : IRequestMessage
     {
         if (_tckPool.Count >= _config.MaxInflightRequests)
         {
@@ -576,7 +576,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         _disposed = true;
     }
 
-    private class ResponseTaskCompletionSource: TaskCompletionSource<ResponseMessage>
+    private class ResponseTaskCompletionSource: TaskCompletionSource<IResponseMessage>
     {
         private readonly ApiKeys _apiKey;
 
@@ -588,7 +588,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
             _version = version;
         }
 
-        internal ResponseMessage BuildResponseMessage(ReadOnlySpan<byte> span, int bodyLen)
+        internal IResponseMessage BuildResponseMessage(ReadOnlySpan<byte> span, int bodyLen)
         {
             return DefaultResponseBuilder.Build(_apiKey, _version, bodyLen, span);
         }

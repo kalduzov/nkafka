@@ -35,17 +35,33 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiVersionsResponseMessage>
+public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<ApiVersionsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The top-level error code.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
 
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
     /// <summary>
     /// The APIs supported by the broker.
     /// </summary>
     public ApiVersionCollection ApiKeys { get; set; } = new ();
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
     /// Features supported by the broker.
@@ -64,26 +80,135 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
 
     public ApiVersionsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
     public ApiVersionsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version3;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        ErrorCode = reader.ReadShort();
+        {
+            if (version >= ApiVersions.Version3)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field ApiKeys was serialized as null");
+                }
+                else
+                {
+                    ApiVersionCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new ApiVersionMessage(reader, version));
+                    }
+                    ApiKeys = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field ApiKeys was serialized as null");
+                }
+                else
+                {
+                    ApiVersionCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new ApiVersionMessage(reader, version));
+                    }
+                    ApiKeys = newCollection;
+                }
+            }
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        {
+            SupportedFeatures = new ();
+        }
+        FinalizedFeaturesEpoch = -1;
+        {
+            FinalizedFeatures = new ();
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version3)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    case 0:
+                    {
+                        int arrayLength;
+                        arrayLength = reader.ReadVarUInt() - 1;
+                        if (arrayLength < 0)
+                        {
+                            throw new Exception("non-nullable field SupportedFeatures was serialized as null");
+                        }
+                        else
+                        {
+                            SupportedFeatureKeyCollection newCollection = new(arrayLength);
+                            for (var i = 0; i< arrayLength; i++)
+                            {
+                                newCollection.Add(new SupportedFeatureKeyMessage(reader, version));
+                            }
+                            SupportedFeatures = newCollection;
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        FinalizedFeaturesEpoch = reader.ReadLong();
+                        break;
+                    }
+                    case 2:
+                    {
+                        int arrayLength;
+                        arrayLength = reader.ReadVarUInt() - 1;
+                        if (arrayLength < 0)
+                        {
+                            throw new Exception("non-nullable field FinalizedFeatures was serialized as null");
+                        }
+                        else
+                        {
+                            FinalizedFeatureKeyCollection newCollection = new(arrayLength);
+                            for (var i = 0; i< arrayLength; i++)
+                            {
+                                newCollection.Add(new FinalizedFeatureKeyMessage(reader, version));
+                            }
+                            FinalizedFeatures = newCollection;
+                        }
+                        break;
+                    }
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersions.Version3)
         {
             writer.WriteVarUInt(ApiKeys.Count + 1);
@@ -181,8 +306,16 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
         return true;
     }
 
-    public sealed class ApiVersionMessage: Message, IEquatable<ApiVersionMessage>
+    public sealed class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The API index.
         /// </summary>
@@ -200,23 +333,42 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
 
         public ApiVersionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public ApiVersionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ApiVersionMessage");
+            }
+            ApiKey = reader.ReadShort();
+            MinVersion = reader.ReadShort();
+            MaxVersion = reader.ReadShort();
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version3)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteShort(ApiKey);
@@ -262,8 +414,16 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
         }
     }
 
-    public sealed class SupportedFeatureKeyMessage: Message, IEquatable<SupportedFeatureKeyMessage>
+    public sealed class SupportedFeatureKeyMessage: IMessage, IEquatable<SupportedFeatureKeyMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The name of the feature.
         /// </summary>
@@ -281,23 +441,54 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
 
         public SupportedFeatureKeyMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public SupportedFeatureKeyMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of SupportedFeatureKeyMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            MinVersion = reader.ReadShort();
+            MaxVersion = reader.ReadShort();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version3)
             {
@@ -341,8 +532,16 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
         }
     }
 
-    public sealed class FinalizedFeatureKeyMessage: Message, IEquatable<FinalizedFeatureKeyMessage>
+    public sealed class FinalizedFeatureKeyMessage: IMessage, IEquatable<FinalizedFeatureKeyMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The name of the feature.
         /// </summary>
@@ -360,23 +559,54 @@ public sealed class ApiVersionsResponseMessage: ResponseMessage, IEquatable<ApiV
 
         public FinalizedFeatureKeyMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
         public FinalizedFeatureKeyMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version3;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version3)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of FinalizedFeatureKeyMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            MaxVersionLevel = reader.ReadShort();
+            MinVersionLevel = reader.ReadShort();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version3)
             {

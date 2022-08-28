@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<DeleteTopicsResponseMessage>
+public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<DeleteTopicsResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The results for each topic we tried to delete.
     /// </summary>
@@ -44,23 +57,81 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<Del
 
     public DeleteTopicsResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
     }
 
     public DeleteTopicsResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version6;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version1)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Responses was serialized as null");
+                }
+                else
+                {
+                    DeletableTopicResultCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DeletableTopicResultMessage(reader, version));
+                    }
+                    Responses = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Responses was serialized as null");
+                }
+                else
+                {
+                    DeletableTopicResultCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new DeletableTopicResultMessage(reader, version));
+                    }
+                    Responses = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -109,8 +180,16 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<Del
         return true;
     }
 
-    public sealed class DeletableTopicResultMessage: Message, IEquatable<DeletableTopicResultMessage>
+    public sealed class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name
         /// </summary>
@@ -126,6 +205,9 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<Del
         /// </summary>
         public short ErrorCode { get; set; } = 0;
 
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
         /// <summary>
         /// The error message, or null if there was no error.
         /// </summary>
@@ -133,23 +215,99 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<Del
 
         public DeletableTopicResultMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
         public DeletableTopicResultMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version6;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version6)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of DeletableTopicResultMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    if (version >= ApiVersions.Version6)
+                    {
+                        Name = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Name was serialized as null");
+                    }
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version6)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
+            }
+            ErrorCode = reader.ReadShort();
+            if (version >= ApiVersions.Version5)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    ErrorMessage = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field ErrorMessage had invalid length {length}");
+                }
+                else
+                {
+                    ErrorMessage = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                ErrorMessage = null;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             if (Name is null)
@@ -179,7 +337,7 @@ public sealed class DeleteTopicsResponseMessage: ResponseMessage, IEquatable<Del
             {
                 writer.WriteGuid(TopicId);
             }
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             if (version >= ApiVersions.Version5)
             {
                 if (ErrorMessage is null)

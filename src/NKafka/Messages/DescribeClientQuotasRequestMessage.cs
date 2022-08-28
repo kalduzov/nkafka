@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeClientQuotasRequestMessage: RequestMessage, IEquatable<DescribeClientQuotasRequestMessage>
+public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquatable<DescribeClientQuotasRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiKeys ApiKey => ApiKeys.DescribeClientQuotas;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// Filter components to apply to quota entities.
     /// </summary>
@@ -49,25 +59,74 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage, IEquatab
 
     public DescribeClientQuotasRequestMessage()
     {
-        ApiKey = ApiKeys.DescribeClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public DescribeClientQuotasRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeClientQuotas;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version1)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Components was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<ComponentDataMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new ComponentDataMessage(reader, version));
+                    }
+                    Components = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Components was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<ComponentDataMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new ComponentDataMessage(reader, version));
+                    }
+                    Components = newCollection;
+                }
+            }
+        }
+        Strict = reader.ReadByte() != 0;
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version1)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
@@ -113,8 +172,16 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage, IEquatab
         return true;
     }
 
-    public sealed class ComponentDataMessage: Message, IEquatable<ComponentDataMessage>
+    public sealed class ComponentDataMessage: IMessage, IEquatable<ComponentDataMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The entity type that the filter component applies to.
         /// </summary>
@@ -132,23 +199,86 @@ public sealed class DescribeClientQuotasRequestMessage: RequestMessage, IEquatab
 
         public ComponentDataMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
         public ComponentDataMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version1;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ComponentDataMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field EntityType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field EntityType had invalid length {length}");
+                }
+                else
+                {
+                    EntityType = reader.ReadString(length);
+                }
+            }
+            MatchType = reader.ReadSByte();
+            {
+                int length;
+                if (version >= ApiVersions.Version1)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Match = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Match had invalid length {length}");
+                }
+                else
+                {
+                    Match = reader.ReadString(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version1)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

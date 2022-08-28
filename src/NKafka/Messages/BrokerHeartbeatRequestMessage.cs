@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class BrokerHeartbeatRequestMessage: RequestMessage, IEquatable<BrokerHeartbeatRequestMessage>
+public sealed class BrokerHeartbeatRequestMessage: IRequestMessage, IEquatable<BrokerHeartbeatRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+
+    public ApiKeys ApiKey => ApiKeys.BrokerHeartbeat;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The broker ID.
     /// </summary>
@@ -64,25 +74,37 @@ public sealed class BrokerHeartbeatRequestMessage: RequestMessage, IEquatable<Br
 
     public BrokerHeartbeatRequestMessage()
     {
-        ApiKey = ApiKeys.BrokerHeartbeat;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
     public BrokerHeartbeatRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.BrokerHeartbeat;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version0;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        BrokerId = reader.ReadInt();
+        BrokerEpoch = reader.ReadLong();
+        CurrentMetadataOffset = reader.ReadLong();
+        WantFence = reader.ReadByte() != 0;
+        WantShutDown = reader.ReadByte() != 0;
+        UnknownTaggedFields = null;
+        var numTaggedFields = reader.ReadVarUInt();
+        for (var t = 0; t < numTaggedFields; t++)
+        {
+            var tag = reader.ReadVarUInt();
+            var size = reader.ReadVarUInt();
+            switch (tag)
+            {
+                default:
+                    UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                    break;
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(BrokerId);

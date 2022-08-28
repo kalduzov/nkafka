@@ -21,45 +21,32 @@
 
 namespace NKafka.Protocol;
 
-public abstract class Message
+public interface IMessage
 {
     public ApiVersions Version { get; set; }
 
     /// <summary>
-    /// Returns the number of bytes it would take to write out this message.
-    /// </summary>
-    internal int MessageSize { get; set; }
-
-    /// <summary>
     /// Returns the lowest supported API key of this message, inclusive.
     /// </summary>
-    internal ApiVersions LowestSupportedVersion { get; init; }
+    public ApiVersions LowestSupportedVersion { get; }
 
     /// <summary>
     /// Returns the highest supported API key of this message, inclusive.
     /// </summary>
-    internal ApiVersions HighestSupportedVersion { get; init; }
+    public ApiVersions HighestSupportedVersion { get;}
 
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand.
     /// </summary>
-    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
-
-    protected Message()
-    {
-    }
-
-    protected Message(BufferReader reader, ApiVersions version)
-    {
-    }
+    public List<TaggedField>? UnknownTaggedFields { get; set; }
 
     /// <summary>
     /// Writes out this message to the given stream.
     /// </summary>
-    internal abstract void Write(BufferWriter writer, ApiVersions version);
+    public void Write(BufferWriter writer, ApiVersions version);
 
     /// <summary>
     /// Reads this message from the given BufferReader. This will overwrite all relevant fields with information from the byte buffer.
     /// </summary>
-    internal abstract void Read(BufferReader reader, ApiVersions version);
+    public void Read(BufferReader reader, ApiVersions version);
 }

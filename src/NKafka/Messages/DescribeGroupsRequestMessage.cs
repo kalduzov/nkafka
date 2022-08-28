@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class DescribeGroupsRequestMessage: RequestMessage, IEquatable<DescribeGroupsRequestMessage>
+public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<DescribeGroupsRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+    public ApiKeys ApiKey => ApiKeys.DescribeGroups;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The names of the groups to describe
     /// </summary>
@@ -49,25 +59,107 @@ public sealed class DescribeGroupsRequestMessage: RequestMessage, IEquatable<Des
 
     public DescribeGroupsRequestMessage()
     {
-        ApiKey = ApiKeys.DescribeGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public DescribeGroupsRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.DescribeGroups;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            if (version >= ApiVersions.Version5)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Groups was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<string>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        int length;
+                        length = reader.ReadVarUInt() - 1;
+                        if (length < 0)
+                        {
+                            throw new Exception("non-nullable field Groups element was serialized as null");
+                        }
+                        else if (length > 0x7fff)
+                        {
+                            throw new Exception($"string field Groups element had invalid length {length}");
+                        }
+                        else
+                        {
+                            newCollection.Add(reader.ReadString(length));
+                        }
+                    }
+                    Groups = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Groups was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<string>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        int length;
+                        length = reader.ReadShort();
+                        if (length < 0)
+                        {
+                            throw new Exception("non-nullable field Groups element was serialized as null");
+                        }
+                        else if (length > 0x7fff)
+                        {
+                            throw new Exception($"string field Groups element had invalid length {length}");
+                        }
+                        else
+                        {
+                            newCollection.Add(reader.ReadString(length));
+                        }
+                    }
+                    Groups = newCollection;
+                }
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            IncludeAuthorizedOperations = reader.ReadByte() != 0;
+        }
+        else
+        {
+            IncludeAuthorizedOperations = false;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version5)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version5)

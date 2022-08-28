@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class ExpireDelegationTokenRequestMessage: RequestMessage, IEquatable<ExpireDelegationTokenRequestMessage>
+public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquatable<ExpireDelegationTokenRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+
+    public ApiKeys ApiKey => ApiKeys.ExpireDelegationToken;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The HMAC of the delegation token to be expired.
     /// </summary>
@@ -49,25 +59,55 @@ public sealed class ExpireDelegationTokenRequestMessage: RequestMessage, IEquata
 
     public ExpireDelegationTokenRequestMessage()
     {
-        ApiKey = ApiKeys.ExpireDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
     public ExpireDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.ExpireDelegationToken;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version2;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version2)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadInt();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field Hmac was serialized as null");
+            }
+            else
+            {
+                Hmac = reader.ReadBytes(length);
+            }
+        }
+        ExpiryTimePeriodMs = reader.ReadLong();
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version2)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version2)

@@ -35,12 +35,28 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SyncGroupResponseMessage: ResponseMessage, IEquatable<SyncGroupResponseMessage>
+public sealed class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncGroupResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// The error code, or 0 if there was no error.
     /// </summary>
     public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
     /// The group protocol type.
@@ -59,30 +75,112 @@ public sealed class SyncGroupResponseMessage: ResponseMessage, IEquatable<SyncGr
 
     public SyncGroupResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public SyncGroupResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version1)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        ErrorCode = reader.ReadShort();
+        if (version >= ApiVersions.Version5)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ProtocolType = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ProtocolType had invalid length {length}");
+            }
+            else
+            {
+                ProtocolType = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ProtocolType = null;
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ProtocolName = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ProtocolName had invalid length {length}");
+            }
+            else
+            {
+                ProtocolName = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ProtocolName = null;
+        }
+        {
+            int length;
+            if (version >= ApiVersions.Version4)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadInt();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field Assignment was serialized as null");
+            }
+            else
+            {
+                Assignment = reader.ReadBytes(length);
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
-        writer.WriteShort(ErrorCode);
+        writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersions.Version5)
         {
             if (ProtocolType is null)

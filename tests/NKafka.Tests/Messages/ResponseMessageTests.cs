@@ -26,7 +26,7 @@ using NKafka.Protocol;
 namespace NKafka.Tests.Messages;
 
 public class ResponseMessageTests<T>
-    where T : ResponseMessage, new()
+    where T : IResponseMessage, new()
 {
     protected void SerializeAndDeserializeMessage(T message, ApiVersions version)
     {

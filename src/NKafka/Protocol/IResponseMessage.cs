@@ -23,14 +23,14 @@
 
 namespace NKafka.Protocol;
 
-public abstract class ResponseMessage: Message
+public interface IResponseMessage: IMessage
 {
     private const ErrorCodes _DEFAULT_CODE = ErrorCodes.None;
 
     /// <summary>
     /// Response error code
     /// </summary>
-    public ErrorCodes Code { get; } = _DEFAULT_CODE;
+    public ErrorCodes Code => _DEFAULT_CODE;
 
     /// <summary>
     /// Indicates that the response message was successful
@@ -41,14 +41,5 @@ public abstract class ResponseMessage: Message
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request
     /// did not violate any quota
     /// </summary>
-    public int ThrottleTimeMs { get; init; } = 0;
-
-    protected ResponseMessage()
-    {
-    }
-
-    protected ResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
-    {
-    }
+    public int ThrottleTimeMs { get; set; }
 }

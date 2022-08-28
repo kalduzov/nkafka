@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SyncGroupRequestMessage: RequestMessage, IEquatable<SyncGroupRequestMessage>
+public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGroupRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+    public ApiKeys ApiKey => ApiKeys.SyncGroup;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The unique group identifier.
     /// </summary>
@@ -74,25 +84,190 @@ public sealed class SyncGroupRequestMessage: RequestMessage, IEquatable<SyncGrou
 
     public SyncGroupRequestMessage()
     {
-        ApiKey = ApiKeys.SyncGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
     public SyncGroupRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.SyncGroup;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version5;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            if (version >= ApiVersions.Version4)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field GroupId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupId had invalid length {length}");
+            }
+            else
+            {
+                GroupId = reader.ReadString(length);
+            }
+        }
+        GenerationId = reader.ReadInt();
+        {
+            int length;
+            if (version >= ApiVersions.Version4)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field MemberId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field MemberId had invalid length {length}");
+            }
+            else
+            {
+                MemberId = reader.ReadString(length);
+            }
+        }
+        if (version >= ApiVersions.Version3)
+        {
+            int length;
+            if (version >= ApiVersions.Version4)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                GroupInstanceId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupInstanceId had invalid length {length}");
+            }
+            else
+            {
+                GroupInstanceId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            GroupInstanceId = null;
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ProtocolType = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ProtocolType had invalid length {length}");
+            }
+            else
+            {
+                ProtocolType = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ProtocolType = null;
+        }
+        if (version >= ApiVersions.Version5)
+        {
+            int length;
+            length = reader.ReadVarUInt() - 1;
+            if (length < 0)
+            {
+                ProtocolName = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ProtocolName had invalid length {length}");
+            }
+            else
+            {
+                ProtocolName = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ProtocolName = null;
+        }
+        {
+            if (version >= ApiVersions.Version4)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Assignments was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
+                    }
+                    Assignments = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Assignments was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
+                    }
+                    Assignments = newCollection;
+                }
+            }
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version4)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         {
@@ -222,8 +397,16 @@ public sealed class SyncGroupRequestMessage: RequestMessage, IEquatable<SyncGrou
         return true;
     }
 
-    public sealed class SyncGroupRequestAssignmentMessage: Message, IEquatable<SyncGroupRequestAssignmentMessage>
+    public sealed class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The ID of the member to assign.
         /// </summary>
@@ -236,23 +419,81 @@ public sealed class SyncGroupRequestMessage: RequestMessage, IEquatable<SyncGrou
 
         public SyncGroupRequestAssignmentMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
         public SyncGroupRequestAssignmentMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version5;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of SyncGroupRequestAssignmentMessage");
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field MemberId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field MemberId had invalid length {length}");
+                }
+                else
+                {
+                    MemberId = reader.ReadString(length);
+                }
+            }
+            {
+                int length;
+                if (version >= ApiVersions.Version4)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadInt();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Assignment was serialized as null");
+                }
+                else
+                {
+                    Assignment = reader.ReadBytes(length);
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version4)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

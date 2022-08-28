@@ -23,7 +23,24 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-public interface IReadMethodGenerator
+internal abstract class MethodGenerator
 {
-    void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions);
+    protected Versions MessageFlexibleVersions { get; set; } = Versions.None;
+
+    protected Versions FieldFlexibleVersions(FieldSpecification field)
+    {
+        if (field.FlexibleVersions is null)
+        {
+            return MessageFlexibleVersions;
+        }
+
+        if (!MessageFlexibleVersions.Intersect(field.FlexibleVersions).Equals(field.FlexibleVersions))
+        {
+            throw new Exception(
+                $"The flexible versions for field {field.Name} are {field.FlexibleVersions}, "
+                + $"which are not a subset of the flexible versions for the message as a whole, which are {MessageFlexibleVersions}");
+        }
+
+        return field.FlexibleVersions;
+    }
 }

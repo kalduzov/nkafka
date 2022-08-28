@@ -35,8 +35,21 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<MetadataResponseMessage>
+public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<MetadataResponseMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <summary>
+    /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
+    /// </summary>
+    public int ThrottleTimeMs { get; set; } = 0;
+
     /// <summary>
     /// Each broker in the response.
     /// </summary>
@@ -64,23 +77,163 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
 
     public MetadataResponseMessage()
     {
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
     }
 
     public MetadataResponseMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version12;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version >= ApiVersions.Version3)
+        {
+            ThrottleTimeMs = reader.ReadInt();
+        }
+        else
+        {
+            ThrottleTimeMs = 0;
+        }
+        {
+            if (version >= ApiVersions.Version9)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Brokers was serialized as null");
+                }
+                else
+                {
+                    MetadataResponseBrokerCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
+                    }
+                    Brokers = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Brokers was serialized as null");
+                }
+                else
+                {
+                    MetadataResponseBrokerCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
+                    }
+                    Brokers = newCollection;
+                }
+            }
+        }
+        if (version >= ApiVersions.Version2)
+        {
+            int length;
+            if (version >= ApiVersions.Version9)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                ClusterId = null;
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field ClusterId had invalid length {length}");
+            }
+            else
+            {
+                ClusterId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            ClusterId = null;
+        }
+        if (version >= ApiVersions.Version1)
+        {
+            ControllerId = reader.ReadInt();
+        }
+        else
+        {
+            ControllerId = -1;
+        }
+        {
+            if (version >= ApiVersions.Version9)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    MetadataResponseTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataResponseTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    MetadataResponseTopicCollection newCollection = new(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new MetadataResponseTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        {
+            ClusterAuthorizedOperations = reader.ReadInt();
+        }
+        else
+        {
+            ClusterAuthorizedOperations = -2147483648;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version9)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersions.Version3)
@@ -187,8 +340,16 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
         return true;
     }
 
-    public sealed class MetadataResponseBrokerMessage: Message, IEquatable<MetadataResponseBrokerMessage>
+    public sealed class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The broker ID.
         /// </summary>
@@ -211,23 +372,92 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
 
         public MetadataResponseBrokerMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
         public MetadataResponseBrokerMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseBrokerMessage");
+            }
+            NodeId = reader.ReadInt();
+            {
+                int length;
+                if (version >= ApiVersions.Version9)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Host was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Host had invalid length {length}");
+                }
+                else
+                {
+                    Host = reader.ReadString(length);
+                }
+            }
+            Port = reader.ReadInt();
+            if (version >= ApiVersions.Version1)
+            {
+                int length;
+                if (version >= ApiVersions.Version9)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    Rack = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Rack had invalid length {length}");
+                }
+                else
+                {
+                    Rack = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                Rack = null;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version9)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
@@ -311,12 +541,23 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
         }
     }
 
-    public sealed class MetadataResponseTopicMessage: Message, IEquatable<MetadataResponseTopicMessage>
+    public sealed class MetadataResponseTopicMessage: IMessage, IEquatable<MetadataResponseTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic error, or 0 if there was no error.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
+
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
         /// The topic name.
@@ -345,26 +586,135 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
 
         public MetadataResponseTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
         public MetadataResponseTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseTopicMessage");
+            }
+            ErrorCode = reader.ReadShort();
+            {
+                int length;
+                if (version >= ApiVersions.Version9)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    if (version >= ApiVersions.Version12)
+                    {
+                        Name = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Name was serialized as null");
+                    }
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            if (version >= ApiVersions.Version10)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
+            }
+            if (version >= ApiVersions.Version1)
+            {
+                IsInternal = reader.ReadByte() != 0;
+            }
+            else
+            {
+                IsInternal = false;
+            }
+            {
+                if (version >= ApiVersions.Version9)
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadVarUInt() - 1;
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+                else
+                {
+                    int arrayLength;
+                    arrayLength = reader.ReadInt();
+                    if (arrayLength < 0)
+                    {
+                        throw new Exception("non-nullable field Partitions was serialized as null");
+                    }
+                    else
+                    {
+                        var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
+                        for (var i = 0; i< arrayLength; i++)
+                        {
+                            newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
+                        }
+                        Partitions = newCollection;
+                    }
+                }
+            }
+            if (version >= ApiVersions.Version8)
+            {
+                TopicAuthorizedOperations = reader.ReadInt();
+            }
+            else
+            {
+                TopicAuthorizedOperations = -2147483648;
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version9)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             if (Name is null)
             {
                 if (version >= ApiVersions.Version12)
@@ -451,12 +801,23 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
         }
     }
 
-    public sealed class MetadataResponsePartitionMessage: Message, IEquatable<MetadataResponsePartitionMessage>
+    public sealed class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The partition error, or 0 if there was no error.
         /// </summary>
         public short ErrorCode { get; set; } = 0;
+
+        /// <inheritdoc />
+        public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
         /// The partition index.
@@ -490,26 +851,130 @@ public sealed class MetadataResponseMessage: ResponseMessage, IEquatable<Metadat
 
         public MetadataResponsePartitionMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
         public MetadataResponsePartitionMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version12;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version12)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponsePartitionMessage");
+            }
+            ErrorCode = reader.ReadShort();
+            PartitionIndex = reader.ReadInt();
+            LeaderId = reader.ReadInt();
+            if (version >= ApiVersions.Version7)
+            {
+                LeaderEpoch = reader.ReadInt();
+            }
+            else
+            {
+                LeaderEpoch = -1;
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version9)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field ReplicaNodes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    ReplicaNodes = newCollection;
+                }
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version9)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field IsrNodes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    IsrNodes = newCollection;
+                }
+            }
+            if (version >= ApiVersions.Version5)
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version9)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field OfflineReplicas was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    OfflineReplicas = newCollection;
+                }
+            }
+            else
+            {
+                OfflineReplicas = new ();
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version9)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-            writer.WriteShort(ErrorCode);
+            writer.WriteShort((short)ErrorCode);
             writer.WriteInt(PartitionIndex);
             writer.WriteInt(LeaderId);
             if (version >= ApiVersions.Version7)

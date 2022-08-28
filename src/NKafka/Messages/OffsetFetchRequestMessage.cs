@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<OffsetFetchRequestMessage>
+public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<OffsetFetchRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+
+    public ApiKeys ApiKey => ApiKeys.OffsetFetch;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The group to fetch offsets for.
     /// </summary>
@@ -59,25 +69,143 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
 
     public OffsetFetchRequestMessage()
     {
-        ApiKey = ApiKeys.OffsetFetch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version8;
     }
 
     public OffsetFetchRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.OffsetFetch;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version8;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        if (version <= ApiVersions.Version7)
+        {
+            int length;
+            if (version >= ApiVersions.Version6)
+            {
+                length = reader.ReadVarUInt() - 1;
+            }
+            else
+            {
+                length = reader.ReadShort();
+            }
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field GroupId was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field GroupId had invalid length {length}");
+            }
+            else
+            {
+                GroupId = reader.ReadString(length);
+            }
+        }
+        else
+        {
+            GroupId = string.Empty;
+        }
+        if (version <= ApiVersions.Version7)
+        {
+            if (version >= ApiVersions.Version6)
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    Topics = null;
+                }
+                else
+                {
+                    var newCollection = new List<OffsetFetchRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new OffsetFetchRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            else
+            {
+                int arrayLength;
+                arrayLength = reader.ReadInt();
+                if (arrayLength < 0)
+                {
+                    if (version >= ApiVersions.Version2)
+                    {
+                        Topics = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
+                }
+                else
+                {
+                    var newCollection = new List<OffsetFetchRequestTopicMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new OffsetFetchRequestTopicMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+        }
+        else
+        {
+            Topics = new ();
+        }
+        if (version >= ApiVersions.Version8)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Groups was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<OffsetFetchRequestGroupMessage>(arrayLength);
+                for (var i = 0; i< arrayLength; i++)
+                {
+                    newCollection.Add(new OffsetFetchRequestGroupMessage(reader, version));
+                }
+                Groups = newCollection;
+            }
+        }
+        else
+        {
+            Groups = new ();
+        }
+        if (version >= ApiVersions.Version7)
+        {
+            RequireStable = reader.ReadByte() != 0;
+        }
+        else
+        {
+            RequireStable = false;
+        }
+        UnknownTaggedFields = null;
+        if (version >= ApiVersions.Version6)
+        {
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         if (version <= ApiVersions.Version7)
@@ -200,8 +328,16 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
         return true;
     }
 
-    public sealed class OffsetFetchRequestTopicMessage: Message, IEquatable<OffsetFetchRequestTopicMessage>
+    public sealed class OffsetFetchRequestTopicMessage: IMessage, IEquatable<OffsetFetchRequestTopicMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -214,23 +350,82 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
 
         public OffsetFetchRequestTopicMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
         public OffsetFetchRequestTopicMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            {
+                int length;
+                if (version >= ApiVersions.Version6)
+                {
+                    length = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    length = reader.ReadShort();
+                }
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                if (version >= ApiVersions.Version6)
+                {
+                    arrayLength = reader.ReadVarUInt() - 1;
+                }
+                else
+                {
+                    arrayLength = reader.ReadInt();
+                }
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field PartitionIndexes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    PartitionIndexes = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            if (version >= ApiVersions.Version6)
+            {
+                var numTaggedFields = reader.ReadVarUInt();
+                for (var t = 0; t < numTaggedFields; t++)
+                {
+                    var tag = reader.ReadVarUInt();
+                    var size = reader.ReadVarUInt();
+                    switch (tag)
+                    {
+                        default:
+                            UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                            break;
+                    }
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version > ApiVersions.Version7)
             {
@@ -288,8 +483,16 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
         }
     }
 
-    public sealed class OffsetFetchRequestGroupMessage: Message, IEquatable<OffsetFetchRequestGroupMessage>
+    public sealed class OffsetFetchRequestGroupMessage: IMessage, IEquatable<OffsetFetchRequestGroupMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The group ID.
         /// </summary>
@@ -302,23 +505,69 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
 
         public OffsetFetchRequestGroupMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
         public OffsetFetchRequestGroupMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version0;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version8)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestGroupMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field groupId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field groupId had invalid length {length}");
+                }
+                else
+                {
+                    groupId = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    Topics = null;
+                }
+                else
+                {
+                    var newCollection = new List<OffsetFetchRequestTopicsMessage>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(new OffsetFetchRequestTopicsMessage(reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             if (version < ApiVersions.Version8)
             {
@@ -359,8 +608,16 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
         }
     }
 
-    public sealed class OffsetFetchRequestTopicsMessage: Message, IEquatable<OffsetFetchRequestTopicsMessage>
+    public sealed class OffsetFetchRequestTopicsMessage: IMessage, IEquatable<OffsetFetchRequestTopicsMessage>
     {
+        public ApiVersions LowestSupportedVersion => ApiVersions.Version8;
+
+        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+
+        public ApiVersions Version {get; set;}
+
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
         /// <summary>
         /// The topic name.
         /// </summary>
@@ -373,23 +630,69 @@ public sealed class OffsetFetchRequestMessage: RequestMessage, IEquatable<Offset
 
         public OffsetFetchRequestTopicsMessage()
         {
-            LowestSupportedVersion = ApiVersions.Version8;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
         public OffsetFetchRequestTopicsMessage(BufferReader reader, ApiVersions version)
-            : base(reader, version)
+            : this()
         {
             Read(reader, version);
-            LowestSupportedVersion = ApiVersions.Version8;
-            HighestSupportedVersion = ApiVersions.Version8;
         }
 
-        internal override void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersions version)
         {
+            if (version > ApiVersions.Version8)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestTopicsMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Name was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Name had invalid length {length}");
+                }
+                else
+                {
+                    Name = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field PartitionIndexes was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new List<int>(arrayLength);
+                    for (var i = 0; i< arrayLength; i++)
+                    {
+                        newCollection.Add(reader.ReadInt());
+                    }
+                    PartitionIndexes = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
         }
 
-        internal override void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
             {

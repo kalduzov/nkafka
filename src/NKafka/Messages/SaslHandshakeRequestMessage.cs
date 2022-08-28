@@ -35,8 +35,18 @@ using System.Text;
 
 namespace NKafka.Messages;
 
-public sealed class SaslHandshakeRequestMessage: RequestMessage, IEquatable<SaslHandshakeRequestMessage>
+public sealed class SaslHandshakeRequestMessage: IRequestMessage, IEquatable<SaslHandshakeRequestMessage>
 {
+    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+
+    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+
+    public ApiKeys ApiKey => ApiKeys.SaslHandshake;
+
+    public ApiVersions Version {get; set;}
+
+    public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
     /// <summary>
     /// The SASL mechanism chosen by the client.
     /// </summary>
@@ -44,25 +54,36 @@ public sealed class SaslHandshakeRequestMessage: RequestMessage, IEquatable<Sasl
 
     public SaslHandshakeRequestMessage()
     {
-        ApiKey = ApiKeys.SaslHandshake;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
     public SaslHandshakeRequestMessage(BufferReader reader, ApiVersions version)
-        : base(reader, version)
+        : this()
     {
         Read(reader, version);
-        ApiKey = ApiKeys.SaslHandshake;
-        LowestSupportedVersion = ApiVersions.Version0;
-        HighestSupportedVersion = ApiVersions.Version1;
     }
 
-    internal override void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersions version)
     {
+        {
+            int length;
+            length = reader.ReadShort();
+            if (length < 0)
+            {
+                throw new Exception("non-nullable field Mechanism was serialized as null");
+            }
+            else if (length > 0x7fff)
+            {
+                throw new Exception($"string field Mechanism had invalid length {length}");
+            }
+            else
+            {
+                Mechanism = reader.ReadString(length);
+            }
+        }
+        UnknownTaggedFields = null;
     }
 
-    internal override void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
         {

@@ -404,6 +404,13 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "SyncGroupRequestMessage("
+            + ", GenerationId=" + GenerationId
+            + ")";
+    }
+
     public sealed class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -555,6 +562,12 @@ public sealed class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGro
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, MemberId, Assignment);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "SyncGroupRequestAssignmentMessage("
+                + ")";
         }
     }
 }

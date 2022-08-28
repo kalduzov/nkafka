@@ -137,6 +137,13 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeQuorumResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -255,6 +262,12 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
         }
     }
 
@@ -416,6 +429,17 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, LeaderId, LeaderEpoch, HighWatermark, CurrentVoters, Observers);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ", LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", HighWatermark=" + HighWatermark
+                + ")";
+        }
     }
 
     public sealed class ReplicaStateMessage: IMessage, IEquatable<ReplicaStateMessage>
@@ -531,6 +555,16 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ReplicaId, LogEndOffset, LastFetchTimestamp, LastCaughtUpTimestamp);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ReplicaStateMessage("
+                + "ReplicaId=" + ReplicaId
+                + ", LogEndOffset=" + LogEndOffset
+                + ", LastFetchTimestamp=" + LastFetchTimestamp
+                + ", LastCaughtUpTimestamp=" + LastCaughtUpTimestamp
+                + ")";
         }
     }
 }

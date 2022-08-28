@@ -179,6 +179,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "IncrementalAlterConfigsRequestMessage("
+            + ", ValidateOnly=" + (ValidateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -365,6 +372,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
             hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "AlterConfigsResourceMessage("
+                + "ResourceType=" + ResourceType
+                + ")";
+        }
     }
 
     public sealed class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
@@ -545,6 +559,13 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, ConfigOperation);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterableConfigMessage("
+                + ", ConfigOperation=" + ConfigOperation
+                + ")";
         }
     }
 

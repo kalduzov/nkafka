@@ -197,6 +197,14 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListGroupsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class ListedGroupMessage: IMessage, IEquatable<ListedGroupMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -389,6 +397,12 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, GroupId, ProtocolType, GroupState);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ListedGroupMessage("
+                + ")";
         }
     }
 }

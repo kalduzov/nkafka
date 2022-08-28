@@ -141,6 +141,13 @@ public sealed class ListPartitionReassignmentsRequestMessage: IRequestMessage, I
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListPartitionReassignmentsRequestMessage("
+            + "TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class ListPartitionReassignmentsTopicsMessage: IMessage, IEquatable<ListPartitionReassignmentsTopicsMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -259,6 +266,12 @@ public sealed class ListPartitionReassignmentsRequestMessage: IRequestMessage, I
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ListPartitionReassignmentsTopicsMessage("
+                + ")";
         }
     }
 }

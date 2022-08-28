@@ -250,4 +250,11 @@ public sealed class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<F
         hashCode = HashCode.Combine(hashCode, Key, KeyType, CoordinatorKeys);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "FindCoordinatorRequestMessage("
+            + ", KeyType=" + KeyType
+            + ")";
+    }
 }

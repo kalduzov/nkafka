@@ -141,6 +141,14 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterPartitionRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -285,6 +293,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             hashCode = HashCode.Combine(hashCode, TopicName, TopicId, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ", TopicId=" + TopicId
+                + ")";
+        }
     }
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
@@ -424,6 +439,16 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, LeaderEpoch, NewIsr, LeaderRecoveryState, PartitionEpoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", LeaderRecoveryState=" + LeaderRecoveryState
+                + ", PartitionEpoch=" + PartitionEpoch
+                + ")";
         }
     }
 }

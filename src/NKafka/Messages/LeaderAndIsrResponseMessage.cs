@@ -239,6 +239,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "LeaderAndIsrResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class LeaderAndIsrTopicErrorMessage: IMessage, IEquatable<LeaderAndIsrTopicErrorMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -343,6 +350,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicId);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderAndIsrTopicErrorMessage("
+                + "TopicId=" + TopicId
+                + ")";
         }
     }
 
@@ -501,6 +515,14 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderAndIsrPartitionErrorMessage("
+                + ", PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

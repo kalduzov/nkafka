@@ -127,6 +127,12 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeProducersRequestMessage("
+            + ")";
+    }
+
     public sealed class TopicRequestMessage: IMessage, IEquatable<TopicRequestMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -245,6 +251,12 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicRequestMessage("
+                + ")";
         }
     }
 }

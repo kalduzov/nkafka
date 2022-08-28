@@ -163,4 +163,10 @@ public sealed class EnvelopeRequestMessage: IRequestMessage, IEquatable<Envelope
         hashCode = HashCode.Combine(hashCode, RequestData, RequestPrincipal, ClientHostAddress);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "EnvelopeRequestMessage("
+            + ")";
+    }
 }

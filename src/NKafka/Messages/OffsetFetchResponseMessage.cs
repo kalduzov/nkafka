@@ -264,6 +264,14 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetFetchResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -442,6 +450,12 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetFetchResponseTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetFetchResponsePartitionMessage: IMessage, IEquatable<OffsetFetchResponsePartitionMessage>
@@ -612,6 +626,16 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, Metadata, ErrorCode);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetFetchResponsePartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", CommittedOffset=" + CommittedOffset
+                + ", CommittedLeaderEpoch=" + CommittedLeaderEpoch
+                + ", ErrorCode=" + ErrorCode
+                + ")";
+        }
     }
 
     public sealed class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
@@ -747,6 +771,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             hashCode = HashCode.Combine(hashCode, groupId, Topics, ErrorCode);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetFetchResponseGroupMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
+        }
     }
 
     public sealed class OffsetFetchResponseTopicsMessage: IMessage, IEquatable<OffsetFetchResponseTopicsMessage>
@@ -867,6 +898,12 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetFetchResponseTopicsMessage("
+                + ")";
         }
     }
 
@@ -997,6 +1034,16 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, Metadata, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetFetchResponsePartitionsMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", CommittedOffset=" + CommittedOffset
+                + ", CommittedLeaderEpoch=" + CommittedLeaderEpoch
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

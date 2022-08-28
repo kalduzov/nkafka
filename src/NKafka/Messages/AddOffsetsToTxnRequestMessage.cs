@@ -206,4 +206,12 @@ public sealed class AddOffsetsToTxnRequestMessage: IRequestMessage, IEquatable<A
         hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, ProducerEpoch, GroupId);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "AddOffsetsToTxnRequestMessage("
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ")";
+    }
 }

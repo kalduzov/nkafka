@@ -135,4 +135,15 @@ public sealed class BrokerHeartbeatResponseMessage: IResponseMessage, IEquatable
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, IsCaughtUp, IsFenced, ShouldShutDown);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "BrokerHeartbeatResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", IsCaughtUp=" + (IsCaughtUp ? "true" : "false")
+            + ", IsFenced=" + (IsFenced ? "true" : "false")
+            + ", ShouldShutDown=" + (ShouldShutDown ? "true" : "false")
+            + ")";
+    }
 }

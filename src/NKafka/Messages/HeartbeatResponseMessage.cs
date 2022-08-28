@@ -137,4 +137,12 @@ public sealed class HeartbeatResponseMessage: IResponseMessage, IEquatable<Heart
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "HeartbeatResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

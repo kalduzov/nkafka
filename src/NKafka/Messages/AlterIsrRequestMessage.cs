@@ -141,6 +141,14 @@ public sealed class AlterIsrRequestMessage: IRequestMessage, IEquatable<AlterIsr
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterIsrRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -260,6 +268,12 @@ public sealed class AlterIsrRequestMessage: IRequestMessage, IEquatable<AlterIsr
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
@@ -375,6 +389,15 @@ public sealed class AlterIsrRequestMessage: IRequestMessage, IEquatable<AlterIsr
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, LeaderEpoch, NewIsr, CurrentIsrVersion);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", CurrentIsrVersion=" + CurrentIsrVersion
+                + ")";
         }
     }
 }

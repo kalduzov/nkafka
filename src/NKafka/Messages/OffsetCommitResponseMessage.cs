@@ -187,6 +187,13 @@ public sealed class OffsetCommitResponseMessage: IResponseMessage, IEquatable<Of
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetCommitResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class OffsetCommitResponseTopicMessage: IMessage, IEquatable<OffsetCommitResponseTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -365,6 +372,12 @@ public sealed class OffsetCommitResponseMessage: IResponseMessage, IEquatable<Of
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetCommitResponseTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetCommitResponsePartitionMessage: IMessage, IEquatable<OffsetCommitResponsePartitionMessage>
@@ -462,6 +475,14 @@ public sealed class OffsetCommitResponseMessage: IResponseMessage, IEquatable<Of
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetCommitResponsePartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

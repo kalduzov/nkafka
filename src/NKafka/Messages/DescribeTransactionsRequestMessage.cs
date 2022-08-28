@@ -143,4 +143,10 @@ public sealed class DescribeTransactionsRequestMessage: IRequestMessage, IEquata
         hashCode = HashCode.Combine(hashCode, TransactionalIds);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "DescribeTransactionsRequestMessage("
+            + ")";
+    }
 }

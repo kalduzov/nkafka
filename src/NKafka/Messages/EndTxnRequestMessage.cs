@@ -173,4 +173,13 @@ public sealed class EndTxnRequestMessage: IRequestMessage, IEquatable<EndTxnRequ
         hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, ProducerEpoch, Committed);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "EndTxnRequestMessage("
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ", Committed=" + (Committed ? "true" : "false")
+            + ")";
+    }
 }

@@ -204,6 +204,14 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ElectLeadersResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class ReplicaElectionResultMessage: IMessage, IEquatable<ReplicaElectionResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -382,6 +390,12 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
             hashCode = HashCode.Combine(hashCode, Topic, PartitionResult);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "ReplicaElectionResultMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionResultMessage: IMessage, IEquatable<PartitionResultMessage>
@@ -531,6 +545,14 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionId, ErrorCode, ErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionResultMessage("
+                + "PartitionId=" + PartitionId
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

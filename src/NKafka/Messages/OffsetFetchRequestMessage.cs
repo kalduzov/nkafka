@@ -335,6 +335,13 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetFetchRequestMessage("
+            + ", RequireStable=" + (RequireStable ? "true" : "false")
+            + ")";
+    }
+
     public sealed class OffsetFetchRequestTopicMessage: IMessage, IEquatable<OffsetFetchRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -495,6 +502,12 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetFetchRequestTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetFetchRequestGroupMessage: IMessage, IEquatable<OffsetFetchRequestGroupMessage>
@@ -627,6 +640,12 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
             hashCode = HashCode.Combine(hashCode, groupId, Topics);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetFetchRequestGroupMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetFetchRequestTopicsMessage: IMessage, IEquatable<OffsetFetchRequestTopicsMessage>
@@ -747,6 +766,12 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetFetchRequestTopicsMessage("
+                + ")";
         }
     }
 }

@@ -24,8 +24,8 @@
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
 
 using Microsoft.Extensions.Logging;
@@ -36,7 +36,6 @@ using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Protocol;
 
-//using NKafka.Protocol.Requests;
 using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Connection;
@@ -45,6 +44,9 @@ namespace NKafka.Connection;
 /// </summary>
 internal sealed class Broker: IBroker, IEquatable<Broker>
 {
+
+    private ApiVersions _headerVersion = ApiVersions.Version1; //minimum version header
+    
     private readonly IKafkaConnector _kafkaConnector;
     private readonly ArrayPool<byte> _arrayPool;
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
@@ -142,11 +144,13 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         _closeConnectionAfterTimeout = new Timer(
             _ =>
             {
-                if (_globalTimeWaiting.IsRunning && _globalTimeWaiting.ElapsedMilliseconds > _config.ConnectionsMaxIdleMs)
+                if (!_globalTimeWaiting.IsRunning || _globalTimeWaiting.ElapsedMilliseconds <= _config.ConnectionsMaxIdleMs)
                 {
-                    ResetConnection();
-                    _globalTimeWaiting.Reset();
+                    return;
                 }
+
+                ResetConnection();
+                _globalTimeWaiting.Reset();
             });
     }
 
@@ -159,8 +163,11 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     {
         if (_config.ApiVersionRequest)
         {
-            var request = new ApiVersionsRequestMessage();
-            var response = await _kafkaConnector.SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(request, true, token)
+            var request = new ApiVersionsRequestMessage
+            {
+                Version = ApiVersions.Version1
+            };
+            var response = await InternalSendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(request, true, token)
                 .ConfigureAwait(false);
             UpdateApiVersions(response);
         }
@@ -169,7 +176,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         {
             Topics = Array.Empty<MetadataRequestMessage.MetadataRequestTopicMessage>().ToList()
         };
-        var metadataResponse = await _kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(metadataRequest, true, token)
+        var metadataResponse = await InternalSendAsync<MetadataResponseMessage, MetadataRequestMessage>(metadataRequest, true, token)
             .ConfigureAwait(false);
         UpdateMetadata(metadataResponse);
     }
@@ -216,6 +223,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     /// </summary>
     Task<TResponseMessage> IBroker.SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
     {
+        //return _kafkaConnector.SendAsync<TResponseMessage, TRequestMessage>(message, false, token);
         return InternalSendAsync<TResponseMessage, TRequestMessage>(message, false, token);
     }
 
@@ -272,8 +280,6 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         return Id;
     }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public async ValueTask DisposeAsync()
     {
         if (!_responseProcessingTokenSource.IsCancellationRequested)
@@ -437,7 +443,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
             new RequestHeader
             {
                 ClientId = _config.ClientId,
-                RequestApiVersion = (short)content.Version,
+                RequestApiVersion = (short)_headerVersion, //header minimum version
                 CorrelationId = requestId,
                 RequestApiKey = (short)content.ApiKey
             },
@@ -456,7 +462,9 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var taskCompletionSource = new ResponseTaskCompletionSource((ApiKeys)request.Header.RequestApiKey, (ApiVersions)request.Header.RequestApiVersion);
+        var taskCompletionSource = new ResponseTaskCompletionSource(
+            (ApiKeys)request.Header.RequestApiKey,
+            (ApiVersions)request.Header.RequestApiVersion);
 
         token.Register(
             state =>
@@ -474,9 +482,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
             if (_stream.CanWrite)
             {
-                //todo добавить запись тела в отдельный буфер (stream) а потом его длинну добавить в исходное сообщение
                 request.Write(_stream);
-                await _stream.FlushAsync(cts.Token);
             }
         }
         catch (Exception exc)
@@ -542,9 +548,14 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
             if (!_socket.Connected && !cancellationToken.IsCancellationRequested)
             {
                 await _socket.ConnectAsync(EndPoint, cancellationToken);
-                var networkStream = new NetworkStream(_socket);
+                Stream stream = new NetworkStream(_socket, true);
 
-                _stream = new BufferedStream(networkStream, _config.MessageMaxBytes);
+                if (_config.SecurityProtocol is SecurityProtocols.Ssl or SecurityProtocols.SaslSsl)
+                {
+                    stream = new SslStream(stream, false, (_, _, _, _) => true); //skip server cert validation
+                }
+
+                _stream = stream;
                 _globalTimeWaiting.Start();
             }
         }

@@ -172,6 +172,12 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterReplicaLogDirsRequestMessage("
+            + ")";
+    }
+
     public sealed class AlterReplicaLogDirMessage: IMessage, IEquatable<AlterReplicaLogDirMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -351,6 +357,12 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
             hashCode = HashCode.Combine(hashCode, Path);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "AlterReplicaLogDirMessage("
+                + ")";
+        }
     }
 
     public sealed class AlterReplicaLogDirTopicMessage: IMessage, IEquatable<AlterReplicaLogDirTopicMessage>
@@ -513,6 +525,12 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterReplicaLogDirTopicMessage("
+                + ")";
         }
     }
 

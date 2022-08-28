@@ -179,6 +179,14 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "FetchSnapshotRequestMessage("
+            + ", ReplicaId=" + ReplicaId
+            + ", MaxBytes=" + MaxBytes
+            + ")";
+    }
+
     public sealed class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -298,6 +306,12 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicSnapshotMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionSnapshotMessage: IMessage, IEquatable<PartitionSnapshotMessage>
@@ -396,6 +410,15 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
             hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, SnapshotId, Position);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "PartitionSnapshotMessage("
+                + "Partition=" + Partition
+                + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
+                + ", Position=" + Position
+                + ")";
+        }
     }
 
     public sealed class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
@@ -477,6 +500,14 @@ public sealed class FetchSnapshotRequestMessage: IRequestMessage, IEquatable<Fet
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, EndOffset, Epoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "SnapshotIdMessage("
+                + "EndOffset=" + EndOffset
+                + ", Epoch=" + Epoch
+                + ")";
         }
     }
 }

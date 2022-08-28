@@ -225,6 +225,14 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "BrokerRegistrationRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", IncarnationId=" + IncarnationId
+            + ")";
+    }
+
     public sealed class ListenerMessage: IMessage, IEquatable<ListenerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -358,6 +366,14 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "ListenerMessage("
+                + ", Port=" + Port
+                + ", SecurityProtocol=" + SecurityProtocol
+                + ")";
+        }
     }
 
     public sealed class ListenerCollection: HashSet<ListenerMessage>
@@ -478,6 +494,14 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "FeatureMessage("
+                + ", MinSupportedVersion=" + MinSupportedVersion
+                + ", MaxSupportedVersion=" + MaxSupportedVersion
+                + ")";
         }
     }
 

@@ -179,6 +179,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterClientQuotasRequestMessage("
+            + ", ValidateOnly=" + (ValidateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -376,6 +383,12 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, Entity, Ops);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "EntryDataMessage("
+                + ")";
+        }
     }
 
     public sealed class EntityDataMessage: IMessage, IEquatable<EntityDataMessage>
@@ -549,6 +562,12 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, EntityType, EntityName);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "EntityDataMessage("
+                + ")";
+        }
     }
 
     public sealed class OpDataMessage: IMessage, IEquatable<OpDataMessage>
@@ -683,6 +702,14 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Key, Value, Remove);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OpDataMessage("
+                + ", Value=" + Value
+                + ", Remove=" + (Remove ? "true" : "false")
+                + ")";
         }
     }
 }

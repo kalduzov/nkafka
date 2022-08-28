@@ -145,4 +145,10 @@ public sealed class SaslAuthenticateRequestMessage: IRequestMessage, IEquatable<
         hashCode = HashCode.Combine(hashCode, AuthBytes);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "SaslAuthenticateRequestMessage("
+            + ")";
+    }
 }

@@ -115,4 +115,10 @@ public sealed class SaslHandshakeRequestMessage: IRequestMessage, IEquatable<Sas
         hashCode = HashCode.Combine(hashCode, Mechanism);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "SaslHandshakeRequestMessage("
+            + ")";
+    }
 }

@@ -43,12 +43,12 @@ public class CodeGenerator: ICodeGenerator
 
     public void AppendLeftBrace()
     {
-        _builder.AppendLine("{");
+        AppendLine("{");
     }
 
     public void AppendRightBrace()
     {
-        _builder.AppendLine("}");
+        AppendLine("}");
     }
 
     public void Append(string value)

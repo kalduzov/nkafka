@@ -187,6 +187,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ProduceResponseMessage("
+            + ", ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -365,6 +372,12 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicProduceResponseMessage("
+                + ")";
         }
     }
 
@@ -632,6 +645,17 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             hashCode = HashCode.Combine(hashCode, Index, ErrorCode, BaseOffset, LogAppendTimeMs, LogStartOffset, RecordErrors, ErrorMessage);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "PartitionProduceResponseMessage("
+                + "Index=" + Index
+                + ", ErrorCode=" + ErrorCode
+                + ", BaseOffset=" + BaseOffset
+                + ", LogAppendTimeMs=" + LogAppendTimeMs
+                + ", LogStartOffset=" + LogStartOffset
+                + ")";
+        }
     }
 
     public sealed class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
@@ -775,6 +799,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, BatchIndex, BatchIndexErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "BatchIndexAndErrorMessageMessage("
+                + "BatchIndex=" + BatchIndex
+                + ")";
         }
     }
 

@@ -343,6 +343,16 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "LeaderAndIsrRequestMessage("
+            + "ControllerId=" + ControllerId
+            + ", ControllerEpoch=" + ControllerEpoch
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ", Type=" + Type
+            + ")";
+    }
+
     public sealed class LeaderAndIsrTopicStateMessage: IMessage, IEquatable<LeaderAndIsrTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -542,6 +552,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             hashCode = HashCode.Combine(hashCode, TopicName, TopicId, PartitionStates);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "LeaderAndIsrTopicStateMessage("
+                + ", TopicId=" + TopicId
+                + ")";
+        }
     }
 
     public sealed class LeaderAndIsrLiveLeaderMessage: IMessage, IEquatable<LeaderAndIsrLiveLeaderMessage>
@@ -676,6 +693,14 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, BrokerId, HostName, Port);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderAndIsrLiveLeaderMessage("
+                + "BrokerId=" + BrokerId
+                + ", Port=" + Port
+                + ")";
         }
     }
 
@@ -1048,6 +1073,19 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ControllerEpoch, Leader, LeaderEpoch, Isr, PartitionEpoch);
             hashCode = HashCode.Combine(hashCode, Replicas, AddingReplicas, RemovingReplicas, IsNew, LeaderRecoveryState);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderAndIsrPartitionStateMessage("
+                + ", PartitionIndex=" + PartitionIndex
+                + ", ControllerEpoch=" + ControllerEpoch
+                + ", Leader=" + Leader
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", PartitionEpoch=" + PartitionEpoch
+                + ", IsNew=" + (IsNew ? "true" : "false")
+                + ", LeaderRecoveryState=" + LeaderRecoveryState
+                + ")";
         }
     }
 }

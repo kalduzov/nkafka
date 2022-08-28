@@ -360,6 +360,16 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "FindCoordinatorResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", NodeId=" + NodeId
+            + ", Port=" + Port
+            + ")";
+    }
+
     public sealed class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -536,6 +546,15 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Key, NodeId, Host, Port, ErrorCode, ErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CoordinatorMessage("
+                + ", NodeId=" + NodeId
+                + ", Port=" + Port
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

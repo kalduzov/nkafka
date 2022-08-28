@@ -134,6 +134,13 @@ public sealed class AlterPartitionReassignmentsRequestMessage: IRequestMessage, 
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterPartitionReassignmentsRequestMessage("
+            + "TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class ReassignableTopicMessage: IMessage, IEquatable<ReassignableTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -253,6 +260,12 @@ public sealed class AlterPartitionReassignmentsRequestMessage: IRequestMessage, 
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "ReassignableTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class ReassignablePartitionMessage: IMessage, IEquatable<ReassignablePartitionMessage>
@@ -361,6 +374,13 @@ public sealed class AlterPartitionReassignmentsRequestMessage: IRequestMessage, 
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, Replicas);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ReassignablePartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 }

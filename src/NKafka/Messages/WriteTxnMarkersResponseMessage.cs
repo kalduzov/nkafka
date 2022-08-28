@@ -172,6 +172,12 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "WriteTxnMarkersResponseMessage("
+            + ")";
+    }
+
     public sealed class WritableTxnMarkerResultMessage: IMessage, IEquatable<WritableTxnMarkerResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -316,6 +322,13 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ProducerId, Topics);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "WritableTxnMarkerResultMessage("
+                + "ProducerId=" + ProducerId
+                + ")";
         }
     }
 
@@ -497,6 +510,12 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "WritableTxnMarkerTopicResultMessage("
+                + ")";
+        }
     }
 
     public sealed class WritableTxnMarkerPartitionResultMessage: IMessage, IEquatable<WritableTxnMarkerPartitionResultMessage>
@@ -594,6 +613,14 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "WritableTxnMarkerPartitionResultMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

@@ -239,6 +239,14 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeAclsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class DescribeAclsResourceMessage: IMessage, IEquatable<DescribeAclsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -448,6 +456,14 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
             hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, PatternType, Acls);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribeAclsResourceMessage("
+                + "ResourceType=" + ResourceType
+                + ", PatternType=" + PatternType
+                + ")";
+        }
     }
 
     public sealed class AclDescriptionMessage: IMessage, IEquatable<AclDescriptionMessage>
@@ -622,6 +638,14 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Principal, Host, Operation, PermissionType);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AclDescriptionMessage("
+                + ", Operation=" + Operation
+                + ", PermissionType=" + PermissionType
+                + ")";
         }
     }
 }

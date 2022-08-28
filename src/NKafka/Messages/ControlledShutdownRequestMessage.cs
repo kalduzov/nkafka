@@ -136,4 +136,12 @@ public sealed class ControlledShutdownRequestMessage: IRequestMessage, IEquatabl
         hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "ControlledShutdownRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
 }

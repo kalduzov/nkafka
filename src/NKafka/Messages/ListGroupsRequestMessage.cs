@@ -171,4 +171,10 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
         hashCode = HashCode.Combine(hashCode, StatesFilter);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "ListGroupsRequestMessage("
+            + ")";
+    }
 }

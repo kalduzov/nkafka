@@ -186,6 +186,14 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListTransactionsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class TransactionStateMessage: IMessage, IEquatable<TransactionStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -310,6 +318,13 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, TransactionState);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TransactionStateMessage("
+                + ", ProducerId=" + ProducerId
+                + ")";
         }
     }
 }

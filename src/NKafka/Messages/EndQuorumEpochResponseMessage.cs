@@ -127,6 +127,13 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "EndQuorumEpochResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -236,6 +243,12 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
             hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
@@ -324,6 +337,16 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, LeaderId, LeaderEpoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ", LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 }

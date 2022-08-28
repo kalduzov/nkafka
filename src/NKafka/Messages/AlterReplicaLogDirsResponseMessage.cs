@@ -177,6 +177,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterReplicaLogDirsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class AlterReplicaLogDirTopicResultMessage: IMessage, IEquatable<AlterReplicaLogDirTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -355,6 +362,12 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "AlterReplicaLogDirTopicResultMessage("
+                + ")";
+        }
     }
 
     public sealed class AlterReplicaLogDirPartitionResultMessage: IMessage, IEquatable<AlterReplicaLogDirPartitionResultMessage>
@@ -452,6 +465,14 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterReplicaLogDirPartitionResultMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

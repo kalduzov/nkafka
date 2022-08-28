@@ -394,6 +394,7 @@ public sealed class KafkaCluster: IKafkaCluster
     private async Task UpdateMetadataAsync(CancellationToken token)
     {
         var broker = GetControllerBroker();
+        await broker.OpenAsync(token);
 
         var request = new MetadataRequestMessage
         {

@@ -23,7 +23,7 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
+internal class ReadMethodGenerator: IMethodGenerator
 {
     private readonly StructRegistry _structRegistry;
     private readonly ICodeGenerator _codeGenerator;
@@ -52,7 +52,7 @@ internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
 
         foreach (var field in structSpecification.Fields)
         {
-            var fieldFlexibleVersions = FieldFlexibleVersions(field);
+            var fieldFlexibleVersions = ((IMethodGenerator)this).FieldFlexibleVersions(field);
 
             if (!field.TaggedVersions.Intersect(fieldFlexibleVersions).Equals(field.TaggedVersions))
             {
@@ -75,7 +75,7 @@ internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
                             void CallGenerateVariableLengthReader(Versions versions)
                             {
                                 GenerateVariableLengthReader(
-                                    FieldFlexibleVersions(field),
+                                    ((IMethodGenerator)this).FieldFlexibleVersions(field),
                                     field.Name,
                                     field.Type,
                                     versions,
@@ -89,7 +89,7 @@ internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
                             if (field.Type.IsArray && ((IFieldType.ArrayType)field.Type).ElementType.SerializationIsDifferentInFlexibleVersions)
                             {
                                 VersionConditional
-                                    .ForVersions(FieldFlexibleVersions(field), presentAndUntaggedVersions)
+                                    .ForVersions(((IMethodGenerator)this).FieldFlexibleVersions(field), presentAndUntaggedVersions)
                                     .IfMember(CallGenerateVariableLengthReader)
                                     .IfNotMember(CallGenerateVariableLengthReader)
                                     .Generate(_codeGenerator);
@@ -145,7 +145,7 @@ internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
                                         if (field.Type.IsVariableLength && !field.Type.IsStruct)
                                         {
                                             GenerateVariableLengthReader(
-                                                FieldFlexibleVersions(field),
+                                                ((IMethodGenerator)this).FieldFlexibleVersions(field),
                                                 field.Name,
                                                 field.Type,
                                                 presentAndTaggedVersions,
@@ -187,6 +187,8 @@ internal class ReadMethodGenerator: MethodGenerator, IReadMethodGenerator
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendRightBrace();
     }
+
+    public Versions MessageFlexibleVersions { get; set; }
 
     private static string PrimitiveReadExpression(IFieldType type)
     {

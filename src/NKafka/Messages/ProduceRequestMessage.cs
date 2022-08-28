@@ -253,6 +253,14 @@ public sealed class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRe
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ProduceRequestMessage("
+            + ", Acks=" + Acks
+            + ", TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class TopicProduceDataMessage: IMessage, IEquatable<TopicProduceDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -432,6 +440,12 @@ public sealed class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRe
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicProduceDataMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionProduceDataMessage: IMessage, IEquatable<PartitionProduceDataMessage>
@@ -566,6 +580,13 @@ public sealed class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRe
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Index, Records);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionProduceDataMessage("
+                + "Index=" + Index
+                + ")";
         }
     }
 

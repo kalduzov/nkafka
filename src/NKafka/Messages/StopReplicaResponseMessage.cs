@@ -182,6 +182,13 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "StopReplicaResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class StopReplicaPartitionErrorMessage: IMessage, IEquatable<StopReplicaPartitionErrorMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -317,6 +324,14 @@ public sealed class StopReplicaResponseMessage: IResponseMessage, IEquatable<Sto
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "StopReplicaPartitionErrorMessage("
+                + ", PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

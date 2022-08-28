@@ -189,6 +189,13 @@ public sealed class OffsetForLeaderEpochRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetForLeaderEpochRequestMessage("
+            + "ReplicaId=" + ReplicaId
+            + ")";
+    }
+
     public sealed class OffsetForLeaderTopicMessage: IMessage, IEquatable<OffsetForLeaderTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -368,6 +375,12 @@ public sealed class OffsetForLeaderEpochRequestMessage: IRequestMessage, IEquata
             hashCode = HashCode.Combine(hashCode, Topic);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetForLeaderTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetForLeaderPartitionMessage: IMessage, IEquatable<OffsetForLeaderPartitionMessage>
@@ -479,6 +492,15 @@ public sealed class OffsetForLeaderEpochRequestMessage: IRequestMessage, IEquata
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, LeaderEpoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetForLeaderPartitionMessage("
+                + "Partition=" + Partition
+                + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 

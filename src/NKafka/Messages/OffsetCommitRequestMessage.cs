@@ -361,6 +361,14 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetCommitRequestMessage("
+            + ", GenerationId=" + GenerationId
+            + ", RetentionTimeMs=" + RetentionTimeMs
+            + ")";
+    }
+
     public sealed class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -538,6 +546,12 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetCommitRequestTopicMessage("
+                + ")";
         }
     }
 
@@ -726,6 +740,16 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommitTimestamp, CommittedMetadata);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetCommitRequestPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", CommittedOffset=" + CommittedOffset
+                + ", CommittedLeaderEpoch=" + CommittedLeaderEpoch
+                + ", CommitTimestamp=" + CommitTimestamp
+                + ")";
         }
     }
 }

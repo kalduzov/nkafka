@@ -226,6 +226,14 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AddPartitionsToTxnRequestMessage("
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ")";
+    }
+
     public sealed class AddPartitionsToTxnTopicMessage: IMessage, IEquatable<AddPartitionsToTxnTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -386,6 +394,12 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AddPartitionsToTxnTopicMessage("
+                + ")";
         }
     }
 

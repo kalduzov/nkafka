@@ -132,6 +132,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeProducersResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class TopicResponseMessage: IMessage, IEquatable<TopicResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -250,6 +257,12 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicResponseMessage("
+                + ")";
         }
     }
 
@@ -394,6 +407,14 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, ErrorMessage, ActiveProducers);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "PartitionResponseMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
+        }
     }
 
     public sealed class ProducerStateMessage: IMessage, IEquatable<ProducerStateMessage>
@@ -503,6 +524,18 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ProducerId, ProducerEpoch, LastSequence, LastTimestamp, CoordinatorEpoch, CurrentTxnStartOffset);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ProducerStateMessage("
+                + "ProducerId=" + ProducerId
+                + ", ProducerEpoch=" + ProducerEpoch
+                + ", LastSequence=" + LastSequence
+                + ", LastTimestamp=" + LastTimestamp
+                + ", CoordinatorEpoch=" + CoordinatorEpoch
+                + ", CurrentTxnStartOffset=" + CurrentTxnStartOffset
+                + ")";
         }
     }
 }

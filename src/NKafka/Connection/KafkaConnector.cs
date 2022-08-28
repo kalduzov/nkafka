@@ -20,11 +20,17 @@
 //  limitations under the License.
 
 using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 using Microsoft.Extensions.Logging;
 
 using NKafka.Config;
+using NKafka.Diagnostics;
+using NKafka.Exceptions;
+using NKafka.Messages;
+using NKafka.Protocol;
 
 namespace NKafka.Connection;
 
@@ -46,6 +52,13 @@ internal sealed class KafkaConnector: IKafkaConnector
     private Stream _stream = default!;
 
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
+
+    /*
+ * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
+ * соединение с брокером автоматически закроется 
+ */
+    private readonly Stopwatch _globalTimeWaiting = new();
+    private readonly Timer _closeConnectionAfterTimeout;
 
     public State ConnectorState { get; private set; } = State.Closed;
 
@@ -69,6 +82,24 @@ internal sealed class KafkaConnector: IKafkaConnector
         _securityProtocols = securityProtocols;
         _inFlightRequests = new ConcurrentDictionary<int, Task>(Environment.ProcessorCount, _maxInflightRequests);
         _logger = loggerFactory.CreateLogger<KafkaConnector>();
+
+        _closeConnectionAfterTimeout = new Timer(
+            _ =>
+            {
+                if (!_globalTimeWaiting.IsRunning || _globalTimeWaiting.ElapsedMilliseconds <= _connectionsMaxIdleMs)
+                {
+                    return;
+                }
+
+                ResetConnection();
+                _globalTimeWaiting.Reset();
+            });
+    }
+
+    private void ResetConnection()
+    {
+        _stream.Dispose();
+        _socket.Close(_closeConnectionTimeoutMs);
     }
 
     //     private readonly ArrayPool<byte> _arrayPool;
@@ -96,7 +127,80 @@ internal sealed class KafkaConnector: IKafkaConnector
         bool isInternalRequest,
         CancellationToken token)
     {
-        return null;
+        return Task.FromResult<TResponseMessage>(default);
+
+        // if (_inFlightRequests.Count >= _maxInflightRequests)
+        // {
+        //     throw new ProtocolKafkaException(
+        //         ErrorCodes.None,
+        //         $"Количество ожидающих ответов запросов к брокеру превысило ограничение в '{_maxInflightRequests}' единиц");
+        // }
+        //
+        // _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
+        //
+        // var requestId = Interlocked.Increment(ref _requestId);
+        //
+        // using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, requestId, Id, EndPoint);
+        //
+        // var request = new SendMessage(
+        //     new RequestHeader
+        //     {
+        //         ClientId = _config.ClientId,
+        //         RequestApiVersion = (short)content.Version,
+        //         CorrelationId = requestId,
+        //         RequestApiKey = (short)content.ApiKey
+        //     },
+        //     content);
+        //
+        // ThrowExceptionIfRequestNotValid(request, activity);
+        //
+        // await ThrowIfBrokerDontSupportApiVersion(request);
+        //
+        // await ReEstablishConnectionAsync(token);
+        //
+        // if (token.IsCancellationRequested)
+        // {
+        //     return await Task.FromCanceled<TResponseMessage>(token);
+        // }
+        //
+        // using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+        //
+        // var taskCompletionSource = new ResponseTaskCompletionSource(
+        //     (ApiKeys)request.Header.RequestApiKey,
+        //     (ApiVersions)request.Header.RequestApiVersion);
+        //
+        // token.Register(
+        //     state =>
+        //     {
+        //         var awaiter = state as ResponseTaskCompletionSource;
+        //         awaiter?.TrySetCanceled();
+        //     },
+        //     taskCompletionSource,
+        //     false);
+        //
+        // try
+        // {
+        //     _tckPool.TryAdd(requestId, taskCompletionSource);
+        //     WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
+        //
+        //     if (_stream.CanWrite)
+        //     {
+        //         request.Write(_stream);
+        //     }
+        // }
+        // catch (Exception exc)
+        // {
+        //     activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
+        //
+        //     _tckPool.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
+        //
+        //     if (!taskCompletionSource.Task.IsCanceled || !taskCompletionSource.Task.IsCompleted)
+        //     {
+        //         taskCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Не удалось отправить запрос", exc));
+        //     }
+        // }
+        //
+        // return (TResponseMessage)await taskCompletionSource.Task;
     }
 
     private void ReleaseUnmanagedResources()

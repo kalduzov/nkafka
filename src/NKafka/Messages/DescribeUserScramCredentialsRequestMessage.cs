@@ -134,6 +134,12 @@ public sealed class DescribeUserScramCredentialsRequestMessage: IRequestMessage,
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeUserScramCredentialsRequestMessage("
+            + ")";
+    }
+
     public sealed class UserNameMessage: IMessage, IEquatable<UserNameMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -225,6 +231,12 @@ public sealed class DescribeUserScramCredentialsRequestMessage: IRequestMessage,
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "UserNameMessage("
+                + ")";
         }
     }
 }

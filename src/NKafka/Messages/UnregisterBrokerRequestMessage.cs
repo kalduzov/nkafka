@@ -106,4 +106,11 @@ public sealed class UnregisterBrokerRequestMessage: IRequestMessage, IEquatable<
         hashCode = HashCode.Combine(hashCode, BrokerId);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "UnregisterBrokerRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ")";
+    }
 }

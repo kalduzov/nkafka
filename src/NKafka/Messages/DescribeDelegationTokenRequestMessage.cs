@@ -186,6 +186,12 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeDelegationTokenRequestMessage("
+            + ")";
+    }
+
     public sealed class DescribeDelegationTokenOwnerMessage: IMessage, IEquatable<DescribeDelegationTokenOwnerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -344,6 +350,12 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeDelegationTokenOwnerMessage("
+                + ")";
         }
     }
 }

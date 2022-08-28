@@ -170,4 +170,10 @@ public sealed class ListTransactionsRequestMessage: IRequestMessage, IEquatable<
         hashCode = HashCode.Combine(hashCode, StateFilters, ProducerIdFilters);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "ListTransactionsRequestMessage("
+            + ")";
+    }
 }

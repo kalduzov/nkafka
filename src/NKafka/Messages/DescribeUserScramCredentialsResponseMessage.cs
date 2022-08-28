@@ -173,6 +173,14 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeUserScramCredentialsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class DescribeUserScramCredentialsResultMessage: IMessage, IEquatable<DescribeUserScramCredentialsResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -333,6 +341,13 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
             hashCode = HashCode.Combine(hashCode, User, ErrorCode, ErrorMessage, CredentialInfos);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribeUserScramCredentialsResultMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
+        }
     }
 
     public sealed class CredentialInfoMessage: IMessage, IEquatable<CredentialInfoMessage>
@@ -414,6 +429,14 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Mechanism, Iterations);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CredentialInfoMessage("
+                + "Mechanism=" + Mechanism
+                + ", Iterations=" + Iterations
+                + ")";
         }
     }
 }

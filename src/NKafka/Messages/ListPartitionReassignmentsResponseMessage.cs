@@ -173,6 +173,14 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListPartitionReassignmentsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class OngoingTopicReassignmentMessage: IMessage, IEquatable<OngoingTopicReassignmentMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -291,6 +299,12 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OngoingTopicReassignmentMessage("
+                + ")";
         }
     }
 
@@ -447,6 +461,13 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, Replicas, AddingReplicas, RemovingReplicas);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OngoingPartitionReassignmentMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 }

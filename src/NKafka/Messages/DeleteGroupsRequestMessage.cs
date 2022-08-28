@@ -205,4 +205,10 @@ public sealed class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<Dele
         hashCode = HashCode.Combine(hashCode, GroupsNames);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "DeleteGroupsRequestMessage("
+            + ")";
+    }
 }

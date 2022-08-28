@@ -13,8 +13,8 @@ public class MessageGenerator: IMessageGenerator
     private readonly IHeaderGenerator _headerGenerator;
     private readonly ICodeGenerator _codeGenerator;
     private readonly StructRegistry _structRegistry;
-    private readonly IReadMethodGenerator _readMethodGenerator;
-    private readonly IWriteMethodGenerator _writeMethodGenerator;
+    private readonly IMethodGenerator _readMethodGenerator;
+    private readonly IMethodGenerator _writeMethodGenerator;
     private Versions _messageFlexibleVersions = Versions.None;
 
     public MessageGenerator(string ns)
@@ -67,7 +67,7 @@ public class MessageGenerator: IMessageGenerator
         _codeGenerator.IncrementIndent();
         GenerateProperties(@struct, isTopLevel, topLevelMessage, parentVersions);
         _codeGenerator.AppendLine();
-        GenerateCtor(className, topLevelMessage, parentVersions);
+        GenerateCtor(className);
         _codeGenerator.AppendLine();
         _readMethodGenerator.Generate(className, @struct, parentVersions, _messageFlexibleVersions);
         _codeGenerator.AppendLine();
@@ -115,9 +115,47 @@ public class MessageGenerator: IMessageGenerator
         _codeGenerator.AppendLine("public override string ToString()");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
-        
+        _codeGenerator.AppendLine($"return \"{className}(\"");
+        _codeGenerator.IncrementIndent();
+        var prefix = "";
+
+        foreach (var field in @struct.Fields)
+        {
+            GenerateFieldToString(prefix, field);
+            prefix = ", ";
+        }
+
+        _codeGenerator.AppendLine("+ \")\";");
+        _codeGenerator.DecrementIndent();
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendRightBrace();
+    }
+
+    private void GenerateFieldToString(string prefix, FieldSpecification field)
+    {
+        switch (field.Type)
+        {
+            case IFieldType.BoolFieldType:
+            {
+                _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + ({field.Name} ? \"true\" : \"false\")");
+
+                break;
+            }
+            case IFieldType.Int8FieldType:
+            case IFieldType.Int16FieldType:
+            case IFieldType.UInt16FieldType:
+            case IFieldType.Int32FieldType:
+            case IFieldType.UInt32FieldType:
+            case IFieldType.Int64FieldType:
+            case IFieldType.Float64FieldType:
+            case IFieldType.UuidFieldType:
+            {
+                _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + {field.Name}");
+
+                break;
+            }
+        }
+        //todo дописать работу со сложными типами
     }
 
     private void GenerateHashCode(StructSpecification @struct, bool onlyMapKeys)
@@ -232,10 +270,7 @@ public class MessageGenerator: IMessageGenerator
         _codeGenerator.AppendRightBrace();
     }
 
-    private void GenerateCtor(
-        string className,
-        MessageSpecification? topLevelMessage,
-        Versions versions)
+    private void GenerateCtor(string className)
     {
         _codeGenerator.AppendLine($"public {className}()");
         _codeGenerator.AppendLeftBrace();

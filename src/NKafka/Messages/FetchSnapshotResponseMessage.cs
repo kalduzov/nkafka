@@ -142,6 +142,14 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "FetchSnapshotResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -260,6 +268,12 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicSnapshotMessage("
+                + ")";
         }
     }
 
@@ -412,6 +426,16 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             hashCode = HashCode.Combine(hashCode, Index, ErrorCode, SnapshotId, CurrentLeader, Size, Position, UnalignedRecords);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "PartitionSnapshotMessage("
+                + "Index=" + Index
+                + ", ErrorCode=" + ErrorCode
+                + ", Size=" + Size
+                + ", Position=" + Position
+                + ")";
+        }
     }
 
     public sealed class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
@@ -494,6 +518,14 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             hashCode = HashCode.Combine(hashCode, EndOffset, Epoch);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "SnapshotIdMessage("
+                + "EndOffset=" + EndOffset
+                + ", Epoch=" + Epoch
+                + ")";
+        }
     }
 
     public sealed class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
@@ -575,6 +607,14 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, LeaderId, LeaderEpoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderIdAndEpochMessage("
+                + "LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 }

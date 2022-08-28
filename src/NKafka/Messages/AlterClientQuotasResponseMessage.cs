@@ -177,6 +177,13 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterClientQuotasResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -377,6 +384,13 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
             hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, Entity);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "EntryDataMessage("
+                + "ErrorCode=" + ErrorCode
+                + ")";
+        }
     }
 
     public sealed class EntityDataMessage: IMessage, IEquatable<EntityDataMessage>
@@ -549,6 +563,12 @@ public sealed class AlterClientQuotasResponseMessage: IResponseMessage, IEquatab
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, EntityType, EntityName);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "EntityDataMessage("
+                + ")";
         }
     }
 }

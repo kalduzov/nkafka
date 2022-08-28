@@ -186,6 +186,14 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreatePartitionsRequestMessage("
+            + ", TimeoutMs=" + TimeoutMs
+            + ", ValidateOnly=" + (ValidateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class CreatePartitionsTopicMessage: IMessage, IEquatable<CreatePartitionsTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -386,6 +394,13 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "CreatePartitionsTopicMessage("
+                + ", Count=" + Count
+                + ")";
+        }
     }
 
     public sealed class CreatePartitionsAssignmentMessage: IMessage, IEquatable<CreatePartitionsAssignmentMessage>
@@ -507,6 +522,12 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, BrokerIds);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreatePartitionsAssignmentMessage("
+                + ")";
         }
     }
 

@@ -248,4 +248,12 @@ public sealed class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncG
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProtocolType, ProtocolName, Assignment);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "SyncGroupResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

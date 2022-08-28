@@ -271,6 +271,13 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreateDelegationTokenRequestMessage("
+            + ", MaxLifetimeMs=" + MaxLifetimeMs
+            + ")";
+    }
+
     public sealed class CreatableRenewersMessage: IMessage, IEquatable<CreatableRenewersMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -429,6 +436,12 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreatableRenewersMessage("
+                + ")";
         }
     }
 }

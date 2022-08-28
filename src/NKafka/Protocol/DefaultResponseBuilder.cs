@@ -33,7 +33,8 @@ namespace NKafka.Protocol
 
             return apiKey switch
             {
-                ApiKeys.Metadata => new MetadataResponseMessage(reader, apiVersion)
+                ApiKeys.Metadata => new MetadataResponseMessage(reader, apiVersion),
+                ApiKeys.ApiVersions => new ApiVersionsResponseMessage(reader, apiVersion),
             };
         }
     }

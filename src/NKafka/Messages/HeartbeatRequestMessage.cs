@@ -266,4 +266,11 @@ public sealed class HeartbeatRequestMessage: IRequestMessage, IEquatable<Heartbe
         hashCode = HashCode.Combine(hashCode, GroupId, GenerationId, MemberId, GroupInstanceId);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "HeartbeatRequestMessage("
+            + ", GenerationId=" + GenerationId
+            + ")";
+    }
 }

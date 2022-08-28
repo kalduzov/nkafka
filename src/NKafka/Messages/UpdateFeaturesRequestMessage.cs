@@ -158,6 +158,14 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "UpdateFeaturesRequestMessage("
+            + "timeoutMs=" + timeoutMs
+            + ", ValidateOnly=" + (ValidateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class FeatureUpdateKeyMessage: IMessage, IEquatable<FeatureUpdateKeyMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -305,6 +313,15 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Feature);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "FeatureUpdateKeyMessage("
+                + ", MaxVersionLevel=" + MaxVersionLevel
+                + ", AllowDowngrade=" + (AllowDowngrade ? "true" : "false")
+                + ", UpgradeType=" + UpgradeType
+                + ")";
         }
     }
 

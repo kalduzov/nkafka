@@ -224,4 +224,12 @@ public sealed class SaslAuthenticateResponseMessage: IResponseMessage, IEquatabl
         hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, AuthBytes, SessionLifetimeMs);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "SaslAuthenticateResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ", SessionLifetimeMs=" + SessionLifetimeMs
+            + ")";
+    }
 }

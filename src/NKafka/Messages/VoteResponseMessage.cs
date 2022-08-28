@@ -137,6 +137,13 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "VoteResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -256,6 +263,12 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
             hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
@@ -361,6 +374,17 @@ public sealed class VoteResponseMessage: IResponseMessage, IEquatable<VoteRespon
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, LeaderId, LeaderEpoch, VoteGranted);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ", LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", VoteGranted=" + (VoteGranted ? "true" : "false")
+                + ")";
         }
     }
 }

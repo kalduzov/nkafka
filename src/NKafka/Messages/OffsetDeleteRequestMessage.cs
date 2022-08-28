@@ -143,6 +143,12 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetDeleteRequestMessage("
+            + ")";
+    }
+
     public sealed class OffsetDeleteRequestTopicMessage: IMessage, IEquatable<OffsetDeleteRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -253,6 +259,12 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetDeleteRequestTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class OffsetDeleteRequestPartitionMessage: IMessage, IEquatable<OffsetDeleteRequestPartitionMessage>
@@ -317,6 +329,13 @@ public sealed class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<Offs
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "OffsetDeleteRequestPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 

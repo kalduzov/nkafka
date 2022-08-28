@@ -135,4 +135,11 @@ public sealed class EnvelopeResponseMessage: IResponseMessage, IEquatable<Envelo
         hashCode = HashCode.Combine(hashCode, ResponseData, ErrorCode);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "EnvelopeResponseMessage("
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

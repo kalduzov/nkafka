@@ -187,6 +187,13 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeGroupsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DescribedGroupMessage: IMessage, IEquatable<DescribedGroupMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -519,6 +526,14 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
             hashCode = HashCode.Combine(hashCode, ErrorCode, GroupId, GroupState, ProtocolType, ProtocolData, Members, AuthorizedOperations);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribedGroupMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", AuthorizedOperations=" + AuthorizedOperations
+                + ")";
+        }
     }
 
     public sealed class DescribedGroupMemberMessage: IMessage, IEquatable<DescribedGroupMemberMessage>
@@ -845,6 +860,12 @@ public sealed class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, ClientId, ClientHost, MemberMetadata, MemberAssignment);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribedGroupMemberMessage("
+                + ")";
         }
     }
 }

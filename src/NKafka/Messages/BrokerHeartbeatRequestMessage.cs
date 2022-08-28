@@ -134,4 +134,15 @@ public sealed class BrokerHeartbeatRequestMessage: IRequestMessage, IEquatable<B
         hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch, CurrentMetadataOffset, WantFence, WantShutDown);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "BrokerHeartbeatRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ", CurrentMetadataOffset=" + CurrentMetadataOffset
+            + ", WantFence=" + (WantFence ? "true" : "false")
+            + ", WantShutDown=" + (WantShutDown ? "true" : "false")
+            + ")";
+    }
 }

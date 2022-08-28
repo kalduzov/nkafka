@@ -229,4 +229,11 @@ public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<De
         hashCode = HashCode.Combine(hashCode, Groups, IncludeAuthorizedOperations);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "DescribeGroupsRequestMessage("
+            + ", IncludeAuthorizedOperations=" + (IncludeAuthorizedOperations ? "true" : "false")
+            + ")";
+    }
 }

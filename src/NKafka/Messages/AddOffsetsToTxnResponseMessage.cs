@@ -127,4 +127,12 @@ public sealed class AddOffsetsToTxnResponseMessage: IResponseMessage, IEquatable
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "AddOffsetsToTxnResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

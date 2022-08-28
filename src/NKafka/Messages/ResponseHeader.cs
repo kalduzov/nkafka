@@ -117,4 +117,11 @@ public sealed class ResponseHeader: IMessage, IEquatable<ResponseHeader>
         hashCode = HashCode.Combine(hashCode, CorrelationId);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "ResponseHeader("
+            + "CorrelationId=" + CorrelationId
+            + ")";
+    }
 }

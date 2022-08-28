@@ -172,6 +172,12 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreateAclsRequestMessage("
+            + ")";
+    }
+
     public sealed class AclCreationMessage: IMessage, IEquatable<AclCreationMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -415,6 +421,16 @@ public sealed class CreateAclsRequestMessage: IRequestMessage, IEquatable<Create
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, ResourcePatternType, Principal, Host, Operation, PermissionType);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AclCreationMessage("
+                + "ResourceType=" + ResourceType
+                + ", ResourcePatternType=" + ResourcePatternType
+                + ", Operation=" + Operation
+                + ", PermissionType=" + PermissionType
+                + ")";
         }
     }
 }

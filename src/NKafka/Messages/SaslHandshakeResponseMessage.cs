@@ -143,4 +143,11 @@ public sealed class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<S
         hashCode = HashCode.Combine(hashCode, ErrorCode, Mechanisms);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "SaslHandshakeResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

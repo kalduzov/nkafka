@@ -122,4 +122,11 @@ public sealed class UpdateMetadataResponseMessage: IResponseMessage, IEquatable<
         hashCode = HashCode.Combine(hashCode, ErrorCode);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "UpdateMetadataResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

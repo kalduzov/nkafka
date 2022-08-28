@@ -186,6 +186,12 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeLogDirsRequestMessage("
+            + ")";
+    }
+
     public sealed class DescribableLogDirTopicMessage: IMessage, IEquatable<DescribableLogDirTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -346,6 +352,12 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Topic);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribableLogDirTopicMessage("
+                + ")";
         }
     }
 

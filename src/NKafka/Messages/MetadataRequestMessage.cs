@@ -271,6 +271,15 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "MetadataRequestMessage("
+            + ", AllowAutoTopicCreation=" + (AllowAutoTopicCreation ? "true" : "false")
+            + ", IncludeClusterAuthorizedOperations=" + (IncludeClusterAuthorizedOperations ? "true" : "false")
+            + ", IncludeTopicAuthorizedOperations=" + (IncludeTopicAuthorizedOperations ? "true" : "false")
+            + ")";
+    }
+
     public sealed class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -424,6 +433,13 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicId, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "MetadataRequestTopicMessage("
+                + "TopicId=" + TopicId
+                + ")";
         }
     }
 }

@@ -19,13 +19,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
+internal class WriteMethodGenerator: IMethodGenerator
 {
     private readonly StructRegistry _structRegistry;
     private readonly ICodeGenerator _codeGenerator;
@@ -69,7 +67,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                         void CallGenerateVariableLengthWriter(Versions versions)
                                         {
                                             GenerateVariableLengthWriter(
-                                                FieldFlexibleVersions(field),
+                                                ((IMethodGenerator)this).FieldFlexibleVersions(field),
                                                 field.Name,
                                                 field.Type,
                                                 versions,
@@ -80,7 +78,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                         if (field.Type.IsArray
                                             && ((IFieldType.ArrayType)field.Type).ElementType.SerializationIsDifferentInFlexibleVersions)
                                         {
-                                            VersionConditional.ForVersions(FieldFlexibleVersions(field), presentAndUntaggedVersions)
+                                            VersionConditional.ForVersions(((IMethodGenerator)this).FieldFlexibleVersions(field), presentAndUntaggedVersions)
                                                 .IfMember(CallGenerateVariableLengthWriter)
                                                 .IfNotMember(CallGenerateVariableLengthWriter)
                                                 .Generate(_codeGenerator);
@@ -178,7 +176,7 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
                                                 {
                                                     //todo тут проблема с рассчетом размера - надо подумать как сделать    
                                                     GenerateVariableLengthWriter(
-                                                        FieldFlexibleVersions(field),
+                                                        ((IMethodGenerator)this).FieldFlexibleVersions(field),
                                                         field.Name,
                                                         field.Type,
                                                         presentAndTaggedVersions,
@@ -234,6 +232,8 @@ internal class WriteMethodGenerator: MethodGenerator, IWriteMethodGenerator
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendRightBrace();
     }
+
+    public Versions MessageFlexibleVersions { get; set; }
 
     private void GenerateCheckForUnsupportedNumTaggedFields(string conditional)
     {

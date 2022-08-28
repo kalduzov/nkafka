@@ -177,6 +177,13 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteAclsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DeleteAclsFilterResultMessage: IMessage, IEquatable<DeleteAclsFilterResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -376,6 +383,13 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, MatchingAcls);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteAclsFilterResultMessage("
+                + "ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 
@@ -685,6 +699,17 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
             hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName, PatternType, Principal, Host);
             hashCode = HashCode.Combine(hashCode, Operation, PermissionType);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteAclsMatchingAclMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", ResourceType=" + ResourceType
+                + ", PatternType=" + PatternType
+                + ", Operation=" + Operation
+                + ", PermissionType=" + PermissionType
+                + ")";
         }
     }
 }

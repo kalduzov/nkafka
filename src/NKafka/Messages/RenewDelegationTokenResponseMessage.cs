@@ -134,4 +134,13 @@ public sealed class RenewDelegationTokenResponseMessage: IResponseMessage, IEqua
         hashCode = HashCode.Combine(hashCode, ErrorCode, ExpiryTimestampMs, ThrottleTimeMs);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "RenewDelegationTokenResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ", ExpiryTimestampMs=" + ExpiryTimestampMs
+            + ", ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
 }

@@ -172,6 +172,12 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteAclsRequestMessage("
+            + ")";
+    }
+
     public sealed class DeleteAclsFilterMessage: IMessage, IEquatable<DeleteAclsFilterMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -451,6 +457,16 @@ public sealed class DeleteAclsRequestMessage: IRequestMessage, IEquatable<Delete
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ResourceTypeFilter, ResourceNameFilter, PatternTypeFilter, PrincipalFilter, HostFilter, Operation, PermissionType);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteAclsFilterMessage("
+                + "ResourceTypeFilter=" + ResourceTypeFilter
+                + ", PatternTypeFilter=" + PatternTypeFilter
+                + ", Operation=" + Operation
+                + ", PermissionType=" + PermissionType
+                + ")";
         }
     }
 }

@@ -187,6 +187,13 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListOffsetsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class ListOffsetsTopicResponseMessage: IMessage, IEquatable<ListOffsetsTopicResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -364,6 +371,12 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ListOffsetsTopicResponseMessage("
+                + ")";
         }
     }
 
@@ -576,6 +589,17 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, OldStyleOffsets, Timestamp, Offset, LeaderEpoch);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ListOffsetsPartitionResponseMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ", Timestamp=" + Timestamp
+                + ", Offset=" + Offset
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 }

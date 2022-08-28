@@ -173,6 +173,14 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterPartitionReassignmentsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class ReassignableTopicResponseMessage: IMessage, IEquatable<ReassignableTopicResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -292,6 +300,12 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "ReassignableTopicResponseMessage("
+                + ")";
+        }
     }
 
     public sealed class ReassignablePartitionResponseMessage: IMessage, IEquatable<ReassignablePartitionResponseMessage>
@@ -407,6 +421,14 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, ErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ReassignablePartitionResponseMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

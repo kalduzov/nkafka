@@ -132,6 +132,13 @@ public sealed class AlterUserScramCredentialsResponseMessage: IResponseMessage, 
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterUserScramCredentialsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class AlterUserScramCredentialsResultMessage: IMessage, IEquatable<AlterUserScramCredentialsResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -264,6 +271,13 @@ public sealed class AlterUserScramCredentialsResponseMessage: IResponseMessage, 
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, User, ErrorCode, ErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterUserScramCredentialsResultMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

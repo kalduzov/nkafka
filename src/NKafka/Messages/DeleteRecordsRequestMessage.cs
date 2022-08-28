@@ -179,6 +179,13 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteRecordsRequestMessage("
+            + ", TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class DeleteRecordsTopicMessage: IMessage, IEquatable<DeleteRecordsTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -357,6 +364,12 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DeleteRecordsTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class DeleteRecordsPartitionMessage: IMessage, IEquatable<DeleteRecordsPartitionMessage>
@@ -451,6 +464,14 @@ public sealed class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<Del
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, Offset);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteRecordsPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", Offset=" + Offset
+                + ")";
         }
     }
 }

@@ -177,6 +177,13 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteGroupsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DeletableGroupResultMessage: IMessage, IEquatable<DeletableGroupResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -306,6 +313,13 @@ public sealed class DeleteGroupsResponseMessage: IResponseMessage, IEquatable<De
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, GroupId);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeletableGroupResultMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 

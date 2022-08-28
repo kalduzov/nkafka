@@ -187,6 +187,14 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeDelegationTokenResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ", ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DescribedDelegationTokenMessage: IMessage, IEquatable<DescribedDelegationTokenMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -582,6 +590,15 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
             hashCode = HashCode.Combine(hashCode, TokenId, Hmac, Renewers);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribedDelegationTokenMessage("
+                + ", IssueTimestamp=" + IssueTimestamp
+                + ", ExpiryTimestamp=" + ExpiryTimestamp
+                + ", MaxTimestamp=" + MaxTimestamp
+                + ")";
+        }
     }
 
     public sealed class DescribedDelegationTokenRenewerMessage: IMessage, IEquatable<DescribedDelegationTokenRenewerMessage>
@@ -742,6 +759,12 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PrincipalType, PrincipalName);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribedDelegationTokenRenewerMessage("
+                + ")";
         }
     }
 }

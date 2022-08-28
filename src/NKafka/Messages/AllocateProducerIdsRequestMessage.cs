@@ -113,4 +113,12 @@ public sealed class AllocateProducerIdsRequestMessage: IRequestMessage, IEquatab
         hashCode = HashCode.Combine(hashCode, BrokerId, BrokerEpoch);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "AllocateProducerIdsRequestMessage("
+            + "BrokerId=" + BrokerId
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
 }

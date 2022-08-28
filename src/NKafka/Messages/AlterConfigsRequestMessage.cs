@@ -179,6 +179,13 @@ public sealed class AlterConfigsRequestMessage: IRequestMessage, IEquatable<Alte
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterConfigsRequestMessage("
+            + ", ValidateOnly=" + (ValidateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -365,6 +372,13 @@ public sealed class AlterConfigsRequestMessage: IRequestMessage, IEquatable<Alte
             hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "AlterConfigsResourceMessage("
+                + "ResourceType=" + ResourceType
+                + ")";
+        }
     }
 
     public sealed class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
@@ -538,6 +552,12 @@ public sealed class AlterConfigsRequestMessage: IRequestMessage, IEquatable<Alte
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterableConfigMessage("
+                + ")";
         }
     }
 

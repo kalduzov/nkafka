@@ -172,6 +172,12 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "WriteTxnMarkersRequestMessage("
+            + ")";
+    }
+
     public sealed class WritableTxnMarkerMessage: IMessage, IEquatable<WritableTxnMarkerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -338,6 +344,16 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
             hashCode = HashCode.Combine(hashCode, ProducerId, ProducerEpoch, TransactionResult, Topics, CoordinatorEpoch);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "WritableTxnMarkerMessage("
+                + "ProducerId=" + ProducerId
+                + ", ProducerEpoch=" + ProducerEpoch
+                + ", TransactionResult=" + (TransactionResult ? "true" : "false")
+                + ", CoordinatorEpoch=" + CoordinatorEpoch
+                + ")";
+        }
     }
 
     public sealed class WritableTxnMarkerTopicMessage: IMessage, IEquatable<WritableTxnMarkerTopicMessage>
@@ -499,6 +515,12 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "WritableTxnMarkerTopicMessage("
+                + ")";
         }
     }
 }

@@ -203,6 +203,14 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ListOffsetsRequestMessage("
+            + "ReplicaId=" + ReplicaId
+            + ", IsolationLevel=" + IsolationLevel
+            + ")";
+    }
+
     public sealed class ListOffsetsTopicMessage: IMessage, IEquatable<ListOffsetsTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -381,6 +389,12 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "ListOffsetsTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class ListOffsetsPartitionMessage: IMessage, IEquatable<ListOffsetsPartitionMessage>
@@ -516,6 +530,16 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, CurrentLeaderEpoch, Timestamp, MaxNumOffsets);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ListOffsetsPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
+                + ", Timestamp=" + Timestamp
+                + ", MaxNumOffsets=" + MaxNumOffsets
+                + ")";
         }
     }
 }

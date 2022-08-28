@@ -347,6 +347,15 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "MetadataResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ControllerId=" + ControllerId
+            + ", ClusterAuthorizedOperations=" + ClusterAuthorizedOperations
+            + ")";
+    }
+
     public sealed class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -540,6 +549,14 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, NodeId);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "MetadataResponseBrokerMessage("
+                + "NodeId=" + NodeId
+                + ", Port=" + Port
+                + ")";
         }
     }
 
@@ -820,6 +837,16 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "MetadataResponseTopicMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", TopicId=" + TopicId
+                + ", IsInternal=" + (IsInternal ? "true" : "false")
+                + ", TopicAuthorizedOperations=" + TopicAuthorizedOperations
+                + ")";
+        }
     }
 
     public sealed class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
@@ -1072,6 +1099,16 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ErrorCode, PartitionIndex, LeaderId, LeaderEpoch, ReplicaNodes, IsrNodes, OfflineReplicas);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "MetadataResponsePartitionMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", PartitionIndex=" + PartitionIndex
+                + ", LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 

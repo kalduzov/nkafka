@@ -154,6 +154,12 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterUserScramCredentialsRequestMessage("
+            + ")";
+    }
+
     public sealed class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -252,6 +258,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Mechanism);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ScramCredentialDeletionMessage("
+                + ", Mechanism=" + Mechanism
+                + ")";
         }
     }
 
@@ -398,6 +411,14 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Mechanism, Iterations, Salt, SaltedPassword);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ScramCredentialUpsertionMessage("
+                + ", Mechanism=" + Mechanism
+                + ", Iterations=" + Iterations
+                + ")";
         }
     }
 }

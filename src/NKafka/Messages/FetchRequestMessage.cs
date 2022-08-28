@@ -425,6 +425,19 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "FetchRequestMessage("
+            + ", ReplicaId=" + ReplicaId
+            + ", MaxWaitMs=" + MaxWaitMs
+            + ", MinBytes=" + MinBytes
+            + ", MaxBytes=" + MaxBytes
+            + ", IsolationLevel=" + IsolationLevel
+            + ", SessionId=" + SessionId
+            + ", SessionEpoch=" + SessionEpoch
+            + ")";
+    }
+
     public sealed class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -628,6 +641,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             hashCode = HashCode.Combine(hashCode, Topic, TopicId, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "FetchTopicMessage("
+                + ", TopicId=" + TopicId
+                + ")";
+        }
     }
 
     public sealed class FetchPartitionMessage: IMessage, IEquatable<FetchPartitionMessage>
@@ -787,6 +807,18 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, FetchOffset, LastFetchedEpoch, LogStartOffset, PartitionMaxBytes);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "FetchPartitionMessage("
+                + "Partition=" + Partition
+                + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
+                + ", FetchOffset=" + FetchOffset
+                + ", LastFetchedEpoch=" + LastFetchedEpoch
+                + ", LogStartOffset=" + LogStartOffset
+                + ", PartitionMaxBytes=" + PartitionMaxBytes
+                + ")";
         }
     }
 
@@ -978,6 +1010,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Topic, TopicId, Partitions);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ForgottenTopicMessage("
+                + ", TopicId=" + TopicId
+                + ")";
         }
     }
 }

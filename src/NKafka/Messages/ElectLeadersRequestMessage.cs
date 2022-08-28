@@ -217,6 +217,14 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ElectLeadersRequestMessage("
+            + "ElectionType=" + ElectionType
+            + ", TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class TopicPartitionsMessage: IMessage, IEquatable<TopicPartitionsMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -377,6 +385,12 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Topic);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicPartitionsMessage("
+                + ")";
         }
     }
 

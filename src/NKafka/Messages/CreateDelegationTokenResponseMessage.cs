@@ -384,4 +384,15 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         hashCode = HashCode.Combine(hashCode, MaxTimestampMs, TokenId, Hmac, ThrottleTimeMs);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "CreateDelegationTokenResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ", IssueTimestampMs=" + IssueTimestampMs
+            + ", ExpiryTimestampMs=" + ExpiryTimestampMs
+            + ", MaxTimestampMs=" + MaxTimestampMs
+            + ", ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
 }

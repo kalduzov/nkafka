@@ -180,4 +180,10 @@ public sealed class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVe
         hashCode = HashCode.Combine(hashCode, ClientSoftwareName, ClientSoftwareVersion);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "ApiVersionsRequestMessage("
+            + ")";
+    }
 }

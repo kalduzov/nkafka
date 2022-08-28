@@ -326,6 +326,16 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "StopReplicaRequestMessage("
+            + "ControllerId=" + ControllerId
+            + ", ControllerEpoch=" + ControllerEpoch
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ", DeletePartitions=" + (DeletePartitions ? "true" : "false")
+            + ")";
+    }
+
     public sealed class StopReplicaPartitionV0Message: IMessage, IEquatable<StopReplicaPartitionV0Message>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -414,6 +424,13 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "StopReplicaPartitionV0Message("
+                + ", PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 
@@ -577,6 +594,12 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "StopReplicaTopicV1Message("
+                + ")";
+        }
     }
 
     public sealed class StopReplicaTopicStateMessage: IMessage, IEquatable<StopReplicaTopicStateMessage>
@@ -702,6 +725,12 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionStates);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "StopReplicaTopicStateMessage("
+                + ")";
+        }
     }
 
     public sealed class StopReplicaPartitionStateMessage: IMessage, IEquatable<StopReplicaPartitionStateMessage>
@@ -790,6 +819,15 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, LeaderEpoch, DeletePartition);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "StopReplicaPartitionStateMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", DeletePartition=" + (DeletePartition ? "true" : "false")
+                + ")";
         }
     }
 }

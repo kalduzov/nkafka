@@ -127,6 +127,12 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeQuorumRequestMessage("
+            + ")";
+    }
+
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -246,6 +252,12 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
             hashCode = HashCode.Combine(hashCode, TopicName, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
+        }
     }
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
@@ -320,6 +332,13 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 }

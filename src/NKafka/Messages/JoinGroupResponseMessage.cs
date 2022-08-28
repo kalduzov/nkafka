@@ -406,6 +406,16 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "JoinGroupResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", GenerationId=" + GenerationId
+            + ", SkipAssignment=" + (SkipAssignment ? "true" : "false")
+            + ")";
+    }
+
     public sealed class JoinGroupResponseMemberMessage: IMessage, IEquatable<JoinGroupResponseMemberMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -624,6 +634,12 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, Metadata);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "JoinGroupResponseMemberMessage("
+                + ")";
         }
     }
 }

@@ -197,6 +197,14 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeLogDirsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class DescribeLogDirsResultMessage: IMessage, IEquatable<DescribeLogDirsResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -419,6 +427,15 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, ErrorCode, LogDir, Topics, TotalBytes, UsableBytes);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribeLogDirsResultMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", TotalBytes=" + TotalBytes
+                + ", UsableBytes=" + UsableBytes
+                + ")";
+        }
     }
 
     public sealed class DescribeLogDirsTopicMessage: IMessage, IEquatable<DescribeLogDirsTopicMessage>
@@ -599,6 +616,12 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribeLogDirsTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class DescribeLogDirsPartitionMessage: IMessage, IEquatable<DescribeLogDirsPartitionMessage>
@@ -707,6 +730,16 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, PartitionSize, OffsetLag, IsFutureKey);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeLogDirsPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", PartitionSize=" + PartitionSize
+                + ", OffsetLag=" + OffsetLag
+                + ", IsFutureKey=" + (IsFutureKey ? "true" : "false")
+                + ")";
         }
     }
 }

@@ -177,6 +177,13 @@ public sealed class AlterConfigsResponseMessage: IResponseMessage, IEquatable<Al
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AlterConfigsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class AlterConfigsResourceResponseMessage: IMessage, IEquatable<AlterConfigsResourceResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -364,6 +371,14 @@ public sealed class AlterConfigsResponseMessage: IResponseMessage, IEquatable<Al
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AlterConfigsResourceResponseMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", ResourceType=" + ResourceType
+                + ")";
         }
     }
 }

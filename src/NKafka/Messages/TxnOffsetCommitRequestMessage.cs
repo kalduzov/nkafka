@@ -378,6 +378,15 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "TxnOffsetCommitRequestMessage("
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ", GenerationId=" + GenerationId
+            + ")";
+    }
+
     public sealed class TxnOffsetCommitRequestTopicMessage: IMessage, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -556,6 +565,12 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TxnOffsetCommitRequestTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class TxnOffsetCommitRequestPartitionMessage: IMessage, IEquatable<TxnOffsetCommitRequestPartitionMessage>
@@ -719,6 +734,15 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommittedMetadata);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TxnOffsetCommitRequestPartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", CommittedOffset=" + CommittedOffset
+                + ", CommittedLeaderEpoch=" + CommittedLeaderEpoch
+                + ")";
         }
     }
 }

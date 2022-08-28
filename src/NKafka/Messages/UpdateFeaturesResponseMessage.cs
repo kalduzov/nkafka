@@ -173,6 +173,14 @@ public sealed class UpdateFeaturesResponseMessage: IResponseMessage, IEquatable<
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "UpdateFeaturesResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class UpdatableFeatureResultMessage: IMessage, IEquatable<UpdatableFeatureResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -306,6 +314,13 @@ public sealed class UpdateFeaturesResponseMessage: IResponseMessage, IEquatable<
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Feature);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "UpdatableFeatureResultMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 

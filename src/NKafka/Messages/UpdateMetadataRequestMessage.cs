@@ -319,6 +319,15 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "UpdateMetadataRequestMessage("
+            + "ControllerId=" + ControllerId
+            + ", ControllerEpoch=" + ControllerEpoch
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
+
     public sealed class UpdateMetadataTopicStateMessage: IMessage, IEquatable<UpdateMetadataTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -517,6 +526,13 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, TopicId, PartitionStates);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "UpdateMetadataTopicStateMessage("
+                + ", TopicId=" + TopicId
+                + ")";
         }
     }
 
@@ -784,6 +800,14 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             hashCode = HashCode.Combine(hashCode, Id, V0Host, V0Port, Endpoints, Rack);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "UpdateMetadataBrokerMessage("
+                + "Id=" + Id
+                + ", V0Port=" + V0Port
+                + ")";
+        }
     }
 
     public sealed class UpdateMetadataEndpointMessage: IMessage, IEquatable<UpdateMetadataEndpointMessage>
@@ -970,6 +994,14 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Port, Host, Listener, SecurityProtocol);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "UpdateMetadataEndpointMessage("
+                + "Port=" + Port
+                + ", SecurityProtocol=" + SecurityProtocol
+                + ")";
         }
     }
 
@@ -1252,6 +1284,17 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex, ControllerEpoch, Leader, LeaderEpoch, Isr, ZkVersion);
             hashCode = HashCode.Combine(hashCode, Replicas, OfflineReplicas);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "UpdateMetadataPartitionStateMessage("
+                + ", PartitionIndex=" + PartitionIndex
+                + ", ControllerEpoch=" + ControllerEpoch
+                + ", Leader=" + Leader
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", ZkVersion=" + ZkVersion
+                + ")";
         }
     }
 }

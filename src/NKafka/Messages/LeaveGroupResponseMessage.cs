@@ -212,6 +212,14 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "LeaveGroupResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class MemberResponseMessage: IMessage, IEquatable<MemberResponseMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -396,6 +404,13 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "MemberResponseMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

@@ -177,6 +177,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "AddPartitionsToTxnResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class AddPartitionsToTxnTopicResultMessage: IMessage, IEquatable<AddPartitionsToTxnTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -356,6 +363,12 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "AddPartitionsToTxnTopicResultMessage("
+                + ")";
+        }
     }
 
     public sealed class AddPartitionsToTxnPartitionResultMessage: IMessage, IEquatable<AddPartitionsToTxnPartitionResultMessage>
@@ -454,6 +467,14 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AddPartitionsToTxnPartitionResultMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 

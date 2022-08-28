@@ -268,6 +268,12 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "LeaveGroupRequestMessage("
+            + ")";
+    }
+
     public sealed class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -481,6 +487,12 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, MemberId, GroupInstanceId, Reason);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "MemberIdentityMessage("
+                + ")";
         }
     }
 }

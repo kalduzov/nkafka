@@ -187,6 +187,13 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreateTopicsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class CreatableTopicResultMessage: IMessage, IEquatable<CreatableTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -496,6 +503,17 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "CreatableTopicResultMessage("
+                + ", TopicId=" + TopicId
+                + ", ErrorCode=" + ErrorCode
+                + ", TopicConfigErrorCode=" + TopicConfigErrorCode
+                + ", NumPartitions=" + NumPartitions
+                + ", ReplicationFactor=" + ReplicationFactor
+                + ")";
+        }
     }
 
     public sealed class CreatableTopicConfigsMessage: IMessage, IEquatable<CreatableTopicConfigsMessage>
@@ -645,6 +663,15 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Value, ReadOnly, ConfigSource, IsSensitive);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreatableTopicConfigsMessage("
+                + ", ReadOnly=" + (ReadOnly ? "true" : "false")
+                + ", ConfigSource=" + ConfigSource
+                + ", IsSensitive=" + (IsSensitive ? "true" : "false")
+                + ")";
         }
     }
 

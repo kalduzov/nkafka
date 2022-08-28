@@ -423,6 +423,14 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "JoinGroupRequestMessage("
+            + ", SessionTimeoutMs=" + SessionTimeoutMs
+            + ", RebalanceTimeoutMs=" + RebalanceTimeoutMs
+            + ")";
+    }
+
     public sealed class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -575,6 +583,12 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "JoinGroupRequestProtocolMessage("
+                + ")";
         }
     }
 

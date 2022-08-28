@@ -213,6 +213,16 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeClusterResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", ControllerId=" + ControllerId
+            + ", ClusterAuthorizedOperations=" + ClusterAuthorizedOperations
+            + ")";
+    }
+
     public sealed class DescribeClusterBrokerMessage: IMessage, IEquatable<DescribeClusterBrokerMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -350,6 +360,14 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, BrokerId);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeClusterBrokerMessage("
+                + "BrokerId=" + BrokerId
+                + ", Port=" + Port
+                + ")";
         }
     }
 

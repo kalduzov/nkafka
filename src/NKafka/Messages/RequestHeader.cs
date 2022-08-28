@@ -170,4 +170,13 @@ public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
         hashCode = HashCode.Combine(hashCode, RequestApiKey, RequestApiVersion, CorrelationId, ClientId);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "RequestHeader("
+            + "RequestApiKey=" + RequestApiKey
+            + ", RequestApiVersion=" + RequestApiVersion
+            + ", CorrelationId=" + CorrelationId
+            + ")";
+    }
 }

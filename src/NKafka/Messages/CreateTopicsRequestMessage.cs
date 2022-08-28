@@ -203,6 +203,14 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreateTopicsRequestMessage("
+            + ", timeoutMs=" + timeoutMs
+            + ", validateOnly=" + (validateOnly ? "true" : "false")
+            + ")";
+    }
+
     public sealed class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -455,6 +463,14 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "CreatableTopicMessage("
+                + ", NumPartitions=" + NumPartitions
+                + ", ReplicationFactor=" + ReplicationFactor
+                + ")";
+        }
     }
 
     public sealed class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
@@ -584,6 +600,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreatableReplicaAssignmentMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 
@@ -770,6 +793,12 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreateableTopicConfigMessage("
+                + ")";
         }
     }
 

@@ -145,4 +145,12 @@ public sealed class UnregisterBrokerResponseMessage: IResponseMessage, IEquatabl
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ErrorMessage);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "UnregisterBrokerResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

@@ -31,7 +31,6 @@ using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-
 using System.Text;
 
 namespace NKafka.Messages;
@@ -42,7 +41,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
     public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-    public ApiVersions Version { get; set; }
+    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -67,7 +66,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
     /// <summary>
     /// The response topics.
     /// </summary>
-    public List<FetchableTopicResponseMessage> Responses { get; set; } = new();
+    public List<FetchableTopicResponseMessage> Responses { get; set; } = new ();
 
     public FetchResponseMessage()
     {
@@ -89,7 +88,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             ThrottleTimeMs = 0;
         }
-
         if (version >= ApiVersions.Version7)
         {
             ErrorCode = reader.ReadShort();
@@ -98,7 +96,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             ErrorCode = 0;
         }
-
         if (version >= ApiVersions.Version7)
         {
             SessionId = reader.ReadInt();
@@ -107,13 +104,11 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             SessionId = 0;
         }
-
         {
             if (version >= ApiVersions.Version12)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
-
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Responses was serialized as null");
@@ -121,12 +116,10 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 else
                 {
                     var newCollection = new List<FetchableTopicResponseMessage>(arrayLength);
-
                     for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new FetchableTopicResponseMessage(reader, version));
                     }
-
                     Responses = newCollection;
                 }
             }
@@ -134,7 +127,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 int arrayLength;
                 arrayLength = reader.ReadInt();
-
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Responses was serialized as null");
@@ -142,32 +134,26 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 else
                 {
                     var newCollection = new List<FetchableTopicResponseMessage>(arrayLength);
-
                     for (var i = 0; i < arrayLength; i++)
                     {
                         newCollection.Add(new FetchableTopicResponseMessage(reader, version));
                     }
-
                     Responses = newCollection;
                 }
             }
         }
         UnknownTaggedFields = null;
-
         if (version >= ApiVersions.Version12)
         {
             var numTaggedFields = reader.ReadVarUInt();
-
             for (var t = 0; t < numTaggedFields; t++)
             {
                 var tag = reader.ReadVarUInt();
                 var size = reader.ReadVarUInt();
-
                 switch (tag)
                 {
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                         break;
                 }
             }
@@ -177,17 +163,14 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
     public void Write(BufferWriter writer, ApiVersions version)
     {
         var numTaggedFields = 0;
-
         if (version >= ApiVersions.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
-
         if (version >= ApiVersions.Version7)
         {
             writer.WriteShort((short)ErrorCode);
         }
-
         if (version >= ApiVersions.Version7)
         {
             writer.WriteInt(SessionId);
@@ -199,11 +182,9 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 throw new UnsupportedVersionException($"Attempted to write a non-default SessionId at version {version}");
             }
         }
-
         if (version >= ApiVersions.Version12)
         {
             writer.WriteVarUInt(Responses.Count + 1);
-
             foreach (var element in Responses)
             {
                 element.Write(writer, version);
@@ -212,16 +193,13 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         else
         {
             writer.WriteInt(Responses.Count);
-
             foreach (var element in Responses)
             {
                 element.Write(writer, version);
             }
         }
-
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-
         if (version >= ApiVersions.Version12)
         {
             writer.WriteVarUInt(numTaggedFields);
@@ -250,8 +228,16 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
     {
         var hashCode = 0;
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, SessionId, Responses);
-
         return hashCode;
+    }
+
+    public override string ToString()
+    {
+        return "FetchResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", SessionId=" + SessionId
+            + ")";
     }
 
     public sealed class FetchableTopicResponseMessage: IMessage, IEquatable<FetchableTopicResponseMessage>
@@ -260,7 +246,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -277,7 +263,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         /// <summary>
         /// The topic partitions.
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new();
+        public List<PartitionDataMessage> Partitions { get; set; } = new ();
 
         public FetchableTopicResponseMessage()
         {
@@ -295,11 +281,9 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchableTopicResponseMessage");
             }
-
             if (version <= ApiVersions.Version12)
             {
                 int length;
-
                 if (version >= ApiVersions.Version12)
                 {
                     length = reader.ReadVarUInt() - 1;
@@ -308,7 +292,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 {
                     length = reader.ReadShort();
                 }
-
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Topic was serialized as null");
@@ -326,7 +309,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 Topic = string.Empty;
             }
-
             if (version >= ApiVersions.Version13)
             {
                 TopicId = reader.ReadGuid();
@@ -335,13 +317,11 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 TopicId = Guid.Empty;
             }
-
             {
                 if (version >= ApiVersions.Version12)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
-
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -349,12 +329,10 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         var newCollection = new List<PartitionDataMessage>(arrayLength);
-
                         for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionDataMessage(reader, version));
                         }
-
                         Partitions = newCollection;
                     }
                 }
@@ -362,7 +340,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 {
                     int arrayLength;
                     arrayLength = reader.ReadInt();
-
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -370,32 +347,26 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         var newCollection = new List<PartitionDataMessage>(arrayLength);
-
                         for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new PartitionDataMessage(reader, version));
                         }
-
                         Partitions = newCollection;
                     }
                 }
             }
             UnknownTaggedFields = null;
-
             if (version >= ApiVersions.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
-
                 for (var t = 0; t < numTaggedFields; t++)
                 {
                     var tag = reader.ReadVarUInt();
                     var size = reader.ReadVarUInt();
-
                     switch (tag)
                     {
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                             break;
                     }
                 }
@@ -405,12 +376,10 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         public void Write(BufferWriter writer, ApiVersions version)
         {
             var numTaggedFields = 0;
-
             if (version <= ApiVersions.Version12)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(Topic);
-
                     if (version >= ApiVersions.Version12)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
@@ -419,20 +388,16 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     {
                         writer.WriteShort((short)stringBytes.Length);
                     }
-
                     writer.WriteBytes(stringBytes);
                 }
             }
-
             if (version >= ApiVersions.Version13)
             {
                 writer.WriteGuid(TopicId);
             }
-
             if (version >= ApiVersions.Version12)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
-
                 foreach (var element in Partitions)
                 {
                     element.Write(writer, version);
@@ -441,16 +406,13 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             else
             {
                 writer.WriteInt(Partitions.Count);
-
                 foreach (var element in Partitions)
                 {
                     element.Write(writer, version);
                 }
             }
-
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-
             if (version >= ApiVersions.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
@@ -479,8 +441,14 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Topic, TopicId, Partitions);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "FetchableTopicResponseMessage("
+                + ", TopicId=" + TopicId
+                + ")";
         }
     }
 
@@ -490,7 +458,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -525,22 +493,22 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         /// <summary>
         /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
         /// </summary>
-        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new();
+        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new ();
 
         /// <summary>
         /// 
         /// </summary>
-        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
         /// <summary>
         /// In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request.
         /// </summary>
-        public SnapshotIdMessage SnapshotId { get; set; } = new();
+        public SnapshotIdMessage SnapshotId { get; set; } = new ();
 
         /// <summary>
         /// The aborted transactions.
         /// </summary>
-        public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new();
+        public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new ();
 
         /// <summary>
         /// The preferred read replica for the consumer to use on its next fetch request
@@ -568,11 +536,9 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
-
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             HighWatermark = reader.ReadLong();
-
             if (version >= ApiVersions.Version4)
             {
                 LastStableOffset = reader.ReadLong();
@@ -581,7 +547,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 LastStableOffset = -1;
             }
-
             if (version >= ApiVersions.Version5)
             {
                 LogStartOffset = reader.ReadLong();
@@ -590,24 +555,21 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 LogStartOffset = -1;
             }
-
             {
-                DivergingEpoch = new();
+                DivergingEpoch = new ();
             }
             {
-                CurrentLeader = new();
+                CurrentLeader = new ();
             }
             {
-                SnapshotId = new();
+                SnapshotId = new ();
             }
-
             if (version >= ApiVersions.Version4)
             {
                 if (version >= ApiVersions.Version12)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
-
                     if (arrayLength < 0)
                     {
                         AbortedTransactions = null;
@@ -615,12 +577,10 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         var newCollection = new List<AbortedTransactionMessage>(arrayLength);
-
                         for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AbortedTransactionMessage(reader, version));
                         }
-
                         AbortedTransactions = newCollection;
                     }
                 }
@@ -628,7 +588,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 {
                     int arrayLength;
                     arrayLength = reader.ReadInt();
-
                     if (arrayLength < 0)
                     {
                         AbortedTransactions = null;
@@ -636,21 +595,18 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         var newCollection = new List<AbortedTransactionMessage>(arrayLength);
-
                         for (var i = 0; i < arrayLength; i++)
                         {
                             newCollection.Add(new AbortedTransactionMessage(reader, version));
                         }
-
                         AbortedTransactions = newCollection;
                     }
                 }
             }
             else
             {
-                AbortedTransactions = new();
+                AbortedTransactions = new ();
             }
-
             if (version >= ApiVersions.Version11)
             {
                 PreferredReadReplica = reader.ReadInt();
@@ -659,10 +615,8 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 PreferredReadReplica = -1;
             }
-
             {
                 int length;
-
                 if (version >= ApiVersions.Version12)
                 {
                     length = reader.ReadVarUInt() - 1;
@@ -671,7 +625,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 {
                     length = reader.ReadInt();
                 }
-
                 if (length < 0)
                 {
                     Records = null;
@@ -682,39 +635,32 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 }
             }
             UnknownTaggedFields = null;
-
             if (version >= ApiVersions.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
-
                 for (var t = 0; t < numTaggedFields; t++)
                 {
                     var tag = reader.ReadVarUInt();
                     var size = reader.ReadVarUInt();
-
                     switch (tag)
                     {
                         case 0:
                         {
                             DivergingEpoch = new EpochEndOffsetMessage(reader, version);
-
                             break;
                         }
                         case 1:
                         {
                             CurrentLeader = new LeaderIdAndEpochMessage(reader, version);
-
                             break;
                         }
                         case 2:
                         {
                             SnapshotId = new SnapshotIdMessage(reader, version);
-
                             break;
                         }
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                             break;
                     }
                 }
@@ -727,62 +673,56 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             writer.WriteInt(PartitionIndex);
             writer.WriteShort((short)ErrorCode);
             writer.WriteLong(HighWatermark);
-
             if (version >= ApiVersions.Version4)
             {
                 writer.WriteLong(LastStableOffset);
             }
-
             if (version >= ApiVersions.Version5)
             {
                 writer.WriteLong(LogStartOffset);
             }
-
             if (version >= ApiVersions.Version12)
             {
-                if (!DivergingEpoch.Equals(new()))
+                if (!DivergingEpoch.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!DivergingEpoch.Equals(new()))
+                if (!DivergingEpoch.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default DivergingEpoch at version {version}");
                 }
             }
-
             if (version >= ApiVersions.Version12)
             {
-                if (!CurrentLeader.Equals(new()))
+                if (!CurrentLeader.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!CurrentLeader.Equals(new()))
+                if (!CurrentLeader.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default CurrentLeader at version {version}");
                 }
             }
-
             if (version >= ApiVersions.Version12)
             {
-                if (!SnapshotId.Equals(new()))
+                if (!SnapshotId.Equals(new ()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!SnapshotId.Equals(new()))
+                if (!SnapshotId.Equals(new ()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default SnapshotId at version {version}");
                 }
             }
-
             if (version >= ApiVersions.Version4)
             {
                 if (version >= ApiVersions.Version12)
@@ -794,7 +734,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         writer.WriteVarUInt(AbortedTransactions.Count + 1);
-
                         foreach (var element in AbortedTransactions)
                         {
                             element.Write(writer, version);
@@ -810,7 +749,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     else
                     {
                         writer.WriteInt(AbortedTransactions.Count);
-
                         foreach (var element in AbortedTransactions)
                         {
                             element.Write(writer, version);
@@ -818,7 +756,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     }
                 }
             }
-
             if (version >= ApiVersions.Version11)
             {
                 writer.WriteInt(PreferredReadReplica);
@@ -830,7 +767,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     throw new UnsupportedVersionException($"Attempted to write a non-default PreferredReadReplica at version {version}");
                 }
             }
-
             if (Records is null)
             {
                 if (version >= ApiVersions.Version12)
@@ -852,32 +788,29 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 {
                     writer.WriteInt(Records.Length);
                 }
-
                 writer.WriteRecords(Records);
             }
-
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-
             if (version >= ApiVersions.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 {
-                    if (!DivergingEpoch.Equals(new()))
+                    if (!DivergingEpoch.Equals(new ()))
                     {
                         writer.WriteVarUInt(0);
                         DivergingEpoch.Write(writer, version);
                     }
                 }
                 {
-                    if (!CurrentLeader.Equals(new()))
+                    if (!CurrentLeader.Equals(new ()))
                     {
                         writer.WriteVarUInt(1);
                         CurrentLeader.Write(writer, version);
                     }
                 }
                 {
-                    if (!SnapshotId.Equals(new()))
+                    if (!SnapshotId.Equals(new ()))
                     {
                         writer.WriteVarUInt(2);
                         SnapshotId.Write(writer, version);
@@ -907,18 +840,21 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(
-                hashCode,
-                PartitionIndex,
-                ErrorCode,
-                HighWatermark,
-                LastStableOffset,
-                LogStartOffset,
-                DivergingEpoch,
-                CurrentLeader);
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, HighWatermark, LastStableOffset, LogStartOffset, DivergingEpoch, CurrentLeader);
             hashCode = HashCode.Combine(hashCode, SnapshotId, AbortedTransactions, PreferredReadReplica, Records);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "PartitionDataMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ", HighWatermark=" + HighWatermark
+                + ", LastStableOffset=" + LastStableOffset
+                + ", LogStartOffset=" + LogStartOffset
+                + ", PreferredReadReplica=" + PreferredReadReplica
+                + ")";
         }
     }
 
@@ -928,7 +864,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -958,22 +894,18 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EpochEndOffsetMessage");
             }
-
             Epoch = reader.ReadInt();
             EndOffset = reader.ReadLong();
             UnknownTaggedFields = null;
             var numTaggedFields = reader.ReadVarUInt();
-
             for (var t = 0; t < numTaggedFields; t++)
             {
                 var tag = reader.ReadVarUInt();
                 var size = reader.ReadVarUInt();
-
                 switch (tag)
                 {
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                         break;
                 }
             }
@@ -985,7 +917,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of EpochEndOffsetMessage");
             }
-
             var numTaggedFields = 0;
             writer.WriteInt(Epoch);
             writer.WriteLong(EndOffset);
@@ -1009,8 +940,15 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Epoch, EndOffset);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "EpochEndOffsetMessage("
+                + "Epoch=" + Epoch
+                + ", EndOffset=" + EndOffset
+                + ")";
         }
     }
 
@@ -1020,7 +958,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -1050,22 +988,18 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
-
             LeaderId = reader.ReadInt();
             LeaderEpoch = reader.ReadInt();
             UnknownTaggedFields = null;
             var numTaggedFields = reader.ReadVarUInt();
-
             for (var t = 0; t < numTaggedFields; t++)
             {
                 var tag = reader.ReadVarUInt();
                 var size = reader.ReadVarUInt();
-
                 switch (tag)
                 {
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                         break;
                 }
             }
@@ -1077,7 +1011,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of LeaderIdAndEpochMessage");
             }
-
             var numTaggedFields = 0;
             writer.WriteInt(LeaderId);
             writer.WriteInt(LeaderEpoch);
@@ -1101,8 +1034,15 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, LeaderId, LeaderEpoch);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "LeaderIdAndEpochMessage("
+                + "LeaderId=" + LeaderId
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ")";
         }
     }
 
@@ -1112,7 +1052,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -1142,22 +1082,18 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
             }
-
             EndOffset = reader.ReadLong();
             Epoch = reader.ReadInt();
             UnknownTaggedFields = null;
             var numTaggedFields = reader.ReadVarUInt();
-
             for (var t = 0; t < numTaggedFields; t++)
             {
                 var tag = reader.ReadVarUInt();
                 var size = reader.ReadVarUInt();
-
                 switch (tag)
                 {
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                         break;
                 }
             }
@@ -1169,7 +1105,6 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of SnapshotIdMessage");
             }
-
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);
             writer.WriteInt(Epoch);
@@ -1193,8 +1128,15 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, EndOffset, Epoch);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "SnapshotIdMessage("
+                + "EndOffset=" + EndOffset
+                + ", Epoch=" + Epoch
+                + ")";
         }
     }
 
@@ -1204,7 +1146,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
 
         public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
 
-        public ApiVersions Version { get; set; }
+        public ApiVersions Version {get; set;}
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -1234,25 +1176,20 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AbortedTransactionMessage");
             }
-
             ProducerId = reader.ReadLong();
             FirstOffset = reader.ReadLong();
             UnknownTaggedFields = null;
-
             if (version >= ApiVersions.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
-
                 for (var t = 0; t < numTaggedFields; t++)
                 {
                     var tag = reader.ReadVarUInt();
                     var size = reader.ReadVarUInt();
-
                     switch (tag)
                     {
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
-
                             break;
                     }
                 }
@@ -1265,13 +1202,11 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of AbortedTransactionMessage");
             }
-
             var numTaggedFields = 0;
             writer.WriteLong(ProducerId);
             writer.WriteLong(FirstOffset);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-
             if (version >= ApiVersions.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
@@ -1300,8 +1235,15 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ProducerId, FirstOffset);
-
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "AbortedTransactionMessage("
+                + "ProducerId=" + ProducerId
+                + ", FirstOffset=" + FirstOffset
+                + ")";
         }
     }
 }

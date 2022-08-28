@@ -121,4 +121,13 @@ public sealed class BrokerRegistrationResponseMessage: IResponseMessage, IEquata
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, BrokerEpoch);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "BrokerRegistrationResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", BrokerEpoch=" + BrokerEpoch
+            + ")";
+    }
 }

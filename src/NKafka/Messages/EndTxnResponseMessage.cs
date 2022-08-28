@@ -127,4 +127,12 @@ public sealed class EndTxnResponseMessage: IResponseMessage, IEquatable<EndTxnRe
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "EndTxnResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ")";
+    }
 }

@@ -187,6 +187,13 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteTopicsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -390,6 +397,14 @@ public sealed class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<De
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeletableTopicResultMessage("
+                + ", TopicId=" + TopicId
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 

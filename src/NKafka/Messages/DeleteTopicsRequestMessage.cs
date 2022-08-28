@@ -263,6 +263,13 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteTopicsRequestMessage("
+            + ", TimeoutMs=" + TimeoutMs
+            + ")";
+    }
+
     public sealed class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -370,6 +377,13 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, TopicId);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteTopicStateMessage("
+                + ", TopicId=" + TopicId
+                + ")";
         }
     }
 }

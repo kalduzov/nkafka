@@ -177,6 +177,13 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DeleteRecordsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DeleteRecordsTopicResultMessage: IMessage, IEquatable<DeleteRecordsTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -356,6 +363,12 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DeleteRecordsTopicResultMessage("
+                + ")";
+        }
     }
 
     public sealed class DeleteRecordsPartitionResultMessage: IMessage, IEquatable<DeleteRecordsPartitionResultMessage>
@@ -461,6 +474,15 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DeleteRecordsPartitionResultMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", LowWatermark=" + LowWatermark
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 

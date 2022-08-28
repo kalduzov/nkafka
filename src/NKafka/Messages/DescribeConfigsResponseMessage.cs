@@ -177,6 +177,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeConfigsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -423,6 +430,14 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ErrorCode, ErrorMessage, ResourceType, ResourceName, Configs);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeConfigsResultMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", ResourceType=" + ResourceType
+                + ")";
         }
     }
 
@@ -797,6 +812,17 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, ConfigType, Documentation);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "DescribeConfigsResourceResultMessage("
+                + ", ReadOnly=" + (ReadOnly ? "true" : "false")
+                + ", IsDefault=" + (IsDefault ? "true" : "false")
+                + ", ConfigSource=" + ConfigSource
+                + ", IsSensitive=" + (IsSensitive ? "true" : "false")
+                + ", ConfigType=" + ConfigType
+                + ")";
+        }
     }
 
     public sealed class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
@@ -980,6 +1006,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, Value, Source);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeConfigsSynonymMessage("
+                + ", Source=" + Source
+                + ")";
         }
     }
 }

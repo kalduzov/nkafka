@@ -177,6 +177,13 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "CreatePartitionsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class CreatePartitionsTopicResultMessage: IMessage, IEquatable<CreatePartitionsTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -357,6 +364,13 @@ public sealed class CreatePartitionsResponseMessage: IResponseMessage, IEquatabl
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name, ErrorCode, ErrorMessage);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "CreatePartitionsTopicResultMessage("
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

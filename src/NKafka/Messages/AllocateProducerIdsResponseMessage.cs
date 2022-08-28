@@ -128,4 +128,14 @@ public sealed class AllocateProducerIdsResponseMessage: IResponseMessage, IEquat
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerIdStart, ProducerIdLen);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "AllocateProducerIdsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", ProducerIdStart=" + ProducerIdStart
+            + ", ProducerIdLen=" + ProducerIdLen
+            + ")";
+    }
 }

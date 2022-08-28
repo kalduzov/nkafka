@@ -220,6 +220,14 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeConfigsRequestMessage("
+            + ", IncludeSynonyms=" + (IncludeSynonyms ? "true" : "false")
+            + ", IncludeDocumentation=" + (IncludeDocumentation ? "true" : "false")
+            + ")";
+    }
+
     public sealed class DescribeConfigsResourceMessage: IMessage, IEquatable<DescribeConfigsResourceMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -452,6 +460,13 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ResourceType, ResourceName, ConfigurationKeys);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "DescribeConfigsResourceMessage("
+                + "ResourceType=" + ResourceType
+                + ")";
         }
     }
 }

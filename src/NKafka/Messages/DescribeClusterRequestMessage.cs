@@ -106,4 +106,11 @@ public sealed class DescribeClusterRequestMessage: IRequestMessage, IEquatable<D
         hashCode = HashCode.Combine(hashCode, IncludeClusterAuthorizedOperations);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "DescribeClusterRequestMessage("
+            + "IncludeClusterAuthorizedOperations=" + (IncludeClusterAuthorizedOperations ? "true" : "false")
+            + ")";
+    }
 }

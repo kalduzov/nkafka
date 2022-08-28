@@ -313,4 +313,14 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         hashCode = HashCode.Combine(hashCode, ResourceTypeFilter, ResourceNameFilter, PatternTypeFilter, PrincipalFilter, HostFilter, Operation, PermissionType);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "DescribeAclsRequestMessage("
+            + "ResourceTypeFilter=" + ResourceTypeFilter
+            + ", PatternTypeFilter=" + PatternTypeFilter
+            + ", Operation=" + Operation
+            + ", PermissionType=" + PermissionType
+            + ")";
+    }
 }

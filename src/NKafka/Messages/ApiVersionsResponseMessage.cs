@@ -313,6 +313,15 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ApiVersionsResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ", ThrottleTimeMs=" + ThrottleTimeMs
+            + ", FinalizedFeaturesEpoch=" + FinalizedFeaturesEpoch
+            + ")";
+    }
+
     public sealed class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -413,6 +422,15 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ApiKey);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ApiVersionMessage("
+                + "ApiKey=" + ApiKey
+                + ", MinVersion=" + MinVersion
+                + ", MaxVersion=" + MaxVersion
+                + ")";
         }
     }
 
@@ -539,6 +557,14 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "SupportedFeatureKeyMessage("
+                + ", MinVersion=" + MinVersion
+                + ", MaxVersion=" + MaxVersion
+                + ")";
+        }
     }
 
     public sealed class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
@@ -663,6 +689,14 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Name);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "FinalizedFeatureKeyMessage("
+                + ", MaxVersionLevel=" + MaxVersionLevel
+                + ", MinVersionLevel=" + MinVersionLevel
+                + ")";
         }
     }
 

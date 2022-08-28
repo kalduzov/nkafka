@@ -219,4 +219,13 @@ public sealed class InitProducerIdRequestMessage: IRequestMessage, IEquatable<In
         hashCode = HashCode.Combine(hashCode, TransactionalId, TransactionTimeoutMs, ProducerId, ProducerEpoch);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "InitProducerIdRequestMessage("
+            + ", TransactionTimeoutMs=" + TransactionTimeoutMs
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ")";
+    }
 }

@@ -177,6 +177,13 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "TxnOffsetCommitResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class TxnOffsetCommitResponseTopicMessage: IMessage, IEquatable<TxnOffsetCommitResponseTopicMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -355,6 +362,12 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
             hashCode = HashCode.Combine(hashCode, Name, Partitions);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TxnOffsetCommitResponseTopicMessage("
+                + ")";
+        }
     }
 
     public sealed class TxnOffsetCommitResponsePartitionMessage: IMessage, IEquatable<TxnOffsetCommitResponsePartitionMessage>
@@ -452,6 +465,14 @@ public sealed class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TxnOffsetCommitResponsePartitionMessage("
+                + "PartitionIndex=" + PartitionIndex
+                + ", ErrorCode=" + ErrorCode
+                + ")";
         }
     }
 }

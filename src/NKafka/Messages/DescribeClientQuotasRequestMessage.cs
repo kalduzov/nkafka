@@ -179,6 +179,13 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeClientQuotasRequestMessage("
+            + ", Strict=" + (Strict ? "true" : "false")
+            + ")";
+    }
+
     public sealed class ComponentDataMessage: IMessage, IEquatable<ComponentDataMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -356,6 +363,13 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, EntityType, MatchType, Match);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "ComponentDataMessage("
+                + ", MatchType=" + MatchType
+                + ")";
         }
     }
 }

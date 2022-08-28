@@ -182,6 +182,13 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "ControlledShutdownResponseMessage("
+            + "ErrorCode=" + ErrorCode
+            + ")";
+    }
+
     public sealed class RemainingPartitionMessage: IMessage, IEquatable<RemainingPartitionMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -308,6 +315,13 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, TopicName, PartitionIndex);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "RemainingPartitionMessage("
+                + ", PartitionIndex=" + PartitionIndex
+                + ")";
         }
     }
 

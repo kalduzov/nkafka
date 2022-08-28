@@ -187,6 +187,13 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "OffsetForLeaderEpochResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -366,6 +373,12 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
             hashCode = HashCode.Combine(hashCode, Topic);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "OffsetForLeaderTopicResultMessage("
+                + ")";
+        }
     }
 
     public sealed class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
@@ -487,6 +500,16 @@ public sealed class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEqua
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, ErrorCode, Partition, LeaderEpoch, EndOffset);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "EpochEndOffsetMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", Partition=" + Partition
+                + ", LeaderEpoch=" + LeaderEpoch
+                + ", EndOffset=" + EndOffset
+                + ")";
         }
     }
 

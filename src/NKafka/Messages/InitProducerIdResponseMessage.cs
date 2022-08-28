@@ -141,4 +141,14 @@ public sealed class InitProducerIdResponseMessage: IResponseMessage, IEquatable<
         hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerId, ProducerEpoch);
         return hashCode;
     }
+
+    public override string ToString()
+    {
+        return "InitProducerIdResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ", ErrorCode=" + ErrorCode
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
+            + ")";
+    }
 }

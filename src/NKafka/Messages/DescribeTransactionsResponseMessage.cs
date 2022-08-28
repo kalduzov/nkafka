@@ -132,6 +132,13 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
         return hashCode;
     }
 
+    public override string ToString()
+    {
+        return "DescribeTransactionsResponseMessage("
+            + "ThrottleTimeMs=" + ThrottleTimeMs
+            + ")";
+    }
+
     public sealed class TransactionStateMessage: IMessage, IEquatable<TransactionStateMessage>
     {
         public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
@@ -316,6 +323,17 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
             hashCode = HashCode.Combine(hashCode, Topics);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return "TransactionStateMessage("
+                + "ErrorCode=" + ErrorCode
+                + ", TransactionTimeoutMs=" + TransactionTimeoutMs
+                + ", TransactionStartTimeMs=" + TransactionStartTimeMs
+                + ", ProducerId=" + ProducerId
+                + ", ProducerEpoch=" + ProducerEpoch
+                + ")";
+        }
     }
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
@@ -437,6 +455,12 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Topic);
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "TopicDataMessage("
+                + ")";
         }
     }
 

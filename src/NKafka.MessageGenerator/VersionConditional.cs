@@ -32,6 +32,7 @@ internal sealed class VersionConditional
     private Action<Versions>? _ifNotMember;
     private bool _allowMembershipCheckAlwaysFalse = true;
     private bool _alwaysEmitBlockScope;
+    private bool _asTernary;
 
     private VersionConditional(Versions containingVersions, Versions possibleVersions)
     {
@@ -56,6 +57,13 @@ internal sealed class VersionConditional
     internal VersionConditional AllowMembershipCheckAlwaysFalse(bool allowMembershipCheckAlwaysFalse)
     {
         _allowMembershipCheckAlwaysFalse = allowMembershipCheckAlwaysFalse;
+
+        return this;
+    }
+
+    internal VersionConditional AsTernary(bool asTernary)
+    {
+        _asTernary = asTernary;
 
         return this;
     }
@@ -142,25 +150,51 @@ internal sealed class VersionConditional
     {
         if (_ifMember is not null)
         {
-            codeGenerator.AppendLine($"if (version <= ApiVersion.Version{_containingVersions.Highest})");
-            codeGenerator.AppendLeftBrace();
-
-            codeGenerator.IncrementIndent();
-            _ifMember(ifVersions);
-            codeGenerator.DecrementIndent();
-
-            if (_ifNotMember is not null)
+            if (_asTernary)
             {
-                codeGenerator.AppendRightBrace();
-                codeGenerator.AppendLine("else");
+                codeGenerator.AppendWithoutIdent($"version <= ApiVersion.Version{_containingVersions.Highest} ? ");
+            }
+            else
+            {
+                codeGenerator.AppendLine($"if (version <= ApiVersion.Version{_containingVersions.Highest})");
                 codeGenerator.AppendLeftBrace();
 
                 codeGenerator.IncrementIndent();
-                _ifNotMember(ifNotVersions);
+            }
+
+            _ifMember(ifVersions);
+
+            if (!_asTernary)
+            {
                 codeGenerator.DecrementIndent();
             }
 
-            codeGenerator.AppendRightBrace();
+            if (_ifNotMember is not null)
+            {
+                if (_asTernary)
+                {
+                    codeGenerator.AppendWithoutIdent(" : ");
+                }
+                else
+                {
+                    codeGenerator.AppendRightBrace();
+                    codeGenerator.AppendLine("else");
+                    codeGenerator.AppendLeftBrace();
+                    codeGenerator.IncrementIndent();
+                }
+
+                _ifNotMember(ifNotVersions);
+
+                if (!_asTernary)
+                {
+                    codeGenerator.DecrementIndent();
+                }
+            }
+
+            if (!_asTernary)
+            {
+                codeGenerator.AppendRightBrace();
+            }
         }
         else if (_ifNotMember is not null)
         {
@@ -202,25 +236,52 @@ internal sealed class VersionConditional
     {
         if (_ifMember is not null)
         {
-            codeGenerator.AppendLine($"if (version >= ApiVersion.Version{_containingVersions.Lowest})");
-            codeGenerator.AppendLeftBrace();
-
-            codeGenerator.IncrementIndent();
-            _ifMember(ifVersions);
-            codeGenerator.DecrementIndent();
-
-            if (_ifNotMember is not null)
+            if (_asTernary)
             {
-                codeGenerator.AppendRightBrace();
-                codeGenerator.AppendLine("else");
+                codeGenerator.AppendWithoutIdent($"version >= ApiVersion.Version{_containingVersions.Lowest} ? ");
+            }
+            else
+            {
+                codeGenerator.AppendLine($"if (version >= ApiVersion.Version{_containingVersions.Lowest})");
                 codeGenerator.AppendLeftBrace();
 
                 codeGenerator.IncrementIndent();
-                _ifNotMember(ifNotVersions);
+            }
+
+            _ifMember(ifVersions);
+
+            if (!_asTernary)
+            {
                 codeGenerator.DecrementIndent();
             }
 
-            codeGenerator.AppendRightBrace();
+            if (_ifNotMember is not null)
+            {
+                if (_asTernary)
+                {
+                    codeGenerator.AppendWithoutIdent(" : ");
+                }
+                else
+                {
+                    codeGenerator.AppendRightBrace();
+                    codeGenerator.AppendLine("else");
+                    codeGenerator.AppendLeftBrace();
+
+                    codeGenerator.IncrementIndent();
+                }
+
+                _ifNotMember(ifNotVersions);
+
+                if (!_asTernary)
+                {
+                    codeGenerator.DecrementIndent();
+                }
+            }
+
+            if (!_asTernary)
+            {
+                codeGenerator.AppendRightBrace();
+            }
         }
         else if (_ifNotMember is not null)
         {

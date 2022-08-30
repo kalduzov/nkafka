@@ -27,8 +27,6 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
-using FastEnumUtility;
-
 using NKafka.Exceptions;
 
 namespace NKafka.Protocol;
@@ -107,13 +105,7 @@ internal static class SupportVersionsExtensions
             ApiKeys.UpdateMetadata => version >= ApiVersion.Version6 ? ApiVersion.Version2 : ApiVersion.Version1,
             ApiKeys.Vote => ApiVersion.Version2,
             ApiKeys.WriteTxnMarkers => version >= ApiVersion.Version1 ? ApiVersion.Version2 : ApiVersion.Version1,
-            ApiKeys.None => throw new UnsupportedVersionException($"Unsupported API key {apiKey}"),
             _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
         };
-    }
-
-    public static ApiVersion GetApiVersion(this ApiKeys apiKey)
-    {
-        return ApiVersion.Version1;
     }
 }

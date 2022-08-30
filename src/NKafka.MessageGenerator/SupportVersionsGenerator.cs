@@ -39,7 +39,7 @@ public class SupportVersionsGenerator
 
     public StringBuilder Generate(IEnumerable<(string Name, short ApiKey, Versions FlexibleVersions, Versions Versions)> supportVersionsInformation)
     {
-        _headerGenerator.AppendUsing("FastEnumUtility");
+        _headerGenerator.AppendUsing("NKafka.Exceptions");
         _headerGenerator.Generate();
 
         GenerateSupportVersions(supportVersionsInformation);
@@ -75,20 +75,19 @@ public class SupportVersionsGenerator
         //_codeGenerator.AppendLine($"private static Dictionary<>");
     }
 
-    private void GenerateHeaderVersions((string Name, short ApiKey, Versions FlexibleVersion, Versions versions)[] supportVersionsInformation)
+    private void GenerateHeaderVersions(
+        IEnumerable<(string Name, short ApiKey, Versions FlexibleVersion, Versions versions)> supportVersionsInformation)
     {
         _codeGenerator.AppendLine("public static ApiVersion GetHeaderVersion(this ApiKeys apiKey, ApiVersion version)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
-        _codeGenerator.AppendLine("switch (apiKey)");
+        _codeGenerator.AppendLine("return apiKey switch");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
 
         foreach (var info in supportVersionsInformation)
         {
-            _codeGenerator.AppendLine($"case ApiKeys.{info.Name}:");
-            _codeGenerator.AppendLeftBrace();
-            _codeGenerator.IncrementIndent();
+            _codeGenerator.Append($"ApiKeys.{info.Name} => ");
 
             if (info.ApiKey == 7)
             {
@@ -96,15 +95,16 @@ public class SupportVersionsGenerator
 
             VersionConditional
                 .ForVersions(info.FlexibleVersion, info.versions)
-                .IfMember(_ => { _codeGenerator.AppendLine("return ApiVersion.Version2;"); })
-                .IfNotMember(_ => { _codeGenerator.AppendLine("return ApiVersion.Version1;"); })
+                .AsTernary(true)
+                .IfMember(_ => { _codeGenerator.AppendWithoutIdent("ApiVersion.Version2"); })
+                .IfNotMember(_ => { _codeGenerator.AppendWithoutIdent("ApiVersion.Version1"); })
                 .Generate(_codeGenerator);
 
-            _codeGenerator.DecrementIndent();
-            _codeGenerator.AppendRightBrace();
+            _codeGenerator.AppendWithoutIdent(",");
+            _codeGenerator.AppendLine();
         }
 
-        _codeGenerator.AppendLine("_ => ApiVersion.Version1");
+        _codeGenerator.AppendLine("_ => throw new UnsupportedVersionException($\"Unsupported API key {apiKey}\")");
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendLine("};");
         _codeGenerator.DecrementIndent();

@@ -56,6 +56,11 @@ public class CodeGenerator: ICodeGenerator
         _builder.Append($"{Indent}{value}");
     }
 
+    public void AppendWithoutIdent(string value)
+    {
+        _builder.Append(value);
+    }
+
     private string Indent
     {
         get

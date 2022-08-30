@@ -124,6 +124,13 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="token"></param>
     /// <param name="topics">Список топиков, по которым необходимо получить информацию из брокеров</param>
-    /// <remarks>Если топики не указаны, будет возвращена информация по всем топикам</remarks>
-    Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token, params string[] topics);
+    /// <remarks>Если топики не указаны, будет возвращена информация по всем топикам кластера</remarks>
+    Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token = default, params string[] topics);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    Task OpenAsync(CancellationToken token);
 }

@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<LeaderAndIsrRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.LeaderAndIsr;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -86,17 +88,17 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
     {
     }
 
-    public LeaderAndIsrRequestMessage(BufferReader reader, ApiVersions version)
+    public LeaderAndIsrRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ControllerId = reader.ReadInt();
         ControllerEpoch = reader.ReadInt();
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             BrokerEpoch = reader.ReadLong();
         }
@@ -104,7 +106,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
             BrokerEpoch = -1;
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             Type = reader.ReadSByte();
         }
@@ -112,7 +114,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
             Type = 0;
         }
-        if (version <= ApiVersions.Version1)
+        if (version <= ApiVersion.Version1)
         {
             int arrayLength;
             arrayLength = reader.ReadInt();
@@ -134,9 +136,9 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
             UngroupedPartitionStates = new ();
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -178,7 +180,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             TopicStates = new ();
         }
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -216,7 +218,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -233,16 +235,16 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ControllerId);
         writer.WriteInt(ControllerEpoch);
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteLong(BrokerEpoch);
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             writer.WriteSByte(Type);
         }
@@ -253,7 +255,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 throw new UnsupportedVersionException($"Attempted to write a non-default Type at version {version}");
             }
         }
-        if (version <= ApiVersions.Version1)
+        if (version <= ApiVersion.Version1)
         {
             writer.WriteInt(UngroupedPartitionStates.Count);
             foreach (var element in UngroupedPartitionStates)
@@ -268,9 +270,9 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 throw new UnsupportedVersionException($"Attempted to write a non-default UngroupedPartitionStates at version {version}");
             }
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(TopicStates.Count + 1);
                 foreach (var element in TopicStates)
@@ -294,7 +296,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 throw new UnsupportedVersionException($"Attempted to write a non-default TopicStates at version {version}");
             }
         }
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(LiveLeaders.Count + 1);
             foreach (var element in LiveLeaders)
@@ -312,7 +314,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -355,11 +357,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
 
     public sealed class LeaderAndIsrTopicStateMessage: IMessage, IEquatable<LeaderAndIsrTopicStateMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -382,21 +386,21 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
         }
 
-        public LeaderAndIsrTopicStateMessage(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrTopicStateMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrTopicStateMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -417,7 +421,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     TopicName = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -426,7 +430,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 TopicId = Guid.Empty;
             }
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -464,7 +468,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -481,16 +485,16 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version2)
+            if (version < ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of LeaderAndIsrTopicStateMessage");
             }
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -500,11 +504,11 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteGuid(TopicId);
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(PartitionStates.Count + 1);
                 foreach (var element in PartitionStates)
@@ -522,7 +526,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -563,11 +567,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
 
     public sealed class LeaderAndIsrLiveLeaderMessage: IMessage, IEquatable<LeaderAndIsrLiveLeaderMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -590,22 +596,22 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
         }
 
-        public LeaderAndIsrLiveLeaderMessage(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrLiveLeaderMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrLiveLeaderMessage");
             }
             BrokerId = reader.ReadInt();
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -628,7 +634,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
             Port = reader.ReadInt();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -645,13 +651,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(BrokerId);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(HostName);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -664,7 +670,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             writer.WriteInt(Port);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -706,11 +712,13 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
 
     public sealed class LeaderAndIsrPartitionStateMessage: IMessage, IEquatable<LeaderAndIsrPartitionStateMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -778,19 +786,19 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         {
         }
 
-        public LeaderAndIsrPartitionStateMessage(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrPartitionStateMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrPartitionStateMessage");
             }
-            if (version <= ApiVersions.Version1)
+            if (version <= ApiVersion.Version1)
             {
                 int length;
                 length = reader.ReadShort();
@@ -817,7 +825,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             LeaderEpoch = reader.ReadInt();
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -842,7 +850,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             PartitionEpoch = reader.ReadInt();
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -864,10 +872,10 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     Replicas = newCollection;
                 }
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -893,10 +901,10 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             {
                 AddingReplicas = new ();
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -922,7 +930,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             {
                 RemovingReplicas = new ();
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 IsNew = reader.ReadByte() != 0;
             }
@@ -930,7 +938,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             {
                 IsNew = false;
             }
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 LeaderRecoveryState = reader.ReadSByte();
             }
@@ -939,7 +947,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 LeaderRecoveryState = 0;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -956,10 +964,10 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version <= ApiVersions.Version1)
+            if (version <= ApiVersion.Version1)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(TopicName);
@@ -971,7 +979,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             writer.WriteInt(ControllerEpoch);
             writer.WriteInt(Leader);
             writer.WriteInt(LeaderEpoch);
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(Isr.Count + 1);
             }
@@ -984,7 +992,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                 writer.WriteInt(element);
             }
             writer.WriteInt(PartitionEpoch);
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(Replicas.Count + 1);
             }
@@ -996,9 +1004,9 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             {
                 writer.WriteInt(element);
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(AddingReplicas.Count + 1);
                 }
@@ -1011,9 +1019,9 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     writer.WriteInt(element);
                 }
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(RemovingReplicas.Count + 1);
                 }
@@ -1026,11 +1034,11 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
                     writer.WriteInt(element);
                 }
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteBool(IsNew);
             }
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteSByte(LeaderRecoveryState);
             }
@@ -1043,7 +1051,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

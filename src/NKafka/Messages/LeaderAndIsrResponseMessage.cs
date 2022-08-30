@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<LeaderAndIsrResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -69,18 +71,18 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
     {
     }
 
-    public LeaderAndIsrResponseMessage(BufferReader reader, ApiVersions version)
+    public LeaderAndIsrResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
-        if (version <= ApiVersions.Version4)
+        if (version <= ApiVersion.Version4)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -121,7 +123,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         {
             PartitionErrors = new ();
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             int arrayLength;
             arrayLength = reader.ReadVarUInt() - 1;
@@ -144,7 +146,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             Topics = new ();
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -161,13 +163,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
-        if (version <= ApiVersions.Version4)
+        if (version <= ApiVersion.Version4)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(PartitionErrors.Count + 1);
                 foreach (var element in PartitionErrors)
@@ -191,7 +193,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
                 throw new UnsupportedVersionException($"Attempted to write a non-default PartitionErrors at version {version}");
             }
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -208,7 +210,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -248,11 +250,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
 
     public sealed class LeaderAndIsrTopicErrorMessage: IMessage, IEquatable<LeaderAndIsrTopicErrorMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -270,15 +274,15 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         {
         }
 
-        public LeaderAndIsrTopicErrorMessage(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrTopicErrorMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrTopicErrorMessage");
             }
@@ -315,9 +319,9 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version5)
+            if (version < ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of LeaderAndIsrTopicErrorMessage");
             }
@@ -374,11 +378,13 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
 
     public sealed class LeaderAndIsrPartitionErrorMessage: IMessage, IEquatable<LeaderAndIsrPartitionErrorMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -404,22 +410,22 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         {
         }
 
-        public LeaderAndIsrPartitionErrorMessage(BufferReader reader, ApiVersions version)
+        public LeaderAndIsrPartitionErrorMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderAndIsrPartitionErrorMessage");
             }
-            if (version <= ApiVersions.Version4)
+            if (version <= ApiVersion.Version4)
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -447,7 +453,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -464,14 +470,14 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version <= ApiVersions.Version4)
+            if (version <= ApiVersion.Version4)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                    if (version >= ApiVersions.Version4)
+                    if (version >= ApiVersion.Version4)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -486,7 +492,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.AlterUserScramCredentials;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -61,13 +63,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
     {
     }
 
-    public AlterUserScramCredentialsRequestMessage(BufferReader reader, ApiVersions version)
+    public AlterUserScramCredentialsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int arrayLength;
@@ -118,7 +120,7 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteVarUInt(Deletions.Count + 1);
@@ -162,11 +164,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
 
     public sealed class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -184,15 +188,15 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         {
         }
 
-        public ScramCredentialDeletionMessage(BufferReader reader, ApiVersions version)
+        public ScramCredentialDeletionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ScramCredentialDeletionMessage");
             }
@@ -228,7 +232,7 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -270,11 +274,13 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
 
     public sealed class ScramCredentialUpsertionMessage: IMessage, IEquatable<ScramCredentialUpsertionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -307,15 +313,15 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
         {
         }
 
-        public ScramCredentialUpsertionMessage(BufferReader reader, ApiVersions version)
+        public ScramCredentialUpsertionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ScramCredentialUpsertionMessage");
             }
@@ -376,7 +382,7 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {

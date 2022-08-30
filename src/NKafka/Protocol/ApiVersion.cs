@@ -22,37 +22,22 @@
  */
 namespace NKafka.Protocol;
 
-public readonly struct ApiVersion
+public enum ApiVersion : short
 {
-    private readonly string _message;
+    LastVersion = Version13,
 
-    public readonly short ApiKey;
-
-    public readonly short MinVersion;
-
-    public readonly short MaxVersion;
-
-    public ApiVersion(short apiKey, short minVersion, short maxVersion)
-    {
-        ApiKey = apiKey;
-        MinVersion = minVersion;
-        MaxVersion = maxVersion;
-
-        _message = $"ApiKey: {apiKey} min value is {minVersion} and max version {maxVersion}";
-    }
-
-    public override int GetHashCode()
-    {
-        return ApiKey;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return GetHashCode() == obj?.GetHashCode();
-    }
-
-    public override string ToString()
-    {
-        return _message;
-    }
+    Version0 = 0x0000,
+    Version1 = 0x0001,
+    Version2 = 0x0002,
+    Version3 = 0x0003,
+    Version4 = 0x0004,
+    Version5 = 0x0005,
+    Version6 = 0x0006,
+    Version7 = 0x0007,
+    Version8 = 0x0008,
+    Version9 = 0x0009,
+    Version10 = 0x000A,
+    Version11 = 0x000B,
+    Version12 = 0x000C,
+    Version13 = 0x000D
 }

@@ -8,7 +8,6 @@ using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Exceptions;
 using NKafka.Messages;
-using NKafka.Protocol;
 
 using Xunit;
 
@@ -47,7 +46,6 @@ public class ClusterTests
                     {
                         new()
                         {
-                            Version = ApiVersions.Version0,
                             NodeId = 1,
                             Host = "localhost1",
                             Port = 1000,
@@ -55,7 +53,6 @@ public class ClusterTests
                         },
                         new()
                         {
-                            Version = ApiVersions.Version0,
                             NodeId = 2,
                             Host = "localhost2",
                             Port = 1000,
@@ -64,7 +61,6 @@ public class ClusterTests
                     },
                     ControllerId = 1,
                     ClusterId = "test_cluster",
-                    Version = ApiVersions.Version0
                 });
 
         return broker;

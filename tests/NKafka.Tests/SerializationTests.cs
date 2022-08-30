@@ -41,24 +41,24 @@ public class SerializationTests
         var header = new RequestHeader
         {
             RequestApiKey = (short)request.ApiKey,
-            RequestApiVersion = (short)ApiVersions.Version1,
+            RequestApiVersion = (short)ApiVersion.Version1,
             ClientId = "test",
             CorrelationId = 1,
         };
 
         var hashCode = header.GetHashCode();
-        
+
         var header1 = new RequestHeader
         {
             RequestApiKey = (short)request.ApiKey,
-            RequestApiVersion = (short)ApiVersions.Version1,
+            RequestApiVersion = (short)ApiVersion.Version1,
             ClientId = "test",
             CorrelationId = 2,
         };
 
         var hashCode2 = header1.GetHashCode();
-        
-        var sendMessage = new SendMessage(header, request);
+
+        var sendMessage = new SendMessage(header, request, ApiVersion.Version1);
 
         using var stream = new MemoryStream();
 

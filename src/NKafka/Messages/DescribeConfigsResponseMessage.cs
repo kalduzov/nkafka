@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable<DescribeConfigsResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -59,17 +61,17 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
     {
     }
 
-    public DescribeConfigsResponseMessage(BufferReader reader, ApiVersions version)
+    public DescribeConfigsResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -107,7 +109,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -124,11 +126,11 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
@@ -146,7 +148,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -186,11 +188,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -226,22 +230,22 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeConfigsResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResultMessage");
             }
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -265,7 +269,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             ResourceType = reader.ReadSByte();
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -287,7 +291,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -325,7 +329,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -342,13 +346,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -360,7 +364,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -373,7 +377,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             writer.WriteSByte(ResourceType);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -383,7 +387,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
@@ -401,7 +405,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -443,11 +447,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeConfigsResourceResultMessage: IMessage, IEquatable<DescribeConfigsResourceResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -500,21 +506,21 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResourceResultMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -537,7 +543,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -559,7 +565,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             ReadOnly = reader.ReadByte() != 0;
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 IsDefault = reader.ReadByte() != 0;
             }
@@ -567,7 +573,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             {
                 IsDefault = false;
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 ConfigSource = reader.ReadSByte();
             }
@@ -576,9 +582,9 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 ConfigSource = -1;
             }
             IsSensitive = reader.ReadByte() != 0;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -619,7 +625,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             {
                 Synonyms = new ();
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 ConfigType = reader.ReadSByte();
             }
@@ -627,10 +633,10 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             {
                 ConfigType = 0;
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -656,7 +662,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 Documentation = string.Empty;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -673,12 +679,12 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -690,7 +696,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             if (Value is null)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -702,7 +708,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -713,7 +719,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteBool(ReadOnly);
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 writer.WriteBool(IsDefault);
             }
@@ -724,14 +730,14 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     throw new UnsupportedVersionException($"Attempted to write a non-default IsDefault at version {version}");
                 }
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteSByte(ConfigSource);
             }
             writer.WriteBool(IsSensitive);
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(Synonyms.Count + 1);
                     foreach (var element in Synonyms)
@@ -748,15 +754,15 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                     }
                 }
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteSByte(ConfigType);
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 if (Documentation is null)
                 {
-                    if (version >= ApiVersions.Version4)
+                    if (version >= ApiVersion.Version4)
                     {
                         writer.WriteVarUInt(0);
                     }
@@ -768,7 +774,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
                 else
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(Documentation);
-                    if (version >= ApiVersions.Version4)
+                    if (version >= ApiVersion.Version4)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -781,7 +787,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -827,11 +833,13 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -854,21 +862,21 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersions version)
+        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsSynonymMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -891,7 +899,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -914,7 +922,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             Source = reader.ReadSByte();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -931,16 +939,16 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version1)
+            if (version < ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of DescribeConfigsSynonymMessage");
             }
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -952,7 +960,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             if (Value is null)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -964,7 +972,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -977,7 +985,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             writer.WriteSByte(Source);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

@@ -37,7 +37,7 @@ internal class ReadMethodGenerator: IMethodGenerator
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions)
     {
         MessageFlexibleVersions = messageFlexibleVersions;
-        _codeGenerator.AppendLine("public void Read(BufferReader reader, ApiVersions version)");
+        _codeGenerator.AppendLine("public void Read(BufferReader reader, ApiVersion version)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
 

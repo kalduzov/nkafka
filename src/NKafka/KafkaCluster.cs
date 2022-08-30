@@ -187,12 +187,18 @@ public sealed class KafkaCluster: IKafkaCluster
     {
         ThrowIfClusterClosed();
 
-        var broker = GetControllerBroker();
+        var broker = GetBrokerForServiceRequests(); //Обновляем метададанные из брокера, который является контроллером
 
-        var request = new MetadataRequestMessage
+        var request = new MetadataRequestMessage();
+
+        foreach (var topic in topics)
         {
-            AllowAutoTopicCreation = true,
-        };
+            request.Topics.Add(
+                new MetadataRequestMessage.MetadataRequestTopicMessage
+                {
+                    Name = topic
+                });
+        }
 
         var message = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
 
@@ -204,6 +210,16 @@ public sealed class KafkaCluster: IKafkaCluster
         UpdateTopicPartitions(message.Topics, token);
 
         return message;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public Task OpenAsync(CancellationToken token)
+    {
+        return OpenInternalAsync(token);
     }
 
     public void Dispose()
@@ -325,9 +341,9 @@ public sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    /// Возвращает наименее нагруженный запросами брокер
+    /// Возвращает 
     /// </summary>
-    private IBroker GetControllerBroker()
+    private IBroker GetBrokerForServiceRequests()
     {
         return Controller ?? _seedBrokers.Shuffle().First();
     }
@@ -363,8 +379,6 @@ public sealed class KafkaCluster: IKafkaCluster
             tokenSource.CancelAfter(Config.RequestTimeoutMs);
             await UpdateMetadataAsync(tokenSource.Token);
 
-            activity?.AddBaggage("test", "test");
-
             if (_logger.IsEnabled(LogLevel.Trace))
             {
                 activity?.AddEvent(
@@ -393,12 +407,12 @@ public sealed class KafkaCluster: IKafkaCluster
 
     private async Task UpdateMetadataAsync(CancellationToken token)
     {
-        var broker = GetControllerBroker();
+        var broker = GetBrokerForServiceRequests();
+
         await broker.OpenAsync(token);
 
         var request = new MetadataRequestMessage
         {
-            Version = ApiVersions.Version2,
             Topics = _topics.Select(
                     t => new MetadataRequestMessage.MetadataRequestTopicMessage
                     {
@@ -421,14 +435,12 @@ public sealed class KafkaCluster: IKafkaCluster
     /// <summary>
     /// Инициализируем кластер
     /// </summary>
-    internal async Task InitializationAsync(CancellationToken token)
+    private async Task OpenInternalAsync(CancellationToken token)
     {
         if (!Closed)
         {
             return;
         }
-
-        Closed = false;
 
         if (Config.FullUpdateMetadata)
         {
@@ -436,6 +448,8 @@ public sealed class KafkaCluster: IKafkaCluster
         }
 
         _metadataUpdaterTimer.Change(Config.MetadataMaxAge, Config.MetadataMaxAge);
+
+        Closed = false;
     }
 
     private void ThrowIfClusterClosed()

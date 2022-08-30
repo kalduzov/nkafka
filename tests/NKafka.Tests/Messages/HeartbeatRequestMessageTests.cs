@@ -28,12 +28,12 @@ namespace NKafka.Tests.Messages;
 public class HeartbeatRequestMessageTests: RequestMessageTests<HeartbeatRequestMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'HeartbeatRequestMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    [InlineData(ApiVersions.Version1)]
-    [InlineData(ApiVersions.Version2)]
-    [InlineData(ApiVersions.Version3)]
-    [InlineData(ApiVersions.Version4)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    [InlineData(ApiVersion.Version1)]
+    [InlineData(ApiVersion.Version2)]
+    [InlineData(ApiVersion.Version3)]
+    [InlineData(ApiVersion.Version4)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new HeartbeatRequestMessage
         {

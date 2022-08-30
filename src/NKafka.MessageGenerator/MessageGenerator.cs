@@ -276,7 +276,7 @@ public class MessageGenerator: IMessageGenerator
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.AppendRightBrace();
         _codeGenerator.AppendLine();
-        _codeGenerator.AppendLine($"public {className}(BufferReader reader, ApiVersions version)");
+        _codeGenerator.AppendLine($"public {className}(BufferReader reader, ApiVersion version)");
 
         _codeGenerator.IncrementIndent();
         _codeGenerator.AppendLine(": this()");
@@ -299,9 +299,14 @@ public class MessageGenerator: IMessageGenerator
     {
         var lastField = structSpecification.Fields.Last();
 
-        _codeGenerator.AppendLine($"public ApiVersions LowestSupportedVersion => ApiVersions.Version{versions.Lowest};");
+        
+        _codeGenerator.AppendLine($"public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version{versions.Lowest};");
         _codeGenerator.AppendLine();
-        _codeGenerator.AppendLine($"public ApiVersions HighestSupportedVersion => ApiVersions.Version{versions.Highest};");
+        _codeGenerator.AppendLine($"public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version{versions.Highest};");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;");
+        _codeGenerator.AppendLine();
+        _codeGenerator.AppendLine($"public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;");
         _codeGenerator.AppendLine();
 
         if (isTopLevel)
@@ -320,8 +325,6 @@ public class MessageGenerator: IMessageGenerator
             }
         }
 
-        _codeGenerator.AppendLine("public ApiVersions Version {get; set;}");
-        _codeGenerator.AppendLine();
         _codeGenerator.AppendLine("public List<TaggedField>? UnknownTaggedFields { get; set; } = null;");
         _codeGenerator.AppendLine();
 

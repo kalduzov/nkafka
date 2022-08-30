@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGroupRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.JoinGroup;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -91,17 +93,17 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
     {
     }
 
-    public JoinGroupRequestMessage(BufferReader reader, ApiVersions version)
+    public JoinGroupRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int length;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -123,7 +125,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
         }
         SessionTimeoutMs = reader.ReadInt();
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             RebalanceTimeoutMs = reader.ReadInt();
         }
@@ -133,7 +135,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         }
         {
             int length;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -154,10 +156,10 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 MemberId = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             int length;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -184,7 +186,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         }
         {
             int length;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -206,7 +208,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
         }
         {
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -243,7 +245,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 }
             }
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             int length;
             length = reader.ReadVarUInt() - 1;
@@ -265,7 +267,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             Reason = null;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -282,12 +284,12 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -298,13 +300,13 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(SessionTimeoutMs);
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(RebalanceTimeoutMs);
         }
         {
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -314,11 +316,11 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             if (GroupInstanceId is null)
             {
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -330,7 +332,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -350,7 +352,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         }
         {
             var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -360,7 +362,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(Protocols.Count + 1);
             foreach (var element in Protocols)
@@ -376,7 +378,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 element.Write(writer, version);
             }
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             if (Reason is null)
             {
@@ -391,7 +393,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -433,11 +435,13 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
 
     public sealed class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -455,21 +459,21 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
         {
         }
 
-        public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersions version)
+        public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version9)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of JoinGroupRequestProtocolMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -492,7 +496,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
             {
                 int length;
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -510,7 +514,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -527,12 +531,12 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -542,7 +546,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(Metadata.Length + 1);
             }
@@ -553,7 +557,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
             writer.WriteBytes(Metadata);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

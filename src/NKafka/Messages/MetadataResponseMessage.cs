@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<MetadataResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -79,15 +81,15 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
     {
     }
 
-    public MetadataResponseMessage(BufferReader reader, ApiVersions version)
+    public MetadataResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             ThrottleTimeMs = reader.ReadInt();
         }
@@ -96,7 +98,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             ThrottleTimeMs = 0;
         }
         {
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -133,10 +135,10 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
             }
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             int length;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -161,7 +163,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
             ClusterId = null;
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ControllerId = reader.ReadInt();
         }
@@ -170,7 +172,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             ControllerId = -1;
         }
         {
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -207,7 +209,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
             }
         }
-        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             ClusterAuthorizedOperations = reader.ReadInt();
         }
@@ -216,7 +218,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             ClusterAuthorizedOperations = -2147483648;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -233,14 +235,14 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(Brokers.Count + 1);
             foreach (var element in Brokers)
@@ -256,11 +258,11 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 element.Write(writer, version);
             }
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             if (ClusterId is null)
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -272,7 +274,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -283,11 +285,11 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 writer.WriteBytes(stringBytes);
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(ControllerId);
         }
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -303,7 +305,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 element.Write(writer, version);
             }
         }
-        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             writer.WriteInt(ClusterAuthorizedOperations);
         }
@@ -316,7 +318,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -358,11 +360,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
 
     public sealed class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -390,22 +394,22 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
         }
 
-        public MetadataResponseBrokerMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponseBrokerMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version12)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseBrokerMessage");
             }
             NodeId = reader.ReadInt();
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -427,10 +431,10 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
             }
             Port = reader.ReadInt();
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -456,7 +460,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 Rack = null;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -473,13 +477,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Host);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -490,11 +494,11 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 if (Rack is null)
                 {
-                    if (version >= ApiVersions.Version9)
+                    if (version >= ApiVersion.Version9)
                     {
                         writer.WriteVarUInt(0);
                     }
@@ -506,7 +510,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 else
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                    if (version >= ApiVersions.Version9)
+                    if (version >= ApiVersion.Version9)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -519,7 +523,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -574,11 +578,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
 
     public sealed class MetadataResponseTopicMessage: IMessage, IEquatable<MetadataResponseTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -619,22 +625,22 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
         }
 
-        public MetadataResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponseTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version12)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseTopicMessage");
             }
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -644,7 +650,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 if (length < 0)
                 {
-                    if (version >= ApiVersions.Version12)
+                    if (version >= ApiVersion.Version12)
                     {
                         Name = null;
                     }
@@ -662,7 +668,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     Name = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersions.Version10)
+            if (version >= ApiVersion.Version10)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -670,7 +676,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             {
                 TopicId = Guid.Empty;
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 IsInternal = reader.ReadByte() != 0;
             }
@@ -679,7 +685,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 IsInternal = false;
             }
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -716,7 +722,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     }
                 }
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 TopicAuthorizedOperations = reader.ReadInt();
             }
@@ -725,7 +731,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 TopicAuthorizedOperations = -2147483648;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -742,13 +748,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
             if (Name is null)
             {
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -759,7 +765,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -769,15 +775,15 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version10)
+            if (version >= ApiVersion.Version10)
             {
                 writer.WriteGuid(TopicId);
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteBool(IsInternal);
             }
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -793,7 +799,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     element.Write(writer, version);
                 }
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 writer.WriteInt(TopicAuthorizedOperations);
             }
@@ -806,7 +812,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -851,11 +857,13 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
 
     public sealed class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -901,22 +909,22 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         {
         }
 
-        public MetadataResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public MetadataResponsePartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version12)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponsePartitionMessage");
             }
             ErrorCode = reader.ReadShort();
             PartitionIndex = reader.ReadInt();
             LeaderId = reader.ReadInt();
-            if (version >= ApiVersions.Version7)
+            if (version >= ApiVersion.Version7)
             {
                 LeaderEpoch = reader.ReadInt();
             }
@@ -926,7 +934,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -950,7 +958,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -972,10 +980,10 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                     IsrNodes = newCollection;
                 }
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -1002,7 +1010,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 OfflineReplicas = new ();
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -1019,17 +1027,17 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
             writer.WriteInt(PartitionIndex);
             writer.WriteInt(LeaderId);
-            if (version >= ApiVersions.Version7)
+            if (version >= ApiVersion.Version7)
             {
                 writer.WriteInt(LeaderEpoch);
             }
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(ReplicaNodes.Count + 1);
             }
@@ -1041,7 +1049,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             {
                 writer.WriteInt(element);
             }
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(IsrNodes.Count + 1);
             }
@@ -1053,9 +1061,9 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             {
                 writer.WriteInt(element);
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(OfflineReplicas.Count + 1);
                 }
@@ -1070,7 +1078,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

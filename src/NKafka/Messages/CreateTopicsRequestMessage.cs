@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<CreateTopicsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.CreateTopics;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,16 +68,16 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
     {
     }
 
-    public CreateTopicsRequestMessage(BufferReader reader, ApiVersions version)
+    public CreateTopicsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -113,7 +115,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
         }
         timeoutMs = reader.ReadInt();
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             validateOnly = reader.ReadByte() != 0;
         }
@@ -122,7 +124,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             validateOnly = false;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -139,10 +141,10 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -159,7 +161,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
         }
         writer.WriteInt(timeoutMs);
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteBool(validateOnly);
         }
@@ -172,7 +174,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version5)
+        if (version >= ApiVersion.Version5)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -213,11 +215,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
 
     public sealed class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -250,21 +254,21 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         {
         }
 
-        public CreatableTopicMessage(BufferReader reader, ApiVersions version)
+        public CreatableTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreatableTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -288,7 +292,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             NumPartitions = reader.ReadInt();
             ReplicationFactor = reader.ReadShort();
             {
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -326,7 +330,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
             }
             {
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -364,7 +368,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -381,12 +385,12 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -398,7 +402,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             writer.WriteInt(NumPartitions);
             writer.WriteShort(ReplicationFactor);
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(Assignments.Count + 1);
                 foreach (var element in Assignments)
@@ -414,7 +418,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                     element.Write(writer, version);
                 }
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
@@ -432,7 +436,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -475,11 +479,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
 
     public sealed class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -497,22 +503,22 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         {
         }
 
-        public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersions version)
+        public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreatableReplicaAssignmentMessage");
             }
             PartitionIndex = reader.ReadInt();
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -535,7 +541,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -552,11 +558,11 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(BrokerIds.Count + 1);
             }
@@ -570,7 +576,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -624,11 +630,13 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
 
     public sealed class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -646,21 +654,21 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         {
         }
 
-        public CreateableTopicConfigMessage(BufferReader reader, ApiVersions version)
+        public CreateableTopicConfigMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreateableTopicConfigMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -683,7 +691,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             {
                 int length;
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -705,7 +713,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -722,12 +730,12 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -739,7 +747,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             if (Value is null)
             {
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -751,7 +759,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
-                if (version >= ApiVersions.Version5)
+                if (version >= ApiVersion.Version5)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -763,7 +771,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

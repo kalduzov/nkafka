@@ -24,24 +24,25 @@ using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol;
 
-public class SendMessage
+public struct SendMessage
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public RequestHeader Header { get; set; }
+    private ApiVersion Version { get; }
 
     /// <summary>
     /// 
     /// </summary>
-    public IRequestMessage Content { get; set; }
+    public RequestHeader Header { get; }
 
-    public SendMessage(RequestHeader header, IRequestMessage content)
+    /// <summary>
+    /// 
+    /// </summary>
+    public IRequestMessage Content { get; }
+
+    public SendMessage(RequestHeader header, IRequestMessage content, ApiVersion version)
     {
+        Version = version;
         Header = header;
         Content = content;
-
-        //RequestLength = header.Length + content.MessageSize;
     }
 
     public void Write(Stream writableStream)
@@ -49,8 +50,8 @@ public class SendMessage
         using var stream = new MemoryStream();
         var writer = new BufferWriter(stream);
 
-        Header.Write(writer, (ApiVersions)Header.RequestApiVersion);
-        Content.Write(writer, (ApiVersions)Header.RequestApiVersion);
+        Header.Write(writer, (ApiVersion)Header.RequestApiVersion);
+        Content.Write(writer, Version);
 
         writableStream.WriteLength((int)stream.Length);
         stream.WriteTo(writableStream);

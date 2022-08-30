@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatable<DescribeProducersResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -59,13 +61,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
     {
     }
 
-    public DescribeProducersResponseMessage(BufferReader reader, ApiVersions version)
+    public DescribeProducersResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -100,7 +102,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -141,11 +143,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
 
     public sealed class TopicResponseMessage: IMessage, IEquatable<TopicResponseMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -163,15 +167,15 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         {
         }
 
-        public TopicResponseMessage(BufferReader reader, ApiVersions version)
+        public TopicResponseMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicResponseMessage");
             }
@@ -223,7 +227,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -268,11 +272,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
 
     public sealed class PartitionResponseMessage: IMessage, IEquatable<PartitionResponseMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -303,15 +309,15 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         {
         }
 
-        public PartitionResponseMessage(BufferReader reader, ApiVersions version)
+        public PartitionResponseMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionResponseMessage");
             }
@@ -365,7 +371,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -419,11 +425,13 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
 
     public sealed class ProducerStateMessage: IMessage, IEquatable<ProducerStateMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -461,15 +469,15 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         {
         }
 
-        public ProducerStateMessage(BufferReader reader, ApiVersions version)
+        public ProducerStateMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ProducerStateMessage");
             }
@@ -494,7 +502,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteLong(ProducerId);

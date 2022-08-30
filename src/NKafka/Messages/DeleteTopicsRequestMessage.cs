@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<DeleteTopicsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.DeleteTopics;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,15 +68,15 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
     {
     }
 
-    public DeleteTopicsRequestMessage(BufferReader reader, ApiVersions version)
+    public DeleteTopicsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             int arrayLength;
             arrayLength = reader.ReadVarUInt() - 1;
@@ -96,9 +98,9 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         {
             Topics = new ();
         }
-        if (version <= ApiVersions.Version5)
+        if (version <= ApiVersion.Version5)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -167,7 +169,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         }
         TimeoutMs = reader.ReadInt();
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -184,10 +186,10 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -202,9 +204,9 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
                 throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
             }
         }
-        if (version <= ApiVersions.Version5)
+        if (version <= ApiVersion.Version5)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(TopicNames.Count + 1);
                 foreach (var element in TopicNames)
@@ -232,7 +234,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         writer.WriteInt(TimeoutMs);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -272,11 +274,13 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
 
     public sealed class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version6;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version6;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -294,15 +298,15 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         {
         }
 
-        public DeleteTopicStateMessage(BufferReader reader, ApiVersions version)
+        public DeleteTopicStateMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version6)
+            if (version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DeleteTopicStateMessage");
             }
@@ -338,9 +342,9 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version6)
+            if (version < ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of DeleteTopicStateMessage");
             }

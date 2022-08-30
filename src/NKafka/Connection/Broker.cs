@@ -44,10 +44,6 @@ namespace NKafka.Connection;
 /// </summary>
 internal sealed class Broker: IBroker, IEquatable<Broker>
 {
-
-    private ApiVersions _headerVersion = ApiVersions.Version1; //minimum version header
-    
-    private readonly IKafkaConnector _kafkaConnector;
     private readonly ArrayPool<byte> _arrayPool;
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
@@ -60,8 +56,6 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     private readonly CommonConfig _config;
 
     private Task _processData;
-
-    private readonly Memory<byte> _size = new(new byte[sizeof(int)]);
 
     /*
      * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
@@ -121,14 +115,6 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         EndPoint = endpoint;
         IsController = isController;
 
-        _kafkaConnector = new KafkaConnector(
-            _config.MaxInflightRequests,
-            _config.MessageMaxBytes,
-            _config.CloseConnectionTimeoutMs,
-            _config.ConnectionsMaxIdleMs,
-            _config.SecurityProtocol,
-            loggerFactory);
-
         var maxInflightRequests = _config.MaxInflightRequests;
 
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
@@ -163,30 +149,24 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     {
         if (_config.ApiVersionRequest)
         {
-            var request = new ApiVersionsRequestMessage
-            {
-                Version = ApiVersions.Version1
-            };
+            var request = new ApiVersionsRequestMessage();
             var response = await InternalSendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(request, true, token)
                 .ConfigureAwait(false);
             UpdateApiVersions(response);
         }
-
-        var metadataRequest = new MetadataRequestMessage
-        {
-            Topics = Array.Empty<MetadataRequestMessage.MetadataRequestTopicMessage>().ToList()
-        };
-        var metadataResponse = await InternalSendAsync<MetadataResponseMessage, MetadataRequestMessage>(metadataRequest, true, token)
-            .ConfigureAwait(false);
-        UpdateMetadata(metadataResponse);
-    }
-
-    private void UpdateMetadata(MetadataResponseMessage metadataResponse)
-    {
     }
 
     private void UpdateApiVersions(ApiVersionsResponseMessage response)
     {
+        if (response.Code != ErrorCodes.None)
+        {
+            return;
+        }
+
+        foreach (var key in response.ApiKeys)
+        {
+            //_supportVersions.AddOrUpdate((ApiKeys)key.ApiKey, (ApiVersion)key.MinVersion, (ApiVersion)key.MaxVersion);
+        }
     }
 
     /// <summary>
@@ -321,19 +301,25 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
                     continue;
                 }
 
-                var _ = await _stream.ReadAsync(_size).ConfigureAwait(false);
+                Memory<byte> size = new(new byte[sizeof(int)]);
+                var countReadBytes = await _stream.ReadAsync(size).ConfigureAwait(false);
 
-                var requestLength = ReadInt32BigEndian(_size.Span);
+                var requestLength = ReadInt32BigEndian(size.Span);
 
                 if (requestLength == 0) //Данных нет идем дальше ждать
                 {
-                    continue;
+                    if (countReadBytes == 4)
+                    {
+                        continue;
+                    }
+
+                    throw new ProtocolKafkaException(ErrorCodes.None, "Отправлен некорректный запрос к брокеру. Брокер вернул 0 байт.");
                 }
 
-                var bodyLen = requestLength - await _stream.ReadAsync(_size).ConfigureAwait(false);
-                var requestId = ReadInt32BigEndian(_size.Span);
+                var bodyLen = requestLength - await _stream.ReadAsync(size).ConfigureAwait(false);
+                var requestId = ReadInt32BigEndian(size.Span);
 
-                Debug.WriteLine($"Get new message BrockerId {Id}, CorrelationId={requestId}, ResponseLength={requestLength}");
+                Debug.WriteLine($"Get new message BrokerId {Id}, CorrelationId={requestId}, ResponseLength={requestLength}");
 
                 var buffer = _arrayPool.Rent(bodyLen);
 
@@ -368,7 +354,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
                 try
                 {
-                    var message = responseInfo.BuildResponseMessage(buffer, bodyLen);
+                    var message = responseInfo.BuildResponseMessage(buffer);
                     UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen);
 
                     if (message.IsSuccessStatusCode)
@@ -437,17 +423,21 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         var requestId = Interlocked.Increment(ref _requestId);
 
-        using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, content.Version, requestId, Id, EndPoint);
+        var contentVersion = content.ApiKey.GetApiVersion();
+        var headerVersion = content.ApiKey.GetHeaderVersion(contentVersion);
+
+        using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, contentVersion, requestId, Id, EndPoint);
 
         var request = new SendMessage(
             new RequestHeader
             {
                 ClientId = _config.ClientId,
-                RequestApiVersion = (short)_headerVersion, //header minimum version
+                RequestApiVersion = (short)headerVersion, //header minimum version
                 CorrelationId = requestId,
                 RequestApiKey = (short)content.ApiKey
             },
-            content);
+            content,
+            contentVersion);
 
         ThrowExceptionIfRequestNotValid(request, activity);
 
@@ -464,7 +454,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         var taskCompletionSource = new ResponseTaskCompletionSource(
             (ApiKeys)request.Header.RequestApiKey,
-            (ApiVersions)request.Header.RequestApiVersion);
+            (ApiVersion)request.Header.RequestApiVersion);
 
         token.Register(
             state =>
@@ -591,17 +581,17 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     {
         private readonly ApiKeys _apiKey;
 
-        private readonly ApiVersions _version;
+        private readonly ApiVersion _version;
 
-        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersions version)
+        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
         {
             _apiKey = apiKey;
             _version = version;
         }
 
-        internal IResponseMessage BuildResponseMessage(byte[] span, int bodyLen)
+        internal IResponseMessage BuildResponseMessage(byte[] span)
         {
-            return DefaultResponseBuilder.Build(_apiKey, _version, bodyLen, span);
+            return ResponseBuilder.Build(_apiKey, _version, span);
         }
     }
 }

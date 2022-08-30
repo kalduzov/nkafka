@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<OffsetCommitRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.OffsetCommit;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -81,17 +83,17 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
     {
     }
 
-    public OffsetCommitRequestMessage(BufferReader reader, ApiVersions version)
+    public OffsetCommitRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int length;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -112,7 +114,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 GroupId = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             GenerationId = reader.ReadInt();
         }
@@ -120,10 +122,10 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         {
             GenerationId = -1;
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             int length;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -148,10 +150,10 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         {
             MemberId = string.Empty;
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             int length;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -176,7 +178,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         {
             GroupInstanceId = null;
         }
-        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version4)
+        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version4)
         {
             RetentionTimeMs = reader.ReadLong();
         }
@@ -185,7 +187,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             RetentionTimeMs = -1;
         }
         {
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -223,7 +225,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -240,12 +242,12 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -255,15 +257,15 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(GenerationId);
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -274,11 +276,11 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 writer.WriteBytes(stringBytes);
             }
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             if (GroupInstanceId is null)
             {
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -290,7 +292,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -308,11 +310,11 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
             }
         }
-        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version4)
+        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version4)
         {
             writer.WriteLong(RetentionTimeMs);
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -330,7 +332,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -371,11 +373,13 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
 
     public sealed class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -393,21 +397,21 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         {
         }
 
-        public OffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
+        public OffsetCommitRequestTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version8)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -429,7 +433,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 }
             }
             {
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -467,7 +471,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -484,12 +488,12 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -499,7 +503,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -517,7 +521,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -557,11 +561,13 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
 
     public sealed class OffsetCommitRequestPartitionMessage: IMessage, IEquatable<OffsetCommitRequestPartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -594,21 +600,21 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
         {
         }
 
-        public OffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
+        public OffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version8)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestPartitionMessage");
             }
             PartitionIndex = reader.ReadInt();
             CommittedOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 CommittedLeaderEpoch = reader.ReadInt();
             }
@@ -616,7 +622,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             {
                 CommittedLeaderEpoch = -1;
             }
-            if (version >= ApiVersions.Version1 && version <= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1 && version <= ApiVersion.Version1)
             {
                 CommitTimestamp = reader.ReadLong();
             }
@@ -626,7 +632,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
             {
                 int length;
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -648,7 +654,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -665,16 +671,16 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteLong(CommittedOffset);
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteInt(CommittedLeaderEpoch);
             }
-            if (version >= ApiVersions.Version1 && version <= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1 && version <= ApiVersion.Version1)
             {
                 writer.WriteLong(CommitTimestamp);
             }
@@ -687,7 +693,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
             if (CommittedMetadata is null)
             {
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -699,7 +705,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
-                if (version >= ApiVersions.Version8)
+                if (version >= ApiVersion.Version8)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -711,7 +717,7 @@ public sealed class OffsetCommitRequestMessage: IRequestMessage, IEquatable<Offs
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

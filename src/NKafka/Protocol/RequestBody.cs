@@ -35,7 +35,7 @@ public abstract class RequestBody : IDisposable
 
     public ApiKeys ApiKey { get; protected init; }
 
-    public ApiVersions Version { get; set; }
+    public ApiVersion Version { get; set; }
 
     public void Dispose()
     {

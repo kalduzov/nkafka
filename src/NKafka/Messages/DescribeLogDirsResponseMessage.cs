@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable<DescribeLogDirsResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -67,16 +69,16 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
     {
     }
 
-    public DescribeLogDirsResponseMessage(BufferReader reader, ApiVersions version)
+    public DescribeLogDirsResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             ErrorCode = reader.ReadShort();
         }
@@ -85,7 +87,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             ErrorCode = 0;
         }
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -123,7 +125,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -140,15 +142,15 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteShort((short)ErrorCode);
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
@@ -166,7 +168,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -207,11 +209,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeLogDirsResultMessage: IMessage, IEquatable<DescribeLogDirsResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -247,22 +251,22 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeLogDirsResultMessage(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeLogDirsResultMessage");
             }
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -284,7 +288,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             {
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -321,7 +325,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     }
                 }
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 TotalBytes = reader.ReadLong();
             }
@@ -329,7 +333,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             {
                 TotalBytes = -1;
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 UsableBytes = reader.ReadLong();
             }
@@ -338,7 +342,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 UsableBytes = -1;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -355,13 +359,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(LogDir);
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -371,7 +375,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
@@ -387,17 +391,17 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                     element.Write(writer, version);
                 }
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteLong(TotalBytes);
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteLong(UsableBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -440,11 +444,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeLogDirsTopicMessage: IMessage, IEquatable<DescribeLogDirsTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -462,21 +468,21 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeLogDirsTopicMessage(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeLogDirsTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -498,7 +504,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             {
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -536,7 +542,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -553,12 +559,12 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -568,7 +574,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -586,7 +592,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -626,11 +632,13 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
 
     public sealed class DescribeLogDirsPartitionMessage: IMessage, IEquatable<DescribeLogDirsPartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -658,15 +666,15 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         {
         }
 
-        public DescribeLogDirsPartitionMessage(BufferReader reader, ApiVersions version)
+        public DescribeLogDirsPartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeLogDirsPartitionMessage");
             }
@@ -675,7 +683,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             OffsetLag = reader.ReadLong();
             IsFutureKey = reader.ReadByte() != 0;
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -692,7 +700,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -701,7 +709,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
             writer.WriteBool(IsFutureKey);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

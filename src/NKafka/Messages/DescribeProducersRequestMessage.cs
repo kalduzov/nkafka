@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable<DescribeProducersRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.DescribeProducers;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -56,13 +58,13 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
     {
     }
 
-    public DescribeProducersRequestMessage(BufferReader reader, ApiVersions version)
+    public DescribeProducersRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int arrayLength;
@@ -96,7 +98,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteVarUInt(Topics.Count + 1);
@@ -135,11 +137,13 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
 
     public sealed class TopicRequestMessage: IMessage, IEquatable<TopicRequestMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -157,15 +161,15 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
         {
         }
 
-        public TopicRequestMessage(BufferReader reader, ApiVersions version)
+        public TopicRequestMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicRequestMessage");
             }
@@ -217,7 +221,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {

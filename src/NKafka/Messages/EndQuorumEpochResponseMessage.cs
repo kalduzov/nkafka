@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<EndQuorumEpochResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -64,13 +66,13 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
     {
     }
 
-    public EndQuorumEpochResponseMessage(BufferReader reader, ApiVersions version)
+    public EndQuorumEpochResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         {
@@ -93,7 +95,7 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
         UnknownTaggedFields = null;
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
@@ -136,11 +138,13 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -158,15 +162,15 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
         {
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicDataMessage");
             }
@@ -206,7 +210,7 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
             UnknownTaggedFields = null;
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -253,11 +257,13 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -288,15 +294,15 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
         {
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
@@ -307,7 +313,7 @@ public sealed class EndQuorumEpochResponseMessage: IResponseMessage, IEquatable<
             UnknownTaggedFields = null;
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquatable<ExpireDelegationTokenRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.ExpireDelegationToken;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -61,17 +63,17 @@ public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquat
     {
     }
 
-    public ExpireDelegationTokenRequestMessage(BufferReader reader, ApiVersions version)
+    public ExpireDelegationTokenRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -90,7 +92,7 @@ public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquat
         }
         ExpiryTimePeriodMs = reader.ReadLong();
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -107,10 +109,10 @@ public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquat
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(Hmac.Length + 1);
         }
@@ -122,7 +124,7 @@ public sealed class ExpireDelegationTokenRequestMessage: IRequestMessage, IEquat
         writer.WriteLong(ExpiryTimePeriodMs);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);

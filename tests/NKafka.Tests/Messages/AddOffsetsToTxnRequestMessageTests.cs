@@ -28,11 +28,11 @@ namespace NKafka.Tests.Messages;
 public class AddOffsetsToTxnRequestMessageTests: RequestMessageTests<AddOffsetsToTxnRequestMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    [InlineData(ApiVersions.Version1)]
-    [InlineData(ApiVersions.Version2)]
-    [InlineData(ApiVersions.Version3)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    [InlineData(ApiVersion.Version1)]
+    [InlineData(ApiVersion.Version2)]
+    [InlineData(ApiVersion.Version3)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new AddOffsetsToTxnRequestMessage
         {

@@ -24,5 +24,5 @@ namespace NKafka.Protocol;
 
 internal interface IRequestBuilder
 {
-    IRequestMessage Create(ApiKeys apiKey, ApiVersions version);
+    IRequestMessage Create(ApiKeys apiKey, ApiVersion version);
 }

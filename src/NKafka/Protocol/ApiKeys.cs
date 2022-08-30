@@ -81,7 +81,7 @@ public enum ApiKeys : short
     BeginQuorumEpoch = 53,
     EndQuorumEpoch = 54,
     DescribeQuorum = 55,
-    AlterIsr = 56,
+    AlterPartition = 56,
     UpdateFeatures = 57,
     Envelope = 58,
     FetchSnapshot = 59,

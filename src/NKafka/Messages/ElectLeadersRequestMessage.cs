@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<ElectLeadersRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.ElectLeaders;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,15 +68,15 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
     {
     }
 
-    public ElectLeadersRequestMessage(BufferReader reader, ApiVersions version)
+    public ElectLeadersRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ElectionType = reader.ReadSByte();
         }
@@ -83,7 +85,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
             ElectionType = 0;
         }
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -122,7 +124,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         }
         TimeoutMs = reader.ReadInt();
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -139,10 +141,10 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteSByte(ElectionType);
         }
@@ -153,7 +155,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 throw new UnsupportedVersionException($"Attempted to write a non-default ElectionType at version {version}");
             }
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             if (TopicPartitions is null)
             {
@@ -186,7 +188,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         writer.WriteInt(TimeoutMs);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -227,11 +229,13 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
 
     public sealed class TopicPartitionsMessage: IMessage, IEquatable<TopicPartitionsMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -249,21 +253,21 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         {
         }
 
-        public TopicPartitionsMessage(BufferReader reader, ApiVersions version)
+        public TopicPartitionsMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version2)
+            if (version > ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicPartitionsMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -286,7 +290,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
             }
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -309,7 +313,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -326,12 +330,12 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Topic);
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -341,7 +345,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
             }
@@ -355,7 +359,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

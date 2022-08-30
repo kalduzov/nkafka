@@ -25,20 +25,20 @@ var clusterConfig = new ClusterConfig
     //MessageMaxBytes = 20,
 };
 
-using var tracerProvider = Sdk.CreateTracerProviderBuilder()
-    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples.KafkaProducer"))
-    .AddSource("NKafka.Internal")
-    .AddSource("NKafka")
-    .AddJaegerExporter(
-        options =>
-        {
-            options.AgentHost = "localhost";
-            options.AgentPort = 6831;
-            options.Protocol = JaegerExportProtocol.UdpCompactThrift;
-            options.ExportProcessorType = ExportProcessorType.Simple;
-        })
-    .AddConsoleExporter()
-    .Build();
+// using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+//     .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
+//     .AddSource("NKafka.Internal")
+//     .AddSource("NKafka")
+//     .AddJaegerExporter(
+//         options =>
+//         {
+//             options.AgentHost = "localhost";
+//             options.AgentPort = 6831;
+//             options.Protocol = JaegerExportProtocol.UdpCompactThrift;
+//             options.ExportProcessorType = ExportProcessorType.Simple;
+//         })
+//     .AddConsoleExporter()
+//     .Build();
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -55,6 +55,11 @@ var loggerFactory = LoggerFactory.Create(
 var logger = loggerFactory.CreateLogger<Program>();
 
 await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFactory);
+
+for (var i = 0; i < int.MaxValue; i++)
+{
+    await kafkaCluster.RefreshMetadataAsync();
+}
 
 //await kafkaCluster.RefreshMetadataAsync(default, "test");
 

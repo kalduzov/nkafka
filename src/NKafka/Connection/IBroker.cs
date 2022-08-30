@@ -67,6 +67,9 @@ public interface IBroker : IDisposable, IAsyncDisposable
     /// </summary>
     public int CurrentNumberInflightRequests { get; }
 
+    /// <summary>
+    /// Открывает соединение с брокером
+    /// </summary>
     public Task OpenAsync(CancellationToken token);
     
     /// <summary>

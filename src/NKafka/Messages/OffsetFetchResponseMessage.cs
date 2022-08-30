@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<OffsetFetchResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -72,15 +74,15 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
     {
     }
 
-    public OffsetFetchResponseMessage(BufferReader reader, ApiVersions version)
+    public OffsetFetchResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             ThrottleTimeMs = reader.ReadInt();
         }
@@ -88,9 +90,9 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
             ThrottleTimeMs = 0;
         }
-        if (version <= ApiVersions.Version7)
+        if (version <= ApiVersion.Version7)
         {
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -131,7 +133,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
             Topics = new ();
         }
-        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version7)
+        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version7)
         {
             ErrorCode = reader.ReadShort();
         }
@@ -139,7 +141,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
             ErrorCode = 0;
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             int arrayLength;
             arrayLength = reader.ReadVarUInt() - 1;
@@ -162,7 +164,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             Groups = new ();
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -179,16 +181,16 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
-        if (version <= ApiVersions.Version7)
+        if (version <= ApiVersion.Version7)
         {
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
@@ -212,11 +214,11 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 throw new UnsupportedVersionException($"Attempted to write a non-default Topics at version {version}");
             }
         }
-        if (version >= ApiVersions.Version2 && version <= ApiVersions.Version7)
+        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version7)
         {
             writer.WriteShort((short)ErrorCode);
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
@@ -233,7 +235,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -274,11 +276,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
 
     public sealed class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -296,17 +300,17 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
         }
 
-        public OffsetFetchResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
             {
                 int length;
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -328,7 +332,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 }
             }
             {
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -366,7 +370,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -383,16 +387,16 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchResponseTopicMessage");
             }
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -402,7 +406,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -420,7 +424,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -460,11 +464,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
 
     public sealed class OffsetFetchResponsePartitionMessage: IMessage, IEquatable<OffsetFetchResponsePartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -500,17 +506,17 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
         }
 
-        public OffsetFetchResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponsePartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
             PartitionIndex = reader.ReadInt();
             CommittedOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 CommittedLeaderEpoch = reader.ReadInt();
             }
@@ -520,7 +526,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
             {
                 int length;
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -543,7 +549,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -560,18 +566,18 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteLong(CommittedOffset);
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteInt(CommittedLeaderEpoch);
             }
             if (Metadata is null)
             {
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -583,7 +589,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Metadata);
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -596,7 +602,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -640,11 +646,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
 
     public sealed class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -670,15 +678,15 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
         }
 
-        public OffsetFetchResponseGroupMessage(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseGroupMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version8)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseGroupMessage");
             }
@@ -731,9 +739,9 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version8)
+            if (version < ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of OffsetFetchResponseGroupMessage");
             }
@@ -782,11 +790,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
 
     public sealed class OffsetFetchResponseTopicsMessage: IMessage, IEquatable<OffsetFetchResponseTopicsMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -804,15 +814,15 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
         }
 
-        public OffsetFetchResponseTopicsMessage(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponseTopicsMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version8)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseTopicsMessage");
             }
@@ -864,7 +874,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -909,11 +919,13 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
 
     public sealed class OffsetFetchResponsePartitionsMessage: IMessage, IEquatable<OffsetFetchResponsePartitionsMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version8;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version8;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -949,15 +961,15 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         {
         }
 
-        public OffsetFetchResponsePartitionsMessage(BufferReader reader, ApiVersions version)
+        public OffsetFetchResponsePartitionsMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version8)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponsePartitionsMessage");
             }
@@ -996,7 +1008,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

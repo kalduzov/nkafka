@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<UpdateFeaturesRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.UpdateFeatures;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,13 +68,13 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
     {
     }
 
-    public UpdateFeaturesRequestMessage(BufferReader reader, ApiVersions version)
+    public UpdateFeaturesRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         timeoutMs = reader.ReadInt();
         {
@@ -92,7 +94,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
                 FeatureUpdates = newCollection;
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ValidateOnly = reader.ReadByte() != 0;
         }
@@ -115,7 +117,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(timeoutMs);
@@ -124,7 +126,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
         {
             element.Write(writer, version);
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteBool(ValidateOnly);
         }
@@ -168,11 +170,13 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
 
     public sealed class FeatureUpdateKeyMessage: IMessage, IEquatable<FeatureUpdateKeyMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -200,15 +204,15 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
         {
         }
 
-        public FeatureUpdateKeyMessage(BufferReader reader, ApiVersions version)
+        public FeatureUpdateKeyMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FeatureUpdateKeyMessage");
             }
@@ -229,7 +233,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
                 }
             }
             MaxVersionLevel = reader.ReadShort();
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 AllowDowngrade = reader.ReadByte() != 0;
             }
@@ -237,7 +241,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
             {
                 AllowDowngrade = false;
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 UpgradeType = reader.ReadSByte();
             }
@@ -260,7 +264,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -269,7 +273,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(MaxVersionLevel);
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 writer.WriteBool(AllowDowngrade);
             }
@@ -280,7 +284,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
                     throw new UnsupportedVersionException($"Attempted to write a non-default AllowDowngrade at version {version}");
                 }
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteSByte(UpgradeType);
             }

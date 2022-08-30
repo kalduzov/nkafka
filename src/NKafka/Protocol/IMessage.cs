@@ -23,17 +23,15 @@ namespace NKafka.Protocol;
 
 public interface IMessage
 {
-    public ApiVersions Version { get; set; }
-
     /// <summary>
     /// Returns the lowest supported API key of this message, inclusive.
     /// </summary>
-    public ApiVersions LowestSupportedVersion { get; }
+    public ApiVersion LowestSupportedVersion { get; }
 
     /// <summary>
     /// Returns the highest supported API key of this message, inclusive.
     /// </summary>
-    public ApiVersions HighestSupportedVersion { get;}
+    public ApiVersion HighestSupportedVersion { get;}
 
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand.
@@ -43,10 +41,10 @@ public interface IMessage
     /// <summary>
     /// Writes out this message to the given stream.
     /// </summary>
-    public void Write(BufferWriter writer, ApiVersions version);
+    public void Write(BufferWriter writer, ApiVersion version);
 
     /// <summary>
     /// Reads this message from the given BufferReader. This will overwrite all relevant fields with information from the byte buffer.
     /// </summary>
-    public void Read(BufferReader reader, ApiVersions version);
+    public void Read(BufferReader reader, ApiVersion version);
 }

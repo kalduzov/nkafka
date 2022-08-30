@@ -28,9 +28,9 @@ namespace NKafka.Tests.Messages;
 public class AlterClientQuotasRequestMessageTests: RequestMessageTests<AlterClientQuotasRequestMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'AlterClientQuotasRequestMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    [InlineData(ApiVersions.Version1)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    [InlineData(ApiVersion.Version1)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new AlterClientQuotasRequestMessage
         {

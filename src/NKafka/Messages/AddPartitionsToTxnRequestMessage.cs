@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatable<AddPartitionsToTxnRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.AddPartitionsToTxn;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -71,17 +73,17 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
     {
     }
 
-    public AddPartitionsToTxnRequestMessage(BufferReader reader, ApiVersions version)
+    public AddPartitionsToTxnRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int length;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -105,7 +107,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         ProducerId = reader.ReadLong();
         ProducerEpoch = reader.ReadShort();
         {
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -143,7 +145,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -160,12 +162,12 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
             var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -177,7 +179,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         }
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -195,7 +197,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -236,11 +238,13 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
 
     public sealed class AddPartitionsToTxnTopicMessage: IMessage, IEquatable<AddPartitionsToTxnTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -258,21 +262,21 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         {
         }
 
-        public AddPartitionsToTxnTopicMessage(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version3)
+            if (version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -295,7 +299,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
             }
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -318,7 +322,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -335,12 +339,12 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -350,7 +354,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
             }
@@ -364,7 +368,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

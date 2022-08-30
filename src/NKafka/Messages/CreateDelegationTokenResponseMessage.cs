@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEquatable<CreateDelegationTokenResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -107,18 +109,18 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
     {
     }
 
-    public CreateDelegationTokenResponseMessage(BufferReader reader, ApiVersions version)
+    public CreateDelegationTokenResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -141,7 +143,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         }
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -162,7 +164,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
                 PrincipalName = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             int length;
             length = reader.ReadVarUInt() - 1;
@@ -183,7 +185,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         {
             TokenRequesterPrincipalType = string.Empty;
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             int length;
             length = reader.ReadVarUInt() - 1;
@@ -209,7 +211,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         MaxTimestampMs = reader.ReadLong();
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -232,7 +234,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         }
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -251,7 +253,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         }
         ThrottleTimeMs = reader.ReadInt();
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -268,13 +270,13 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
         {
             var stringBytes = Encoding.UTF8.GetBytes(PrincipalType);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -286,7 +288,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         }
         {
             var stringBytes = Encoding.UTF8.GetBytes(PrincipalName);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -296,7 +298,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalType);
@@ -311,7 +313,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
                 throw new UnsupportedVersionException($"Attempted to write a non-default TokenRequesterPrincipalType at version {version}");
             }
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(TokenRequesterPrincipalName);
@@ -331,7 +333,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         writer.WriteLong(MaxTimestampMs);
         {
             var stringBytes = Encoding.UTF8.GetBytes(TokenId);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -341,7 +343,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(Hmac.Length + 1);
         }
@@ -353,7 +355,7 @@ public sealed class CreateDelegationTokenResponseMessage: IResponseMessage, IEqu
         writer.WriteInt(ThrottleTimeMs);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);

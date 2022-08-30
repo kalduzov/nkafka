@@ -38,10 +38,16 @@ public static class KafkaClusterExtensions
     /// </summary>
     /// <param name="config">Configuration</param>
     /// <param name="loggerFactory">Logging factory instance, can be null</param>
+    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
+    /// <param name="token"></param>
     /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
-    public static Task<IKafkaCluster> CreateClusterAsync(this ClusterConfig config, ILoggerFactory? loggerFactory = null)
+    public static Task<IKafkaCluster> CreateClusterAsync(
+        this ClusterConfig config,
+        ILoggerFactory? loggerFactory = null,
+        CancellationToken token = default,
+        bool openImmediately = true)
     {
-        return CreateClusterInternalAsync(config, loggerFactory);
+        return CreateClusterInternalAsync(config, loggerFactory, token: token, openImmediately: openImmediately);
     }
 
     /// <summary>
@@ -50,15 +56,10 @@ public static class KafkaClusterExtensions
     internal static async Task<IKafkaCluster> CreateClusterInternalAsync(
         this ClusterConfig config,
         ILoggerFactory? loggerFactory = null,
-        List<IBroker>? seedBrokers = null)
+        List<IBroker>? seedBrokers = null,
+        CancellationToken token = default,
+        bool openImmediately = true)
     {
-        /*
-      * Создание нового кластера состоит из нескольких шагов
-      * 1. Валидируем конфигурацию. Нам важно работать с валидной конфигураций.
-      * 2. Создаем новую структуру кластера c уже валидной конфигурацией
-      * 3. Когда структура создана и инициализирована - "запускаем" кластер
-      */
-
         config.Validate();
 
         var factory = loggerFactory ?? NullLoggerFactory.Instance;
@@ -70,11 +71,16 @@ public static class KafkaClusterExtensions
 
         var cts = new CancellationTokenSource(config.ClusterInitTimeoutMs);
 
+        var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
+
+        if (!openImmediately)
+        {
+            return cluster;
+        }
+
         try
         {
-            await cluster.InitializationAsync(cts.Token);
-
-            return cluster;
+            await cluster.OpenAsync(linkedTokenSource.Token);
         }
         catch (OperationCanceledException exc)
         {
@@ -89,7 +95,10 @@ public static class KafkaClusterExtensions
         }
         finally
         {
+            linkedTokenSource.Dispose();
             cts.Dispose();
         }
+
+        return cluster;
     }
 }

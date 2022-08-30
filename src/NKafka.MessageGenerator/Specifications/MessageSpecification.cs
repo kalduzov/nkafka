@@ -12,7 +12,7 @@ public record MessageSpecification
     /// <summary>
     /// Message api key 
     /// </summary>
-    public int ApiKey { get; }
+    public short ApiKey { get; }
 
     /// <summary>
     /// Message type 
@@ -52,7 +52,7 @@ public record MessageSpecification
 
     [JsonConstructor]
     public MessageSpecification(
-        [JsonProperty("apiKey")] int? apiKey,
+        [JsonProperty("apiKey")] short? apiKey,
         [JsonProperty("type")] MessageType type,
         [JsonProperty("listeners")] IReadOnlyCollection<RequestListenerType>? listeners,
         [JsonProperty("name")] string name,

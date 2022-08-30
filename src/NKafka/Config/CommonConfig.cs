@@ -70,11 +70,6 @@ public abstract record CommonConfig
     public bool ApiVersionRequest { get; set; } = true;
 
     /// <summary>
-    ///     Timeout for broker API version requests.
-    /// </summary>
-    public int ApiVersionRequestTimeoutMs { get; set; } = 10000;
-
-    /// <summary>
     ///     The period of time in milliseconds after which we force a refresh of metadata even if we haven't seen any partition
     ///     leadership changes to proactively discover any new brokers or partitions.
     ///

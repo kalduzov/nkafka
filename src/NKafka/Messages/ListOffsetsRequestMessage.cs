@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListOffsetsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.ListOffsets;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,16 +68,16 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
     {
     }
 
-    public ListOffsetsRequestMessage(BufferReader reader, ApiVersions version)
+    public ListOffsetsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ReplicaId = reader.ReadInt();
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             IsolationLevel = reader.ReadSByte();
         }
@@ -84,7 +86,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             IsolationLevel = 0;
         }
         {
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -122,7 +124,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -139,11 +141,11 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ReplicaId);
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteSByte(IsolationLevel);
         }
@@ -154,7 +156,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 throw new UnsupportedVersionException($"Attempted to write a non-default IsolationLevel at version {version}");
             }
         }
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -172,7 +174,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version6)
+        if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -213,11 +215,13 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
 
     public sealed class ListOffsetsTopicMessage: IMessage, IEquatable<ListOffsetsTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -235,21 +239,21 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
         {
         }
 
-        public ListOffsetsTopicMessage(BufferReader reader, ApiVersions version)
+        public ListOffsetsTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -271,7 +275,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 }
             }
             {
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -309,7 +313,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -326,12 +330,12 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version6)
+                if (version >= ApiVersion.Version6)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -341,7 +345,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -359,7 +363,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -399,11 +403,13 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
 
     public sealed class ListOffsetsPartitionMessage: IMessage, IEquatable<ListOffsetsPartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version7;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version7;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -431,20 +437,20 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
         {
         }
 
-        public ListOffsetsPartitionMessage(BufferReader reader, ApiVersions version)
+        public ListOffsetsPartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version7)
+            if (version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionMessage");
             }
             PartitionIndex = reader.ReadInt();
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 CurrentLeaderEpoch = reader.ReadInt();
             }
@@ -453,7 +459,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 CurrentLeaderEpoch = -1;
             }
             Timestamp = reader.ReadLong();
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 MaxNumOffsets = reader.ReadInt();
             }
@@ -462,7 +468,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
                 MaxNumOffsets = 1;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -479,16 +485,16 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteInt(CurrentLeaderEpoch);
             }
             writer.WriteLong(Timestamp);
-            if (version <= ApiVersions.Version0)
+            if (version <= ApiVersion.Version0)
             {
                 writer.WriteInt(MaxNumOffsets);
             }
@@ -501,7 +507,7 @@ public sealed class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListO
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version6)
+            if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

@@ -72,7 +72,7 @@ internal static class KafkaDiagnosticsSource
 
     public static Activity? InternalSendMessage(
         ApiKeys key,
-        ApiVersions version,
+        ApiVersion version,
         int requestId,
         int brokerId,
         EndPoint endPoint)

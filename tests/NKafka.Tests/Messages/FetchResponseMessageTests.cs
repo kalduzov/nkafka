@@ -28,21 +28,21 @@ namespace NKafka.Tests.Messages;
 public class FetchResponseMessageTests: ResponseMessageTests<FetchResponseMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'FetchResponseMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    [InlineData(ApiVersions.Version1)]
-    [InlineData(ApiVersions.Version2)]
-    [InlineData(ApiVersions.Version3)]
-    [InlineData(ApiVersions.Version4)]
-    [InlineData(ApiVersions.Version5)]
-    [InlineData(ApiVersions.Version6)]
-    [InlineData(ApiVersions.Version7)]
-    [InlineData(ApiVersions.Version8)]
-    [InlineData(ApiVersions.Version9)]
-    [InlineData(ApiVersions.Version10)]
-    [InlineData(ApiVersions.Version11)]
-    [InlineData(ApiVersions.Version12)]
-    [InlineData(ApiVersions.Version13)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    [InlineData(ApiVersion.Version1)]
+    [InlineData(ApiVersion.Version2)]
+    [InlineData(ApiVersion.Version3)]
+    [InlineData(ApiVersion.Version4)]
+    [InlineData(ApiVersion.Version5)]
+    [InlineData(ApiVersion.Version6)]
+    [InlineData(ApiVersion.Version7)]
+    [InlineData(ApiVersion.Version8)]
+    [InlineData(ApiVersion.Version9)]
+    [InlineData(ApiVersion.Version10)]
+    [InlineData(ApiVersion.Version11)]
+    [InlineData(ApiVersion.Version12)]
+    [InlineData(ApiVersion.Version13)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new FetchResponseMessage
         {

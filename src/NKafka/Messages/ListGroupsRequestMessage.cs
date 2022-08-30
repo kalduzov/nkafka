@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGroupsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.ListGroups;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -56,15 +58,15 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
     {
     }
 
-    public ListGroupsRequestMessage(BufferReader reader, ApiVersions version)
+    public ListGroupsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             int arrayLength;
             arrayLength = reader.ReadVarUInt() - 1;
@@ -100,7 +102,7 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
             StatesFilter = new ();
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -117,10 +119,10 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(StatesFilter.Count + 1);
             foreach (var element in StatesFilter)
@@ -141,7 +143,7 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);

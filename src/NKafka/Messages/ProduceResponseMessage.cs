@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<ProduceResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -59,16 +61,16 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
     {
     }
 
-    public ProduceResponseMessage(BufferReader reader, ApiVersions version)
+    public ProduceResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -105,7 +107,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ThrottleTimeMs = reader.ReadInt();
         }
@@ -114,7 +116,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             ThrottleTimeMs = 0;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -131,10 +133,10 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
@@ -150,13 +152,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 element.Write(writer, version);
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -196,11 +198,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
 
     public sealed class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -218,21 +222,21 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         {
         }
 
-        public TopicProduceResponseMessage(BufferReader reader, ApiVersions version)
+        public TopicProduceResponseMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version9)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceResponseMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -254,7 +258,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
             }
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -292,7 +296,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -309,12 +313,12 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -324,7 +328,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(PartitionResponses.Count + 1);
                 foreach (var element in PartitionResponses)
@@ -342,7 +346,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -383,11 +387,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
 
     public sealed class PartitionProduceResponseMessage: IMessage, IEquatable<PartitionProduceResponseMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -433,22 +439,22 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         {
         }
 
-        public PartitionProduceResponseMessage(BufferReader reader, ApiVersions version)
+        public PartitionProduceResponseMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version9)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceResponseMessage");
             }
             Index = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             BaseOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 LogAppendTimeMs = reader.ReadLong();
             }
@@ -456,7 +462,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             {
                 LogAppendTimeMs = -1;
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 LogStartOffset = reader.ReadLong();
             }
@@ -464,9 +470,9 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             {
                 LogStartOffset = -1;
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -507,10 +513,10 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             {
                 RecordErrors = new ();
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -536,7 +542,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 ErrorMessage = null;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -553,23 +559,23 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(Index);
             writer.WriteShort((short)ErrorCode);
             writer.WriteLong(BaseOffset);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteLong(LogAppendTimeMs);
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteLong(LogStartOffset);
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(RecordErrors.Count + 1);
                     foreach (var element in RecordErrors)
@@ -586,11 +592,11 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                     }
                 }
             }
-            if (version >= ApiVersions.Version8)
+            if (version >= ApiVersion.Version8)
             {
                 if (ErrorMessage is null)
                 {
-                    if (version >= ApiVersions.Version9)
+                    if (version >= ApiVersion.Version9)
                     {
                         writer.WriteVarUInt(0);
                     }
@@ -602,7 +608,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 else
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                    if (version >= ApiVersions.Version9)
+                    if (version >= ApiVersion.Version9)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -615,7 +621,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -660,11 +666,13 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
 
     public sealed class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version9;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version9;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -682,22 +690,22 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         {
         }
 
-        public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersions version)
+        public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version9)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of BatchIndexAndErrorMessageMessage");
             }
             BatchIndex = reader.ReadInt();
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -719,7 +727,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -736,9 +744,9 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version8)
+            if (version < ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of BatchIndexAndErrorMessageMessage");
             }
@@ -746,7 +754,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             writer.WriteInt(BatchIndex);
             if (BatchIndexErrorMessage is null)
             {
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -758,7 +766,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(BatchIndexErrorMessage);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -770,7 +778,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

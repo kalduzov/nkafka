@@ -24,8 +24,6 @@ public class MessagesGeneratorTask: Task
 
     public override bool Execute()
     {
-        const string messageSuffix = "Message";
-
         Log.LogMessage(MessageImportance.High, $"Solution {SolutionDirectory} output {OutputDirectory}");
         Log.LogMessage(MessageImportance.High, "Start messages generator");
 
@@ -33,6 +31,8 @@ public class MessagesGeneratorTask: Task
 
         try
         {
+            var specifications = new List<MessageSpecification>();
+
             foreach (var fileName in files)
             {
                 if (!fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
@@ -43,25 +43,41 @@ public class MessagesGeneratorTask: Task
                 try
                 {
                     var apiDescriptor = GetApiDescriptor(fileName);
-
-                    switch (apiDescriptor.Type)
-                    {
-                        case MessageType.Request or MessageType.Response or MessageType.Header:
-                        {
-                            IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
-                            var result = messageGenerator.Generate(apiDescriptor);
-                            var classFileName = $"{messageGenerator.ClassName(apiDescriptor)}.cs";
-                            WriteContentToFile(classFileName, result);
-
-                            break;
-                        }
-                    }
+                    specifications.Add(apiDescriptor);
                 }
                 catch (Exception exc)
                 {
                     Log.LogError($"Не удалось обработать файл {fileName}. {exc.StackTrace}");
                 }
             }
+
+            //generate messages
+            foreach (var messageSpecification in specifications)
+            {
+                switch (messageSpecification.Type)
+                {
+                    case MessageType.Request or MessageType.Response or MessageType.Header:
+                    {
+                        IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
+                        var result = messageGenerator.Generate(messageSpecification);
+                        var classFileName = $"{messageGenerator.ClassName(messageSpecification)}.cs";
+                        WriteMessageToFile(classFileName, result);
+
+                        break;
+                    }
+                }
+            }
+
+            var supportVersionsInformation = specifications.Where(s => s.Type == MessageType.Request)
+                .Select(
+                    s => (Name: s.Struct.Name.Replace("Request", ""), s.ApiKey, s.FlexibleVersions, s.Struct.Versions));
+
+            var supportVersionsGenerator = new SupportVersionsGenerator("NKafka.Protocol");
+            var content = supportVersionsGenerator.Generate(supportVersionsInformation);
+            const string supportVersionFileName = "SupportVersionsExtensions.cs";
+            WriteSupportVersionsToFile(supportVersionFileName, content);
+
+           
         }
         catch (Exception exc)
         {
@@ -75,10 +91,16 @@ public class MessagesGeneratorTask: Task
         return true;
     }
 
-    private void WriteContentToFile(string fileName, StringBuilder result)
+    private void WriteMessageToFile(string fileName, StringBuilder result)
     {
         var path = Path.Combine(OutputDirectory, fileName);
         Directory.CreateDirectory(OutputDirectory);
+        File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+    }
+
+    private void WriteSupportVersionsToFile(string fileName, StringBuilder result)
+    {
+        var path = Path.Combine("Protocol", fileName);
         File.WriteAllText(path, result.ToString(), Encoding.UTF8);
     }
 

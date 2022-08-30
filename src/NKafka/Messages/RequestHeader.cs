@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -69,18 +71,18 @@ public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
     {
     }
 
-    public RequestHeader(BufferReader reader, ApiVersions version)
+    public RequestHeader(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         RequestApiKey = reader.ReadShort();
         RequestApiVersion = reader.ReadShort();
         CorrelationId = reader.ReadInt();
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             int length;
             length = reader.ReadShort();
@@ -102,7 +104,7 @@ public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
             ClientId = string.Empty;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -119,13 +121,13 @@ public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort(RequestApiKey);
         writer.WriteShort(RequestApiVersion);
         writer.WriteInt(CorrelationId);
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             if (ClientId is null)
             {
@@ -140,7 +142,7 @@ public sealed class RequestHeader: IMessage, IEquatable<RequestHeader>
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);

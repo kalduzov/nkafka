@@ -28,7 +28,7 @@ namespace NKafka.Tests.Messages;
 public class ResponseMessageTests<T>
     where T : IResponseMessage, new()
 {
-    protected void SerializeAndDeserializeMessage(T message, ApiVersions version)
+    protected void SerializeAndDeserializeMessage(T message, ApiVersion version)
     {
         using var stream = new MemoryStream();
         var writer = new BufferWriter(stream);

@@ -142,7 +142,7 @@ internal sealed class VersionConditional
     {
         if (_ifMember is not null)
         {
-            codeGenerator.AppendLine($"if (version <= ApiVersions.Version{_containingVersions.Highest})");
+            codeGenerator.AppendLine($"if (version <= ApiVersion.Version{_containingVersions.Highest})");
             codeGenerator.AppendLeftBrace();
 
             codeGenerator.IncrementIndent();
@@ -164,7 +164,7 @@ internal sealed class VersionConditional
         }
         else if (_ifNotMember is not null)
         {
-            codeGenerator.AppendLine($"if (version > ApiVersions.Version{_containingVersions.Highest})");
+            codeGenerator.AppendLine($"if (version > ApiVersion.Version{_containingVersions.Highest})");
             codeGenerator.AppendLeftBrace();
             codeGenerator.IncrementIndent();
             _ifNotMember(ifNotVersions);
@@ -202,7 +202,7 @@ internal sealed class VersionConditional
     {
         if (_ifMember is not null)
         {
-            codeGenerator.AppendLine($"if (version >= ApiVersions.Version{_containingVersions.Lowest})");
+            codeGenerator.AppendLine($"if (version >= ApiVersion.Version{_containingVersions.Lowest})");
             codeGenerator.AppendLeftBrace();
 
             codeGenerator.IncrementIndent();
@@ -224,7 +224,7 @@ internal sealed class VersionConditional
         }
         else if (_ifNotMember is not null)
         {
-            codeGenerator.AppendLine($"if (version < ApiVersions.Version{_containingVersions.Lowest})");
+            codeGenerator.AppendLine($"if (version < ApiVersion.Version{_containingVersions.Lowest})");
             codeGenerator.AppendLeftBrace();
             codeGenerator.IncrementIndent();
             _ifNotMember(ifNotVersions);
@@ -238,7 +238,7 @@ internal sealed class VersionConditional
         if (_ifMember is not null)
         {
             codeGenerator.AppendLine(
-                $"if (version >= ApiVersions.Version{_containingVersions.Lowest} && version <= ApiVersions.Version{_containingVersions.Highest})");
+                $"if (version >= ApiVersion.Version{_containingVersions.Lowest} && version <= ApiVersion.Version{_containingVersions.Highest})");
             codeGenerator.AppendLeftBrace();
 
             codeGenerator.IncrementIndent();
@@ -261,7 +261,7 @@ internal sealed class VersionConditional
         else if (_ifNotMember is not null)
         {
             codeGenerator.AppendLine(
-                $"if (version < ApiVersions.Version{_containingVersions.Lowest} || version > ApiVersions.Version{_containingVersions.Highest})");
+                $"if (version < ApiVersion.Version{_containingVersions.Lowest} || version > ApiVersion.Version{_containingVersions.Highest})");
             codeGenerator.AppendLeftBrace();
             codeGenerator.IncrementIndent();
             _ifNotMember(ifNotVersions);

@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquatable<AlterReplicaLogDirsResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -59,17 +61,17 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
     {
     }
 
-    public AlterReplicaLogDirsResponseMessage(BufferReader reader, ApiVersions version)
+    public AlterReplicaLogDirsResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -107,7 +109,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -124,11 +126,11 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
@@ -146,7 +148,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -186,11 +188,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
 
     public sealed class AlterReplicaLogDirTopicResultMessage: IMessage, IEquatable<AlterReplicaLogDirTopicResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -208,21 +212,21 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         {
         }
 
-        public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirTopicResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version2)
+            if (version > ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirTopicResultMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -244,7 +248,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                 }
             }
             {
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -282,7 +286,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -299,12 +303,12 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                if (version >= ApiVersions.Version2)
+                if (version >= ApiVersion.Version2)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -314,7 +318,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -332,7 +336,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -372,11 +376,13 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
 
     public sealed class AlterReplicaLogDirPartitionResultMessage: IMessage, IEquatable<AlterReplicaLogDirPartitionResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -397,22 +403,22 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         {
         }
 
-        public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersions version)
+        public AlterReplicaLogDirPartitionResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version2)
+            if (version > ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AlterReplicaLogDirPartitionResultMessage");
             }
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -429,14 +435,14 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

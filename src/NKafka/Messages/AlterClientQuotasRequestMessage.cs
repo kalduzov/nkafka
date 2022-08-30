@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable<AlterClientQuotasRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.AlterClientQuotas;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -61,16 +63,16 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
     {
     }
 
-    public AlterClientQuotasRequestMessage(BufferReader reader, ApiVersions version)
+    public AlterClientQuotasRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -109,7 +111,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         }
         ValidateOnly = reader.ReadByte() != 0;
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -126,10 +128,10 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteVarUInt(Entries.Count + 1);
             foreach (var element in Entries)
@@ -148,7 +150,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         writer.WriteBool(ValidateOnly);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -188,11 +190,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
 
     public sealed class EntryDataMessage: IMessage, IEquatable<EntryDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -210,20 +214,20 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         {
         }
 
-        public EntryDataMessage(BufferReader reader, ApiVersions version)
+        public EntryDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EntryDataMessage");
             }
             {
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -261,7 +265,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                 }
             }
             {
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -299,7 +303,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -316,10 +320,10 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(Entity.Count + 1);
                 foreach (var element in Entity)
@@ -335,7 +339,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                     element.Write(writer, version);
                 }
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(Ops.Count + 1);
                 foreach (var element in Ops)
@@ -353,7 +357,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -393,11 +397,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
 
     public sealed class EntityDataMessage: IMessage, IEquatable<EntityDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -415,21 +421,21 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         {
         }
 
-        public EntityDataMessage(BufferReader reader, ApiVersions version)
+        public EntityDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EntityDataMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -452,7 +458,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
             {
                 int length;
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -474,7 +480,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -491,12 +497,12 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(EntityType);
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -508,7 +514,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
             if (EntityName is null)
             {
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -520,7 +526,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(EntityName);
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -532,7 +538,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -572,11 +578,13 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
 
     public sealed class OpDataMessage: IMessage, IEquatable<OpDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -599,21 +607,21 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
         {
         }
 
-        public OpDataMessage(BufferReader reader, ApiVersions version)
+        public OpDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OpDataMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -637,7 +645,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             Value = reader.ReadDouble();
             Remove = reader.ReadByte() != 0;
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -654,12 +662,12 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Key);
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -673,7 +681,7 @@ public sealed class AlterClientQuotasRequestMessage: IRequestMessage, IEquatable
             writer.WriteBool(Remove);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

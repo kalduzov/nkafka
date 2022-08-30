@@ -28,10 +28,10 @@ namespace NKafka.Tests.Messages;
 public class RenewDelegationTokenResponseMessageTests: ResponseMessageTests<RenewDelegationTokenResponseMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'RenewDelegationTokenResponseMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    [InlineData(ApiVersions.Version1)]
-    [InlineData(ApiVersions.Version2)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    [InlineData(ApiVersion.Version1)]
+    [InlineData(ApiVersion.Version2)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new RenewDelegationTokenResponseMessage
         {

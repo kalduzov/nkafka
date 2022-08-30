@@ -28,8 +28,8 @@ namespace NKafka.Tests.Messages;
 public class BeginQuorumEpochRequestMessageTests: RequestMessageTests<BeginQuorumEpochRequestMessage>
 {
     [Theory(DisplayName = "Check serialize and deserialize 'BeginQuorumEpochRequestMessage' message")]
-    [InlineData(ApiVersions.Version0)]
-    public void SerializeAndDeserializeMessage_Success(ApiVersions version)
+    [InlineData(ApiVersion.Version0)]
+    public void SerializeAndDeserializeMessage_Success(ApiVersion version)
     {
         var message = new BeginQuorumEpochRequestMessage
         {

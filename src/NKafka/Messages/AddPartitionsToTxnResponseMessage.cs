@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquatable<AddPartitionsToTxnResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -59,17 +61,17 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
     {
     }
 
-    public AddPartitionsToTxnResponseMessage(BufferReader reader, ApiVersions version)
+    public AddPartitionsToTxnResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -107,7 +109,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -124,11 +126,11 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
@@ -146,7 +148,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -186,11 +188,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
 
     public sealed class AddPartitionsToTxnTopicResultMessage: IMessage, IEquatable<AddPartitionsToTxnTopicResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -208,21 +212,21 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         {
         }
 
-        public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnTopicResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version3)
+            if (version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnTopicResultMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -244,7 +248,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                 }
             }
             {
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -282,7 +286,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -299,12 +303,12 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -314,7 +318,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(Results.Count + 1);
                 foreach (var element in Results)
@@ -332,7 +336,7 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -373,11 +377,13 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
 
     public sealed class AddPartitionsToTxnPartitionResultMessage: IMessage, IEquatable<AddPartitionsToTxnPartitionResultMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -398,22 +404,22 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
         {
         }
 
-        public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersions version)
+        public AddPartitionsToTxnPartitionResultMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version3)
+            if (version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnPartitionResultMessage");
             }
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -430,14 +436,14 @@ public sealed class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquata
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

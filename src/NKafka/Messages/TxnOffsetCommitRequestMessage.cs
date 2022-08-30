@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<TxnOffsetCommitRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.TxnOffsetCommit;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -91,17 +93,17 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
     {
     }
 
-    public TxnOffsetCommitRequestMessage(BufferReader reader, ApiVersions version)
+    public TxnOffsetCommitRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             int length;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -124,7 +126,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
         {
             int length;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -147,7 +149,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
         ProducerId = reader.ReadLong();
         ProducerEpoch = reader.ReadShort();
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             GenerationId = reader.ReadInt();
         }
@@ -155,7 +157,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         {
             GenerationId = -1;
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             int length;
             length = reader.ReadVarUInt() - 1;
@@ -176,7 +178,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         {
             MemberId = string.Empty;
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             int length;
             length = reader.ReadVarUInt() - 1;
@@ -198,7 +200,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             GroupInstanceId = null;
         }
         {
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -236,7 +238,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -253,12 +255,12 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
             var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -270,7 +272,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
         {
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -282,7 +284,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteInt(GenerationId);
         }
@@ -293,7 +295,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 throw new UnsupportedVersionException($"Attempted to write a non-default GenerationId at version {version}");
             }
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
@@ -308,7 +310,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 throw new UnsupportedVersionException($"Attempted to write a non-default MemberId at version {version}");
             }
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             if (GroupInstanceId is null)
             {
@@ -328,7 +330,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
             }
         }
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -346,7 +348,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -389,11 +391,13 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
 
     public sealed class TxnOffsetCommitRequestTopicMessage: IMessage, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -411,21 +415,21 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         {
         }
 
-        public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version3)
+            if (version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestTopicMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -447,7 +451,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 }
             }
             {
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -485,7 +489,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -502,12 +506,12 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -517,7 +521,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -535,7 +539,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -575,11 +579,13 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
 
     public sealed class TxnOffsetCommitRequestPartitionMessage: IMessage, IEquatable<TxnOffsetCommitRequestPartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -607,21 +613,21 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         {
         }
 
-        public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersions version)
+        public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version3)
+            if (version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestPartitionMessage");
             }
             PartitionIndex = reader.ReadInt();
             CommittedOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 CommittedLeaderEpoch = reader.ReadInt();
             }
@@ -631,7 +637,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -653,7 +659,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -670,18 +676,18 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteLong(CommittedOffset);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteInt(CommittedLeaderEpoch);
             }
             if (CommittedMetadata is null)
             {
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -693,7 +699,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -705,7 +711,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

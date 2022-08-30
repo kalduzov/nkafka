@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version13;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.Fetch;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -106,13 +108,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
     {
     }
 
-    public FetchRequestMessage(BufferReader reader, ApiVersions version)
+    public FetchRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
             ClusterId = null;
@@ -120,7 +122,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         ReplicaId = reader.ReadInt();
         MaxWaitMs = reader.ReadInt();
         MinBytes = reader.ReadInt();
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             MaxBytes = reader.ReadInt();
         }
@@ -128,7 +130,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
             MaxBytes = 2147483647;
         }
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             IsolationLevel = reader.ReadSByte();
         }
@@ -136,7 +138,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
             IsolationLevel = 0;
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             SessionId = reader.ReadInt();
         }
@@ -144,7 +146,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
             SessionId = 0;
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             SessionEpoch = reader.ReadInt();
         }
@@ -153,7 +155,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             SessionEpoch = -1;
         }
         {
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -190,9 +192,9 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 }
             }
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -233,10 +235,10 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
             ForgottenTopicsData = new ();
         }
-        if (version >= ApiVersions.Version11)
+        if (version >= ApiVersion.Version11)
         {
             int length;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -262,7 +264,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             RackId = string.Empty;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version12)
+        if (version >= ApiVersion.Version12)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -297,10 +299,10 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version12)
+        if (version >= ApiVersion.Version12)
         {
             if (ClusterId is not null)
             {
@@ -310,23 +312,23 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         writer.WriteInt(ReplicaId);
         writer.WriteInt(MaxWaitMs);
         writer.WriteInt(MinBytes);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteInt(MaxBytes);
         }
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteSByte(IsolationLevel);
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             writer.WriteInt(SessionId);
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
             writer.WriteInt(SessionEpoch);
         }
-        if (version >= ApiVersions.Version12)
+        if (version >= ApiVersion.Version12)
         {
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
@@ -342,9 +344,9 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 element.Write(writer, version);
             }
         }
-        if (version >= ApiVersions.Version7)
+        if (version >= ApiVersion.Version7)
         {
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(ForgottenTopicsData.Count + 1);
                 foreach (var element in ForgottenTopicsData)
@@ -368,11 +370,11 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 throw new UnsupportedVersionException($"Attempted to write a non-default ForgottenTopicsData at version {version}");
             }
         }
-        if (version >= ApiVersions.Version11)
+        if (version >= ApiVersion.Version11)
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(RackId);
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -385,7 +387,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version12)
+        if (version >= ApiVersion.Version12)
         {
             writer.WriteVarUInt(numTaggedFields);
             if (ClusterId is not null)
@@ -440,11 +442,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
 
     public sealed class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version13;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -467,22 +471,22 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
         }
 
-        public FetchTopicMessage(BufferReader reader, ApiVersions version)
+        public FetchTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version13)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchTopicMessage");
             }
-            if (version <= ApiVersions.Version12)
+            if (version <= ApiVersion.Version12)
             {
                 int length;
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -507,7 +511,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             {
                 Topic = string.Empty;
             }
-            if (version >= ApiVersions.Version13)
+            if (version >= ApiVersion.Version13)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -516,7 +520,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 TopicId = Guid.Empty;
             }
             {
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     int arrayLength;
                     arrayLength = reader.ReadVarUInt() - 1;
@@ -554,7 +558,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -571,14 +575,14 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version <= ApiVersions.Version12)
+            if (version <= ApiVersion.Version12)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(Topic);
-                    if (version >= ApiVersions.Version12)
+                    if (version >= ApiVersion.Version12)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -589,11 +593,11 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                     writer.WriteBytes(stringBytes);
                 }
             }
-            if (version >= ApiVersions.Version13)
+            if (version >= ApiVersion.Version13)
             {
                 writer.WriteGuid(TopicId);
             }
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
@@ -611,7 +615,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -652,11 +656,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
 
     public sealed class FetchPartitionMessage: IMessage, IEquatable<FetchPartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version13;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -694,20 +700,20 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
         }
 
-        public FetchPartitionMessage(BufferReader reader, ApiVersions version)
+        public FetchPartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version13)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchPartitionMessage");
             }
             Partition = reader.ReadInt();
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 CurrentLeaderEpoch = reader.ReadInt();
             }
@@ -716,7 +722,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 CurrentLeaderEpoch = -1;
             }
             FetchOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 LastFetchedEpoch = reader.ReadInt();
             }
@@ -724,7 +730,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             {
                 LastFetchedEpoch = -1;
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 LogStartOffset = reader.ReadLong();
             }
@@ -734,7 +740,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
             PartitionMaxBytes = reader.ReadInt();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -751,16 +757,16 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(Partition);
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteInt(CurrentLeaderEpoch);
             }
             writer.WriteLong(FetchOffset);
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteInt(LastFetchedEpoch);
             }
@@ -771,14 +777,14 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                     throw new UnsupportedVersionException($"Attempted to write a non-default LastFetchedEpoch at version {version}");
                 }
             }
-            if (version >= ApiVersions.Version5)
+            if (version >= ApiVersion.Version5)
             {
                 writer.WriteLong(LogStartOffset);
             }
             writer.WriteInt(PartitionMaxBytes);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -824,11 +830,13 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
 
     public sealed class ForgottenTopicMessage: IMessage, IEquatable<ForgottenTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version13;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version13;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -851,22 +859,22 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         {
         }
 
-        public ForgottenTopicMessage(BufferReader reader, ApiVersions version)
+        public ForgottenTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version13)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ForgottenTopicMessage");
             }
-            if (version <= ApiVersions.Version12)
+            if (version <= ApiVersion.Version12)
             {
                 int length;
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -891,7 +899,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             {
                 Topic = string.Empty;
             }
-            if (version >= ApiVersions.Version13)
+            if (version >= ApiVersion.Version13)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -901,7 +909,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
             {
                 int arrayLength;
-                if (version >= ApiVersions.Version12)
+                if (version >= ApiVersion.Version12)
                 {
                     arrayLength = reader.ReadVarUInt() - 1;
                 }
@@ -924,7 +932,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -941,18 +949,18 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version7)
+            if (version < ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of ForgottenTopicMessage");
             }
             var numTaggedFields = 0;
-            if (version <= ApiVersions.Version12)
+            if (version <= ApiVersion.Version12)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(Topic);
-                    if (version >= ApiVersions.Version12)
+                    if (version >= ApiVersion.Version12)
                     {
                         writer.WriteVarUInt(stringBytes.Length + 1);
                     }
@@ -963,11 +971,11 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                     writer.WriteBytes(stringBytes);
                 }
             }
-            if (version >= ApiVersions.Version13)
+            if (version >= ApiVersion.Version13)
             {
                 writer.WriteGuid(TopicId);
             }
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(Partitions.Count + 1);
             }
@@ -981,7 +989,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version12)
+            if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

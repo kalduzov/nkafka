@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<DescribeAclsRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version3;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version3;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.DescribeAcls;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -86,18 +88,18 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
     {
     }
 
-    public DescribeAclsRequestMessage(BufferReader reader, ApiVersions version)
+    public DescribeAclsRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ResourceTypeFilter = reader.ReadSByte();
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -118,7 +120,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
                 ResourceNameFilter = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             PatternTypeFilter = reader.ReadSByte();
         }
@@ -128,7 +130,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         }
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -151,7 +153,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         }
         {
             int length;
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 length = reader.ReadVarUInt() - 1;
             }
@@ -175,7 +177,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         Operation = reader.ReadSByte();
         PermissionType = reader.ReadSByte();
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -192,13 +194,13 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteSByte(ResourceTypeFilter);
         if (ResourceNameFilter is null)
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(0);
             }
@@ -210,7 +212,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(ResourceNameFilter);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -220,7 +222,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteSByte(PatternTypeFilter);
         }
@@ -233,7 +235,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         }
         if (PrincipalFilter is null)
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(0);
             }
@@ -245,7 +247,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(PrincipalFilter);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -257,7 +259,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         }
         if (HostFilter is null)
         {
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(0);
             }
@@ -269,7 +271,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(HostFilter);
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(stringBytes.Length + 1);
             }
@@ -283,7 +285,7 @@ public sealed class DescribeAclsRequestMessage: IRequestMessage, IEquatable<Desc
         writer.WriteSByte(PermissionType);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version2)
+        if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);

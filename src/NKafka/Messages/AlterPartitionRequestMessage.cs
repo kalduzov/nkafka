@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<AlterPartitionRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-    public ApiKeys ApiKey => ApiKeys.AlterIsr;
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
+
+    public ApiKeys ApiKey => ApiKeys.AlterPartition;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -66,13 +68,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
     {
     }
 
-    public AlterPartitionRequestMessage(BufferReader reader, ApiVersions version)
+    public AlterPartitionRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         BrokerId = reader.ReadInt();
         BrokerEpoch = reader.ReadLong();
@@ -108,7 +110,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(BrokerId);
@@ -151,11 +153,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -178,19 +182,19 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         {
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version2)
+            if (version > ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicDataMessage");
             }
-            if (version <= ApiVersions.Version1)
+            if (version <= ApiVersion.Version1)
             {
                 int length;
                 length = reader.ReadVarUInt() - 1;
@@ -211,7 +215,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             {
                 TopicName = string.Empty;
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -251,10 +255,10 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version <= ApiVersions.Version1)
+            if (version <= ApiVersion.Version1)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(TopicName);
@@ -262,7 +266,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
                     writer.WriteBytes(stringBytes);
                 }
             }
-            if (version >= ApiVersions.Version2)
+            if (version >= ApiVersion.Version2)
             {
                 writer.WriteGuid(TopicId);
             }
@@ -304,11 +308,13 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version2;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version2;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -341,15 +347,15 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         {
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version2)
+            if (version > ApiVersion.Version2)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
@@ -372,7 +378,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
                     NewIsr = newCollection;
                 }
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 LeaderRecoveryState = reader.ReadSByte();
             }
@@ -396,7 +402,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -406,7 +412,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
             {
                 writer.WriteInt(element);
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteSByte(LeaderRecoveryState);
             }

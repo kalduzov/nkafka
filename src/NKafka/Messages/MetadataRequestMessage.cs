@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,13 +37,15 @@ namespace NKafka.Messages;
 
 public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<MetadataRequestMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
+
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public ApiKeys ApiKey => ApiKeys.Metadata;
-
-    public ApiVersions Version {get; set;}
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -71,16 +73,16 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
     {
     }
 
-    public MetadataRequestMessage(BufferReader reader, ApiVersions version)
+    public MetadataRequestMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         {
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -104,7 +106,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 arrayLength = reader.ReadInt();
                 if (arrayLength < 0)
                 {
-                    if (version >= ApiVersions.Version1)
+                    if (version >= ApiVersion.Version1)
                     {
                         Topics = null;
                     }
@@ -124,7 +126,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
             }
         }
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             AllowAutoTopicCreation = reader.ReadByte() != 0;
         }
@@ -132,7 +134,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         {
             AllowAutoTopicCreation = true;
         }
-        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             IncludeClusterAuthorizedOperations = reader.ReadByte() != 0;
         }
@@ -140,7 +142,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         {
             IncludeClusterAuthorizedOperations = false;
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             IncludeTopicAuthorizedOperations = reader.ReadByte() != 0;
         }
@@ -149,7 +151,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             IncludeTopicAuthorizedOperations = false;
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -166,10 +168,10 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             if (Topics is null)
             {
@@ -188,7 +190,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         {
             if (Topics is null)
             {
-                if (version >= ApiVersions.Version1)
+                if (version >= ApiVersion.Version1)
                 {
                     writer.WriteInt(-1);
                 }
@@ -205,7 +207,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
             }
         }
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteBool(AllowAutoTopicCreation);
         }
@@ -216,7 +218,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 throw new UnsupportedVersionException($"Attempted to write a non-default AllowAutoTopicCreation at version {version}");
             }
         }
-        if (version >= ApiVersions.Version8 && version <= ApiVersions.Version10)
+        if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             writer.WriteBool(IncludeClusterAuthorizedOperations);
         }
@@ -227,7 +229,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 throw new UnsupportedVersionException($"Attempted to write a non-default IncludeClusterAuthorizedOperations at version {version}");
             }
         }
-        if (version >= ApiVersions.Version8)
+        if (version >= ApiVersion.Version8)
         {
             writer.WriteBool(IncludeTopicAuthorizedOperations);
         }
@@ -240,7 +242,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version9)
+        if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -282,11 +284,13 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
 
     public sealed class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version12;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version12;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -304,19 +308,19 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
         {
         }
 
-        public MetadataRequestTopicMessage(BufferReader reader, ApiVersions version)
+        public MetadataRequestTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version12)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataRequestTopicMessage");
             }
-            if (version >= ApiVersions.Version10)
+            if (version >= ApiVersion.Version10)
             {
                 TopicId = reader.ReadGuid();
             }
@@ -326,7 +330,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             }
             {
                 int length;
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -336,7 +340,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
                 if (length < 0)
                 {
-                    if (version >= ApiVersions.Version10)
+                    if (version >= ApiVersion.Version10)
                     {
                         Name = null;
                     }
@@ -355,7 +359,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -372,16 +376,16 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            if (version >= ApiVersions.Version10)
+            if (version >= ApiVersion.Version10)
             {
                 writer.WriteGuid(TopicId);
             }
             if (Name is null)
             {
-                if (version >= ApiVersions.Version10)
+                if (version >= ApiVersion.Version10)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -392,7 +396,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersions.Version9)
+                if (version >= ApiVersion.Version9)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -404,7 +408,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version9)
+            if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

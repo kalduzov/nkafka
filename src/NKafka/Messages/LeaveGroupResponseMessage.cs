@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<LeaveGroupResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version5;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -67,15 +69,15 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
     {
     }
 
-    public LeaveGroupResponseMessage(BufferReader reader, ApiVersions version)
+    public LeaveGroupResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ThrottleTimeMs = reader.ReadInt();
         }
@@ -84,9 +86,9 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             ThrottleTimeMs = 0;
         }
         ErrorCode = reader.ReadShort();
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -128,7 +130,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             Members = new ();
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -145,17 +147,17 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
         writer.WriteShort((short)ErrorCode);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(Members.Count + 1);
                 foreach (var element in Members)
@@ -181,7 +183,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version4)
+        if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -222,11 +224,13 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
 
     public sealed class MemberResponseMessage: IMessage, IEquatable<MemberResponseMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version5;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version5;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -252,21 +256,21 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
         {
         }
 
-        public MemberResponseMessage(BufferReader reader, ApiVersions version)
+        public MemberResponseMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version5)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MemberResponseMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -289,7 +293,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             }
             {
                 int length;
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -312,7 +316,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             }
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -329,16 +333,16 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersions.Version3)
+            if (version < ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't write version {version} of MemberResponseMessage");
             }
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -350,7 +354,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             }
             if (GroupInstanceId is null)
             {
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(0);
                 }
@@ -362,7 +366,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
-                if (version >= ApiVersions.Version4)
+                if (version >= ApiVersion.Version4)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -375,7 +379,7 @@ public sealed class LeaveGroupResponseMessage: IResponseMessage, IEquatable<Leav
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

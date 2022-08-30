@@ -65,7 +65,7 @@ internal static class ProtocolWriterExtensions
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Span<byte> AsShort(this ApiVersions version)
+    private static Span<byte> AsShort(this ApiVersion version)
     {
         return ((short)version).ToBigEndian();
     }

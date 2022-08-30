@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<OffsetDeleteResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -67,13 +69,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
     {
     }
 
-    public OffsetDeleteResponseMessage(BufferReader reader, ApiVersions version)
+    public OffsetDeleteResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         ThrottleTimeMs = reader.ReadInt();
@@ -97,7 +99,7 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
         UnknownTaggedFields = null;
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
@@ -142,11 +144,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
 
     public sealed class OffsetDeleteResponseTopicMessage: IMessage, IEquatable<OffsetDeleteResponseTopicMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -164,15 +168,15 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
         {
         }
 
-        public OffsetDeleteResponseTopicMessage(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponseTopicMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetDeleteResponseTopicMessage");
             }
@@ -212,7 +216,7 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
             UnknownTaggedFields = null;
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -260,11 +264,13 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
 
     public sealed class OffsetDeleteResponsePartitionMessage: IMessage, IEquatable<OffsetDeleteResponsePartitionMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -285,15 +291,15 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
         {
         }
 
-        public OffsetDeleteResponsePartitionMessage(BufferReader reader, ApiVersions version)
+        public OffsetDeleteResponsePartitionMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version0)
+            if (version > ApiVersion.Version0)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetDeleteResponsePartitionMessage");
             }
@@ -302,7 +308,7 @@ public sealed class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<Of
             UnknownTaggedFields = null;
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

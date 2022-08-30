@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<ListGroupsResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -67,15 +69,15 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
     {
     }
 
-    public ListGroupsResponseMessage(BufferReader reader, ApiVersions version)
+    public ListGroupsResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             ThrottleTimeMs = reader.ReadInt();
         }
@@ -85,7 +87,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
         }
         ErrorCode = reader.ReadShort();
         {
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
                 arrayLength = reader.ReadVarUInt() - 1;
@@ -123,7 +125,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             }
         }
         UnknownTaggedFields = null;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             var numTaggedFields = reader.ReadVarUInt();
             for (var t = 0; t < numTaggedFields; t++)
@@ -140,15 +142,15 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersions.Version1)
+        if (version >= ApiVersion.Version1)
         {
             writer.WriteInt(ThrottleTimeMs);
         }
         writer.WriteShort((short)ErrorCode);
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
@@ -166,7 +168,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        if (version >= ApiVersions.Version3)
+        if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -207,11 +209,13 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
 
     public sealed class ListedGroupMessage: IMessage, IEquatable<ListedGroupMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version4;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version4;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -234,21 +238,21 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
         {
         }
 
-        public ListedGroupMessage(BufferReader reader, ApiVersions version)
+        public ListedGroupMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version4)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListedGroupMessage");
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -271,7 +275,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             }
             {
                 int length;
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     length = reader.ReadVarUInt() - 1;
                 }
@@ -292,7 +296,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
                     ProtocolType = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 int length;
                 length = reader.ReadVarUInt() - 1;
@@ -314,7 +318,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
                 GroupState = string.Empty;
             }
             UnknownTaggedFields = null;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 var numTaggedFields = reader.ReadVarUInt();
                 for (var t = 0; t < numTaggedFields; t++)
@@ -331,12 +335,12 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -348,7 +352,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             }
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-                if (version >= ApiVersions.Version3)
+                if (version >= ApiVersion.Version3)
                 {
                     writer.WriteVarUInt(stringBytes.Length + 1);
                 }
@@ -358,7 +362,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersions.Version4)
+            if (version >= ApiVersion.Version4)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupState);
@@ -368,7 +372,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            if (version >= ApiVersions.Version3)
+            if (version >= ApiVersion.Version3)
             {
                 writer.WriteVarUInt(numTaggedFields);
                 rawWriter.WriteRawTags(writer, int.MaxValue);

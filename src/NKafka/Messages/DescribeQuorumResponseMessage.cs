@@ -18,7 +18,7 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
-//
+
 // THIS CODE IS AUTOMATICALLY GENERATED.  DO NOT EDIT.
 
 // ReSharper disable RedundantUsingDirective
@@ -37,11 +37,13 @@ namespace NKafka.Messages;
 
 public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<DescribeQuorumResponseMessage>
 {
-    public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+    public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-    public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+    public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-    public ApiVersions Version {get; set;}
+    public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+    public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -64,13 +66,13 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
     {
     }
 
-    public DescribeQuorumResponseMessage(BufferReader reader, ApiVersions version)
+    public DescribeQuorumResponseMessage(BufferReader reader, ApiVersion version)
         : this()
     {
         Read(reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersions version)
+    public void Read(BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         {
@@ -105,7 +107,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         }
     }
 
-    public void Write(BufferWriter writer, ApiVersions version)
+    public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
@@ -146,11 +148,13 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
 
     public sealed class TopicDataMessage: IMessage, IEquatable<TopicDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -168,15 +172,15 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         {
         }
 
-        public TopicDataMessage(BufferReader reader, ApiVersions version)
+        public TopicDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicDataMessage");
             }
@@ -228,7 +232,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -273,11 +277,13 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
 
     public sealed class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -323,15 +329,15 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         {
         }
 
-        public PartitionDataMessage(BufferReader reader, ApiVersions version)
+        public PartitionDataMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
@@ -389,7 +395,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -444,11 +450,13 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
 
     public sealed class ReplicaStateMessage: IMessage, IEquatable<ReplicaStateMessage>
     {
-        public ApiVersions LowestSupportedVersion => ApiVersions.Version0;
+        public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version0;
 
-        public ApiVersions HighestSupportedVersion => ApiVersions.Version1;
+        public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version1;
 
-        public ApiVersions Version {get; set;}
+        public ApiVersion LowestSupportedVersion => LOWEST_SUPPORTED_VERSION;
+
+        public ApiVersion HighestSupportedVersion => HIGHEST_SUPPORTED_VERSION;
 
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
@@ -476,21 +484,21 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         {
         }
 
-        public ReplicaStateMessage(BufferReader reader, ApiVersions version)
+        public ReplicaStateMessage(BufferReader reader, ApiVersion version)
             : this()
         {
             Read(reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersions version)
+        public void Read(BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersions.Version1)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ReplicaStateMessage");
             }
             ReplicaId = reader.ReadInt();
             LogEndOffset = reader.ReadLong();
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 LastFetchTimestamp = reader.ReadLong();
             }
@@ -498,7 +506,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             {
                 LastFetchTimestamp = -1;
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 LastCaughtUpTimestamp = reader.ReadLong();
             }
@@ -521,16 +529,16 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
             }
         }
 
-        public void Write(BufferWriter writer, ApiVersions version)
+        public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(ReplicaId);
             writer.WriteLong(LogEndOffset);
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteLong(LastFetchTimestamp);
             }
-            if (version >= ApiVersions.Version1)
+            if (version >= ApiVersion.Version1)
             {
                 writer.WriteLong(LastCaughtUpTimestamp);
             }

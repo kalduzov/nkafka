@@ -52,7 +52,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     };
 
     private readonly RecordAccumulator _accumulator;
-    private readonly ApiVersions _apiVersions;
+    private readonly ApiVersion _apiVersion;
 
     private readonly IReadOnlyCollection<ProducerInterceptor<TKey, TValue>> _interceptors;
 
@@ -97,7 +97,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             InitializeSerializers(keySerializer, valueSerializer);
             _interceptors = InitInterceptors(interceptors);
 
-            _apiVersions = new ApiVersions();
+            _apiVersion = new ApiVersion();
 
             var deliveryTimeoutMs = ConfigureDeliveryTimeout();
             _accumulator = new RecordAccumulator(config, deliveryTimeoutMs);

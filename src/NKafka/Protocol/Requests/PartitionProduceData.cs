@@ -35,3 +35,4 @@
 //     /// </summary>
 //     public RecordBatch Record { get; set; }
 // }
+

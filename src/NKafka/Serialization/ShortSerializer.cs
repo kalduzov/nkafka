@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace NKafka.Serialization;
 
-public sealed class ShortSerializer : IAsyncSerializer<short>
+public sealed class ShortSerializer: IAsyncSerializer<short>
 {
     public Task<byte[]> SerializeAsync(short data)
     {

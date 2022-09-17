@@ -19,9 +19,35 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Collections.Concurrent;
+
 namespace NKafka.Protocol;
 
 internal class SupportVersions
 {
-    
+    private Dictionary<Version, HashSet<ApiKeys>> _supportKeys = new()
+    {
+        [Version.Parse("1.0")] = new HashSet<ApiKeys>(),
+        [Version.Parse("1.1")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.0")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.1")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.2")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.3")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.4")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.5")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.6")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.7")] = new HashSet<ApiKeys>(),
+        [Version.Parse("2.8")] = new HashSet<ApiKeys>(),
+        [Version.Parse("3.0")] = new HashSet<ApiKeys>()
+    };
+
+    private readonly ConcurrentDictionary<ApiKeys, (ApiVersion minVersions, ApiVersion maxVersion)> _versions = new();
+
+    public void AddOrUpdate(ApiKeys apiKey, ApiVersion minVersion, ApiVersion maxVersion)
+    {
+        _versions.AddOrUpdate(
+            apiKey,
+            _ => (minVersion, maxVersion),
+            (_, _) => (minVersion, maxVersion));
+    }
 }

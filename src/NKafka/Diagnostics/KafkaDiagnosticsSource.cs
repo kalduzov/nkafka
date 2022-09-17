@@ -53,7 +53,8 @@ internal static class KafkaDiagnosticsSource
             .AddTag("Topic", topicPartition.Topic)
             .AddTag("FireAndForget", isFireAndForget.ToString())
             .AddTag("KeyType", typeof(TKey))
-            .AddTag("ValueType", typeof(TValue)).SetStatus(ActivityStatusCode.Ok);
+            .AddTag("ValueType", typeof(TValue))
+            .SetStatus(ActivityStatusCode.Ok);
 
         if (typeof(TKey).IsValueType)
         {
@@ -92,7 +93,8 @@ internal static class KafkaDiagnosticsSource
     public static Activity? UpdateMetadata()
     {
         var activity = _activitySource
-            .StartActivity(nameof(UpdateMetadata), ActivityKind.Client)?.SetStatus(ActivityStatusCode.Ok);
+            .StartActivity(nameof(UpdateMetadata), ActivityKind.Client)
+            ?.SetStatus(ActivityStatusCode.Ok);
 
         return activity;
     }

@@ -25,7 +25,7 @@
 
 namespace NKafka.Protocol;
 
-public abstract class RequestBody : IDisposable
+public abstract class RequestBody: IDisposable
 {
     //internal static readonly RequestBody EmptyBody = new EmptyRequestBody();
 

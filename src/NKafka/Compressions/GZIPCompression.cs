@@ -20,9 +20,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace NKafka.Compressions;
 
-public class GZIPCompression : ICompression
+public class GZIPCompression: ICompression
 {
     public byte[] Decode(byte[] data)
     {

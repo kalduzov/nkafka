@@ -159,12 +159,12 @@ public sealed class KafkaCluster: IKafkaCluster
         producerConfig = producerConfig != null ? producerConfig.MergeFrom(Config) : ProducerConfig.BaseFrom(Config);
 
         producer = new Producer<TKey, TValue>(
-            kafkaCluster: this,
-            name: name,
-            config: producerConfig,
-            keySerializer: keySerializer,
-            valueSerializer: valueSerializer,
-            interceptors: null!,
+            this,
+            name,
+            producerConfig,
+            keySerializer,
+            valueSerializer,
+            null!,
             _loggerFactory.CreateLogger(name));
 
         return (IProducer<TKey, TValue>)_producers.GetOrAdd(name, producer)!;
@@ -363,7 +363,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
         if (metadataUpdating == _metadataUpdating)
         {
-            _logger.WarningMetadataMaxAge(Config.MetadataMaxAge);
+            _logger.WarningMetadataMaxAge(Config.MetadataUpdateTimeoutMs);
 
             return;
         }
@@ -416,7 +416,7 @@ public sealed class KafkaCluster: IKafkaCluster
             Topics = _topics.Select(
                     t => new MetadataRequestMessage.MetadataRequestTopicMessage
                     {
-                        Name = t,
+                        Name = t
                     })
                 .ToList()
         };
@@ -442,12 +442,12 @@ public sealed class KafkaCluster: IKafkaCluster
             return;
         }
 
-        if (Config.FullUpdateMetadata)
+        if (Config.IsFullUpdateMetadata)
         {
             await UpdateMetadataAsync(token);
         }
 
-        _metadataUpdaterTimer.Change(Config.MetadataMaxAge, Config.MetadataMaxAge);
+        _metadataUpdaterTimer.Change(Config.MetadataUpdateTimeoutMs, Config.MetadataUpdateTimeoutMs);
 
         Closed = false;
     }

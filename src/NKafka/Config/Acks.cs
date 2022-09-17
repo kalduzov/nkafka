@@ -20,12 +20,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace NKafka.Config;
 
 /// <summary>
 ///     Acks enum values
 /// </summary>
-public enum Acks : short
+public enum Acks: short
 {
     /// <summary>
     ///     no set

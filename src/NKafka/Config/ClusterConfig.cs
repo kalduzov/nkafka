@@ -26,18 +26,20 @@ using NKafka.Exceptions;
 namespace NKafka.Config;
 
 /// <summary>
-///     Конфигурация кластера
+///     Cluster configuration
 /// </summary>
 public record ClusterConfig: CommonConfig
 {
     /// <summary>
-    ///     Таймаут обновления метаданных
+    ///     Metadata update timeout
+    /// <p>
+    /// default: <b>5 minutes</b>
+    /// </p> 
     /// </summary>
-    /// <remarks>Default - 1000ms</remarks>
-    public int MetadataUpdateTimeoutMs { get; set; } = 1000;
+    public int MetadataUpdateTimeoutMs { get; set; } = 300000;
 
     /// <summary>
-    ///     Сколько времени ждать инициализации кластера в ms
+    ///     Cluster initialization timeout 
     /// </summary>
     /// <remarks>Default - 15 sec</remarks>
     public int ClusterInitTimeoutMs { get; set; } = 15000;
@@ -48,7 +50,7 @@ public record ClusterConfig: CommonConfig
     /// <remarks>Полное обновление метаданных может сильно раздуть память если в кластере очень много топиков и партиций.
     /// Если метаданные обновляются не полностью, то запрашиваются данные только по тем топикам, которые используется клиентом кластера
     /// </remarks>
-    public bool FullUpdateMetadata { get; set; } = true;
+    public bool IsFullUpdateMetadata { get; set; } = true;
 
     /// <summary>
     ///     Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные

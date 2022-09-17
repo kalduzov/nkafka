@@ -24,6 +24,6 @@ using System;
 namespace NKafka.Diagnostics;
 
 [AttributeUsage(AttributeTargets.Method)]
-public class AddActivityAttribute : Attribute
+public class AddActivityAttribute: Attribute
 {
 }

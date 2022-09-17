@@ -66,6 +66,8 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     private volatile IReadOnlySet<string> _topics;
     private readonly Timer _closeConnectionAfterTimeout;
 
+    private readonly SupportVersions _supportVersions = new(); //Какие версии поддерживает данный брокер
+
     /// <summary>
     ///     Флаг указывающий, что данный брокер является контроллером
     /// </summary>
@@ -165,7 +167,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         foreach (var key in response.ApiKeys)
         {
-            //_supportVersions.AddOrUpdate((ApiKeys)key.ApiKey, (ApiVersion)key.MinVersion, (ApiVersion)key.MaxVersion);
+            _supportVersions.AddOrUpdate((ApiKeys)key.ApiKey, (ApiVersion)key.MinVersion, (ApiVersion)key.MaxVersion);
         }
     }
 
@@ -272,7 +274,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is Broker other && Equals(other);
+        return ReferenceEquals(this, obj) || (obj is Broker other && Equals(other));
     }
 
     private async Task ResponseReaderTask()
@@ -421,12 +423,13 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
 
+        var contentVersion = ApiVersion.Version0; //content.ApiKey.GetApiVersion(_supportVersions);
+        var headerVersion = content.ApiKey.GetHeaderVersion(contentVersion);
         var requestId = Interlocked.Increment(ref _requestId);
 
-        var contentVersion = content.ApiKey.GetApiVersion();
-        var headerVersion = content.ApiKey.GetHeaderVersion(contentVersion);
-
         using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, contentVersion, requestId, Id, EndPoint);
+
+        await ReEstablishConnectionAsync(token);
 
         var request = new SendMessage(
             new RequestHeader
@@ -439,11 +442,10 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
             content,
             contentVersion);
 
-        ThrowExceptionIfRequestNotValid(request, activity);
-
-        await ThrowIfBrokerDontSupportApiVersion(request);
-
-        await ReEstablishConnectionAsync(token);
+        if (!isInternalRequest)
+        {
+            ThrowExceptionIfRequestNotValid(request, activity);
+        }
 
         if (token.IsCancellationRequested)
         {
@@ -459,8 +461,13 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         token.Register(
             state =>
             {
-                var awaiter = state as ResponseTaskCompletionSource;
-                awaiter?.TrySetCanceled();
+                if (state is not ResponseTaskCompletionSource awaiter)
+                {
+                    return;
+                }
+
+                awaiter.TrySetCanceled();
+                _tckPool.TryRemove(requestId, out _);
             },
             taskCompletionSource,
             false);
@@ -510,26 +517,9 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         // }
     }
 
-    private Task ThrowIfBrokerDontSupportApiVersion(SendMessage message)
+    private void ThrowIfBrokerDontSupportApiVersion(SendMessage message)
     {
-        return Task.CompletedTask;
     }
-
-    // private async Task CheckApiVersion(KafkaRequest request, CancellationToken token)
-    // {
-    //     if (request.Header.ApiKey == ApiKeys.ApiVersions)
-    //     {
-    //         return;
-    //     }
-    //
-    //     if (!_versions.ContainsKey(request.Header.ApiKey))
-    //     {
-    //         var requestId = Interlocked.Increment(ref _requestId);
-    //
-    //         var apiRequest = _requestBuilder.Create(ApiKeys.ApiVersions, requestId);
-    //         var result = await InternalSendAsync<ApiVersionMessage>(apiRequest, token);
-    //     }
-    // }
 
     private async Task ReEstablishConnectionAsync(CancellationToken cancellationToken)
     {
@@ -547,6 +537,11 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
                 _stream = stream;
                 _globalTimeWaiting.Start();
+
+                if (_config.SecurityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
+                {
+                    await AuthenticateProcessAsync(cancellationToken);
+                }
             }
         }
         catch (SocketException exc)
@@ -558,6 +553,20 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         catch (Exception exc)
         {
             Debug.WriteLine(exc.Message);
+        }
+    }
+
+    private async Task AuthenticateProcessAsync(CancellationToken token)
+    {
+        var saslHandshakeRequest = new SaslHandshakeRequestMessage();
+        var response = await InternalSendAsync<SaslHandshakeResponseMessage, SaslHandshakeRequestMessage>(saslHandshakeRequest, true, token);
+
+        if (response.Code == ErrorCodes.None)
+        {
+            var authenticateRequest = new SaslAuthenticateRequestMessage
+            {
+            };
+            var r = await InternalSendAsync<SaslAuthenticateResponseMessage, SaslAuthenticateRequestMessage>(authenticateRequest, true, token);
         }
     }
 
@@ -584,6 +593,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         private readonly ApiVersion _version;
 
         public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
+            : base(TaskCreationOptions.RunContinuationsAsynchronously)
         {
             _apiKey = apiKey;
             _version = version;

@@ -20,9 +20,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace NKafka.Protocol;
 
-public enum ApiKeys : short
+public enum ApiKeys: short
 {
     None = -1,
     Produce = 0,

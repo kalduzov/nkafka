@@ -31,7 +31,7 @@ public interface IMessage
     /// <summary>
     /// Returns the highest supported API key of this message, inclusive.
     /// </summary>
-    public ApiVersion HighestSupportedVersion { get;}
+    public ApiVersion HighestSupportedVersion { get; }
 
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand.

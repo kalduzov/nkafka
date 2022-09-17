@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace NKafka.Serialization;
 
-public sealed class GuidSerializer : IAsyncSerializer<Guid>
+public sealed class GuidSerializer: IAsyncSerializer<Guid>
 {
     public Task<byte[]> SerializeAsync(Guid data)
     {

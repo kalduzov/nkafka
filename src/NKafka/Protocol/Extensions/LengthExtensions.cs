@@ -37,7 +37,7 @@ internal static class LengthExtensions
 
         return len;
     }
-    
+
     /// <summary>
     /// Возвращает полную длинну данных в массиве
     /// </summary>
@@ -57,14 +57,14 @@ internal static class LengthExtensions
     {
         byte len = number switch
         {
-            > 0 and <= (1L << 7 * 1) - 1 => 1,
-            > (1L << 7 * 1) - 1 and <= (1L << 7 * 2) - 1 => 2,
-            > (1L << 7 * 2) - 1 and <= (1L << 7 * 3) - 1 => 3,
-            > (1L << 7 * 3) - 1 and <= (1L << 7 * 4) - 1 => 4,
-            > (1L << 7 * 4) - 1 and <= (1L << 7 * 5) - 1 => 5,
-            > (1L << 7 * 5) - 1 and <= (1L << 7 * 6) - 1 => 6,
-            > (1L << 7 * 6) - 1 and <= (1L << 7 * 7) - 1 => 7,
-            > (1L << 7 * 7) - 1 and <= (1L << 7 * 8) - 1 => 8,
+            > 0 and <= (1L << (7 * 1)) - 1 => 1,
+            > (1L << (7 * 1)) - 1 and <= (1L << (7 * 2)) - 1 => 2,
+            > (1L << (7 * 2)) - 1 and <= (1L << (7 * 3)) - 1 => 3,
+            > (1L << (7 * 3)) - 1 and <= (1L << (7 * 4)) - 1 => 4,
+            > (1L << (7 * 4)) - 1 and <= (1L << (7 * 5)) - 1 => 5,
+            > (1L << (7 * 5)) - 1 and <= (1L << (7 * 6)) - 1 => 6,
+            > (1L << (7 * 6)) - 1 and <= (1L << (7 * 7)) - 1 => 7,
+            > (1L << (7 * 7)) - 1 and <= (1L << (7 * 8)) - 1 => 8,
             _ => throw new ArgumentOutOfRangeException(nameof(number), number, null)
         };
 

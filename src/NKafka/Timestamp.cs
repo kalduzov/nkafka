@@ -20,11 +20,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 
 namespace NKafka;
 
-public struct Timestamp : IEquatable<Timestamp>
+public struct Timestamp: IEquatable<Timestamp>
 {
     private const long _RD_KAFKA_NO_TIMESTAMP = 0;
 

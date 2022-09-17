@@ -81,7 +81,7 @@ public class RecordBatch: List<Record>
     /// </summary>
     public int FirstSequence { get; set; }
 
-    public IReadOnlyCollection<Record> Records { get; set; }
+    public IReadOnlyCollection<Record> Records => this;
 
     public byte[] Buffer { get; set; }
 }

@@ -31,10 +31,10 @@ namespace NKafka.Protocol.Records;
 /// <remarks>
 ///     Message headers are supported by v0.11 brokers and above.
 /// </remarks>
-public class Headers : IEnumerable<IHeader>
+public class Headers: IEnumerable<IHeader>
 {
     public static readonly Headers Empty = new();
-    
+
     private readonly List<IHeader> _headers = new();
 
     /// <summary>
@@ -171,7 +171,7 @@ public class Headers : IEnumerable<IHeader>
         _headers.RemoveAll(a => a.Key == key);
     }
 
-    internal class HeadersEnumerator : IEnumerator<IHeader>
+    internal class HeadersEnumerator: IEnumerator<IHeader>
     {
         private readonly Headers _headers;
 
@@ -179,7 +179,7 @@ public class Headers : IEnumerable<IHeader>
 
         public HeadersEnumerator(Headers headers)
         {
-            this._headers = headers;
+            _headers = headers;
         }
 
         public object Current => ((IEnumerator<IHeader>)this).Current;

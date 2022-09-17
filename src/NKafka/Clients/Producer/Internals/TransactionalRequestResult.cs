@@ -21,7 +21,6 @@
  * limitations under the License.
  */
 
-
 namespace NKafka.Clients.Producer.Internals;
 
 public sealed class TransactionalRequestResult

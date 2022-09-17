@@ -228,7 +228,7 @@ public struct Offset: IEquatable<Offset>
     /// </returns>
     public static Offset operator +(Offset a, int b)
     {
-        return new(a.Value + b);
+        return new Offset(a.Value + b);
     }
 
     /// <summary>
@@ -245,7 +245,7 @@ public struct Offset: IEquatable<Offset>
     /// </returns>
     public static Offset operator +(Offset a, long b)
     {
-        return new(a.Value + b);
+        return new Offset(a.Value + b);
     }
 
     /// <summary>
@@ -267,7 +267,7 @@ public struct Offset: IEquatable<Offset>
     /// </param>
     public static implicit operator Offset(long v)
     {
-        return new(v);
+        return new Offset(v);
     }
 
     /// <summary>

@@ -31,7 +31,7 @@ namespace NKafka.Protocol.Records;
 /// <remarks>
 ///     Message headers are supported by v0.11 brokers and above.
 /// </remarks>
-public class Header : IHeader
+public class Header: IHeader
 {
     private readonly byte[] _val;
 

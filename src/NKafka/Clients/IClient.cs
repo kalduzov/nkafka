@@ -20,6 +20,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 
 namespace NKafka.Clients;
@@ -27,6 +28,6 @@ namespace NKafka.Clients;
 /// <summary>
 /// Is a generic Kafka client.
 /// </summary>
-public interface IClient : IDisposable, IAsyncDisposable
+public interface IClient: IDisposable, IAsyncDisposable
 {
 }

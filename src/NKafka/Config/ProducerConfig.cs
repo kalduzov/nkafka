@@ -105,7 +105,7 @@ public record ProducerConfig: CommonConfig
     {
         return this with
         {
-            BootstrapServers = config.BootstrapServers,
+            BootstrapServers = config.BootstrapServers
         };
     }
 }

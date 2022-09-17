@@ -130,10 +130,10 @@
   <data name="InconsistentClusterId" xml:space="preserve"><value>The clusterId in the request does not match that found on the server</value></data>
   <data name="TransactionalIdNotFound" xml:space="preserve"><value>The transactionalId could not be found</value></data>
   <data name="FetchSessionTopicIdError" xml:space="preserve"><value>The fetch session encountered inconsistent topic ID usage</value></data>
-    <data name="IneligibleReplica" xml:space="preserve">
+  <data name="IneligibleReplica" xml:space="preserve">
         <value>The new ISR contains at least one ineligible replica.</value>
     </data>
-    <data name="NewLeaderElected" xml:space="preserve">
+  <data name="NewLeaderElected" xml:space="preserve">
         <value>The AlterPartition request successfully updated the partition state but the leader has changed.</value>
     </data>
 </root>

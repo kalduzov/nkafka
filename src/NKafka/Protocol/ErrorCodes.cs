@@ -134,5 +134,5 @@ public enum ErrorCodes: short
     TransactionalIdNotFound = 105,
     FetchSessionTopicIdError = 106,
     IneligibleReplica = 107,
-    NewLeaderElected = 108,
+    NewLeaderElected = 108
 }

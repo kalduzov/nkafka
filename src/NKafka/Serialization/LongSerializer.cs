@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 
 namespace NKafka.Serialization;
 
-public sealed class LongSerializer : IAsyncSerializer<long>
+public sealed class LongSerializer: IAsyncSerializer<long>
 {
     public Task<byte[]> SerializeAsync(long data)
     {

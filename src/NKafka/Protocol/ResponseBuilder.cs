@@ -34,7 +34,7 @@ internal static class ResponseBuilder
         return apiKey switch
         {
             ApiKeys.Metadata => new MetadataResponseMessage(reader, apiVersion),
-            ApiKeys.ApiVersions => new ApiVersionsResponseMessage(reader, apiVersion),
+            ApiKeys.ApiVersions => new ApiVersionsResponseMessage(reader, apiVersion)
         };
     }
 }

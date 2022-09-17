@@ -21,7 +21,7 @@ var clusterConfig = new ClusterConfig
         "127.0.0.1:29091"
     },
     ClusterInitTimeoutMs = 160000, //160сек для отладки
-    MetadataMaxAge = 10000, //10 секунд на обновление данных по кластеру
+    MetadataUpdateTimeoutMs = 10000, //10 секунд на обновление данных по кластеру
     //MessageMaxBytes = 20,
 };
 

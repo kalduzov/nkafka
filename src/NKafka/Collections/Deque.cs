@@ -21,9 +21,7 @@
  * limitations under the License.
  */
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -33,21 +31,20 @@ namespace NKafka.Collections;
 /// Реализация double ended queue за базу взята internal реализация System.Collections.Generic.Deque<T>
 /// </summary>
 [DebuggerDisplay("Count = {Count}")]
-internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollection<T>
+internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection<T>
 {
     private const int _DEFAULT_CAPACITY = 8;
 
     private T[] _array;
     private int _head; // First valid element in the deque
     private int _tail; // First open slot in the dequeue, unless the dequeue is full
-    private int _size; // Number of elements.
     private int _version;
 
-    public int Count => _size;
+    public int Count { get; private set; }
 
-    public bool IsEmpty => _size == 0;
+    public bool IsEmpty => Count == 0;
 
-    public bool IsFull => _size >= _array.Length;
+    public bool IsFull => Count >= _array.Length;
 
     public bool IsSynchronized => false;
 
@@ -87,7 +84,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
                 //Очищаем массив с сылочными типами
                 if (_head < _tail)
                 {
-                    Array.Clear(_array, _head, _size);
+                    Array.Clear(_array, _head, Count);
                 }
                 else
                 {
@@ -96,7 +93,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
                 }
             }
 
-            _size = 0;
+            Count = 0;
         }
 
         _head = 0;
@@ -128,19 +125,21 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
             throw new ArgumentOutOfRangeException(nameof(index));
         }
 
-        if (arrayLen - index < _size)
+        if (arrayLen - index < Count)
         {
             throw new ArgumentException();
         }
 
-        int numToCopy = _size;
+        var numToCopy = Count;
 
         if (numToCopy == 0)
+        {
             return;
+        }
 
         try
         {
-            int firstPart = (_array.Length - _head < numToCopy) ? _array.Length - _head : numToCopy;
+            var firstPart = _array.Length - _head < numToCopy ? _array.Length - _head : numToCopy;
             Array.Copy(_array, _head, array, index, firstPart);
             numToCopy -= firstPart;
 
@@ -157,7 +156,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
 
     public void PushBack(T item)
     {
-        if (_size == _array.Length)
+        if (Count == _array.Length)
         {
             Grow();
         }
@@ -171,19 +170,19 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
             _tail = 0;
         }
 
-        _size++;
+        Count++;
     }
 
     public void PushFront(T item)
     {
-        if (_size == _array.Length)
+        if (Count == _array.Length)
         {
             Grow();
         }
 
         _head = (_head == 0 ? _array.Length : _head) - 1;
         _array[_head] = item;
-        _size++;
+        Count++;
     }
 
     public T PopFront()
@@ -200,7 +199,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
             _head = 0;
         }
 
-        _size--;
+        Count--;
 
         return item;
     }
@@ -219,7 +218,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
         var item = _array[_tail];
         _array[_tail] = default!;
 
-        _size--;
+        Count--;
 
         return item;
     }
@@ -237,7 +236,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
     public IEnumerator<T> GetEnumerator()
     {
         var pos = _head;
-        var count = _size;
+        var count = Count;
 
         while (count-- > 0)
         {
@@ -248,7 +247,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
 
     private void Grow()
     {
-        Debug.Assert(_size == _array.Length);
+        Debug.Assert(Count == _array.Length);
         Debug.Assert(_head == _tail);
 
         const int minimumGrow = 4;
@@ -264,7 +263,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
 
         if (_head == 0)
         {
-            Array.Copy(_array, newArray, _size);
+            Array.Copy(_array, newArray, Count);
         }
         else
         {
@@ -274,7 +273,7 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
 
         _array = newArray;
         _head = 0;
-        _tail = _size;
+        _tail = Count;
     }
 
     private static int CalculateInitElements(int capacity)
@@ -312,8 +311,8 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
     // Implements an enumerator for a Queue.  The enumerator uses the
     // internal version number of the list to ensure that no modifications are
     // made to the list while an enumeration is in progress.
-    internal struct Enumerator : IEnumerator<T>,
-        System.Collections.IEnumerator
+    internal struct Enumerator: IEnumerator<T>,
+        IEnumerator
     {
         private readonly Deque<T> _q;
         private readonly int _version;
@@ -337,14 +336,18 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
         public bool MoveNext()
         {
             if (_version != _q._version)
+            {
                 throw new InvalidOperationException();
+            }
 
             if (_index == -2)
+            {
                 return false;
+            }
 
             _index++;
 
-            if (_index == _q._size)
+            if (_index == _q.Count)
             {
                 // We've run past the last element
                 _index = -2;
@@ -354,13 +357,13 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
             }
 
             // Cache some fields in locals to decrease code size
-            T[] array = _q._array;
-            int capacity = array.Length;
+            var array = _q._array;
+            var capacity = array.Length;
 
             // _index represents the 0-based index into the queue, however the queue
             // doesn't have to start from 0 and it may not even be stored contiguously in memory.
 
-            int arrayIndex = _q._head + _index; // this is the actual index into the queue's backing array
+            var arrayIndex = _q._head + _index; // this is the actual index into the queue's backing array
 
             if (arrayIndex >= capacity)
             {
@@ -383,7 +386,9 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
             get
             {
                 if (_index < 0)
+                {
                     ThrowEnumerationNotStartedOrEnded();
+                }
 
                 return _currentElement!;
             }
@@ -401,7 +406,10 @@ internal sealed class Deque<T> : IEnumerable<T>, ICollection, IReadOnlyCollectio
         void IEnumerator.Reset()
         {
             if (_version != _q._version)
+            {
                 throw new InvalidOperationException();
+            }
+
             _index = -1;
             _currentElement = default;
         }

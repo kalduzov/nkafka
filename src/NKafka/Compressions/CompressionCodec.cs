@@ -20,9 +20,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace NKafka.Compressions;
 
-public enum CompressionCodec : byte
+public enum CompressionCodec: byte
 {
     None = 0,
     GZIP = 1,

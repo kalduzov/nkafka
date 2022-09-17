@@ -172,25 +172,39 @@ public interface IProducer<TKey, TValue>: IProducer
     #region Transaction
 
     void InitTransactions(TimeSpan timeout)
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void BeginTransaction()
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void CommitTransaction(TimeSpan timeout)
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void CommitTransaction()
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void AbortTransaction(TimeSpan timeout)
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void AbortTransaction()
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     void SendOffsetsToTransaction(IEnumerable<TopicPartitionOffset> offsets, IConsumerGroupMetadata groupMetadata)
-        => throw new NotImplementedException();
+    {
+        throw new NotImplementedException();
+    }
 
     #endregion
 }

@@ -67,7 +67,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     private IAsyncSerializer<TValue> _valueSerializer;
 
     string IProducer.Name => _name;
-    
+
     internal Producer(
         IKafkaCluster kafkaCluster,
         string name,

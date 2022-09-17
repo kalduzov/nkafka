@@ -30,7 +30,7 @@ namespace NKafka.Connection;
 /// <summary>
 /// Интерфейс брокера
 /// </summary>
-public interface IBroker : IDisposable, IAsyncDisposable
+public interface IBroker: IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Список топиков обслуживающихся на брокере
@@ -61,7 +61,7 @@ public interface IBroker : IDisposable, IAsyncDisposable
     /// Список партиций топиков
     /// </summary>
     IReadOnlyDictionary<string, TopicPartition> TopicPartitions { get; }
-    
+
     /// <summary>
     /// The current number of inflight requests
     /// </summary>
@@ -71,7 +71,7 @@ public interface IBroker : IDisposable, IAsyncDisposable
     /// Открывает соединение с брокером
     /// </summary>
     public Task OpenAsync(CancellationToken token);
-    
+
     /// <summary>
     /// Закрывает соединение с брокером
     /// </summary>

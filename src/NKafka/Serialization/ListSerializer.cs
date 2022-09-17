@@ -20,19 +20,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+
 using FastEnumUtility;
+
 using NKafka.Protocol.Extensions;
 using NKafka.Exceptions;
 using NKafka.Protocol;
 
 namespace NKafka.Serialization;
 
-public sealed class ListSerializer<T> : IAsyncSerializer<List<T>>
+public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
 {
     private const int _NULL_ENTRY_VALUE = -1;
 

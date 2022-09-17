@@ -28,14 +28,14 @@ using NKafka.Resources;
 
 namespace NKafka.Exceptions;
 
-public class ProtocolKafkaException : KafkaException
+public class ProtocolKafkaException: KafkaException
 {
     internal ProtocolKafkaException(ErrorCodes code)
         : base(StatusCodesMessages.ResourceManager.GetString(code.FastToString()) ?? code.FastToString())
     {
         InternalError = code;
     }
-    
+
     internal ProtocolKafkaException(ErrorCodes code, string message, Exception innerException = null!)
         : base(message, innerException)
     {

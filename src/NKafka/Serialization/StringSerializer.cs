@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace NKafka.Serialization;
 
-public sealed class StringSerializer : IAsyncSerializer<string>
+public sealed class StringSerializer: IAsyncSerializer<string>
 {
     public Task<byte[]> SerializeAsync(string data)
     {

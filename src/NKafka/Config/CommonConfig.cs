@@ -29,32 +29,45 @@ using NKafka.Exceptions;
 namespace NKafka.Config;
 
 /// <summary>
-///     Общие параметры конфигурации для всех клиентов
+///     Common configs for all clients
 /// </summary>
 public abstract record CommonConfig
 {
     /// <summary>
-    ///     Первичный список брокеров 
+    /// Primary broker address list
+    /// <p>
+    /// default: <b>empty list</b>
+    /// </p><br/>
+    /// <p>
+    /// <b>Mandatory indication required</b>
+    /// </p>
     /// </summary>
     public IReadOnlyList<string> BootstrapServers { get; set; } = Array.Empty<string>();
 
     /// <summary>
-    ///     Идентификатор клиентского приложения
+    /// Client application ID
+    /// <p>
+    /// default: <b>current host name or NKafka/{calling assembly version}</b>
+    /// </p> 
     /// </summary>
     public string ClientId { get; set; } = GetHostName();
 
     /// <summary>
-    ///     Максимальное количество попыток переотправки любого запроса
+    /// The maximum number of attempts to resend any request
+    /// <p>
+    /// default: <b>2</b>
+    /// </p> 
     /// </summary>
     public int MaxRetries { get; set; } = 2;
 
     /// <summary>
-    ///     Maximum Kafka protocol request message size. Due to differing framing overhead between protocol versions the
-    ///     producer is unable to reliably enforce a strict max message limit at produce time and may exceed the maximum size
-    ///     by one message in protocol ProduceRequests, the broker will enforce the the topic's `max.message.bytes` limit (see
-    ///     Apache Kafka documentation).
-    ///     default: 1000000
-    ///     importance: medium
+    /// Maximum Kafka protocol request message size. Due to differing framing overhead between protocol versions the
+    /// producer is unable to reliably enforce a strict max message limit at produce time and may exceed the maximum size
+    /// by one message in protocol ProduceRequests, the broker will enforce the the topic's `max.message.bytes` limit (see
+    /// Apache Kafka documentation).
+    /// <p>
+    /// default: <b>1000000</b>
+    /// </p>
     /// </summary>
     public int MessageMaxBytes { get; set; } = 1000000;
 
@@ -68,14 +81,6 @@ public abstract record CommonConfig
     ///     importance: high
     /// </summary>
     public bool ApiVersionRequest { get; set; } = true;
-
-    /// <summary>
-    ///     The period of time in milliseconds after which we force a refresh of metadata even if we haven't seen any partition
-    ///     leadership changes to proactively discover any new brokers or partitions.
-    ///
-    ///     default: 5 minutes
-    /// </summary>
-    public int MetadataMaxAge { get; set; } = 300000;
 
     /// <summary>
     ///     The base amount of time to wait before attempting to reconnect to a given host.

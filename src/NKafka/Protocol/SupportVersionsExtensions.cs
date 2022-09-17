@@ -108,4 +108,5 @@ internal static class SupportVersionsExtensions
             _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
         };
     }
+
 }

@@ -34,12 +34,12 @@ namespace NKafka;
 public static class KafkaClusterExtensions
 {
     /// <summary>
-    /// Initializes the subsystem for a new kafka cluster
+    /// Initializes the subsystem for a new kafka cluster and open it
     /// </summary>
     /// <param name="config">Configuration</param>
     /// <param name="loggerFactory">Logging factory instance, can be null</param>
-    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
     /// <param name="token"></param>
+    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
     /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
     public static Task<IKafkaCluster> CreateClusterAsync(
         this ClusterConfig config,
@@ -48,6 +48,23 @@ public static class KafkaClusterExtensions
         bool openImmediately = true)
     {
         return CreateClusterInternalAsync(config, loggerFactory, token: token, openImmediately: openImmediately);
+    }
+
+    /// <summary>
+    /// Initializes the subsystem for a new kafka cluster and open it
+    /// </summary>
+    /// <param name="clusterConfigFactory">Configuration factory for cluster</param>
+    /// <param name="loggerFactory">Logging factory instance, can be null</param>
+    /// <param name="token"></param>
+    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
+    /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
+    public static Task<IKafkaCluster> CreateClusterAsync(
+        this IClusterConfigFactory clusterConfigFactory,
+        ILoggerFactory? loggerFactory = null,
+        CancellationToken token = default,
+        bool openImmediately = true)
+    {
+        return CreateClusterInternalAsync(clusterConfigFactory.Build(), loggerFactory, token: token, openImmediately: openImmediately);
     }
 
     /// <summary>

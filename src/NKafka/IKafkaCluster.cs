@@ -21,6 +21,7 @@
  * limitations under the License.
  */
 
+using NKafka.Clients.Admin;
 using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
@@ -67,6 +68,11 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// List of all cluster brokers
     /// </summary>
     IReadOnlyCollection<IBroker> Brokers { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    IAdminClient AdminClient { get; }
 
     /// <summary>
     /// Returns a list of partitions for a topic

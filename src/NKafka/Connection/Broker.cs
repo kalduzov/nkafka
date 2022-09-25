@@ -476,7 +476,8 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         {
             _tckPool.TryAdd(requestId, taskCompletionSource);
             WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
-
+            cts.CancelAfter(_config.RequestTimeoutMs);
+            
             if (_stream.CanWrite)
             {
                 request.Write(_stream);

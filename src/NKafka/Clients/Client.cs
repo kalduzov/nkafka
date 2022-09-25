@@ -21,8 +21,6 @@
  * limitations under the License.
  */
 
-using System.Threading.Tasks;
-
 using Microsoft.Extensions.Logging;
 
 namespace NKafka.Clients;

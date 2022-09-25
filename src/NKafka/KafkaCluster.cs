@@ -28,6 +28,7 @@ using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
+using NKafka.Clients.Admin;
 using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
@@ -35,7 +36,6 @@ using NKafka.Connection;
 using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
-using NKafka.Protocol;
 using NKafka.Serialization;
 
 namespace NKafka;
@@ -71,6 +71,8 @@ public sealed class KafkaCluster: IKafkaCluster
     private int _controllerId = -1;
 
     private readonly Dictionary<string, SortedSet<Partition>> _partitions = new();
+    
+    private IAdminClient? _adminClient;
 
     /// <inheritdoc />
     public string? ClusterId { get; private set; }
@@ -89,6 +91,16 @@ public sealed class KafkaCluster: IKafkaCluster
 
     /// <inheritdoc />
     public IReadOnlyCollection<IBroker> Brokers => _brokers.Values;
+
+    public IAdminClient AdminClient
+    {
+        get
+        {
+            ThrowExceptionIfClusterClosed();
+
+            return _adminClient ??= new AdminClient(this, _loggerFactory.CreateLogger<AdminClient>());
+        }
+    }
 
     /// <summary>
     /// Создает новый класс кластера кафки
@@ -117,7 +129,7 @@ public sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public async ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default)
     {
-        ThrowIfClusterClosed();
+        ThrowExceptionIfClusterClosed();
 
         if (_partitions.TryGetValue(topic, out var partitions) && partitions.Count != 0)
         {
@@ -147,7 +159,7 @@ public sealed class KafkaCluster: IKafkaCluster
         IAsyncSerializer<TKey>? keySerializer = null,
         IAsyncSerializer<TValue>? valueSerializer = null)
     {
-        ThrowIfClusterClosed();
+        ThrowExceptionIfClusterClosed();
 
         if (_producers.TryGetValue(name, out var producer))
         {
@@ -177,7 +189,7 @@ public sealed class KafkaCluster: IKafkaCluster
         IAsyncSerializer<TKey>? keySerializer = null,
         IAsyncSerializer<TValue>? valueSerializer = null)
     {
-        ThrowIfClusterClosed();
+        ThrowExceptionIfClusterClosed();
 
         throw new NotImplementedException();
     }
@@ -185,7 +197,7 @@ public sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public async Task<MetadataResponseMessage> RefreshMetadataAsync(CancellationToken token = default, params string[] topics)
     {
-        ThrowIfClusterClosed();
+        ThrowExceptionIfClusterClosed();
 
         var broker = GetBrokerForServiceRequests(); //Обновляем метададанные из брокера, который является контроллером
 
@@ -243,6 +255,9 @@ public sealed class KafkaCluster: IKafkaCluster
         }
     }
 
+    /// <summary>
+    /// Формирует список посевных брокеров 
+    /// </summary>
     private List<IBroker> SeedBrokers(CommonConfig commonConfig)
     {
         var brokers = new List<IBroker>(Config.BootstrapServers.Count);
@@ -341,7 +356,7 @@ public sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    /// Возвращает 
+    /// Возвращает брокера для сервисных запросов
     /// </summary>
     private IBroker GetBrokerForServiceRequests()
     {
@@ -353,7 +368,7 @@ public sealed class KafkaCluster: IKafkaCluster
     /// </summary>
     private async void UpdateMetadataCallback(object? state)
     {
-        ThrowIfClusterClosed();
+        ThrowExceptionIfClusterClosed();
 
         using var activity = KafkaDiagnosticsSource.UpdateMetadata();
 
@@ -452,7 +467,7 @@ public sealed class KafkaCluster: IKafkaCluster
         Closed = false;
     }
 
-    private void ThrowIfClusterClosed()
+    private void ThrowExceptionIfClusterClosed()
     {
         if (Closed)
         {

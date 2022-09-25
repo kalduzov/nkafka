@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using NKafka;
+using NKafka.Clients.Admin;
 using NKafka.Config;
 
 using OpenTelemetry;
@@ -56,10 +57,16 @@ var logger = loggerFactory.CreateLogger<Program>();
 
 await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFactory);
 
-for (var i = 0; i < int.MaxValue; i++)
-{
-    await kafkaCluster.RefreshMetadataAsync();
-}
+var result = await kafkaCluster.AdminClient.CreateTopicsAsync(
+    new[]
+    {
+        new Topic("test-protocol", 10, 2)
+    });
+
+// for (var i = 0; i < int.MaxValue; i++)
+// {
+//     await kafkaCluster.RefreshMetadataAsync();
+// }
 
 //await kafkaCluster.RefreshMetadataAsync(default, "test");
 

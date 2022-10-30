@@ -25,6 +25,7 @@ using System.Net;
 using System.Reflection;
 
 using NKafka.Exceptions;
+using NKafka.Resources;
 
 namespace NKafka.Config;
 
@@ -103,6 +104,16 @@ public abstract record CommonConfig
     public SecurityProtocols SecurityProtocol { get; set; } = SecurityProtocols.PlainText;
 
     /// <summary>
+    /// 
+    /// </summary>
+    public SslSettings? Ssl { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public SaslSettings? Sasl { get; set; }
+
+    /// <summary>
     ///     The amount of time the client will wait for the socket connection to be established.
     ///     If the connection is not built before the timeout elapses, clients will close the socket channel.
     /// </summary>
@@ -159,13 +170,21 @@ public abstract record CommonConfig
     }
 
     /// <summary>
-    ///     Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные
+    /// Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные
     /// </summary>
     internal virtual void Validate()
     {
         if ((BootstrapServers?.Count ?? 0) == 0)
         {
-            throw new KafkaConfigException(nameof(BootstrapServers), 0, "BootstrapServers not set");
+            throw new KafkaConfigException(nameof(BootstrapServers), 0, ConfigExceptionMessages.No_bootstrap_servers);
+        }
+
+        switch (SecurityProtocol)
+        {
+            case SecurityProtocols.Ssl or SecurityProtocols.SaslSsl when Ssl is null:
+                throw new KafkaConfigException(nameof(Ssl), null!, ConfigExceptionMessages.Ssl_no_configured);
+            case SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl when Sasl is null:
+                throw new KafkaConfigException(nameof(Sasl), null!, ConfigExceptionMessages.Sasl_no_configured);
         }
     }
 }

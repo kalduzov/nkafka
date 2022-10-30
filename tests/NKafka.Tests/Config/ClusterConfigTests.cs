@@ -68,7 +68,7 @@ public class ClusterConfigTests
             .Which.OptionName.Should()
             .Be(nameof(ClusterConfig.MetadataUpdateTimeoutMs));
     }
-    
+
     [Fact]
     public void Validate_WhenClusterInitTimeoutMsIncorrect_MustByThrowException()
     {
@@ -89,5 +89,56 @@ public class ClusterConfigTests
             .Throw<KafkaConfigException>()
             .Which.OptionName.Should()
             .Be(nameof(ClusterConfig.ClusterInitTimeoutMs));
+    }
+
+    [Theory]
+    [InlineData(SecurityProtocols.Ssl)]
+    [InlineData(SecurityProtocols.SaslSsl)]
+    public void Validate_WhenSecurityProtocolSetAsSslButNoSslSettings_MustByThrowException(SecurityProtocols securityProtocol)
+    {
+        var config = new ClusterConfig
+        {
+            BootstrapServers = new[]
+            {
+                "test"
+            },
+            SecurityProtocol = securityProtocol
+        };
+
+        void Validate()
+            => config.Validate();
+
+        FluentActions.Invoking(Validate)
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(ClusterConfig.Ssl));
+    }
+
+    [Theory]
+    [InlineData(SecurityProtocols.SaslPlaintext)]
+    [InlineData(SecurityProtocols.SaslSsl)]
+    public void Validate_WhenSecurityProtocolSetAsSaslButNoSaslSettings_MustByThrowException(SecurityProtocols securityProtocol)
+    {
+        var config = new ClusterConfig
+        {
+            BootstrapServers = new[]
+            {
+                "test"
+            },
+            SecurityProtocol = securityProtocol,
+
+            //Исключаем ошибку при значении SaslSsl, в остальом все должно остаться как было
+            Ssl = securityProtocol == SecurityProtocols.SaslSsl ? new SslSettings() : null
+        };
+
+        void Validate()
+            => config.Validate();
+
+        FluentActions.Invoking(Validate)
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(ClusterConfig.Sasl));
     }
 }

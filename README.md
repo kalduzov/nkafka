@@ -1,6 +1,6 @@
 # NKafka
 
-Это, высокопроизводительный, полностью управляемый, клиент для Kafka.
+It is a high performance fully managed client for Kafka.
 
 ## Quick start
 
@@ -39,4 +39,4 @@ producer.Produce("test_topic", testMessage);
 
 Console.ReadKey();
 
-``` 
+```

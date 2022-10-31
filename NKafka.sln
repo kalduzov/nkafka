@@ -15,14 +15,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C451-E7E8-4A76-AC94-8A165ED35DD2}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		docker-compose.yml = docker-compose.yml
-		Kafka.sln.DotSettings = Kafka.sln.DotSettings
 		LICENCE = LICENCE
 		README.md = README.md
 		changelog.md = changelog.md
-		.env = .env
 		global.json = global.json
 		.editorconfig = .editorconfig
+		NKafka.sln.DotSettings = NKafka.sln.DotSettings
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"
@@ -200,6 +198,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{855C7656-B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NKafka.MessageGenerator", "src\NKafka.MessageGenerator\NKafka.MessageGenerator.csproj", "{4C5E49FE-FCCE-45D1-8C53-915470BF1E41}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{04B6002E-2732-4C6A-A79C-B65FA0793332}"
+	ProjectSection(SolutionItems) = preProject
+		infra\docker-compose.yml = infra\docker-compose.yml
+		infra\.env = infra\.env
+		infra\init.ssl.ps1 = infra\init.ssl.ps1
+		infra\readme.md = infra\readme.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{0BCF7CE3-517C-4AE5-9D39-8B2C353CF89C}"
+	ProjectSection(SolutionItems) = preProject
+		infra\choco\install.ps1 = infra\choco\install.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -256,6 +267,7 @@ Global
 		{FBD2443B-29DB-44E9-AD6B-E7F0100048DD} = {29622E63-2B40-49ED-AFFE-CE7D1D6E2143}
 		{24148224-0644-448D-AA71-BAD284145726} = {29CCE93C-47E9-46FB-980C-8CC68A132789}
 		{4C5E49FE-FCCE-45D1-8C53-915470BF1E41} = {E216684E-35E3-446D-B5EB-F89718D0D0FE}
+		{0BCF7CE3-517C-4AE5-9D39-8B2C353CF89C} = {04B6002E-2732-4C6A-A79C-B65FA0793332}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39C07D03-F77E-4D2B-A72F-FCDC1313B058}

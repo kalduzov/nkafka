@@ -48,9 +48,9 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly CancellationTokenSource _responseProcessingTokenSource = new();
     private readonly Socket _socket;
-    private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tckPool;
+    private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tcsPool;
     private bool _disposed;
-    private Stream _stream;
+    private Stream _stream = Stream.Null;
     private volatile int _requestId = -1;
 
     private readonly CommonConfig _config;
@@ -96,7 +96,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     /// <summary>
     /// The current number of running inflight requests
     /// </summary>
-    public int CurrentNumberInflightRequests => _tckPool.Count;
+    public int CurrentNumberInflightRequests => _tcsPool.Count;
 
     /// <summary>
     /// Топики
@@ -122,7 +122,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
 
         //todo потом поиграться с параметрами структур
-        _tckPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, maxInflightRequests);
+        _tcsPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, maxInflightRequests);
         _arrayPool = ArrayPool<byte>.Create(_config.MessageMaxBytes, maxInflightRequests);
         _topics = new HashSet<string>(0);
         _topicPartitions = new Dictionary<string, TopicPartition>(0);
@@ -181,12 +181,12 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         // Ждем когда остановится обработка потока данных из сокета
         await _processData.WaitAsync(TimeSpan.FromMilliseconds(_config.CloseConnectionTimeoutMs), token);
 
-        foreach (var value in _tckPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
+        foreach (var value in _tcsPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
         {
             value.SetException(new ObjectDisposedException(nameof(Broker), "Broker connection was closed"));
         }
 
-        _tckPool.Clear();
+        _tcsPool.Clear();
         _responsesTasks.Clear();
         await _stream.DisposeAsync();
         _socket.Dispose();
@@ -291,12 +291,12 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
             while (!_responseProcessingTokenSource.IsCancellationRequested)
             {
-                if (_tckPool.IsEmpty)
+                if (_tcsPool.IsEmpty)
                 {
                     return;
                 }
 
-                if (!(_stream?.CanRead ?? false))
+                if (_stream != Stream.Null && !_stream.CanRead)
                 {
                     sw.SpinOnce();
 
@@ -345,7 +345,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
 
         try
         {
-            if (_tckPool.TryRemove(requestId, out var responseInfo))
+            if (_tcsPool.TryRemove(requestId, out var responseInfo))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -379,7 +379,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
                 }
                 finally
                 {
-                    _tckPool.TryRemove(requestId, out responseInfo);
+                    _tcsPool.TryRemove(requestId, out responseInfo);
                 }
             }
             else
@@ -414,7 +414,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         where TResponseMessage : IResponseMessage
         where TRequestMessage : IRequestMessage
     {
-        if (_tckPool.Count >= _config.MaxInflightRequests)
+        if (_tcsPool.Count >= _config.MaxInflightRequests)
         {
             throw new ProtocolKafkaException(
                 ErrorCodes.None,
@@ -467,17 +467,17 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
                 }
 
                 awaiter.TrySetCanceled();
-                _tckPool.TryRemove(requestId, out _);
+                _tcsPool.TryRemove(requestId, out _);
             },
             taskCompletionSource,
             false);
 
         try
         {
-            _tckPool.TryAdd(requestId, taskCompletionSource);
+            _tcsPool.TryAdd(requestId, taskCompletionSource);
             WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
             cts.CancelAfter(_config.RequestTimeoutMs);
-            
+
             if (_stream.CanWrite)
             {
                 request.Write(_stream);
@@ -487,7 +487,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         {
             activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
 
-            _tckPool.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
+            _tcsPool.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
 
             if (!taskCompletionSource.Task.IsCanceled || !taskCompletionSource.Task.IsCompleted)
             {
@@ -518,7 +518,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         // }
     }
 
-    private void ThrowIfBrokerDontSupportApiVersion(SendMessage message)
+    private void ThrowIfBrokerDoestSupportApiVersion(SendMessage message)
     {
     }
 
@@ -557,19 +557,7 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         }
     }
 
-    private async Task AuthenticateProcessAsync(CancellationToken token)
-    {
-        var saslHandshakeRequest = new SaslHandshakeRequestMessage();
-        var response = await InternalSendAsync<SaslHandshakeResponseMessage, SaslHandshakeRequestMessage>(saslHandshakeRequest, true, token);
-
-        if (response.Code == ErrorCodes.None)
-        {
-            var authenticateRequest = new SaslAuthenticateRequestMessage
-            {
-            };
-            var r = await InternalSendAsync<SaslAuthenticateResponseMessage, SaslAuthenticateRequestMessage>(authenticateRequest, true, token);
-        }
-    }
+  
 
     private void Dispose(bool disposing)
     {

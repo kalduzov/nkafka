@@ -109,7 +109,7 @@ public abstract record CommonConfig
     public SslSettings? Ssl { get; set; }
 
     /// <summary>
-    /// 
+    /// Sasl configuration
     /// </summary>
     public SaslSettings? Sasl { get; set; }
 

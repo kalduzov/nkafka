@@ -37,13 +37,15 @@ namespace NKafka.Connection;
 /// <summary>
 /// 
 /// </summary>
-internal sealed class KafkaConnector: IKafkaConnector
+internal sealed partial class KafkaConnector: IKafkaConnector
 {
     private readonly int _maxInflightRequests;
     private readonly int _messageMaxBytes;
     private readonly int _closeConnectionTimeoutMs;
     private readonly int _connectionsMaxIdleMs;
     private readonly SecurityProtocols _securityProtocols;
+    private readonly SaslSettings _saslSettings;
+    private readonly SslSettings _sslSettings;
     private readonly ILogger<KafkaConnector> _logger;
 
     private readonly ConcurrentDictionary<int, Task> _inFlightRequests;
@@ -73,6 +75,8 @@ internal sealed class KafkaConnector: IKafkaConnector
         int closeConnectionTimeoutMs,
         int connectionsMaxIdleMs,
         SecurityProtocols securityProtocols,
+        SaslSettings saslSettings,
+        SslSettings sslSettings,
         ILoggerFactory loggerFactory)
     {
         _maxInflightRequests = maxInflightRequests;
@@ -80,6 +84,8 @@ internal sealed class KafkaConnector: IKafkaConnector
         _closeConnectionTimeoutMs = closeConnectionTimeoutMs;
         _connectionsMaxIdleMs = connectionsMaxIdleMs;
         _securityProtocols = securityProtocols;
+        _saslSettings = saslSettings;
+        _sslSettings = sslSettings;
         _inFlightRequests = new ConcurrentDictionary<int, Task>(Environment.ProcessorCount, _maxInflightRequests);
         _logger = loggerFactory.CreateLogger<KafkaConnector>();
 

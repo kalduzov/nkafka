@@ -29,4 +29,10 @@
   <data name="Kafka_message_header_key_cannot_be_null" xml:space="preserve">
         <value>Kafka message header key cannot be null</value>
     </data>
+    <data name="SaslVersionInvalid" xml:space="preserve">
+        <value>The current version of Sasl is not correct</value>
+    </data>
+    <data name="SaslMechanismInvalid" xml:space="preserve">
+        <value>An unsupported mechanism for Sasl was specified</value>
+    </data>
 </root>

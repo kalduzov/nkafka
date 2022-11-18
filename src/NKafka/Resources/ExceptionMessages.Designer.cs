@@ -76,5 +76,23 @@ namespace NKafka.Resources {
                 return ResourceManager.GetString("Kafka_message_header_key_cannot_be_null", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unsupported mechanism for Sasl was specified.
+        /// </summary>
+        internal static string SaslMechanismInvalid {
+            get {
+                return ResourceManager.GetString("SaslMechanismInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current version of Sasl is not correct.
+        /// </summary>
+        internal static string SaslVersionInvalid {
+            get {
+                return ResourceManager.GetString("SaslVersionInvalid", resourceCulture);
+            }
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace NKafka.Connection;
 /// <summary>
 /// The interface for working with a physical connection to a broker
 /// </summary>
-internal interface IKafkaConnector: IDisposable
+internal interface IKafkaConnector: IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// 
@@ -44,4 +44,6 @@ internal interface IKafkaConnector: IDisposable
         CancellationToken token)
         where TResponseMessage : IResponseMessage
         where TRequestMessage : IRequestMessage;
+
+    ValueTask OpenAsync(CancellationToken token);
 }

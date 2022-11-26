@@ -19,18 +19,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Net;
+
 using Microsoft.Extensions.Logging;
 
 namespace NKafka;
 
 /// <summary>
-/// Содержит все атоматически сгенерированные методы расширения для логирования сообщений в кафке
+/// Содержит все атоматически сгенерированные методы расширения для логирования сообщений в библиотеке
 /// </summary>
 internal static partial class LogExtensions
 {
-    /// <summary>
-    /// 
-    /// </summary>
     [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = Utils.LOGGER_PREFIX + "Creating new cluster")]
     public static partial void CreateCluster(this ILogger logger);
 
@@ -61,4 +60,10 @@ internal static partial class LogExtensions
         Level = LogLevel.Error,
         Message = Utils.LOGGER_PREFIX + "Update metadata error. Count {Count}")]
     public static partial void UpdateMetadataError(this ILogger logger, Exception exc, int count);
+
+    [LoggerMessage(
+        EventId = 7,
+        Level = LogLevel.Trace,
+        Message = Utils.LOGGER_PREFIX + "New kafka connector on {EndPoint} created")]
+    public static partial void CreateConnectorTrace(this ILogger logger, EndPoint endPoint);
 }

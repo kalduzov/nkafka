@@ -23,14 +23,12 @@
 
 using System.Net;
 
-using NKafka.Protocol;
-
 namespace NKafka.Connection;
 
 /// <summary>
 /// Интерфейс брокера
 /// </summary>
-public interface IBroker: IDisposable, IAsyncDisposable
+public interface IBroker
 {
     /// <summary>
     /// Список топиков обслуживающихся на брокере
@@ -61,34 +59,6 @@ public interface IBroker: IDisposable, IAsyncDisposable
     /// Список партиций топиков
     /// </summary>
     IReadOnlyDictionary<string, TopicPartition> TopicPartitions { get; }
-
-    /// <summary>
-    /// The current number of inflight requests
-    /// </summary>
-    public int CurrentNumberInflightRequests { get; }
-
-    /// <summary>
-    /// Открывает соединение с брокером
-    /// </summary>
-    public Task OpenAsync(CancellationToken token);
-
-    /// <summary>
-    /// Закрывает соединение с брокером
-    /// </summary>
-    public Task CloseAsync(CancellationToken token);
-
-    /// <summary>
-    /// Отправка сообщений брокеру по типу fire and forget
-    /// </summary>
-    internal void Send<TRequestMessage>(TRequestMessage message)
-        where TRequestMessage : IRequestMessage;
-
-    /// <summary>
-    /// Отправка сообщения брокеру и ожидание получения результата этого сообщения
-    /// </summary>
-    internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-        where TResponseMessage : IResponseMessage
-        where TRequestMessage : IRequestMessage;
 
     /// <summary>
     /// Обновляет информацию о брокере

@@ -27,10 +27,10 @@ namespace NKafka.Clients.Admin;
 
 internal class AdminClient: IAdminClient
 {
-    private readonly KafkaCluster _kafkaCluster;
+    private readonly IKafkaCluster _kafkaCluster;
     private readonly ILogger<AdminClient> _logger;
 
-    public AdminClient(KafkaCluster kafkaCluster, ILogger<AdminClient> logger)
+    public AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logger)
     {
         _kafkaCluster = kafkaCluster;
         _logger = logger;
@@ -68,13 +68,13 @@ internal class AdminClient: IAdminClient
             Topics = topicCollection
         };
 
-        var broker = _kafkaCluster.Controller ?? _kafkaCluster.Brokers.First();
+        // var broker = _kafkaCluster.Controller ?? _kafkaCluster.Brokers.First();
+        //
+        // var result = await broker.SendAsync<CreateTopicsResponseMessage, CreateTopicsRequestMessage>(request, token);
 
-        var result = await broker.SendAsync<CreateTopicsResponseMessage, CreateTopicsRequestMessage>(request, token);
-
-        foreach (var topicResult in result.Topics)
-        {
-        }
+        // foreach (var topicResult in result.Topics)
+        // {
+        // }
 
         return new CreateTopicsResult(new Dictionary<string, TopicMetadataAndConfig>());
     }

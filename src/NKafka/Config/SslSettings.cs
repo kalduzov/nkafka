@@ -26,4 +26,24 @@ namespace NKafka.Config;
 /// </summary>
 public class SslSettings
 {
+    internal static readonly SslSettings None = new(false);
+
+    internal bool IsSet { get; }
+
+    internal SslSettings(bool isSet)
+    {
+        IsSet = isSet;
+    }
+
+    public SslSettings()
+        : this(true)
+    {
+    }
+
+    /// <summary>
+    /// Validates the settings and throws an exception if the settings are invalid or missing required ones
+    /// </summary>
+    internal void Validate()
+    {
+    }
 }

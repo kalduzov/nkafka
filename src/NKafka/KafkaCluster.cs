@@ -71,8 +71,10 @@ public sealed class KafkaCluster: IKafkaCluster
     private int _controllerId = -1;
 
     private readonly Dictionary<string, SortedSet<Partition>> _partitions = new();
-    
+
     private IAdminClient? _adminClient;
+
+    internal readonly IKafkaConnectorPool _connectorPool;
 
     /// <inheritdoc />
     public string? ClusterId { get; private set; }
@@ -114,6 +116,18 @@ public sealed class KafkaCluster: IKafkaCluster
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, null, Timeout.Infinite, Timeout.Infinite);
         _topics = new HashSet<string>();
         _seedBrokers = SeedBrokers(Config);
+        _connectorPool = new KafkaConnectorPool(
+            _seedBrokers,
+            config.Ssl,
+            config.Sasl,
+            config.MaxInflightRequests,
+            config.MessageMaxBytes,
+            config.CloseConnectionTimeoutMs,
+            config.ConnectionsMaxIdleMs,
+            config.RequestTimeoutMs,
+            config.SecurityProtocol,
+            config.ClientId,
+            loggerFactory);
     }
 
     /// <summary>
@@ -199,7 +213,7 @@ public sealed class KafkaCluster: IKafkaCluster
     {
         ThrowExceptionIfClusterClosed();
 
-        var broker = GetBrokerForServiceRequests(); //Обновляем метададанные из брокера, который является контроллером
+        var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метададанные из брокера, который является контроллером
 
         var request = new MetadataRequestMessage();
 
@@ -212,16 +226,16 @@ public sealed class KafkaCluster: IKafkaCluster
                 });
         }
 
-        var message = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
+        var responseMessage = await kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, true, token);
 
-        Debug.WriteLine($"Message {message.ClusterId ?? "none"}");
+        Debug.WriteLine($"Message {responseMessage.ClusterId ?? "none"}");
 
-        _controllerId = message.ControllerId;
+        _controllerId = responseMessage.ControllerId;
 
-        await UpdateBrokersAndReturnController(message.Brokers, message.ControllerId, token);
-        UpdateTopicPartitions(message.Topics, token);
+        await UpdateBrokersAndReturnController(responseMessage.Brokers, responseMessage.ControllerId, token);
+        UpdateTopicPartitions(responseMessage.Topics, token);
 
-        return message;
+        return responseMessage;
     }
 
     /// <summary>
@@ -237,7 +251,7 @@ public sealed class KafkaCluster: IKafkaCluster
     public void Dispose()
     {
         _metadataUpdaterTimer.Dispose();
-        Controller?.Dispose();
+        _connectorPool.Dispose();
     }
 
     /// <summary>
@@ -248,11 +262,7 @@ public sealed class KafkaCluster: IKafkaCluster
     public async ValueTask DisposeAsync()
     {
         await _metadataUpdaterTimer.DisposeAsync();
-
-        if (Controller is not null)
-        {
-            await Controller.DisposeAsync();
-        }
+        await _connectorPool.DisposeAsync();
     }
 
     /// <summary>
@@ -265,7 +275,7 @@ public sealed class KafkaCluster: IKafkaCluster
         foreach (var bootstrapServer in commonConfig.BootstrapServers)
         {
             var endpoint = Utils.BuildBrokerEndPoint(bootstrapServer);
-            var broker = new Broker(commonConfig, _loggerFactory, endpoint);
+            var broker = new Broker(endpoint);
             brokers.Add(broker);
         }
 
@@ -308,7 +318,7 @@ public sealed class KafkaCluster: IKafkaCluster
         }
     }
 
-    private async ValueTask UpdateBrokersAndReturnController(
+    private ValueTask UpdateBrokersAndReturnController(
         IEnumerable<MetadataResponseMessage.MetadataResponseBrokerMessage> incomingBrokers,
         int? controllerId,
         CancellationToken token)
@@ -335,7 +345,7 @@ public sealed class KafkaCluster: IKafkaCluster
                 }
                 else
                 {
-                    var newBroker = new Broker(Config, _loggerFactory, endpoint, nodeId, rack, isController);
+                    var newBroker = new Broker(endpoint, nodeId, rack, isController);
                     _brokers.Add(newBroker.Id, newBroker);
                 }
 
@@ -350,17 +360,19 @@ public sealed class KafkaCluster: IKafkaCluster
                 continue;
             }
 
-            _brokers.Remove(b.Id, out var oldBroker);
-            await oldBroker!.DisposeAsync(); //Ждем уничтожения соединений со всеми "старыми" брокерами
+            _brokers.Remove(b.Id, out var _);
         }
+
+        return ValueTask.CompletedTask;
     }
 
     /// <summary>
     /// Возвращает брокера для сервисных запросов
     /// </summary>
-    private IBroker GetBrokerForServiceRequests()
+    /// <remarks>Сервисные запросы обычно делаются на контроллер, либо, если он отсутствует, на произвольный брокер кластера</remarks>
+    private IKafkaConnector GetConnectorForServiceRequests()
     {
-        return Controller ?? _seedBrokers.Shuffle().First();
+        return _connectorPool.TryGetConnector(Controller?.Id, out var connector) ? connector : _connectorPool.GetRandomConnector();
     }
 
     /// <summary>
@@ -422,9 +434,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
     private async Task UpdateMetadataAsync(CancellationToken token)
     {
-        var broker = GetBrokerForServiceRequests();
-
-        await broker.OpenAsync(token);
+        var kafkaConnector = GetConnectorForServiceRequests();
 
         var request = new MetadataRequestMessage
         {
@@ -436,7 +446,7 @@ public sealed class KafkaCluster: IKafkaCluster
                 .ToList()
         };
 
-        var response = await broker.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, token);
+        var response = await kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, true, token);
 
         _controllerId = response.ControllerId;
 

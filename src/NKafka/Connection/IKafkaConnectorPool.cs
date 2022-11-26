@@ -1,4 +1,4 @@
-//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -19,13 +19,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Config;
+namespace NKafka.Connection;
 
-/// <summary>
-/// 
-/// </summary>
-public enum OAuthBearerMethod
+internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
 {
-    Default = 0,
-    Oidc = 1
+    bool TryGetConnector(int? controllerId, out IKafkaConnector connector);
+
+    IKafkaConnector GetRandomConnector();
 }

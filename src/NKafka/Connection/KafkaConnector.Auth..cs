@@ -64,8 +64,7 @@ internal sealed partial class KafkaConnector
             SaslMechanism.OAuthBearer => AuthenticateSaslOAuthV0Async(token),
             SaslMechanism.Kerberos => AuthenticateSaslKerberosV0Async(token),
 
-            // ReSharper disable once NotResolvedInText
-            _ => throw new ArgumentOutOfRangeException("Sasl.Mechanism", ExceptionMessages.SaslMechanismInvalid)
+            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
         };
     }
 
@@ -88,4 +87,6 @@ internal sealed partial class KafkaConnector
     {
         throw new NotImplementedException();
     }
+
+   
 }

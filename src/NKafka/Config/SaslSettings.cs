@@ -19,13 +19,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Resources;
+
 namespace NKafka.Config;
 
 /// <summary>
-/// 
+/// Sasl settings
 /// </summary>
 public class SaslSettings
 {
+    internal static readonly SaslSettings None = new SaslSettings(false);
+    
+    internal bool IsSet { get; }
+
     /// <summary>
     /// 
     /// </summary>
@@ -62,4 +68,30 @@ public class SaslSettings
     /// a non-Kafka SASL proxy.
     /// </summary>
     public bool Handshake { get; set; } = true;
+
+    internal SaslSettings(bool isSet)
+    {
+        IsSet = isSet;
+    }
+
+    public SaslSettings()
+        : this(true)
+    {
+    }
+
+    /// <summary>
+    /// Validates the settings and throws an exception if the settings are invalid or missing required ones
+    /// </summary>
+    internal void Validate()
+    {
+        var _ = Mechanism switch
+        {
+            SaslMechanism.Plain => SaslMechanism.Plain,
+            SaslMechanism.ScarmSha256 => SaslMechanism.ScarmSha256,
+            SaslMechanism.ScarmSha512 => SaslMechanism.ScarmSha512,
+            SaslMechanism.OAuthBearer => SaslMechanism.OAuthBearer,
+            SaslMechanism.Kerberos => SaslMechanism.Kerberos,
+            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
+        };
+    }
 }

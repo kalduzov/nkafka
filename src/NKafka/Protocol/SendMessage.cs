@@ -19,13 +19,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Microsoft.IO;
+
 using NKafka.Messages;
 using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol;
 
-public struct SendMessage
+public readonly struct SendMessage
 {
+    private static readonly RecyclableMemoryStreamManager _manager = new();
+
     private ApiVersion Version { get; }
 
     /// <summary>
@@ -47,7 +51,7 @@ public struct SendMessage
 
     public void Write(Stream writableStream)
     {
-        using var stream = new MemoryStream();
+        using var stream = _manager.GetStream();
         var writer = new BufferWriter(stream);
 
         Header.Write(writer, (ApiVersion)Header.RequestApiVersion);

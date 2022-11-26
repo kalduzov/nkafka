@@ -21,22 +21,7 @@
  * limitations under the License.
  */
 
-using System.Buffers;
-using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
-
-using Microsoft.Extensions.Logging;
-
-using NKafka.Config;
-using NKafka.Diagnostics;
-using NKafka.Exceptions;
-using NKafka.Messages;
-using NKafka.Protocol;
-
-using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Connection;
 
@@ -44,29 +29,8 @@ namespace NKafka.Connection;
 /// </summary>
 internal sealed class Broker: IBroker, IEquatable<Broker>
 {
-    private readonly ArrayPool<byte> _arrayPool;
-    private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
-    private readonly CancellationTokenSource _responseProcessingTokenSource = new();
-    private readonly Socket _socket;
-    private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _tcsPool;
-    private bool _disposed;
-    private Stream _stream = Stream.Null;
-    private volatile int _requestId = -1;
-
-    private readonly CommonConfig _config;
-
-    private Task _processData;
-
-    /*
-     * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
-     * соединение с брокером автоматически закроется 
-     */
-    private readonly Stopwatch _globalTimeWaiting = new();
     private volatile IReadOnlyDictionary<string, TopicPartition> _topicPartitions;
     private volatile IReadOnlySet<string> _topics;
-    private readonly Timer _closeConnectionAfterTimeout;
-
-    private readonly SupportVersions _supportVersions = new(); //Какие версии поддерживает данный брокер
 
     /// <summary>
     ///     Флаг указывающий, что данный брокер является контроллером
@@ -94,119 +58,20 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     public IReadOnlyDictionary<string, TopicPartition> TopicPartitions => _topicPartitions;
 
     /// <summary>
-    /// The current number of running inflight requests
-    /// </summary>
-    public int CurrentNumberInflightRequests => _tcsPool.Count;
-
-    /// <summary>
     /// Топики
     /// </summary>
     public IReadOnlySet<string> Topics => _topics;
 
     public Broker(
-        CommonConfig clusterConfig,
-        ILoggerFactory loggerFactory,
         EndPoint endpoint,
         int id = -1,
         string? rack = null,
         bool isController = false)
     {
-        _config = clusterConfig;
         Id = id;
         Rack = rack;
         EndPoint = endpoint;
         IsController = isController;
-
-        var maxInflightRequests = _config.MaxInflightRequests;
-
-        _socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-
-        //todo потом поиграться с параметрами структур
-        _tcsPool = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, maxInflightRequests);
-        _arrayPool = ArrayPool<byte>.Create(_config.MessageMaxBytes, maxInflightRequests);
-        _topics = new HashSet<string>(0);
-        _topicPartitions = new Dictionary<string, TopicPartition>(0);
-
-        _processData = Task.CompletedTask; //init value
-
-        _closeConnectionAfterTimeout = new Timer(
-            _ =>
-            {
-                if (!_globalTimeWaiting.IsRunning || _globalTimeWaiting.ElapsedMilliseconds <= _config.ConnectionsMaxIdleMs)
-                {
-                    return;
-                }
-
-                ResetConnection();
-                _globalTimeWaiting.Reset();
-            });
-    }
-
-    private void ResetConnection()
-    {
-        _socket.Close(_config.CloseConnectionTimeoutMs);
-    }
-
-    public async Task OpenAsync(CancellationToken token)
-    {
-        if (_config.ApiVersionRequest)
-        {
-            var request = new ApiVersionsRequestMessage();
-            var response = await InternalSendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(request, true, token)
-                .ConfigureAwait(false);
-            UpdateApiVersions(response);
-        }
-    }
-
-    private void UpdateApiVersions(ApiVersionsResponseMessage response)
-    {
-        if (response.Code != ErrorCodes.None)
-        {
-            return;
-        }
-
-        foreach (var key in response.ApiKeys)
-        {
-            _supportVersions.AddOrUpdate((ApiKeys)key.ApiKey, (ApiVersion)key.MinVersion, (ApiVersion)key.MaxVersion);
-        }
-    }
-
-    /// <summary>
-    /// Закрывает соединение с брокером
-    /// </summary>
-    public async Task CloseAsync(CancellationToken token)
-    {
-        _responseProcessingTokenSource.Cancel();
-
-        // Ждем когда остановится обработка потока данных из сокета
-        await _processData.WaitAsync(TimeSpan.FromMilliseconds(_config.CloseConnectionTimeoutMs), token);
-
-        foreach (var value in _tcsPool.Values) //Если еще остались необработанные задачи - отменяем их с ошибкой 
-        {
-            value.SetException(new ObjectDisposedException(nameof(Broker), "Broker connection was closed"));
-        }
-
-        _tcsPool.Clear();
-        _responsesTasks.Clear();
-        await _stream.DisposeAsync();
-        _socket.Dispose();
-    }
-
-    /// <summary>
-    /// Отправка сообщений брокеру по типу fire and forget
-    /// </summary>
-    void IBroker.Send<TRequestMessage>(TRequestMessage message)
-    {
-        CheckDisposed();
-    }
-
-    /// <summary>
-    ///     Отправка сообщения брокеру и ожидание получения результата этого сообщения
-    /// </summary>
-    Task<TResponseMessage> IBroker.SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
-    {
-        //return _kafkaConnector.SendAsync<TResponseMessage, TRequestMessage>(message, false, token);
-        return InternalSendAsync<TResponseMessage, TRequestMessage>(message, false, token);
     }
 
     /// <summary>
@@ -231,17 +96,6 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
     {
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    ~Broker()
-    {
-        Dispose(false);
-    }
-
     public bool Equals(Broker? other)
     {
         if (ReferenceEquals(null, other))
@@ -262,335 +116,8 @@ internal sealed class Broker: IBroker, IEquatable<Broker>
         return Id;
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        if (!_responseProcessingTokenSource.IsCancellationRequested)
-        {
-            _responseProcessingTokenSource.Cancel();
-        }
-
-        await _processData.ConfigureAwait(false);
-    }
-
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || (obj is Broker other && Equals(other));
-    }
-
-    private async Task ResponseReaderTask()
-    {
-        /*
-         * Задача на чтение запускается при постановке нового запроса в очередь ожидания 
-         * Задача не завершается, пока в очереди запросов есть хотя бы один не обработанный запрос
-         */
-        await Task.Yield();
-
-        try
-        {
-            var sw = new SpinWait();
-
-            while (!_responseProcessingTokenSource.IsCancellationRequested)
-            {
-                if (_tcsPool.IsEmpty)
-                {
-                    return;
-                }
-
-                if (_stream != Stream.Null && !_stream.CanRead)
-                {
-                    sw.SpinOnce();
-
-                    continue;
-                }
-
-                Memory<byte> size = new(new byte[sizeof(int)]);
-                var countReadBytes = await _stream.ReadAsync(size).ConfigureAwait(false);
-
-                var requestLength = ReadInt32BigEndian(size.Span);
-
-                if (requestLength == 0) //Данных нет идем дальше ждать
-                {
-                    if (countReadBytes == 4)
-                    {
-                        continue;
-                    }
-
-                    throw new ProtocolKafkaException(ErrorCodes.None, "Отправлен некорректный запрос к брокеру. Брокер вернул 0 байт.");
-                }
-
-                var bodyLen = requestLength - await _stream.ReadAsync(size).ConfigureAwait(false);
-                var requestId = ReadInt32BigEndian(size.Span);
-
-                Debug.WriteLine($"Get new message BrokerId {Id}, CorrelationId={requestId}, ResponseLength={requestLength}");
-
-                var buffer = _arrayPool.Rent(bodyLen);
-
-                await _stream.ReadAsync(buffer.AsMemory(0, bodyLen)).ConfigureAwait(false);
-
-                _responsesTasks.TryAdd(
-                    requestId,
-                    ParseResponseAsync(buffer, requestId, requestLength - 4, _responseProcessingTokenSource.Token));
-            }
-        }
-        catch (Exception exc)
-        {
-            Debug.WriteLine(exc.Message);
-        }
-    }
-
-    private async Task ParseResponseAsync(byte[] buffer, int requestId, int bodyLen, CancellationToken cancellationToken)
-    {
-        //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
-        await Task.Yield();
-
-        try
-        {
-            if (_tcsPool.TryRemove(requestId, out var responseInfo))
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    responseInfo.SetCanceled(cancellationToken);
-
-                    return;
-                }
-
-                try
-                {
-                    var message = responseInfo.BuildResponseMessage(buffer);
-                    UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen);
-
-                    if (message.IsSuccessStatusCode)
-                    {
-                        responseInfo.SetResult(message);
-                    }
-                    else
-                    {
-                        throw new ProtocolKafkaException(message.Code, "");
-                    }
-                }
-                catch (ProtocolKafkaException exc)
-                {
-                    responseInfo.SetException(exc);
-                }
-                catch (Exception exc)
-                {
-                    responseInfo.SetException(
-                        new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Неизвестная ошибка при чтении запроса", exc));
-                }
-                finally
-                {
-                    _tcsPool.TryRemove(requestId, out responseInfo);
-                }
-            }
-            else
-            {
-                Debug.WriteLine($"Не удалось получить данные по запросу {requestId}");
-            }
-        }
-        finally
-        {
-            _responsesTasks.TryRemove(requestId, out _);
-
-            _arrayPool.Return(buffer);
-        }
-    }
-
-    private void UpdateResponseMetrics(int messageThrottleTimeMs, int bodyLen)
-    {
-    }
-
-    private void CheckDisposed()
-    {
-        if (_disposed)
-        {
-            throw new ObjectDisposedException(nameof(Broker));
-        }
-    }
-
-    private async Task<TResponseMessage> InternalSendAsync<TResponseMessage, TRequestMessage>(
-        TRequestMessage content,
-        bool isInternalRequest,
-        CancellationToken token)
-        where TResponseMessage : IResponseMessage
-        where TRequestMessage : IRequestMessage
-    {
-        if (_tcsPool.Count >= _config.MaxInflightRequests)
-        {
-            throw new ProtocolKafkaException(
-                ErrorCodes.None,
-                $"Количество ожидающих ответов запросов к брокеру превысило ограничение в '{_config.MaxInflightRequests}' единиц");
-        }
-
-        _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
-
-        var contentVersion = ApiVersion.Version0; //content.ApiKey.GetApiVersion(_supportVersions);
-        var headerVersion = content.ApiKey.GetHeaderVersion(contentVersion);
-        var requestId = Interlocked.Increment(ref _requestId);
-
-        using var activity = KafkaDiagnosticsSource.InternalSendMessage(content.ApiKey, contentVersion, requestId, Id, EndPoint);
-
-        await ReEstablishConnectionAsync(token);
-
-        var request = new SendMessage(
-            new RequestHeader
-            {
-                ClientId = _config.ClientId,
-                RequestApiVersion = (short)headerVersion, //header minimum version
-                CorrelationId = requestId,
-                RequestApiKey = (short)content.ApiKey
-            },
-            content,
-            contentVersion);
-
-        if (!isInternalRequest)
-        {
-            ThrowExceptionIfRequestNotValid(request, activity);
-        }
-
-        if (token.IsCancellationRequested)
-        {
-            return await Task.FromCanceled<TResponseMessage>(token);
-        }
-
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-
-        var taskCompletionSource = new ResponseTaskCompletionSource(
-            (ApiKeys)request.Header.RequestApiKey,
-            (ApiVersion)request.Header.RequestApiVersion);
-
-        token.Register(
-            state =>
-            {
-                if (state is not ResponseTaskCompletionSource awaiter)
-                {
-                    return;
-                }
-
-                awaiter.TrySetCanceled();
-                _tcsPool.TryRemove(requestId, out _);
-            },
-            taskCompletionSource,
-            false);
-
-        try
-        {
-            _tcsPool.TryAdd(requestId, taskCompletionSource);
-            WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
-            cts.CancelAfter(_config.RequestTimeoutMs);
-
-            if (_stream.CanWrite)
-            {
-                request.Write(_stream);
-            }
-        }
-        catch (Exception exc)
-        {
-            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
-
-            _tcsPool.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
-
-            if (!taskCompletionSource.Task.IsCanceled || !taskCompletionSource.Task.IsCompleted)
-            {
-                taskCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Не удалось отправить запрос", exc));
-            }
-        }
-
-        return (TResponseMessage)await taskCompletionSource.Task;
-    }
-
-    private void WakeupProcessingResponses()
-    {
-        if (_processData.Status == TaskStatus.RanToCompletion)
-        {
-            _processData = ResponseReaderTask();
-        }
-    }
-
-    private void ThrowExceptionIfRequestNotValid(SendMessage message, Activity? activity)
-    {
-        // if (message.RequestLength >= _config.MessageMaxBytes)
-        // {
-        //     var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {_config.MessageMaxBytes}";
-        //     activity?.SetStatus(ActivityStatusCode.Error);
-        //     activity?.AddTag("error.message", logMessage);
-        //
-        //     throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
-        // }
-    }
-
-    private void ThrowIfBrokerDoestSupportApiVersion(SendMessage message)
-    {
-    }
-
-    private async Task ReEstablishConnectionAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            if (!_socket.Connected && !cancellationToken.IsCancellationRequested)
-            {
-                await _socket.ConnectAsync(EndPoint, cancellationToken);
-                Stream stream = new NetworkStream(_socket, true);
-
-                if (_config.SecurityProtocol is SecurityProtocols.Ssl or SecurityProtocols.SaslSsl)
-                {
-                    stream = new SslStream(stream, false, (_, _, _, _) => true); //skip server cert validation
-                }
-
-                _stream = stream;
-                _globalTimeWaiting.Start();
-
-                if (_config.SecurityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
-                {
-                    await AuthenticateProcessAsync(cancellationToken);
-                }
-            }
-        }
-        catch (SocketException exc)
-        {
-            Debug.WriteLine(exc.Message);
-
-            throw;
-        }
-        catch (Exception exc)
-        {
-            Debug.WriteLine(exc.Message);
-        }
-    }
-
-  
-
-    private void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-        }
-
-        CloseAsync(CancellationToken.None);
-
-        _disposed = true;
-    }
-
-    private class ResponseTaskCompletionSource: TaskCompletionSource<IResponseMessage>
-    {
-        private readonly ApiKeys _apiKey;
-
-        private readonly ApiVersion _version;
-
-        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
-            : base(TaskCreationOptions.RunContinuationsAsynchronously)
-        {
-            _apiKey = apiKey;
-            _version = version;
-        }
-
-        internal IResponseMessage BuildResponseMessage(byte[] span)
-        {
-            return ResponseBuilder.Build(_apiKey, _version, span);
-        }
     }
 }

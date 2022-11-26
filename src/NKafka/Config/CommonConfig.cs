@@ -106,12 +106,12 @@ public abstract record CommonConfig
     /// <summary>
     /// 
     /// </summary>
-    public SslSettings? Ssl { get; set; }
+    public SslSettings Ssl { get; set; } = SslSettings.None;
 
     /// <summary>
     /// Sasl configuration
     /// </summary>
-    public SaslSettings? Sasl { get; set; }
+    public SaslSettings Sasl { get; set; } = SaslSettings.None;
 
     /// <summary>
     ///     The amount of time the client will wait for the socket connection to be established.
@@ -170,7 +170,7 @@ public abstract record CommonConfig
     }
 
     /// <summary>
-    /// Валидирует настройки и кидает исключение, если настройки не верные или отсутствуют обязательные
+    /// Validates the settings and throws an exception if the settings are invalid or missing required ones
     /// </summary>
     internal virtual void Validate()
     {
@@ -186,5 +186,8 @@ public abstract record CommonConfig
             case SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl when Sasl is null:
                 throw new KafkaConfigException(nameof(Sasl), null!, ConfigExceptionMessages.Sasl_no_configured);
         }
+
+        Sasl?.Validate();
+        Ssl?.Validate();
     }
 }

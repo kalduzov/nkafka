@@ -34,34 +34,34 @@ public class ClusterTests
     {
         var broker = new Mock<IBroker>();
 
-        broker
-            .Setup(
-                x => x.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
-                    It.IsAny<MetadataRequestMessage>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(
-                () => new MetadataResponseMessage
-                {
-                    Brokers = new MetadataResponseMessage.MetadataResponseBrokerCollection(2)
-                    {
-                        new()
-                        {
-                            NodeId = 1,
-                            Host = "localhost1",
-                            Port = 1000,
-                            Rack = null
-                        },
-                        new()
-                        {
-                            NodeId = 2,
-                            Host = "localhost2",
-                            Port = 1000,
-                            Rack = null
-                        }
-                    },
-                    ControllerId = 1,
-                    ClusterId = "test_cluster",
-                });
+        // broker
+        //     .Setup(
+        //         x => x.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
+        //             It.IsAny<MetadataRequestMessage>(),
+        //             It.IsAny<CancellationToken>()))
+        //     .ReturnsAsync(
+        //         () => new MetadataResponseMessage
+        //         {
+        //             Brokers = new MetadataResponseMessage.MetadataResponseBrokerCollection(2)
+        //             {
+        //                 new()
+        //                 {
+        //                     NodeId = 1,
+        //                     Host = "localhost1",
+        //                     Port = 1000,
+        //                     Rack = null
+        //                 },
+        //                 new()
+        //                 {
+        //                     NodeId = 2,
+        //                     Host = "localhost2",
+        //                     Port = 1000,
+        //                     Rack = null
+        //                 }
+        //             },
+        //             ControllerId = 1,
+        //             ClusterId = "test_cluster",
+        //         });
 
         return broker;
     }

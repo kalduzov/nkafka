@@ -40,3 +40,11 @@ producer.Produce("test_topic", testMessage);
 Console.ReadKey();
 
 ```
+
+## Начало работы с репозитарием
+
+```
+1. run git clone https://github.com/kalduzov/nkafka
+
+2. run update_repo.ps1 or update_repo.sh 
+```

@@ -33,9 +33,9 @@ public class StructRegistryTests
     public async Task Register_Successful(string fileName)
     {
         var specification = await JsonParseTests.GetMessageSpecification(fileName);
-        
+
         var registry = new StructRegistry();
-        
+
         registry.Register(specification);
     }
 }

@@ -29,7 +29,7 @@ internal static class Utils
 {
     internal const string LOGGER_PREFIX = "[Kafka] ";
 
-    internal static EndPoint BuildBrokerEndPoint(string bootstrapServer)
+    internal static EndPoint BuildEndPoint(string bootstrapServer)
     {
         var (host, port) = GetHostAndPort(bootstrapServer);
 

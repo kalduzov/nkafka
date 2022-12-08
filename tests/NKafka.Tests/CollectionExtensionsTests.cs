@@ -49,7 +49,7 @@ public class CollectionExtensionsTests
 
     public CollectionExtensionsTests()
     {
-        _longData = new int [short.MaxValue];
+        _longData = new int[short.MaxValue];
 
         for (var i = 0; i < short.MaxValue; i++)
         {

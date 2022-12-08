@@ -393,12 +393,12 @@ public class DeserializationTests
 
         var bufferReader = new BufferReader(data);
 
-        var len =  bufferReader.ReadInt(); // длинна сообщения
+        var len = bufferReader.ReadInt(); // длинна сообщения
         len.Should().Be(350);
-        
+
         var header = new ResponseHeader(bufferReader, ApiVersion.Version0);
         header.CorrelationId.Should().Be(1);
-        
+
         var response = new ApiVersionsResponseMessage(bufferReader, ApiVersion.Version0);
         response.ApiKeys.Count.Should().Be(56);
     }

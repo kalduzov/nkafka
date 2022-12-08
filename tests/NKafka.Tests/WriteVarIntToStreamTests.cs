@@ -1,5 +1,7 @@
 using FluentAssertions;
+
 using NKafka.Protocol.Extensions;
+
 using Xunit;
 
 namespace NKafka.Tests;
@@ -23,7 +25,7 @@ public class WriteVarIntToStreamTests
         var checkValue = BitConverter.ToUInt64(array);
         checkValue.Should().Be(calculateValue);
     }
-    
+
     [Theory]
     [InlineData(0x0, 0x0, 1)]
     [InlineData(-0x1, 0x1, 1)]

@@ -23,5 +23,5 @@ namespace NKafka.Tests.Clients.Producer;
 
 public class ProducerTests
 {
-    
+
 }

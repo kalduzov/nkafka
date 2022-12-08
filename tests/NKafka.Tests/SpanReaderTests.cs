@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+
 using FluentAssertions;
+
 using NKafka.Protocol;
+
 using Xunit;
 
 namespace NKafka.Tests;
@@ -182,7 +185,7 @@ public class SpanReaderTests
 
         value.Should().Be(testValue);
     }
-    
+
     [Theory(DisplayName = "Read varlong from simple buffer test ")]
     [InlineData(0, 0)]
     [InlineData(1, -1)]

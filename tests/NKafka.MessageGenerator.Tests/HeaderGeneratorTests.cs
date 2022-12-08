@@ -40,7 +40,7 @@ public sealed class HeaderGeneratorTests
         var result = headerGenerator.ToString();
         result.Should().Contain($"using {usingName};");
     }
-    
+
     [Theory]
     [InlineData("test1")]
     [InlineData("test1.test1")]

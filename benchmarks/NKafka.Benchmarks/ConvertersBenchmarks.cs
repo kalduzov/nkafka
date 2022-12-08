@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 

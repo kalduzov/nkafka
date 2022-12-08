@@ -69,7 +69,7 @@ public class ConfigTests
     {
         var config = new TestCommonConfig
         {
-            BootstrapServers = null!
+            BootstrapServers = null
         };
 
         void Validate()

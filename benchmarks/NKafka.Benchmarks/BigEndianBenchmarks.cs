@@ -33,7 +33,7 @@ public class BigEndianBenchmarks
     public Span<byte> CustomBigEndian()
     {
         var value = int.MaxValue;
-        
+
         Span<byte> bytes = stackalloc byte[4];
 
         if (BitConverter.IsLittleEndian)

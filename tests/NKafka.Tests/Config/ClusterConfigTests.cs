@@ -128,8 +128,8 @@ public class ClusterConfigTests
             },
             SecurityProtocol = securityProtocol,
 
-            //Исключаем ошибку при значении SaslSsl, в остальом все должно остаться как было
-            Ssl = securityProtocol == SecurityProtocols.SaslSsl ? new SslSettings() : null
+            //Исключаем ошибку при значении SaslSsl, в остальном все должно остаться как было
+            Ssl = securityProtocol == SecurityProtocols.SaslSsl ? new SslSettings() : SslSettings.None
         };
 
         void Validate()

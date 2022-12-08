@@ -57,14 +57,14 @@ public class MessagesGeneratorTask: Task
                 switch (messageSpecification.Type)
                 {
                     case MessageType.Request or MessageType.Response or MessageType.Header:
-                    {
-                        IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
-                        var result = messageGenerator.Generate(messageSpecification);
-                        var classFileName = $"{messageGenerator.ClassName(messageSpecification)}.cs";
-                        WriteMessageToFile(classFileName, result);
+                        {
+                            IMessageGenerator messageGenerator = new MessageGenerator.MessageGenerator("NKafka.Messages");
+                            var result = messageGenerator.Generate(messageSpecification);
+                            var classFileName = $"{messageGenerator.ClassName(messageSpecification)}.cs";
+                            WriteMessageToFile(classFileName, result);
 
-                        break;
-                    }
+                            break;
+                        }
                 }
             }
 
@@ -77,7 +77,7 @@ public class MessagesGeneratorTask: Task
             const string supportVersionFileName = "SupportVersionsExtensions.cs";
             WriteSupportVersionsToFile(supportVersionFileName, content);
 
-           
+
         }
         catch (Exception exc)
         {

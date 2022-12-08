@@ -149,7 +149,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
 
-        var contentVersion = ApiVersion.Version0; //content.ApiKey.GetApiVersion(_supportVersions);
+        var contentVersion = ApiVersion.Version1; //content.ApiKey.GetApiVersion(_supportVersions);
         var headerVersion = message.ApiKey.GetHeaderVersion(contentVersion);
         var requestId = Interlocked.Increment(ref _requestId);
 

@@ -48,7 +48,6 @@ public sealed class KafkaCluster: IKafkaCluster
     private readonly ConcurrentDictionary<string, IConsumer?> _consumers = new();
     private readonly ConcurrentDictionary<string, IProducer?> _producers = new();
 
-    private readonly object _lockObject = new();
     private readonly ILogger<KafkaCluster> _logger;
     private readonly ILoggerFactory _loggerFactory;
 
@@ -65,7 +64,6 @@ public sealed class KafkaCluster: IKafkaCluster
 
     private readonly HashSet<string> _topics;
 
-    //private volatile int _brokerIndex = 0;
     private readonly List<IBroker> _seedBrokers;
     private readonly Dictionary<int, IBroker> _brokers = new();
     private int _controllerId = -1;
@@ -74,7 +72,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
     private IAdminClient? _adminClient;
 
-    internal readonly IKafkaConnectorPool _connectorPool;
+    private readonly IKafkaConnectorPool _connectorPool;
 
     /// <inheritdoc />
     public string? ClusterId { get; private set; }
@@ -105,7 +103,7 @@ public sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    /// Создает новый класс кластера кафки
+    /// Create a new kafka cluster
     /// </summary>
     internal KafkaCluster(ClusterConfig config, ILoggerFactory loggerFactory)
     {
@@ -214,7 +212,7 @@ public sealed class KafkaCluster: IKafkaCluster
     {
         ThrowExceptionIfClusterClosed();
 
-        var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метададанные из брокера, который является контроллером
+        var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метаданные из брокера, который является контроллером
 
         var request = new MetadataRequestMessage();
 
@@ -275,7 +273,7 @@ public sealed class KafkaCluster: IKafkaCluster
 
         foreach (var bootstrapServer in commonConfig.BootstrapServers)
         {
-            var endpoint = Utils.BuildBrokerEndPoint(bootstrapServer);
+            var endpoint = Utils.BuildEndPoint(bootstrapServer);
             var broker = new Broker(endpoint);
             brokers.Add(broker);
         }

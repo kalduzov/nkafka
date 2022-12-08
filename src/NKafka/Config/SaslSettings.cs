@@ -26,9 +26,9 @@ namespace NKafka.Config;
 /// <summary>
 /// Sasl settings
 /// </summary>
-public class SaslSettings
+public record SaslSettings
 {
-    internal static readonly SaslSettings None = new SaslSettings(false);
+    internal static readonly SaslSettings None = new(false);
 
     internal bool IsSet { get; }
 

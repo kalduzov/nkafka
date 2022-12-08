@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
 using FluentAssertions;
+
 using NKafka.Serialization;
+
 using Xunit;
 
 namespace NKafka.Tests;

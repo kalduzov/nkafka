@@ -60,7 +60,7 @@ public class ConsumerTests
 
         FluentActions.Invoking(Ctor).Should().NotThrow();
     }
-    
+
     [Fact]
     public void Ctor_WithSerializersIsNotNull_Success()
     {
@@ -79,7 +79,7 @@ public class ConsumerTests
 
         FluentActions.Invoking(Ctor).Should().NotThrow();
     }
-    
+
     [Fact]
     public async Task Subscribe_Success()
     {

@@ -24,7 +24,7 @@ public class MessageGeneratorTests
 
         var messageGenerator = new MessageGenerator("test");
         var result = messageGenerator.Generate(specification);
-        
+
         result.ToString().Should().NotBeEmpty();
     }
 

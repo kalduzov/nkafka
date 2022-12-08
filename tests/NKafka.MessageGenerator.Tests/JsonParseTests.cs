@@ -19,9 +19,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Newtonsoft.Json;
-
 using FluentAssertions;
+
+using Newtonsoft.Json;
 
 using NKafka.MessageGenerator.Specifications;
 
@@ -61,7 +61,7 @@ public class JsonParseTests
     public async Task ParseNoError_Successful(string fileName)
     {
         var specification = await GetMessageSpecification(fileName);
-        
+
         specification.ClassName.Should().NotBeNullOrWhiteSpace();
     }
 

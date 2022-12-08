@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -57,7 +58,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
     /// <summary>
     /// The topic partitions to elect leaders.
     /// </summary>
-    public TopicPartitionsCollection TopicPartitions { get; set; } = new ();
+    public TopicPartitionsCollection TopicPartitions { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the election to complete.
@@ -247,7 +248,7 @@ public sealed class ElectLeadersRequestMessage: IRequestMessage, IEquatable<Elec
         /// <summary>
         /// The partitions of this topic whose leader should be elected.
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public TopicPartitionsMessage()
         {

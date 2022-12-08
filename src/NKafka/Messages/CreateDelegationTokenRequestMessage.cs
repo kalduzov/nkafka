@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -62,7 +63,7 @@ public sealed class CreateDelegationTokenRequestMessage: IRequestMessage, IEquat
     /// <summary>
     /// A list of those who are allowed to renew this token before it expires.
     /// </summary>
-    public List<CreatableRenewersMessage> Renewers { get; set; } = new ();
+    public List<CreatableRenewersMessage> Renewers { get; set; } = new();
 
     /// <summary>
     /// The maximum lifetime of the token in milliseconds, or -1 to use the server side default.

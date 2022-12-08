@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -57,7 +58,7 @@ public sealed class UpdateFeaturesRequestMessage: IRequestMessage, IEquatable<Up
     /// <summary>
     /// The list of updates to finalized features.
     /// </summary>
-    public FeatureUpdateKeyCollection FeatureUpdates { get; set; } = new ();
+    public FeatureUpdateKeyCollection FeatureUpdates { get; set; } = new();
 
     /// <summary>
     /// True if we should validate the request, but not perform the upgrade or downgrade.

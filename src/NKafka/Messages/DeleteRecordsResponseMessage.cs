@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
     /// <summary>
     /// Each topic that we wanted to delete records from.
     /// </summary>
-    public DeleteRecordsTopicResultCollection Topics { get; set; } = new ();
+    public DeleteRecordsTopicResultCollection Topics { get; set; } = new();
 
     public DeleteRecordsResponseMessage()
     {
@@ -206,7 +207,7 @@ public sealed class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<D
         /// <summary>
         /// Each partition that we wanted to delete records from.
         /// </summary>
-        public DeleteRecordsPartitionResultCollection Partitions { get; set; } = new ();
+        public DeleteRecordsPartitionResultCollection Partitions { get; set; } = new();
 
         public DeleteRecordsTopicResultMessage()
         {

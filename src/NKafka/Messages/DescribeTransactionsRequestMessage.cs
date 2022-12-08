@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeTransactionsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Array of transactionalIds to include in describe results. If empty, then no results will be returned.
     /// </summary>
-    public List<string> TransactionalIds { get; set; } = new ();
+    public List<string> TransactionalIds { get; set; } = new();
 
     public DescribeTransactionsRequestMessage()
     {

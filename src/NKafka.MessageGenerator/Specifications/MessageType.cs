@@ -24,7 +24,7 @@ namespace NKafka.MessageGenerator.Specifications;
 public enum MessageType
 {
     None,
-    
+
     Request,
 
     Response,

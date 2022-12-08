@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<TopicResponseMessage> Topics { get; set; } = new ();
+    public List<TopicResponseMessage> Topics { get; set; } = new();
 
     public DescribeProducersResponseMessage()
     {
@@ -161,7 +162,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public List<PartitionResponseMessage> Partitions { get; set; } = new ();
+        public List<PartitionResponseMessage> Partitions { get; set; } = new();
 
         public TopicResponseMessage()
         {
@@ -303,7 +304,7 @@ public sealed class DescribeProducersResponseMessage: IResponseMessage, IEquatab
         /// <summary>
         /// 
         /// </summary>
-        public List<ProducerStateMessage> ActiveProducers { get; set; } = new ();
+        public List<ProducerStateMessage> ActiveProducers { get; set; } = new();
 
         public PartitionResponseMessage()
         {

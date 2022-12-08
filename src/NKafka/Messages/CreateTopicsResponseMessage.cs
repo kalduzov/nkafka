@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
     /// <summary>
     /// Results for each topic we tried to create.
     /// </summary>
-    public CreatableTopicResultCollection Topics { get; set; } = new ();
+    public CreatableTopicResultCollection Topics { get; set; } = new();
 
     public CreateTopicsResponseMessage()
     {
@@ -249,7 +250,7 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
         /// <summary>
         /// Configuration of the topic.
         /// </summary>
-        public List<CreatableTopicConfigsMessage> Configs { get; set; } = new ();
+        public List<CreatableTopicConfigsMessage> Configs { get; set; } = new();
 
         public CreatableTopicResultMessage()
         {
@@ -364,7 +365,7 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
             }
             else
             {
-                Configs = new ();
+                Configs = new();
             }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version5)
@@ -377,10 +378,10 @@ public sealed class CreateTopicsResponseMessage: IResponseMessage, IEquatable<Cr
                     switch (tag)
                     {
                         case 0:
-                        {
-                            TopicConfigErrorCode = reader.ReadShort();
-                            break;
-                        }
+                            {
+                                TopicConfigErrorCode = reader.ReadShort();
+                                break;
+                            }
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                             break;

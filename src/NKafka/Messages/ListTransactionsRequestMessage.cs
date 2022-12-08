@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,12 +53,12 @@ public sealed class ListTransactionsRequestMessage: IRequestMessage, IEquatable<
     /// <summary>
     /// The transaction states to filter by: if empty, all transactions are returned; if non-empty, then only transactions matching one of the filtered states will be returned
     /// </summary>
-    public List<string> StateFilters { get; set; } = new ();
+    public List<string> StateFilters { get; set; } = new();
 
     /// <summary>
     /// The producerIds to filter by: if empty, all transactions will be returned; if non-empty, only transactions which match one of the filtered producerIds will be returned
     /// </summary>
-    public List<long> ProducerIdFilters { get; set; } = new ();
+    public List<long> ProducerIdFilters { get; set; } = new();
 
     public ListTransactionsRequestMessage()
     {

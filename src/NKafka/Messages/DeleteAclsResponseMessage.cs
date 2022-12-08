@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
     /// <summary>
     /// The results for each filter.
     /// </summary>
-    public List<DeleteAclsFilterResultMessage> FilterResults { get; set; } = new ();
+    public List<DeleteAclsFilterResultMessage> FilterResults { get; set; } = new();
 
     public DeleteAclsResponseMessage()
     {
@@ -214,7 +215,7 @@ public sealed class DeleteAclsResponseMessage: IResponseMessage, IEquatable<Dele
         /// <summary>
         /// The ACLs which matched this filter.
         /// </summary>
-        public List<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; } = new ();
+        public List<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; } = new();
 
         public DeleteAclsFilterResultMessage()
         {

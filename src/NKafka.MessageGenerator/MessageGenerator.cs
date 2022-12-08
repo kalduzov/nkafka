@@ -136,11 +136,11 @@ public class MessageGenerator: IMessageGenerator
         switch (field.Type)
         {
             case IFieldType.BoolFieldType:
-            {
-                _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + ({field.Name} ? \"true\" : \"false\")");
+                {
+                    _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + ({field.Name} ? \"true\" : \"false\")");
 
-                break;
-            }
+                    break;
+                }
             case IFieldType.Int8FieldType:
             case IFieldType.Int16FieldType:
             case IFieldType.UInt16FieldType:
@@ -149,11 +149,11 @@ public class MessageGenerator: IMessageGenerator
             case IFieldType.Int64FieldType:
             case IFieldType.Float64FieldType:
             case IFieldType.UuidFieldType:
-            {
-                _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + {field.Name}");
+                {
+                    _codeGenerator.AppendLine($"+ \"{prefix}{field.Name}=\" + {field.Name}");
 
-                break;
-            }
+                    break;
+                }
         }
         //todo дописать работу со сложными типами
     }
@@ -299,7 +299,7 @@ public class MessageGenerator: IMessageGenerator
     {
         var lastField = structSpecification.Fields.Last();
 
-        
+
         _codeGenerator.AppendLine($"public const ApiVersion LOWEST_SUPPORTED_VERSION = ApiVersion.Version{versions.Lowest};");
         _codeGenerator.AppendLine();
         _codeGenerator.AppendLine($"public const ApiVersion HIGHEST_SUPPORTED_VERSION = ApiVersion.Version{versions.Highest};");
@@ -315,13 +315,13 @@ public class MessageGenerator: IMessageGenerator
             {
                 //Данные поля есть в базовом классе
                 case MessageType.Request:
-                {
-                    var apiKey = (ApiKeys)topLevelMessage.ApiKey;
-                    _codeGenerator.AppendLine($"public ApiKeys ApiKey => ApiKeys.{apiKey};");
-                    _codeGenerator.AppendLine();
+                    {
+                        var apiKey = (ApiKeys)topLevelMessage.ApiKey;
+                        _codeGenerator.AppendLine($"public ApiKeys ApiKey => ApiKeys.{apiKey};");
+                        _codeGenerator.AppendLine();
 
-                    break;
-                }
+                        break;
+                    }
             }
         }
 

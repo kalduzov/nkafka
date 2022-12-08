@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeDelegationTokenRequestMessage: IRequestMessage, IEqu
     /// <summary>
     /// Each owner that we want to describe delegation tokens for, or null to describe all tokens.
     /// </summary>
-    public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new ();
+    public List<DescribeDelegationTokenOwnerMessage> Owners { get; set; } = new();
 
     public DescribeDelegationTokenRequestMessage()
     {

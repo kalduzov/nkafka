@@ -2,24 +2,38 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
+using static System.Buffers.Binary.BinaryPrimitives;
+
 namespace NKafka.Benchmarks;
 
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net60)]
+[SimpleJob(RuntimeMoniker.Net70)]
 public class ConvertersBenchmarks
 {
-    private static readonly byte[] _data =
+    private static readonly byte[] _data;
+
+    static ConvertersBenchmarks()
     {
-        0x00,
-        0x00,
-        0x00,
-        0x01
-    };
+        _data = new byte[]
+        {
+            0x00,
+            0x00,
+            0x00,
+            0x01
+        };
+    }
 
     [Benchmark(Baseline = true)]
     public int BitConverterByteArray()
     {
         return BitConverter.ToInt32(_data);
+    }
+
+    [Benchmark()]
+    public int BufferPrimitives()
+    {
+        return ReadInt32BigEndian(_data);
     }
 
     [Benchmark]
@@ -47,12 +61,6 @@ public class ConvertersBenchmarks
         }
 
         return res;
-    }
-
-    [Benchmark]
-    public int BufferExtensionsToInt32()
-    {
-        return 0; //_memory.ToInt32();
     }
 
     [StructLayout(LayoutKind.Explicit)]

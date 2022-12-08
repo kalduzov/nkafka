@@ -23,5 +23,5 @@ namespace NKafka.Connection;
 
 internal partial class KafkaConnectorPool
 {
-    
+
 }

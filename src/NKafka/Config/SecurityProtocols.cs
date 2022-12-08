@@ -23,6 +23,9 @@
 
 namespace NKafka.Config;
 
+/// <summary>
+/// Support security protocols
+/// </summary>
 public enum SecurityProtocols
 {
     PlainText = 0,

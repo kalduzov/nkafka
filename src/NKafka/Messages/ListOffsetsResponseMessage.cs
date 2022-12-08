@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public List<ListOffsetsTopicResponseMessage> Topics { get; set; } = new ();
+    public List<ListOffsetsTopicResponseMessage> Topics { get; set; } = new();
 
     public ListOffsetsResponseMessage()
     {
@@ -216,7 +217,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         /// <summary>
         /// Each partition in the response.
         /// </summary>
-        public List<ListOffsetsPartitionResponseMessage> Partitions { get; set; } = new ();
+        public List<ListOffsetsPartitionResponseMessage> Partitions { get; set; } = new();
 
         public ListOffsetsTopicResponseMessage()
         {
@@ -412,7 +413,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
         /// <summary>
         /// The result offsets.
         /// </summary>
-        public List<long> OldStyleOffsets { get; set; } = new ();
+        public List<long> OldStyleOffsets { get; set; } = new();
 
         /// <summary>
         /// The timestamp associated with the returned offset.
@@ -467,7 +468,7 @@ public sealed class ListOffsetsResponseMessage: IResponseMessage, IEquatable<Lis
             }
             else
             {
-                OldStyleOffsets = new ();
+                OldStyleOffsets = new();
             }
             if (version >= ApiVersion.Version1)
             {

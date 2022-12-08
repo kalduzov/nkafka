@@ -29,9 +29,9 @@ using System.Threading.Tasks;
 
 using FastEnumUtility;
 
-using NKafka.Protocol.Extensions;
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Serialization;
 

@@ -116,6 +116,7 @@ public sealed class KafkaCluster: IKafkaCluster
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, null, Timeout.Infinite, Timeout.Infinite);
         _topics = new HashSet<string>();
         _seedBrokers = SeedBrokers(Config);
+
         _connectorPool = new KafkaConnectorPool(
             _seedBrokers,
             config.Ssl,

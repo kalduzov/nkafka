@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public MetadataResponseBrokerCollection Brokers { get; set; } = new ();
+    public MetadataResponseBrokerCollection Brokers { get; set; } = new();
 
     /// <summary>
     /// The cluster ID that responding broker belongs to.
@@ -70,7 +71,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
     /// <summary>
     /// Each topic in the response.
     /// </summary>
-    public MetadataResponseTopicCollection Topics { get; set; } = new ();
+    public MetadataResponseTopicCollection Topics { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.
@@ -614,7 +615,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         /// <summary>
         /// Each partition in the topic.
         /// </summary>
-        public List<MetadataResponsePartitionMessage> Partitions { get; set; } = new ();
+        public List<MetadataResponsePartitionMessage> Partitions { get; set; } = new();
 
         /// <summary>
         /// 32-bit bitfield to represent authorized operations for this topic.
@@ -760,7 +761,8 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
                 }
                 else
                 {
-                    throw new NullReferenceException();                }
+                    throw new NullReferenceException();
+                }
             }
             else
             {
@@ -893,17 +895,17 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
         /// <summary>
         /// The set of all nodes that host this partition.
         /// </summary>
-        public List<int> ReplicaNodes { get; set; } = new ();
+        public List<int> ReplicaNodes { get; set; } = new();
 
         /// <summary>
         /// The set of nodes that are in sync with the leader for this partition.
         /// </summary>
-        public List<int> IsrNodes { get; set; } = new ();
+        public List<int> IsrNodes { get; set; } = new();
 
         /// <summary>
         /// The set of offline replicas of this partition.
         /// </summary>
-        public List<int> OfflineReplicas { get; set; } = new ();
+        public List<int> OfflineReplicas { get; set; } = new();
 
         public MetadataResponsePartitionMessage()
         {
@@ -1007,7 +1009,7 @@ public sealed class MetadataResponseMessage: IResponseMessage, IEquatable<Metada
             }
             else
             {
-                OfflineReplicas = new ();
+                OfflineReplicas = new();
             }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version9)

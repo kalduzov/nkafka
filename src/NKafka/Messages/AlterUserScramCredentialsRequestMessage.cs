@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,12 +53,12 @@ public sealed class AlterUserScramCredentialsRequestMessage: IRequestMessage, IE
     /// <summary>
     /// The SCRAM credentials to remove.
     /// </summary>
-    public List<ScramCredentialDeletionMessage> Deletions { get; set; } = new ();
+    public List<ScramCredentialDeletionMessage> Deletions { get; set; } = new();
 
     /// <summary>
     /// The SCRAM credentials to update/insert.
     /// </summary>
-    public List<ScramCredentialUpsertionMessage> Upsertions { get; set; } = new ();
+    public List<ScramCredentialUpsertionMessage> Upsertions { get; set; } = new();
 
     public AlterUserScramCredentialsRequestMessage()
     {

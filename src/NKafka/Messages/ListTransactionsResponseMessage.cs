@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -63,12 +64,12 @@ public sealed class ListTransactionsResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Set of state filters provided in the request which were unknown to the transaction coordinator
     /// </summary>
-    public List<string> UnknownStateFilters { get; set; } = new ();
+    public List<string> UnknownStateFilters { get; set; } = new();
 
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionStateMessage> TransactionStates { get; set; } = new ();
+    public List<TransactionStateMessage> TransactionStates { get; set; } = new();
 
     public ListTransactionsResponseMessage()
     {

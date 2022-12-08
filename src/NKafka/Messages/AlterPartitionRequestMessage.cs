@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -62,7 +63,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new();
 
     public AlterPartitionRequestMessage()
     {
@@ -176,7 +177,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
         public TopicDataMessage()
         {
@@ -331,7 +332,7 @@ public sealed class AlterPartitionRequestMessage: IRequestMessage, IEquatable<Al
         /// <summary>
         /// The ISR for this partition
         /// </summary>
-        public List<int> NewIsr { get; set; } = new ();
+        public List<int> NewIsr { get; set; } = new();
 
         /// <summary>
         /// 1 if the partition is recovering from an unclean leader election; 0 otherwise.

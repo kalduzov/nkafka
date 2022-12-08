@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -63,7 +64,7 @@ public sealed class ListGroupsResponseMessage: IResponseMessage, IEquatable<List
     /// <summary>
     /// Each group in the response.
     /// </summary>
-    public List<ListedGroupMessage> Groups { get; set; } = new ();
+    public List<ListedGroupMessage> Groups { get; set; } = new();
 
     public ListGroupsResponseMessage()
     {

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk" InitialTargets="GenerateMessages">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageTags>Kafka</PackageTags>
@@ -66,9 +66,9 @@
     <Folder Include="Messages"/>
   </ItemGroup>
 
-  <UsingTask TaskName="NKafka.BuildTasks.MessagesGeneratorTask" AssemblyFile="..\NKafka.BuildTasks\bin\$(Configuration)\$(TargetFramework)\NKafka.BuildTasks.dll"/>
+  <UsingTask TaskName="NKafka.BuildTasks.MessagesGeneratorTask" AssemblyFile="..\NKafka.BuildTasks\bin\$(Configuration)\net7.0\NKafka.BuildTasks.dll"/>
 
-  <Target Name="GenerateMessages">
+  <Target Name="GenerateMessages" BeforeTargets="BeforeBuild">
     <MessagesGeneratorTask SolutionDirectory="$(SolutionDir)" OutputDirectory="Messages" TestsMessageProject="NKafka.Tests"/>
   </Target>
 

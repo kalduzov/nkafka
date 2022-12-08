@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -57,12 +58,12 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
     /// <summary>
     /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
     /// </summary>
-    public List<OffsetFetchRequestTopicMessage> Topics { get; set; } = new ();
+    public List<OffsetFetchRequestTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// Each group we would like to fetch offsets for
     /// </summary>
-    public List<OffsetFetchRequestGroupMessage> Groups { get; set; } = new ();
+    public List<OffsetFetchRequestGroupMessage> Groups { get; set; } = new();
 
     /// <summary>
     /// Whether broker should hold on returning unstable offsets but set a retriable error code for the partitions.
@@ -157,7 +158,7 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         }
         else
         {
-            Topics = new ();
+            Topics = new();
         }
         if (version >= ApiVersion.Version8)
         {
@@ -179,7 +180,7 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         }
         else
         {
-            Groups = new ();
+            Groups = new();
         }
         if (version >= ApiVersion.Version7)
         {
@@ -259,7 +260,8 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
                     }
                     else
                     {
-                        throw new NullReferenceException();                    }
+                        throw new NullReferenceException();
+                    }
                 }
                 else
                 {
@@ -364,7 +366,7 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new();
 
         public OffsetFetchRequestTopicMessage()
         {
@@ -534,7 +536,7 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         /// <summary>
         /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
         /// </summary>
-        public List<OffsetFetchRequestTopicsMessage> Topics { get; set; } = new ();
+        public List<OffsetFetchRequestTopicsMessage> Topics { get; set; } = new();
 
         public OffsetFetchRequestGroupMessage()
         {
@@ -674,7 +676,7 @@ public sealed class OffsetFetchRequestMessage: IRequestMessage, IEquatable<Offse
         /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new();
 
         public OffsetFetchRequestTopicsMessage()
         {

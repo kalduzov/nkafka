@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -93,7 +94,7 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
     /// <summary>
     /// 
     /// </summary>
-    public List<JoinGroupResponseMemberMessage> Members { get; set; } = new ();
+    public List<JoinGroupResponseMemberMessage> Members { get; set; } = new();
 
     public JoinGroupResponseMessage()
     {
@@ -308,7 +309,8 @@ public sealed class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinG
             }
             else
             {
-                throw new NullReferenceException();            }
+                throw new NullReferenceException();
+            }
         }
         else
         {

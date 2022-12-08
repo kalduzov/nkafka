@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
     /// <summary>
     /// The resources whose configurations we want to describe.
     /// </summary>
-    public List<DescribeConfigsResourceMessage> Resources { get; set; } = new ();
+    public List<DescribeConfigsResourceMessage> Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should include all synonyms.
@@ -255,7 +256,7 @@ public sealed class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<D
         /// <summary>
         /// The configuration keys to list, or null to list all configuration keys.
         /// </summary>
-        public List<string> ConfigurationKeys { get; set; } = new ();
+        public List<string> ConfigurationKeys { get; set; } = new();
 
         public DescribeConfigsResourceMessage()
         {

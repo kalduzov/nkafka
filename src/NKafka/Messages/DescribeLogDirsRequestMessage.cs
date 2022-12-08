@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
     /// <summary>
     /// Each topic that we want to describe log directories for, or null for all topics.
     /// </summary>
-    public DescribableLogDirTopicCollection Topics { get; set; } = new ();
+    public DescribableLogDirTopicCollection Topics { get; set; } = new();
 
     public DescribeLogDirsRequestMessage()
     {
@@ -214,7 +215,7 @@ public sealed class DescribeLogDirsRequestMessage: IRequestMessage, IEquatable<D
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public DescribableLogDirTopicMessage()
         {

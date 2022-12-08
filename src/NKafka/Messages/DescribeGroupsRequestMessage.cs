@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeGroupsRequestMessage: IRequestMessage, IEquatable<De
     /// <summary>
     /// The names of the groups to describe
     /// </summary>
-    public List<string> Groups { get; set; } = new ();
+    public List<string> Groups { get; set; } = new();
 
     /// <summary>
     /// Whether to include authorized operations.

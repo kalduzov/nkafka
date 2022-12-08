@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
     /// <summary>
     /// The responses to topics to reassign.
     /// </summary>
-    public List<ReassignableTopicResponseMessage> Responses { get; set; } = new ();
+    public List<ReassignableTopicResponseMessage> Responses { get; set; } = new();
 
     public AlterPartitionReassignmentsResponseMessage()
     {
@@ -203,7 +204,7 @@ public sealed class AlterPartitionReassignmentsResponseMessage: IResponseMessage
         /// <summary>
         /// The responses to partitions to reassign
         /// </summary>
-        public List<ReassignablePartitionResponseMessage> Partitions { get; set; } = new ();
+        public List<ReassignablePartitionResponseMessage> Partitions { get; set; } = new();
 
         public ReassignableTopicResponseMessage()
         {

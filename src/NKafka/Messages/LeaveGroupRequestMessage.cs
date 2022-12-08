@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -62,7 +63,7 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
     /// <summary>
     /// List of leaving member identities.
     /// </summary>
-    public List<MemberIdentityMessage> Members { get; set; } = new ();
+    public List<MemberIdentityMessage> Members { get; set; } = new();
 
     public LeaveGroupRequestMessage()
     {
@@ -161,7 +162,7 @@ public sealed class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveG
         }
         else
         {
-            Members = new ();
+            Members = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)

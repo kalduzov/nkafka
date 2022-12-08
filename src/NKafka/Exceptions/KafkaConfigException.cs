@@ -27,6 +27,9 @@ public class KafkaConfigException: KafkaException
 {
     public string OptionName { get; }
 
+    /// <summary>
+    /// Create a new exception
+    /// </summary>
     public KafkaConfigException(string optionName, object value, string? message = null)
         : base("Invalid value " + value + " for configuration " + optionName + (message == null ? "" : ": " + message))
     {

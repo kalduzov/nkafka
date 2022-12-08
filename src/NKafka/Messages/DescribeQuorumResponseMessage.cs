@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -60,7 +61,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new();
 
     public DescribeQuorumResponseMessage()
     {
@@ -166,7 +167,7 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
         public TopicDataMessage()
         {
@@ -318,12 +319,12 @@ public sealed class DescribeQuorumResponseMessage: IResponseMessage, IEquatable<
         /// <summary>
         /// 
         /// </summary>
-        public List<ReplicaStateMessage> CurrentVoters { get; set; } = new ();
+        public List<ReplicaStateMessage> CurrentVoters { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public List<ReplicaStateMessage> Observers { get; set; } = new ();
+        public List<ReplicaStateMessage> Observers { get; set; } = new();
 
         public PartitionDataMessage()
         {

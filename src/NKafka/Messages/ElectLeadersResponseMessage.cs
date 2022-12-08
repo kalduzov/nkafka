@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -63,7 +64,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
     /// <summary>
     /// The election results, or an empty array if the requester did not have permission and the request asks for all partitions.
     /// </summary>
-    public List<ReplicaElectionResultMessage> ReplicaElectionResults { get; set; } = new ();
+    public List<ReplicaElectionResultMessage> ReplicaElectionResults { get; set; } = new();
 
     public ElectLeadersResponseMessage()
     {
@@ -234,7 +235,7 @@ public sealed class ElectLeadersResponseMessage: IResponseMessage, IEquatable<El
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public List<PartitionResultMessage> PartitionResult { get; set; } = new ();
+        public List<PartitionResultMessage> PartitionResult { get; set; } = new();
 
         public ReplicaElectionResultMessage()
         {

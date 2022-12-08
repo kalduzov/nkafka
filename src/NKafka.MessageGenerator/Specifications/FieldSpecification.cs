@@ -176,193 +176,193 @@ public class FieldSpecification
         switch (Type)
         {
             case IFieldType.BoolFieldType:
-            {
-                if (string.IsNullOrEmpty(Default))
                 {
-                    return "false";
-                }
+                    if (string.IsNullOrEmpty(Default))
+                    {
+                        return "false";
+                    }
 
-                if (Default.Equals("true", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "true";
-                }
+                    if (Default.Equals("true", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "true";
+                    }
 
-                if (Default.Equals("false", StringComparison.OrdinalIgnoreCase))
-                {
-                    return "false";
-                }
+                    if (Default.Equals("false", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return "false";
+                    }
 
-                throw new ArgumentException($"Invalid default for boolean field {Name}: {Default}");
-            }
+                    throw new ArgumentException($"Invalid default for boolean field {Name}: {Default}");
+                }
             case IFieldType.Int8FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToSByte(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToSByte(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.Int16FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToInt16(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToInt16(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.UInt16FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToUInt16(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToUInt16(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.Int32FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToInt32(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToInt32(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.UInt32FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToUInt32(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToUInt32(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.Int64FieldType:
-            {
-                var @base = 10;
-                var defaultString = Default;
-
-                if (defaultString.StartsWith("0x"))
                 {
-                    @base = 16;
-                    defaultString = defaultString[2..];
+                    var @base = 10;
+                    var defaultString = Default;
+
+                    if (defaultString.StartsWith("0x"))
+                    {
+                        @base = 16;
+                        defaultString = defaultString[2..];
+                    }
+
+                    if (string.IsNullOrEmpty(defaultString))
+                    {
+                        return "0";
+                    }
+
+                    var val = Convert.ToInt64(defaultString, @base);
+
+                    return $"{val}";
                 }
-
-                if (string.IsNullOrEmpty(defaultString))
-                {
-                    return "0";
-                }
-
-                var val = Convert.ToInt64(defaultString, @base);
-
-                return $"{val}";
-            }
             case IFieldType.UuidFieldType:
-            {
-                if (string.IsNullOrEmpty(Default))
                 {
-                    return "Guid.Empty";
+                    if (string.IsNullOrEmpty(Default))
+                    {
+                        return "Guid.Empty";
+                    }
+
+                    Guid.Parse(Default);
+
+                    return $"Guid.Parse(\"{Default}\")";
                 }
-
-                Guid.Parse(Default);
-
-                return $"Guid.Parse(\"{Default}\")";
-            }
             case IFieldType.Float64FieldType:
-            {
-                if (string.IsNullOrEmpty(Default))
                 {
-                    return "0.0";
+                    if (string.IsNullOrEmpty(Default))
+                    {
+                        return "0.0";
+                    }
+
+                    var _ = Convert.ToDouble(Default);
+
+                    return Default;
                 }
-
-                var _ = Convert.ToDouble(Default);
-
-                return Default;
-            }
             case IFieldType.StringFieldType when Default.Equals("null"):
-            {
-                ValidateNullDefault();
-
-                return "null";
-            }
-            case IFieldType.StringFieldType:
-            {
-                return string.IsNullOrWhiteSpace(Default) ? "string.Empty" : $"\"{Default}\"";
-            }
-            case IFieldType.BytesFieldType:
-            {
-                if (Default.Equals("null"))
                 {
                     ValidateNullDefault();
 
                     return "null";
                 }
-
-                if (!string.IsNullOrWhiteSpace(Default))
+            case IFieldType.StringFieldType:
                 {
-                    throw new ArgumentException(
-                        $"Invalid default for bytes field {Name}. The only valid default for a bytes field is empty or null.");
+                    return string.IsNullOrWhiteSpace(Default) ? "string.Empty" : $"\"{Default}\"";
                 }
+            case IFieldType.BytesFieldType:
+                {
+                    if (Default.Equals("null"))
+                    {
+                        ValidateNullDefault();
 
-                return ZeroCopy ? "new byte[0]" : "Array.Empty<byte>()";
-            }
+                        return "null";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(Default))
+                    {
+                        throw new ArgumentException(
+                            $"Invalid default for bytes field {Name}. The only valid default for a bytes field is empty or null.");
+                    }
+
+                    return ZeroCopy ? "new byte[0]" : "Array.Empty<byte>()";
+                }
         }
 
         if (Type.IsRecords)
@@ -421,23 +421,23 @@ public class FieldSpecification
             case IFieldType.StructType:
                 return Type.ToString() + "Message";
             case IFieldType.ArrayType arrayType:
-            {
-                if (structRegistry.IsStructArrayWithKeys(this))
                 {
-                    return CollectionType(arrayType.ElementType.ToString());
-                }
+                    if (structRegistry.IsStructArrayWithKeys(this))
+                    {
+                        return CollectionType(arrayType.ElementType.ToString());
+                    }
 
-                if (arrayType.IsStructArray)
-                {
-                    return $"List<{arrayType.ElementType.ClrName}Message>";
-                }
+                    if (arrayType.IsStructArray)
+                    {
+                        return $"List<{arrayType.ElementType.ClrName}Message>";
+                    }
 
-                return $"List<{arrayType.ElementType.ClrName}>";
-            }
+                    return $"List<{arrayType.ElementType.ClrName}>";
+                }
             default:
-            {
-                throw new Exception($"Unknown field type {Type}");
-            }
+                {
+                    throw new Exception($"Unknown field type {Type}");
+                }
         }
     }
 

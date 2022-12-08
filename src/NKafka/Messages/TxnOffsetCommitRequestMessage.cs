@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -87,7 +88,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
     /// <summary>
     /// Each topic that we want to commit offsets for.
     /// </summary>
-    public List<TxnOffsetCommitRequestTopicMessage> Topics { get; set; } = new ();
+    public List<TxnOffsetCommitRequestTopicMessage> Topics { get; set; } = new();
 
     public TxnOffsetCommitRequestMessage()
     {
@@ -409,7 +410,7 @@ public sealed class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<T
         /// <summary>
         /// The partitions inside the topic that we want to committ offsets for.
         /// </summary>
-        public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new ();
+        public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new();
 
         public TxnOffsetCommitRequestTopicMessage()
         {

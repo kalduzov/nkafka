@@ -87,6 +87,4 @@ internal sealed partial class KafkaConnector
     {
         throw new NotImplementedException();
     }
-
-   
 }

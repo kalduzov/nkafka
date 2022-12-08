@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// 
     /// </summary>
-    public List<TransactionStateMessage> TransactionStates { get; set; } = new ();
+    public List<TransactionStateMessage> TransactionStates { get; set; } = new();
 
     public DescribeTransactionsResponseMessage()
     {
@@ -194,7 +195,7 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
         /// <summary>
         /// The set of partitions included in the current transaction (if active). When a transaction is preparing to commit or abort, this will include only partitions which do not have markers.
         /// </summary>
-        public TopicDataCollection Topics { get; set; } = new ();
+        public TopicDataCollection Topics { get; set; } = new();
 
         public TransactionStateMessage()
         {
@@ -360,7 +361,7 @@ public sealed class DescribeTransactionsResponseMessage: IResponseMessage, IEqua
         /// <summary>
         /// 
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public TopicDataMessage()
         {

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicRequestMessage> Topics { get; set; } = new ();
+    public List<TopicRequestMessage> Topics { get; set; } = new();
 
     public DescribeProducersRequestMessage()
     {
@@ -155,7 +156,7 @@ public sealed class DescribeProducersRequestMessage: IRequestMessage, IEquatable
         /// <summary>
         /// The indexes of the partitions to list producers for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new();
 
         public TopicRequestMessage()
         {

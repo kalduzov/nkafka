@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -67,17 +68,17 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
     /// <summary>
     /// In older versions of this RPC, each partition that we would like to update.
     /// </summary>
-    public List<UpdateMetadataPartitionStateMessage> UngroupedPartitionStates { get; set; } = new ();
+    public List<UpdateMetadataPartitionStateMessage> UngroupedPartitionStates { get; set; } = new();
 
     /// <summary>
     /// In newer versions of this RPC, each topic that we would like to update.
     /// </summary>
-    public List<UpdateMetadataTopicStateMessage> TopicStates { get; set; } = new ();
+    public List<UpdateMetadataTopicStateMessage> TopicStates { get; set; } = new();
 
     /// <summary>
     /// 
     /// </summary>
-    public List<UpdateMetadataBrokerMessage> LiveBrokers { get; set; } = new ();
+    public List<UpdateMetadataBrokerMessage> LiveBrokers { get; set; } = new();
 
     public UpdateMetadataRequestMessage()
     {
@@ -121,7 +122,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         }
         else
         {
-            UngroupedPartitionStates = new ();
+            UngroupedPartitionStates = new();
         }
         if (version >= ApiVersion.Version5)
         {
@@ -164,7 +165,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         }
         else
         {
-            TopicStates = new ();
+            TopicStates = new();
         }
         {
             if (version >= ApiVersion.Version6)
@@ -355,7 +356,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         /// <summary>
         /// The partition that we would like to update.
         /// </summary>
-        public List<UpdateMetadataPartitionStateMessage> PartitionStates { get; set; } = new ();
+        public List<UpdateMetadataPartitionStateMessage> PartitionStates { get; set; } = new();
 
         public UpdateMetadataTopicStateMessage()
         {
@@ -570,7 +571,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         /// <summary>
         /// The broker endpoints.
         /// </summary>
-        public List<UpdateMetadataEndpointMessage> Endpoints { get; set; } = new ();
+        public List<UpdateMetadataEndpointMessage> Endpoints { get; set; } = new();
 
         /// <summary>
         /// The rack which this broker belongs to.
@@ -664,7 +665,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             }
             else
             {
-                Endpoints = new ();
+                Endpoints = new();
             }
             if (version >= ApiVersion.Version2)
             {
@@ -1053,7 +1054,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         /// <summary>
         /// The brokers which are in the ISR for this partition.
         /// </summary>
-        public List<int> Isr { get; set; } = new ();
+        public List<int> Isr { get; set; } = new();
 
         /// <summary>
         /// The Zookeeper version.
@@ -1063,12 +1064,12 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
         /// <summary>
         /// All the replicas of this partition.
         /// </summary>
-        public List<int> Replicas { get; set; } = new ();
+        public List<int> Replicas { get; set; } = new();
 
         /// <summary>
         /// The replicas of this partition which are offline.
         /// </summary>
-        public List<int> OfflineReplicas { get; set; } = new ();
+        public List<int> OfflineReplicas { get; set; } = new();
 
         public UpdateMetadataPartitionStateMessage()
         {
@@ -1187,7 +1188,7 @@ public sealed class UpdateMetadataRequestMessage: IRequestMessage, IEquatable<Up
             }
             else
             {
-                OfflineReplicas = new ();
+                OfflineReplicas = new();
             }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)

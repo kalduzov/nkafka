@@ -74,10 +74,7 @@ public struct Offset: IEquatable<Offset>
     ///     Gets whether or not this is one of the special
     ///     offset values.
     /// </summary>
-    public bool IsSpecial => Value == _OFFSET_BEGINNING
-                             || Value == _OFFSET_END
-                             || Value == _OFFSET_STORED
-                             || Value == _OFFSET_INVALID;
+    public bool IsSpecial => Value is _OFFSET_BEGINNING or _OFFSET_END or _OFFSET_STORED or _OFFSET_INVALID;
 
     /// <summary>
     ///     Tests whether this Offset value is equal to the specified object.

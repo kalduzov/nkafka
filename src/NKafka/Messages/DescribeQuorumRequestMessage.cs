@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
     /// <summary>
     /// 
     /// </summary>
-    public List<TopicDataMessage> Topics { get; set; } = new ();
+    public List<TopicDataMessage> Topics { get; set; } = new();
 
     public DescribeQuorumRequestMessage()
     {
@@ -155,7 +156,7 @@ public sealed class DescribeQuorumRequestMessage: IRequestMessage, IEquatable<De
         /// <summary>
         /// 
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
         public TopicDataMessage()
         {

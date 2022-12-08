@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// The results for each resource.
     /// </summary>
-    public List<DescribeConfigsResultMessage> Results { get; set; } = new ();
+    public List<DescribeConfigsResultMessage> Results { get; set; } = new();
 
     public DescribeConfigsResponseMessage()
     {
@@ -224,7 +225,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// Each listed configuration.
         /// </summary>
-        public List<DescribeConfigsResourceResultMessage> Configs { get; set; } = new ();
+        public List<DescribeConfigsResourceResultMessage> Configs { get; set; } = new();
 
         public DescribeConfigsResultMessage()
         {
@@ -490,7 +491,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// The synonyms for this configuration key.
         /// </summary>
-        public List<DescribeConfigsSynonymMessage> Synonyms { get; set; } = new ();
+        public List<DescribeConfigsSynonymMessage> Synonyms { get; set; } = new();
 
         /// <summary>
         /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
@@ -623,7 +624,7 @@ public sealed class DescribeConfigsResponseMessage: IResponseMessage, IEquatable
             }
             else
             {
-                Synonyms = new ();
+                Synonyms = new();
             }
             if (version >= ApiVersion.Version3)
             {

@@ -106,6 +106,19 @@ public sealed class Versions: IEquatable<Versions>
         return new Versions(newLowest, newHighest);
     }
 
+    /// <summary>
+    /// Return a new version range that trims some versions from this range, if possible.
+    /// We can't trim any versions if the resulting range would be disjoint.
+    ///
+    /// Some examples:
+    ///   1-4.trim(1-2) = 3-4
+    ///   3+.trim(4+) = 3
+    ///   4+.trim(3+) = none
+    ///   1-5.trim(2-4) = null
+    /// </summary>
+    /// <param name="one"></param>
+    /// <param name="two"></param>
+    /// <returns>A new version range</returns>
     public static Versions? operator -(Versions one, Versions two)
     {
         if (two.Lowest <= one.Lowest)
@@ -159,7 +172,7 @@ public sealed class Versions: IEquatable<Versions>
     /// <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is Versions other && Equals(other);
+        return ReferenceEquals(this, obj) || (obj is Versions other && Equals(other));
     }
 
     /// <summary>Serves as the default hash function.</summary>
@@ -186,8 +199,12 @@ public sealed class Versions: IEquatable<Versions>
 
     public bool IsEmpty => Lowest > Highest;
 
-    /// <summary>Returns a string that represents the current object.</summary>
-    /// <returns>A string that represents the current object.</returns>
+    /// <summary>
+    /// Returns a string that represents the current object.
+    /// </summary>
+    /// <returns>
+    /// A string that represents the current object.
+    /// </returns>
     public override string ToString()
     {
         if (IsEmpty)

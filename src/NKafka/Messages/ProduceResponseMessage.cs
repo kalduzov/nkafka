@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -50,7 +51,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
     /// <summary>
     /// Each produce response
     /// </summary>
-    public TopicProduceResponseCollection Responses { get; set; } = new ();
+    public TopicProduceResponseCollection Responses { get; set; } = new();
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -216,7 +217,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         /// <summary>
         /// Each partition that we produced to within the topic.
         /// </summary>
-        public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new ();
+        public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new();
 
         public TopicProduceResponseMessage()
         {
@@ -428,7 +429,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
         /// <summary>
         /// The batch indices of records that caused the batch to be dropped
         /// </summary>
-        public List<BatchIndexAndErrorMessageMessage> RecordErrors { get; set; } = new ();
+        public List<BatchIndexAndErrorMessageMessage> RecordErrors { get; set; } = new();
 
         /// <summary>
         /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
@@ -511,7 +512,7 @@ public sealed class ProduceResponseMessage: IResponseMessage, IEquatable<Produce
             }
             else
             {
-                RecordErrors = new ();
+                RecordErrors = new();
             }
             if (version >= ApiVersion.Version8)
             {

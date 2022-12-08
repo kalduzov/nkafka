@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// The results for writing makers.
     /// </summary>
-    public List<WritableTxnMarkerResultMessage> Markers { get; set; } = new ();
+    public List<WritableTxnMarkerResultMessage> Markers { get; set; } = new();
 
     public WriteTxnMarkersResponseMessage()
     {
@@ -200,7 +201,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// The results by topic.
         /// </summary>
-        public List<WritableTxnMarkerTopicResultMessage> Topics { get; set; } = new ();
+        public List<WritableTxnMarkerTopicResultMessage> Topics { get; set; } = new();
 
         public WritableTxnMarkerResultMessage()
         {
@@ -356,7 +357,7 @@ public sealed class WriteTxnMarkersResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// The results by partition.
         /// </summary>
-        public List<WritableTxnMarkerPartitionResultMessage> Partitions { get; set; } = new ();
+        public List<WritableTxnMarkerPartitionResultMessage> Partitions { get; set; } = new();
 
         public WritableTxnMarkerTopicResultMessage()
         {

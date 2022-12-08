@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// The alterations to make for each directory.
     /// </summary>
-    public AlterReplicaLogDirCollection Dirs { get; set; } = new ();
+    public AlterReplicaLogDirCollection Dirs { get; set; } = new();
 
     public AlterReplicaLogDirsRequestMessage()
     {
@@ -200,7 +201,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
         /// <summary>
         /// The topics to add to the directory.
         /// </summary>
-        public AlterReplicaLogDirTopicCollection Topics { get; set; } = new ();
+        public AlterReplicaLogDirTopicCollection Topics { get; set; } = new();
 
         public AlterReplicaLogDirMessage()
         {
@@ -389,7 +390,7 @@ public sealed class AlterReplicaLogDirsRequestMessage: IRequestMessage, IEquatab
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public AlterReplicaLogDirTopicMessage()
         {

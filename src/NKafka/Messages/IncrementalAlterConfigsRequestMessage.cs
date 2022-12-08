@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
     /// <summary>
     /// The incremental updates for each resource.
     /// </summary>
-    public AlterConfigsResourceCollection Resources { get; set; } = new ();
+    public AlterConfigsResourceCollection Resources { get; set; } = new();
 
     /// <summary>
     /// True if we should validate the request, but not change the configurations.
@@ -213,7 +214,7 @@ public sealed class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEqu
         /// <summary>
         /// The configurations.
         /// </summary>
-        public AlterableConfigCollection Configs { get; set; } = new ();
+        public AlterableConfigCollection Configs { get; set; } = new();
 
         public AlterConfigsResourceMessage()
         {

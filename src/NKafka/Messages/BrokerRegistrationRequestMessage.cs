@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -67,12 +68,12 @@ public sealed class BrokerRegistrationRequestMessage: IRequestMessage, IEquatabl
     /// <summary>
     /// The listeners of this broker
     /// </summary>
-    public ListenerCollection Listeners { get; set; } = new ();
+    public ListenerCollection Listeners { get; set; } = new();
 
     /// <summary>
     /// The features on this broker
     /// </summary>
-    public FeatureCollection Features { get; set; } = new ();
+    public FeatureCollection Features { get; set; } = new();
 
     /// <summary>
     /// The rack which this broker is in.

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -58,7 +59,7 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
     /// <summary>
     /// The APIs supported by the broker.
     /// </summary>
-    public ApiVersionCollection ApiKeys { get; set; } = new ();
+    public ApiVersionCollection ApiKeys { get; set; } = new();
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -68,7 +69,7 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
     /// <summary>
     /// Features supported by the broker.
     /// </summary>
-    public SupportedFeatureKeyCollection SupportedFeatures { get; set; } = new ();
+    public SupportedFeatureKeyCollection SupportedFeatures { get; set; } = new();
 
     /// <summary>
     /// The monotonically increasing epoch for the finalized features information. Valid values are >= 0. A value of -1 is special and represents unknown epoch.
@@ -78,7 +79,7 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
     /// <summary>
     /// List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch >= 0.
     /// </summary>
-    public FinalizedFeatureKeyCollection FinalizedFeatures { get; set; } = new ();
+    public FinalizedFeatureKeyCollection FinalizedFeatures { get; set; } = new();
 
     public ApiVersionsResponseMessage()
     {
@@ -140,11 +141,11 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
             ThrottleTimeMs = 0;
         }
         {
-            SupportedFeatures = new ();
+            SupportedFeatures = new();
         }
         FinalizedFeaturesEpoch = -1;
         {
-            FinalizedFeatures = new ();
+            FinalizedFeatures = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
@@ -157,48 +158,48 @@ public sealed class ApiVersionsResponseMessage: IResponseMessage, IEquatable<Api
                 switch (tag)
                 {
                     case 0:
-                    {
-                        int arrayLength;
-                        arrayLength = reader.ReadVarUInt() - 1;
-                        if (arrayLength < 0)
                         {
-                            throw new Exception("non-nullable field SupportedFeatures was serialized as null");
-                        }
-                        else
-                        {
-                            var newCollection = new SupportedFeatureKeyCollection(arrayLength);
-                            for (var i = 0; i < arrayLength; i++)
+                            int arrayLength;
+                            arrayLength = reader.ReadVarUInt() - 1;
+                            if (arrayLength < 0)
                             {
-                                newCollection.Add(new SupportedFeatureKeyMessage(reader, version));
+                                throw new Exception("non-nullable field SupportedFeatures was serialized as null");
                             }
-                            SupportedFeatures = newCollection;
+                            else
+                            {
+                                var newCollection = new SupportedFeatureKeyCollection(arrayLength);
+                                for (var i = 0; i < arrayLength; i++)
+                                {
+                                    newCollection.Add(new SupportedFeatureKeyMessage(reader, version));
+                                }
+                                SupportedFeatures = newCollection;
+                            }
+                            break;
                         }
-                        break;
-                    }
                     case 1:
-                    {
-                        FinalizedFeaturesEpoch = reader.ReadLong();
-                        break;
-                    }
+                        {
+                            FinalizedFeaturesEpoch = reader.ReadLong();
+                            break;
+                        }
                     case 2:
-                    {
-                        int arrayLength;
-                        arrayLength = reader.ReadVarUInt() - 1;
-                        if (arrayLength < 0)
                         {
-                            throw new Exception("non-nullable field FinalizedFeatures was serialized as null");
-                        }
-                        else
-                        {
-                            var newCollection = new FinalizedFeatureKeyCollection(arrayLength);
-                            for (var i = 0; i < arrayLength; i++)
+                            int arrayLength;
+                            arrayLength = reader.ReadVarUInt() - 1;
+                            if (arrayLength < 0)
                             {
-                                newCollection.Add(new FinalizedFeatureKeyMessage(reader, version));
+                                throw new Exception("non-nullable field FinalizedFeatures was serialized as null");
                             }
-                            FinalizedFeatures = newCollection;
+                            else
+                            {
+                                var newCollection = new FinalizedFeatureKeyCollection(arrayLength);
+                                for (var i = 0; i < arrayLength; i++)
+                                {
+                                    newCollection.Add(new FinalizedFeatureKeyMessage(reader, version));
+                                }
+                                FinalizedFeatures = newCollection;
+                            }
+                            break;
                         }
-                        break;
-                    }
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                         break;

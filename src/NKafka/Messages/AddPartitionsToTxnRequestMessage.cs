@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -67,7 +68,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
     /// <summary>
     /// The partitions to add to the transaction.
     /// </summary>
-    public AddPartitionsToTxnTopicCollection Topics { get; set; } = new ();
+    public AddPartitionsToTxnTopicCollection Topics { get; set; } = new();
 
     public AddPartitionsToTxnRequestMessage()
     {
@@ -256,7 +257,7 @@ public sealed class AddPartitionsToTxnRequestMessage: IRequestMessage, IEquatabl
         /// <summary>
         /// The partition indexes to add to the transaction
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public AddPartitionsToTxnTopicMessage()
         {

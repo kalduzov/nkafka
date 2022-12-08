@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
     /// <summary>
     /// Each topic that we want to create new partitions inside.
     /// </summary>
-    public CreatePartitionsTopicCollection Topics { get; set; } = new ();
+    public CreatePartitionsTopicCollection Topics { get; set; } = new();
 
     /// <summary>
     /// The time in ms to wait for the partitions to be created.
@@ -221,7 +222,7 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
         /// <summary>
         /// The new partition assignments.
         /// </summary>
-        public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new ();
+        public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new();
 
         public CreatePartitionsTopicMessage()
         {
@@ -422,7 +423,7 @@ public sealed class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<
         /// <summary>
         /// The assigned broker IDs.
         /// </summary>
-        public List<int> BrokerIds { get; set; } = new ();
+        public List<int> BrokerIds { get; set; } = new();
 
         public CreatePartitionsAssignmentMessage()
         {

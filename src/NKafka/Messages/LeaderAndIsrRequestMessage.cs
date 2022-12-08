@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -72,17 +73,17 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
     /// <summary>
     /// The state of each partition, in a v0 or v1 message.
     /// </summary>
-    public List<LeaderAndIsrPartitionStateMessage> UngroupedPartitionStates { get; set; } = new ();
+    public List<LeaderAndIsrPartitionStateMessage> UngroupedPartitionStates { get; set; } = new();
 
     /// <summary>
     /// Each topic.
     /// </summary>
-    public List<LeaderAndIsrTopicStateMessage> TopicStates { get; set; } = new ();
+    public List<LeaderAndIsrTopicStateMessage> TopicStates { get; set; } = new();
 
     /// <summary>
     /// The current live leaders.
     /// </summary>
-    public List<LeaderAndIsrLiveLeaderMessage> LiveLeaders { get; set; } = new ();
+    public List<LeaderAndIsrLiveLeaderMessage> LiveLeaders { get; set; } = new();
 
     public LeaderAndIsrRequestMessage()
     {
@@ -134,7 +135,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         }
         else
         {
-            UngroupedPartitionStates = new ();
+            UngroupedPartitionStates = new();
         }
         if (version >= ApiVersion.Version2)
         {
@@ -177,7 +178,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         }
         else
         {
-            TopicStates = new ();
+            TopicStates = new();
         }
         {
             if (version >= ApiVersion.Version4)
@@ -380,7 +381,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         /// <summary>
         /// The state of each partition
         /// </summary>
-        public List<LeaderAndIsrPartitionStateMessage> PartitionStates { get; set; } = new ();
+        public List<LeaderAndIsrPartitionStateMessage> PartitionStates { get; set; } = new();
 
         public LeaderAndIsrTopicStateMessage()
         {
@@ -750,7 +751,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         /// <summary>
         /// The in-sync replica IDs.
         /// </summary>
-        public List<int> Isr { get; set; } = new ();
+        public List<int> Isr { get; set; } = new();
 
         /// <summary>
         /// The current epoch for the partition. The epoch is a monotonically increasing value which is incremented after every partition change. (Since the LeaderAndIsr request is only used by the legacy controller, this corresponds to the zkVersion)
@@ -760,17 +761,17 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
         /// <summary>
         /// The replica IDs.
         /// </summary>
-        public List<int> Replicas { get; set; } = new ();
+        public List<int> Replicas { get; set; } = new();
 
         /// <summary>
         /// The replica IDs that we are adding this partition to, or null if no replicas are being added.
         /// </summary>
-        public List<int> AddingReplicas { get; set; } = new ();
+        public List<int> AddingReplicas { get; set; } = new();
 
         /// <summary>
         /// The replica IDs that we are removing this partition from, or null if no replicas are being removed.
         /// </summary>
-        public List<int> RemovingReplicas { get; set; } = new ();
+        public List<int> RemovingReplicas { get; set; } = new();
 
         /// <summary>
         /// Whether the replica should have existed on the broker or not.
@@ -899,7 +900,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
             else
             {
-                AddingReplicas = new ();
+                AddingReplicas = new();
             }
             if (version >= ApiVersion.Version3)
             {
@@ -928,7 +929,7 @@ public sealed class LeaderAndIsrRequestMessage: IRequestMessage, IEquatable<Lead
             }
             else
             {
-                RemovingReplicas = new ();
+                RemovingReplicas = new();
             }
             if (version >= ApiVersion.Version1)
             {

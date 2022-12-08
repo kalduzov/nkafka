@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DescribeClientQuotasRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Filter components to apply to quota entities.
     /// </summary>
-    public List<ComponentDataMessage> Components { get; set; } = new ();
+    public List<ComponentDataMessage> Components { get; set; } = new();
 
     /// <summary>
     /// Whether the match is strict, i.e. should exclude entities with unspecified entity types.

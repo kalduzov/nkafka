@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -78,7 +79,7 @@ public sealed class DescribeClusterResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Each broker in the response.
     /// </summary>
-    public DescribeClusterBrokerCollection Brokers { get; set; } = new ();
+    public DescribeClusterBrokerCollection Brokers { get; set; } = new();
 
     /// <summary>
     /// 32-bit bitfield to represent authorized operations for this cluster.

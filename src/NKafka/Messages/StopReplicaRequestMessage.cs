@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -72,17 +73,17 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
     /// <summary>
     /// The partitions to stop.
     /// </summary>
-    public List<StopReplicaPartitionV0Message> UngroupedPartitions { get; set; } = new ();
+    public List<StopReplicaPartitionV0Message> UngroupedPartitions { get; set; } = new();
 
     /// <summary>
     /// The topics to stop.
     /// </summary>
-    public List<StopReplicaTopicV1Message> Topics { get; set; } = new ();
+    public List<StopReplicaTopicV1Message> Topics { get; set; } = new();
 
     /// <summary>
     /// Each topic.
     /// </summary>
-    public List<StopReplicaTopicStateMessage> TopicStates { get; set; } = new ();
+    public List<StopReplicaTopicStateMessage> TopicStates { get; set; } = new();
 
     public StopReplicaRequestMessage()
     {
@@ -134,7 +135,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         }
         else
         {
-            UngroupedPartitions = new ();
+            UngroupedPartitions = new();
         }
         if (version >= ApiVersion.Version1 && version <= ApiVersion.Version2)
         {
@@ -177,7 +178,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         }
         else
         {
-            Topics = new ();
+            Topics = new();
         }
         if (version >= ApiVersion.Version3)
         {
@@ -199,7 +200,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         }
         else
         {
-            TopicStates = new ();
+            TopicStates = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
@@ -458,7 +459,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         /// <summary>
         /// The partition indexes.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new();
 
         public StopReplicaTopicV1Message()
         {
@@ -628,7 +629,7 @@ public sealed class StopReplicaRequestMessage: IRequestMessage, IEquatable<StopR
         /// <summary>
         /// The state of each partition
         /// </summary>
-        public List<StopReplicaPartitionStateMessage> PartitionStates { get; set; } = new ();
+        public List<StopReplicaPartitionStateMessage> PartitionStates { get; set; } = new();
 
         public StopReplicaTopicStateMessage()
         {

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
     /// <summary>
     /// The results for descriptions, one per user.
     /// </summary>
-    public List<DescribeUserScramCredentialsResultMessage> Results { get; set; } = new ();
+    public List<DescribeUserScramCredentialsResultMessage> Results { get; set; } = new();
 
     public DescribeUserScramCredentialsResponseMessage()
     {
@@ -216,7 +217,7 @@ public sealed class DescribeUserScramCredentialsResponseMessage: IResponseMessag
         /// <summary>
         /// The mechanism and related information associated with the user's SCRAM credentials.
         /// </summary>
-        public List<CredentialInfoMessage> CredentialInfos { get; set; } = new ();
+        public List<CredentialInfoMessage> CredentialInfos { get; set; } = new();
 
         public DescribeUserScramCredentialsResultMessage()
         {

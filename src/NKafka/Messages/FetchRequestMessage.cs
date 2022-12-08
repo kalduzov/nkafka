@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -92,12 +93,12 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
     /// <summary>
     /// The topics to fetch.
     /// </summary>
-    public List<FetchTopicMessage> Topics { get; set; } = new ();
+    public List<FetchTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// In an incremental fetch request, the partitions to remove.
     /// </summary>
-    public List<ForgottenTopicMessage> ForgottenTopicsData { get; set; } = new ();
+    public List<ForgottenTopicMessage> ForgottenTopicsData { get; set; } = new();
 
     /// <summary>
     /// Rack ID of the consumer making this request
@@ -233,7 +234,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         }
         else
         {
-            ForgottenTopicsData = new ();
+            ForgottenTopicsData = new();
         }
         if (version >= ApiVersion.Version11)
         {
@@ -274,23 +275,23 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
                 switch (tag)
                 {
                     case 0:
-                    {
-                        int length;
-                        length = reader.ReadVarUInt() - 1;
-                        if (length < 0)
                         {
-                            ClusterId = null;
+                            int length;
+                            length = reader.ReadVarUInt() - 1;
+                            if (length < 0)
+                            {
+                                ClusterId = null;
+                            }
+                            else if (length > 0x7fff)
+                            {
+                                throw new Exception($"string field ClusterId had invalid length {length}");
+                            }
+                            else
+                            {
+                                ClusterId = reader.ReadString(length);
+                            }
+                            break;
                         }
-                        else if (length > 0x7fff)
-                        {
-                            throw new Exception($"string field ClusterId had invalid length {length}");
-                        }
-                        else
-                        {
-                            ClusterId = reader.ReadString(length);
-                        }
-                        break;
-                    }
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                         break;
@@ -465,7 +466,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         /// <summary>
         /// The partitions to fetch.
         /// </summary>
-        public List<FetchPartitionMessage> Partitions { get; set; } = new ();
+        public List<FetchPartitionMessage> Partitions { get; set; } = new();
 
         public FetchTopicMessage()
         {
@@ -853,7 +854,7 @@ public sealed class FetchRequestMessage: IRequestMessage, IEquatable<FetchReques
         /// <summary>
         /// The partitions indexes to forget.
         /// </summary>
-        public List<int> Partitions { get; set; } = new ();
+        public List<int> Partitions { get; set; } = new();
 
         public ForgottenTopicMessage()
         {

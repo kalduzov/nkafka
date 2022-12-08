@@ -126,7 +126,7 @@ namespace FileLockRemover
                     path
                 }; // Just checking on one resource.
 
-                res = RmRegisterResources(handle, (uint)resources.Length, resources, 0, null, 0, null);
+                res = RmRegisterResources(handle, (uint)resources.Length, resources, 0, null!, 0, null!);
 
                 if (res != 0)
                     throw new Exception("Could not register resource.");
@@ -134,7 +134,7 @@ namespace FileLockRemover
                 //Note: there's a race condition here -- the first call to RmGetList() returns
                 //      the total number of process. However, when we call RmGetList() again to get
                 //      the actual processes this number may have increased.
-                res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, null, ref lpdwRebootReasons);
+                res = RmGetList(handle, out pnProcInfoNeeded, ref pnProcInfo, null!, ref lpdwRebootReasons);
 
                 if (res == ERROR_MORE_DATA)
                 {

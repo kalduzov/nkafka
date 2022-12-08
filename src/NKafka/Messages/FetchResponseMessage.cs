@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
     /// <summary>
     /// The response topics.
     /// </summary>
-    public List<FetchableTopicResponseMessage> Responses { get; set; } = new ();
+    public List<FetchableTopicResponseMessage> Responses { get; set; } = new();
 
     public FetchResponseMessage()
     {
@@ -267,7 +268,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         /// <summary>
         /// The topic partitions.
         /// </summary>
-        public List<PartitionDataMessage> Partitions { get; set; } = new ();
+        public List<PartitionDataMessage> Partitions { get; set; } = new();
 
         public FetchableTopicResponseMessage()
         {
@@ -499,22 +500,22 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
         /// <summary>
         /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
         /// </summary>
-        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new ();
+        public EpochEndOffsetMessage DivergingEpoch { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new();
 
         /// <summary>
         /// In the case of fetching an offset less than the LogStartOffset, this is the end offset and epoch that should be used in the FetchSnapshot request.
         /// </summary>
-        public SnapshotIdMessage SnapshotId { get; set; } = new ();
+        public SnapshotIdMessage SnapshotId { get; set; } = new();
 
         /// <summary>
         /// The aborted transactions.
         /// </summary>
-        public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new ();
+        public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new();
 
         /// <summary>
         /// The preferred read replica for the consumer to use on its next fetch request
@@ -562,13 +563,13 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                 LogStartOffset = -1;
             }
             {
-                DivergingEpoch = new ();
+                DivergingEpoch = new();
             }
             {
-                CurrentLeader = new ();
+                CurrentLeader = new();
             }
             {
-                SnapshotId = new ();
+                SnapshotId = new();
             }
             if (version >= ApiVersion.Version4)
             {
@@ -611,7 +612,7 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             }
             else
             {
-                AbortedTransactions = new ();
+                AbortedTransactions = new();
             }
             if (version >= ApiVersion.Version11)
             {
@@ -651,20 +652,20 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
                     switch (tag)
                     {
                         case 0:
-                        {
-                            DivergingEpoch = new EpochEndOffsetMessage(reader, version);
-                            break;
-                        }
+                            {
+                                DivergingEpoch = new EpochEndOffsetMessage(reader, version);
+                                break;
+                            }
                         case 1:
-                        {
-                            CurrentLeader = new LeaderIdAndEpochMessage(reader, version);
-                            break;
-                        }
+                            {
+                                CurrentLeader = new LeaderIdAndEpochMessage(reader, version);
+                                break;
+                            }
                         case 2:
-                        {
-                            SnapshotId = new SnapshotIdMessage(reader, version);
-                            break;
-                        }
+                            {
+                                SnapshotId = new SnapshotIdMessage(reader, version);
+                                break;
+                            }
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                             break;
@@ -689,42 +690,42 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             }
             if (version >= ApiVersion.Version12)
             {
-                if (!DivergingEpoch.Equals(new ()))
+                if (!DivergingEpoch.Equals(new()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!DivergingEpoch.Equals(new ()))
+                if (!DivergingEpoch.Equals(new()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default DivergingEpoch at version {version}");
                 }
             }
             if (version >= ApiVersion.Version12)
             {
-                if (!CurrentLeader.Equals(new ()))
+                if (!CurrentLeader.Equals(new()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!CurrentLeader.Equals(new ()))
+                if (!CurrentLeader.Equals(new()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default CurrentLeader at version {version}");
                 }
             }
             if (version >= ApiVersion.Version12)
             {
-                if (!SnapshotId.Equals(new ()))
+                if (!SnapshotId.Equals(new()))
                 {
                     numTaggedFields++;
                 }
             }
             else
             {
-                if (!SnapshotId.Equals(new ()))
+                if (!SnapshotId.Equals(new()))
                 {
                     throw new UnsupportedVersionException($"Attempted to write a non-default SnapshotId at version {version}");
                 }
@@ -802,21 +803,21 @@ public sealed class FetchResponseMessage: IResponseMessage, IEquatable<FetchResp
             {
                 writer.WriteVarUInt(numTaggedFields);
                 {
-                    if (!DivergingEpoch.Equals(new ()))
+                    if (!DivergingEpoch.Equals(new()))
                     {
                         writer.WriteVarUInt(0);
                         DivergingEpoch.Write(writer, version);
                     }
                 }
                 {
-                    if (!CurrentLeader.Equals(new ()))
+                    if (!CurrentLeader.Equals(new()))
                     {
                         writer.WriteVarUInt(1);
                         CurrentLeader.Write(writer, version);
                     }
                 }
                 {
-                    if (!SnapshotId.Equals(new ()))
+                    if (!SnapshotId.Equals(new()))
                     {
                         writer.WriteVarUInt(2);
                         SnapshotId.Write(writer, version);

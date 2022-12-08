@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
     /// <summary>
     /// The topics to fetch metadata for.
     /// </summary>
-    public List<MetadataRequestTopicMessage> Topics { get; set; } = new ();
+    public List<MetadataRequestTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// If this is true, the broker may auto-create topics that we requested which do not already exist, if it is configured to do so.
@@ -196,7 +197,8 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
                 else
                 {
-                    throw new NullReferenceException();                }
+                    throw new NullReferenceException();
+                }
             }
             else
             {
@@ -391,7 +393,8 @@ public sealed class MetadataRequestMessage: IRequestMessage, IEquatable<Metadata
                 }
                 else
                 {
-                    throw new NullReferenceException();                }
+                    throw new NullReferenceException();
+                }
             }
             else
             {

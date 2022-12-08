@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -60,12 +61,12 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
     /// <summary>
     /// Each partition in v0 to v4 message.
     /// </summary>
-    public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new ();
+    public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new();
 
     /// <summary>
     /// Each topic
     /// </summary>
-    public LeaderAndIsrTopicErrorCollection Topics { get; set; } = new ();
+    public LeaderAndIsrTopicErrorCollection Topics { get; set; } = new();
 
     public LeaderAndIsrResponseMessage()
     {
@@ -121,7 +122,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         }
         else
         {
-            PartitionErrors = new ();
+            PartitionErrors = new();
         }
         if (version >= ApiVersion.Version5)
         {
@@ -143,7 +144,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         }
         else
         {
-            Topics = new ();
+            Topics = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)
@@ -268,7 +269,7 @@ public sealed class LeaderAndIsrResponseMessage: IResponseMessage, IEquatable<Le
         /// <summary>
         /// Each partition.
         /// </summary>
-        public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new ();
+        public List<LeaderAndIsrPartitionErrorMessage> PartitionErrors { get; set; } = new();
 
         public LeaderAndIsrTopicErrorMessage()
         {

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
     /// <summary>
     /// The ongoing reassignments for each topic.
     /// </summary>
-    public List<OngoingTopicReassignmentMessage> Topics { get; set; } = new ();
+    public List<OngoingTopicReassignmentMessage> Topics { get; set; } = new();
 
     public ListPartitionReassignmentsResponseMessage()
     {
@@ -203,7 +204,7 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
         /// <summary>
         /// The ongoing reassignments for each partition.
         /// </summary>
-        public List<OngoingPartitionReassignmentMessage> Partitions { get; set; } = new ();
+        public List<OngoingPartitionReassignmentMessage> Partitions { get; set; } = new();
 
         public OngoingTopicReassignmentMessage()
         {
@@ -332,17 +333,17 @@ public sealed class ListPartitionReassignmentsResponseMessage: IResponseMessage,
         /// <summary>
         /// The current replica set.
         /// </summary>
-        public List<int> Replicas { get; set; } = new ();
+        public List<int> Replicas { get; set; } = new();
 
         /// <summary>
         /// The set of replicas we are currently adding.
         /// </summary>
-        public List<int> AddingReplicas { get; set; } = new ();
+        public List<int> AddingReplicas { get; set; } = new();
 
         /// <summary>
         /// The set of replicas we are currently removing.
         /// </summary>
-        public List<int> RemovingReplicas { get; set; } = new ();
+        public List<int> RemovingReplicas { get; set; } = new();
 
         public OngoingPartitionReassignmentMessage()
         {

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
     /// <summary>
     /// The transaction markers to be written.
     /// </summary>
-    public List<WritableTxnMarkerMessage> Markers { get; set; } = new ();
+    public List<WritableTxnMarkerMessage> Markers { get; set; } = new();
 
     public WriteTxnMarkersRequestMessage()
     {
@@ -210,7 +211,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         /// <summary>
         /// Each topic that we want to write transaction marker(s) for.
         /// </summary>
-        public List<WritableTxnMarkerTopicMessage> Topics { get; set; } = new ();
+        public List<WritableTxnMarkerTopicMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// Epoch associated with the transaction state partition hosted by this transaction coordinator
@@ -380,7 +381,7 @@ public sealed class WriteTxnMarkersRequestMessage: IRequestMessage, IEquatable<W
         /// <summary>
         /// The indexes of the partitions to write transaction markers for.
         /// </summary>
-        public List<int> PartitionIndexes { get; set; } = new ();
+        public List<int> PartitionIndexes { get; set; } = new();
 
         public WritableTxnMarkerTopicMessage()
         {

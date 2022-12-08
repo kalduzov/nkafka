@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,12 +53,12 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
     /// <summary>
     /// The name or topic ID of the topic
     /// </summary>
-    public List<DeleteTopicStateMessage> Topics { get; set; } = new ();
+    public List<DeleteTopicStateMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// The names of the topics to delete
     /// </summary>
-    public List<string> TopicNames { get; set; } = new ();
+    public List<string> TopicNames { get; set; } = new();
 
     /// <summary>
     /// The length of time in milliseconds to wait for the deletions to complete.
@@ -96,7 +97,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         }
         else
         {
-            Topics = new ();
+            Topics = new();
         }
         if (version <= ApiVersion.Version5)
         {
@@ -165,7 +166,7 @@ public sealed class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<Dele
         }
         else
         {
-            TopicNames = new ();
+            TopicNames = new();
         }
         TimeoutMs = reader.ReadInt();
         UnknownTaggedFields = null;

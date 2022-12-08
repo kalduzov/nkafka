@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -63,7 +64,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// The topics to fetch.
     /// </summary>
-    public List<TopicSnapshotMessage> Topics { get; set; } = new ();
+    public List<TopicSnapshotMessage> Topics { get; set; } = new();
 
     public FetchSnapshotResponseMessage()
     {
@@ -172,7 +173,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         /// <summary>
         /// The partitions to fetch.
         /// </summary>
-        public List<PartitionSnapshotMessage> Partitions { get; set; } = new ();
+        public List<PartitionSnapshotMessage> Partitions { get; set; } = new();
 
         public TopicSnapshotMessage()
         {
@@ -309,12 +310,12 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
         /// <summary>
         /// The snapshot endOffset and epoch fetched
         /// </summary>
-        public SnapshotIdMessage SnapshotId { get; set; } = new ();
+        public SnapshotIdMessage SnapshotId { get; set; } = new();
 
         /// <summary>
         /// 
         /// </summary>
-        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
+        public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new();
 
         /// <summary>
         /// The total size of the snapshot.
@@ -353,7 +354,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
                 SnapshotId = new SnapshotIdMessage(reader, version);
             }
             {
-                CurrentLeader = new ();
+                CurrentLeader = new();
             }
             Size = reader.ReadLong();
             Position = reader.ReadLong();
@@ -378,10 +379,10 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
                 switch (tag)
                 {
                     case 0:
-                    {
-                        CurrentLeader = new LeaderIdAndEpochMessage(reader, version);
-                        break;
-                    }
+                        {
+                            CurrentLeader = new LeaderIdAndEpochMessage(reader, version);
+                            break;
+                        }
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                         break;
@@ -395,7 +396,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             writer.WriteInt(Index);
             writer.WriteShort((short)ErrorCode);
             SnapshotId.Write(writer, version);
-            if (!CurrentLeader.Equals(new ()))
+            if (!CurrentLeader.Equals(new()))
             {
                 numTaggedFields++;
             }
@@ -407,7 +408,7 @@ public sealed class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<F
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
             {
-                if (!CurrentLeader.Equals(new ()))
+                if (!CurrentLeader.Equals(new()))
                 {
                     writer.WriteVarUInt(0);
                     CurrentLeader.Write(writer, version);

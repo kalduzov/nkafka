@@ -69,7 +69,7 @@ public class StructSpecification
             {
                 if (!tags.Contains(i))
                 {
-                    throw new ArgumentException("In {name}, the tag IDs are not contiguous. Make use of tag {i} before using any higher tag IDs.");
+                    throw new ArgumentException($"In {name}, the tag IDs are not contiguous. Make use of tag {i} before using any higher tag IDs.");
                 }
             }
         }

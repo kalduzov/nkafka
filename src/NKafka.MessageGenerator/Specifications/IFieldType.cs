@@ -82,28 +82,28 @@ public interface IFieldType
             case StringFieldType.NAME:
                 return StringFieldType.Instance;
             default:
-            {
-                if (!value.StartsWith(_ARRAY_PREFIX))
                 {
-                    return new StructType(value);
+                    if (!value.StartsWith(_ARRAY_PREFIX))
+                    {
+                        return new StructType(value);
+                    }
+
+                    var elementTypeString = value[2..];
+
+                    if (elementTypeString.Length == 0)
+                    {
+                        throw new ArgumentException($"Can't parse array type {value}. No element type found.");
+                    }
+
+                    var elementType = Parse(elementTypeString);
+
+                    if (elementType.IsArray)
+                    {
+                        throw new ArgumentException("Can't have an array of arrays. Use an array of structs containing an array instead.");
+                    }
+
+                    return new ArrayType(elementType);
                 }
-
-                var elementTypeString = value[2..];
-
-                if (elementTypeString.Length == 0)
-                {
-                    throw new ArgumentException($"Can't parse array type {value}. No element type found.");
-                }
-
-                var elementType = Parse(elementTypeString);
-
-                if (elementType.IsArray)
-                {
-                    throw new ArgumentException("Can't have an array of arrays. Use an array of structs containing an array instead.");
-                }
-
-                return new ArrayType(elementType);
-            }
         }
     }
 

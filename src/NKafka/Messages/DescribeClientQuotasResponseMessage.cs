@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class DescribeClientQuotasResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// A result entry.
     /// </summary>
-    public List<EntryDataMessage> Entries { get; set; } = new ();
+    public List<EntryDataMessage> Entries { get; set; } = new();
 
     public DescribeClientQuotasResponseMessage()
     {
@@ -278,12 +279,12 @@ public sealed class DescribeClientQuotasResponseMessage: IResponseMessage, IEqua
         /// <summary>
         /// The quota entity description.
         /// </summary>
-        public List<EntityDataMessage> Entity { get; set; } = new ();
+        public List<EntityDataMessage> Entity { get; set; } = new();
 
         /// <summary>
         /// The quota values for the entity.
         /// </summary>
-        public List<ValueDataMessage> Values { get; set; } = new ();
+        public List<ValueDataMessage> Values { get; set; } = new();
 
         public EntryDataMessage()
         {

@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -60,7 +61,7 @@ public sealed class ControlledShutdownResponseMessage: IResponseMessage, IEquata
     /// <summary>
     /// The partitions that the broker still leads.
     /// </summary>
-    public RemainingPartitionCollection RemainingPartitions { get; set; } = new ();
+    public RemainingPartitionCollection RemainingPartitions { get; set; } = new();
 
     public ControlledShutdownResponseMessage()
     {

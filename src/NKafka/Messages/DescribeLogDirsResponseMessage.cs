@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -63,7 +64,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// The log directories.
     /// </summary>
-    public List<DescribeLogDirsResultMessage> Results { get; set; } = new ();
+    public List<DescribeLogDirsResultMessage> Results { get; set; } = new();
 
     public DescribeLogDirsResponseMessage()
     {
@@ -235,7 +236,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// Each topic.
         /// </summary>
-        public List<DescribeLogDirsTopicMessage> Topics { get; set; } = new ();
+        public List<DescribeLogDirsTopicMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// The total size in bytes of the volume the log directory is in.
@@ -462,7 +463,7 @@ public sealed class DescribeLogDirsResponseMessage: IResponseMessage, IEquatable
         /// <summary>
         /// 
         /// </summary>
-        public List<DescribeLogDirsPartitionMessage> Partitions { get; set; } = new ();
+        public List<DescribeLogDirsPartitionMessage> Partitions { get; set; } = new();
 
         public DescribeLogDirsTopicMessage()
         {

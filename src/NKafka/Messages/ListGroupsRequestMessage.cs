@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
     /// <summary>
     /// The states of the groups we want to list. If empty all groups are returned with their state.
     /// </summary>
-    public List<string> StatesFilter { get; set; } = new ();
+    public List<string> StatesFilter { get; set; } = new();
 
     public ListGroupsRequestMessage()
     {
@@ -99,7 +100,7 @@ public sealed class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGr
         }
         else
         {
-            StatesFilter = new ();
+            StatesFilter = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)

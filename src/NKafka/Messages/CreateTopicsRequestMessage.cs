@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
     /// <summary>
     /// The topics to create.
     /// </summary>
-    public CreatableTopicCollection Topics { get; set; } = new ();
+    public CreatableTopicCollection Topics { get; set; } = new();
 
     /// <summary>
     /// How long to wait in milliseconds before timing out the request.
@@ -243,12 +244,12 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         /// <summary>
         /// The manual partition assignment, or the empty array if we are using automatic assignment.
         /// </summary>
-        public CreatableReplicaAssignmentCollection Assignments { get; set; } = new ();
+        public CreatableReplicaAssignmentCollection Assignments { get; set; } = new();
 
         /// <summary>
         /// The custom topic configurations to set.
         /// </summary>
-        public CreateableTopicConfigCollection Configs { get; set; } = new ();
+        public CreateableTopicConfigCollection Configs { get; set; } = new();
 
         public CreatableTopicMessage()
         {
@@ -497,7 +498,7 @@ public sealed class CreateTopicsRequestMessage: IRequestMessage, IEquatable<Crea
         /// <summary>
         /// The brokers to place the partition on.
         /// </summary>
-        public List<int> BrokerIds { get; set; } = new ();
+        public List<int> BrokerIds { get; set; } = new();
 
         public CreatableReplicaAssignmentMessage()
         {

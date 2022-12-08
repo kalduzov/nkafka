@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -83,7 +84,7 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Each coordinator result in the response
     /// </summary>
-    public List<CoordinatorMessage> Coordinators { get; set; } = new ();
+    public List<CoordinatorMessage> Coordinators { get; set; } = new();
 
     public FindCoordinatorResponseMessage()
     {
@@ -205,7 +206,7 @@ public sealed class FindCoordinatorResponseMessage: IResponseMessage, IEquatable
         }
         else
         {
-            Coordinators = new ();
+            Coordinators = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)

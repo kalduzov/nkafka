@@ -100,11 +100,12 @@ public abstract record CommonConfig
     public int ReconnectBackoffMaxMs { get; set; }
 
     /// <summary>
+    /// Security protocol
     /// </summary>
     public SecurityProtocols SecurityProtocol { get; set; } = SecurityProtocols.PlainText;
 
     /// <summary>
-    /// 
+    /// Ssl configuration
     /// </summary>
     public SslSettings Ssl { get; set; } = SslSettings.None;
 
@@ -174,16 +175,16 @@ public abstract record CommonConfig
     /// </summary>
     internal virtual void Validate()
     {
-        if ((BootstrapServers?.Count ?? 0) == 0)
+        if (BootstrapServers.Count  == 0)
         {
             throw new KafkaConfigException(nameof(BootstrapServers), 0, ConfigExceptionMessages.No_bootstrap_servers);
         }
 
         switch (SecurityProtocol)
         {
-            case SecurityProtocols.Ssl or SecurityProtocols.SaslSsl when Ssl is null:
+            case SecurityProtocols.Ssl or SecurityProtocols.SaslSsl when Ssl != SslSettings.None:
                 throw new KafkaConfigException(nameof(Ssl), null!, ConfigExceptionMessages.Ssl_no_configured);
-            case SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl when Sasl is null:
+            case SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl when Sasl != SaslSettings.None:
                 throw new KafkaConfigException(nameof(Sasl), null!, ConfigExceptionMessages.Sasl_no_configured);
         }
 

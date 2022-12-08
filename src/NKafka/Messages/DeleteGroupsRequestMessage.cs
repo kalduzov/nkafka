@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -52,7 +53,7 @@ public sealed class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<Dele
     /// <summary>
     /// The group names to delete.
     /// </summary>
-    public List<string> GroupsNames { get; set; } = new ();
+    public List<string> GroupsNames { get; set; } = new();
 
     public DeleteGroupsRequestMessage()
     {

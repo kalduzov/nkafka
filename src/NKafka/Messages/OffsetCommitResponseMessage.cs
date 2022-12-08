@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class OffsetCommitResponseMessage: IResponseMessage, IEquatable<Of
     /// <summary>
     /// The responses for each topic.
     /// </summary>
-    public List<OffsetCommitResponseTopicMessage> Topics { get; set; } = new ();
+    public List<OffsetCommitResponseTopicMessage> Topics { get; set; } = new();
 
     public OffsetCommitResponseMessage()
     {
@@ -216,7 +217,7 @@ public sealed class OffsetCommitResponseMessage: IResponseMessage, IEquatable<Of
         /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
-        public List<OffsetCommitResponsePartitionMessage> Partitions { get; set; } = new ();
+        public List<OffsetCommitResponsePartitionMessage> Partitions { get; set; } = new();
 
         public OffsetCommitResponseTopicMessage()
         {

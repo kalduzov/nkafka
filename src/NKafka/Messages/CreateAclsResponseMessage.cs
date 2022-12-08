@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class CreateAclsResponseMessage: IResponseMessage, IEquatable<Crea
     /// <summary>
     /// The results for each ACL creation.
     /// </summary>
-    public List<AclCreationResultMessage> Results { get; set; } = new ();
+    public List<AclCreationResultMessage> Results { get; set; } = new();
 
     public CreateAclsResponseMessage()
     {

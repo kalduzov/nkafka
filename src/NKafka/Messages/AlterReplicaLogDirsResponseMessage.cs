@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// The results for each topic.
     /// </summary>
-    public List<AlterReplicaLogDirTopicResultMessage> Results { get; set; } = new ();
+    public List<AlterReplicaLogDirTopicResultMessage> Results { get; set; } = new();
 
     public AlterReplicaLogDirsResponseMessage()
     {
@@ -206,7 +207,7 @@ public sealed class AlterReplicaLogDirsResponseMessage: IResponseMessage, IEquat
         /// <summary>
         /// The results for each partition.
         /// </summary>
-        public List<AlterReplicaLogDirPartitionResultMessage> Partitions { get; set; } = new ();
+        public List<AlterReplicaLogDirPartitionResultMessage> Partitions { get; set; } = new();
 
         public AlterReplicaLogDirTopicResultMessage()
         {

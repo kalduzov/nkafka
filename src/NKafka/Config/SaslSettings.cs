@@ -29,7 +29,7 @@ namespace NKafka.Config;
 public class SaslSettings
 {
     internal static readonly SaslSettings None = new SaslSettings(false);
-    
+
     internal bool IsSet { get; }
 
     /// <summary>

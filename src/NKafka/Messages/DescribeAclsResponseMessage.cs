@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -68,7 +69,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
     /// <summary>
     /// Each Resource that is referenced in an ACL.
     /// </summary>
-    public List<DescribeAclsResourceMessage> Resources { get; set; } = new ();
+    public List<DescribeAclsResourceMessage> Resources { get; set; } = new();
 
     public DescribeAclsResponseMessage()
     {
@@ -279,7 +280,7 @@ public sealed class DescribeAclsResponseMessage: IResponseMessage, IEquatable<De
         /// <summary>
         /// The ACLs.
         /// </summary>
-        public List<AclDescriptionMessage> Acls { get; set; } = new ();
+        public List<AclDescriptionMessage> Acls { get; set; } = new();
 
         public DescribeAclsResourceMessage()
         {

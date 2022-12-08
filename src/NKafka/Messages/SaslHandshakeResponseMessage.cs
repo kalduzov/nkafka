@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -60,7 +61,7 @@ public sealed class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<S
     /// <summary>
     /// The mechanisms enabled in the server.
     /// </summary>
-    public List<string> Mechanisms { get; set; } = new ();
+    public List<string> Mechanisms { get; set; } = new();
 
     public SaslHandshakeResponseMessage()
     {

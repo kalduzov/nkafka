@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -57,7 +58,7 @@ public sealed class OffsetForLeaderEpochRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Each topic to get offsets for.
     /// </summary>
-    public OffsetForLeaderTopicCollection Topics { get; set; } = new ();
+    public OffsetForLeaderTopicCollection Topics { get; set; } = new();
 
     public OffsetForLeaderEpochRequestMessage()
     {
@@ -218,7 +219,7 @@ public sealed class OffsetForLeaderEpochRequestMessage: IRequestMessage, IEquata
         /// <summary>
         /// Each partition to get offsets for.
         /// </summary>
-        public List<OffsetForLeaderPartitionMessage> Partitions { get; set; } = new ();
+        public List<OffsetForLeaderPartitionMessage> Partitions { get; set; } = new();
 
         public OffsetForLeaderTopicMessage()
         {

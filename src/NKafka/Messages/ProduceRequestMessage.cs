@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -67,7 +68,7 @@ public sealed class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRe
     /// <summary>
     /// Each topic to produce to.
     /// </summary>
-    public TopicProduceDataCollection TopicData { get; set; } = new ();
+    public TopicProduceDataCollection TopicData { get; set; } = new();
 
     public ProduceRequestMessage()
     {
@@ -283,7 +284,7 @@ public sealed class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRe
         /// <summary>
         /// Each partition to produce to.
         /// </summary>
-        public List<PartitionProduceDataMessage> PartitionData { get; set; } = new ();
+        public List<PartitionProduceDataMessage> PartitionData { get; set; } = new();
 
         public TopicProduceDataMessage()
         {

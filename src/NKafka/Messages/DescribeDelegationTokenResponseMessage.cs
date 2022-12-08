@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -58,7 +59,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
     /// <summary>
     /// The tokens.
     /// </summary>
-    public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new ();
+    public List<DescribedDelegationTokenMessage> Tokens { get; set; } = new();
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -257,7 +258,7 @@ public sealed class DescribeDelegationTokenResponseMessage: IResponseMessage, IE
         /// <summary>
         /// Those who are able to renew this token before it expires.
         /// </summary>
-        public List<DescribedDelegationTokenRenewerMessage> Renewers { get; set; } = new ();
+        public List<DescribedDelegationTokenRenewerMessage> Renewers { get; set; } = new();
 
         public DescribedDelegationTokenMessage()
         {

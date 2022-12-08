@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -55,7 +56,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
     /// <summary>
     /// The responses per topic.
     /// </summary>
-    public List<OffsetFetchResponseTopicMessage> Topics { get; set; } = new ();
+    public List<OffsetFetchResponseTopicMessage> Topics { get; set; } = new();
 
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
@@ -68,7 +69,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
     /// <summary>
     /// The responses per group id.
     /// </summary>
-    public List<OffsetFetchResponseGroupMessage> Groups { get; set; } = new ();
+    public List<OffsetFetchResponseGroupMessage> Groups { get; set; } = new();
 
     public OffsetFetchResponseMessage()
     {
@@ -131,7 +132,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         }
         else
         {
-            Topics = new ();
+            Topics = new();
         }
         if (version >= ApiVersion.Version2 && version <= ApiVersion.Version7)
         {
@@ -161,7 +162,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         }
         else
         {
-            Groups = new ();
+            Groups = new();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version6)
@@ -294,7 +295,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         /// <summary>
         /// The responses per partition
         /// </summary>
-        public List<OffsetFetchResponsePartitionMessage> Partitions { get; set; } = new ();
+        public List<OffsetFetchResponsePartitionMessage> Partitions { get; set; } = new();
 
         public OffsetFetchResponseTopicMessage()
         {
@@ -664,7 +665,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         /// <summary>
         /// The responses per topic.
         /// </summary>
-        public List<OffsetFetchResponseTopicsMessage> Topics { get; set; } = new ();
+        public List<OffsetFetchResponseTopicsMessage> Topics { get; set; } = new();
 
         /// <summary>
         /// The group-level error code, or 0 if there was no error.
@@ -808,7 +809,7 @@ public sealed class OffsetFetchResponseMessage: IResponseMessage, IEquatable<Off
         /// <summary>
         /// The responses per partition
         /// </summary>
-        public List<OffsetFetchResponsePartitionsMessage> Partitions { get; set; } = new ();
+        public List<OffsetFetchResponsePartitionsMessage> Partitions { get; set; } = new();
 
         public OffsetFetchResponseTopicsMessage()
         {

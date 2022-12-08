@@ -27,11 +27,12 @@
 // ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable PartialTypeWithSinglePart
 
+using System.Text;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
-using System.Text;
 
 namespace NKafka.Messages;
 
@@ -82,7 +83,7 @@ public sealed class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGro
     /// <summary>
     /// The list of protocols that the member supports.
     /// </summary>
-    public JoinGroupRequestProtocolCollection Protocols { get; set; } = new ();
+    public JoinGroupRequestProtocolCollection Protocols { get; set; } = new();
 
     /// <summary>
     /// The reason why the member (re-)joins the group.

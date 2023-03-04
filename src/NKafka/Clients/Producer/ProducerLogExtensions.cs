@@ -28,11 +28,14 @@ namespace NKafka.Clients.Producer;
 internal static partial class ProducerLogExtensions
 {
     [LoggerMessage(EventId = 500, Level = LogLevel.Trace, Message = Utils.LOGGER_PREFIX + "Starting the Kafka producer {ProducerName}")]
-    public static partial void StartProducer(this ILogger logger, string producerName);
+    public static partial void StartProducerTrace(this ILogger logger, string producerName);
 
     [LoggerMessage(EventId = 501, Level = LogLevel.Debug, Message = Utils.LOGGER_PREFIX + "Kafka producer {ProducerName} started")]
     public static partial void StartedProducer(this ILogger logger, string producerName);
 
     [LoggerMessage(EventId = 502, Level = LogLevel.Trace, Message = Utils.LOGGER_PREFIX + "Produce new message to topic {TopicPartition}")]
-    public static partial void ProduceMessage(this ILogger logger, TopicPartition topicPartition);
+    public static partial void ProduceMessageTrace(this ILogger logger, TopicPartition topicPartition);
+
+    [LoggerMessage(EventId = 503, Level = LogLevel.Error, Message = Utils.LOGGER_PREFIX + "Topic message producing error {TopicPartition}")]
+    public static partial void ProduceMessageError(this ILogger logger, Exception exc, TopicPartition topicPartition);
 }

@@ -123,6 +123,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are no partitions available for the topic {0}.
+        /// </summary>
+        internal static string Producer_NoAvailablePartitions {
+            get {
+                return ResourceManager.GetString("Producer_NoAvailablePartitions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Serializer not specified and there is no default serializer defined for type {0}..
         /// </summary>
         internal static string Producer_SerializerError {
@@ -132,11 +141,20 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The record size is too large and exceeds the parameter {0} {1}.
+        /// </summary>
+        internal static string Producer_SizeVeryLarge {
+            get {
+                return ResourceManager.GetString("Producer_SizeVeryLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation cannot be performed because the producer was closed.
         /// </summary>
-        internal static string ProducerClosed {
+        internal static string Producer_WasClosed {
             get {
-                return ResourceManager.GetString("ProducerClosed", resourceCulture);
+                return ResourceManager.GetString("Producer_WasClosed", resourceCulture);
             }
         }
         

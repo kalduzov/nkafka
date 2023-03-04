@@ -9,6 +9,8 @@ namespace NKafka.Connection;
 
 internal sealed partial class KafkaConnector
 {
+    private long _totalBytesReceived;
+
     private async Task ResponseReaderTask()
     {
         /*
@@ -48,6 +50,7 @@ internal sealed partial class KafkaConnector
                 // В идельном случае можно вообще не вычитывать весь буфер, а последовательным чтением сразу формировать нужный класс ответа 
                 // Pipelines требуют свободного "потока", который будет сливать данные из сокета - его можно сделать один на весь пулл подключений aka NIO из java 
                 var countReadBytes = await _stream.ReadAsync(intBuffer).ConfigureAwait(false);
+                _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, countReadBytes);
 
                 var responseLen = ReadInt32BigEndian(intBuffer.Span);
 
@@ -62,6 +65,8 @@ internal sealed partial class KafkaConnector
                 }
 
                 var responseIdLen = await _stream.ReadAsync(intBuffer).ConfigureAwait(false);
+                _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, responseIdLen);
+
                 var requestId = ReadInt32BigEndian(intBuffer.Span);
 
                 Debug.WriteLine($"Get new message from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={responseLen}");
@@ -84,6 +89,7 @@ internal sealed partial class KafkaConnector
                 {
                     currentRead = await _stream.ReadAsync(buffer.AsMemory(startPosition, leftRead))
                         .ConfigureAwait(false);
+                    _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, currentRead);
 
                     leftRead -= currentRead;
                     startPosition += currentRead;

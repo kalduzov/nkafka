@@ -77,7 +77,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// Returns a list of partitions for a topic
     /// </summary>
     /// <remarks>If the data is not in the internal cache, then a request is made to the broker for this information.</remarks>
-    /// <exception cref="ProtocolKafkaException">Бросается в случае, если такого топика нет в кафке</exception>
+    /// <exception cref="ProtocolKafkaException">Throws if there is no such topic in kafka</exception>
     ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);
 
     /// <summary>

@@ -26,7 +26,7 @@ using NKafka.Protocol.Records;
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
-/// 
+/// Contains batch data and metadata
 /// </summary>
 internal class ProducerBatch
 {
@@ -37,10 +37,16 @@ internal class ProducerBatch
     private int _maxRecordSize;
     private int _recordsCount;
     private bool _retry;
-    private List<RecordMetadataTask> _recordTasks = new();
+    private List<SendResultTask> _recordTasks = new();
 
+    /// <summary>
+    /// How many bytes are left to add so that the batch is complete
+    /// </summary>
     public int EstimatedSizeInBytes { get; set; }
 
+    /// <summary>
+    /// Indicates that no more data can be added to the batch
+    /// </summary>
     public bool IsFull { get; set; }
 
     public ProducerBatch(TopicPartition topicPartition, RecordsBuilder recordsBuilder)
@@ -57,14 +63,18 @@ internal class ProducerBatch
         _retry = false;
     }
 
+    /// <summary>
+    /// Try to add new data to batch
+    /// </summary>
+    /// <returns>true if it was possible to add an entry to the batch, false otherwise</returns>
     public bool TryAppend(
         long timestamp,
         byte[]? key,
         byte[]? value,
         Headers headers,
-        out RecordMetadataTask? recordMetadataTask)
+        out SendResultTask? sendResultTask)
     {
-        recordMetadataTask = null;
+        sendResultTask = null;
 
         if (!_recordsBuilder.HasRoomFor(timestamp, key, value, headers))
         {
@@ -74,8 +84,8 @@ internal class ProducerBatch
         _recordsBuilder.Append(timestamp, key, value, headers);
         var estimateSizeInBytesUpperBound = Records.EstimateSizeInBytesUpperBound(key, value, headers);
         _maxRecordSize = Math.Max(_maxRecordSize, estimateSizeInBytesUpperBound);
-        recordMetadataTask = new RecordMetadataTask(_produceRequestResult, _recordsCount, timestamp, key?.Length ?? -1, value?.Length ?? -1);
-        _recordTasks.Add(recordMetadataTask);
+        sendResultTask = new SendResultTask(_produceRequestResult, _recordsCount, timestamp, key?.Length ?? -1, value?.Length ?? -1);
+        _recordTasks.Add(sendResultTask);
         _recordsCount++;
 
         return true;
@@ -87,7 +97,7 @@ internal class ProducerBatch
     }
 
     /// <summary>
-    /// Успешно завершает 
+    /// Successfully completes batch processing 
     /// </summary>
     /// <param name="baseOffset"></param>
     /// <param name="appendTime"></param>

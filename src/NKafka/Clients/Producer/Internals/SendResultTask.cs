@@ -21,11 +21,28 @@
 
 namespace NKafka.Clients.Producer.Internals;
 
-internal class ProduceRequestResult: TaskCompletionSource
+internal class SendResultTask: TaskCompletionSource<RecordMetadata>
 {
-    public ProduceRequestResult()
+    private readonly long _createTimestamp;
+    private readonly int _recordsCount;
+    private readonly TaskCompletionSource _result;
+    private readonly int _serializedKeySize;
+    private readonly int _serializedValueSize;
+
+    public RecordMetadata Value { get; set; }
+
+    public SendResultTask(
+        TaskCompletionSource result,
+        int recordsCount,
+        long createTimestamp,
+        int serializedKeySize,
+        int serializedValueSize)
         : base(TaskCreationOptions.RunContinuationsAsynchronously)
     {
-
+        _result = result;
+        _recordsCount = recordsCount;
+        _createTimestamp = createTimestamp;
+        _serializedKeySize = serializedKeySize;
+        _serializedValueSize = serializedValueSize;
     }
 }

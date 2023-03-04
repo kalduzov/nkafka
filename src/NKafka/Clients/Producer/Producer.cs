@@ -29,7 +29,7 @@ using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Diagnostics;
 using NKafka.Exceptions;
-using NKafka.Protocol;
+using NKafka.Metrics;
 using NKafka.Protocol.Records;
 using NKafka.Serialization;
 
@@ -58,14 +58,12 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         [typeof(Guid)] = Serializers.Guid
     };
 
-    private readonly RecordAccumulator _accumulator;
-    private readonly CompressionType _compressionType;
+    private readonly IRecordAccumulator _accumulator;
     private readonly ILogger _logger;
     private readonly int _maxRequestSize;
     private readonly string _name;
-    private readonly ILoggerFactory _loggerFactory;
+    private readonly IProducerMetrics _producerMetrics;
     private readonly IPartitioner _partitioner;
-    private readonly TimeSpan _time;
     private readonly CancellationTokenSource _tokenSource = new();
     private readonly int _totalMemorySize;
     private readonly ITransactionManager _transactionManager;
@@ -73,8 +71,12 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     private readonly IAsyncSerializer<TKey> _keySerializer;
     private readonly IAsyncSerializer<TValue> _valueSerializer;
     private readonly Task _senderTask;
-    private readonly ISender _sender;
+    private readonly IMessagesSender _messagesSender;
+    private readonly int _deliveryTimeoutMs;
 
+    /// <summary>
+    /// Use this constructor to create a producer
+    /// </summary>
     internal Producer(
         IKafkaCluster kafkaCluster,
         string name,
@@ -82,28 +84,47 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         IAsyncSerializer<TKey> keySerializer,
         IAsyncSerializer<TValue> valueSerializer,
         ILoggerFactory loggerFactory)
+        : this(kafkaCluster, name, config, keySerializer, valueSerializer, null, null, null, loggerFactory)
+    {
+    }
+
+    /// <summary>
+    ///  Test-only constructor
+    /// </summary>
+    internal Producer(
+        IKafkaCluster kafkaCluster,
+        string name,
+        ProducerConfig config,
+        IAsyncSerializer<TKey> keySerializer,
+        IAsyncSerializer<TValue> valueSerializer,
+        ITransactionManager? transactionManager,
+        IRecordAccumulator? recordAccumulator,
+        IMessagesSender? messagesSender,
+        ILoggerFactory loggerFactory)
         : base(kafkaCluster, config, loggerFactory)
     {
         _name = name;
-        _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger(name);
 
-        _logger.StartProducer(_name);
+        _logger.StartProducerTrace(_name);
 
-        _transactionManager = new TransactionManager();
+        _producerMetrics = config.Metrics;
         _maxRequestSize = config.MaxRequestSize;
         _totalMemorySize = config.BufferMemory;
+        _senderTask = Task.CompletedTask; //initialize in order not to make it nullable
 
         try
         {
-            _compressionType = config.CompressionType;
             _partitioner = InitPartitionerClass(config.PartitionerConfig);
             _keySerializer = InitializeSerializer(keySerializer);
             _valueSerializer = InitializeSerializer(valueSerializer);
-            var deliveryTimeoutMs = ConfigureDeliveryTimeout();
-            _accumulator = new RecordAccumulator(config, _transactionManager, deliveryTimeoutMs, loggerFactory);
-            _sender = BuildSender();
-            _senderTask = Task.Factory.StartNew(_sender.RunAsync, _tokenSource, TaskCreationOptions.LongRunning | TaskCreationOptions.RunContinuationsAsynchronously);
+
+            _deliveryTimeoutMs = ConfigureDeliveryTimeout();
+
+            _transactionManager = transactionManager ?? new TransactionManager();
+            _accumulator = recordAccumulator ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, loggerFactory);
+            _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, loggerFactory);
+            _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
             _logger.StartedProducer(_name);
         }
         catch (Exception exc)
@@ -119,12 +140,21 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     /// <inheritdoc/>
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
-        InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
+        var _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
                 task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
+                        Debug.WriteLine($"The message {message} was sent successfully");
+
+                        return;
+                    }
+
+                    if (task.IsFaulted)
+                    {
+                        _logger.ProduceMessageError(task.Exception!, topicPartition);
+
                         Debug.WriteLine($"The message {message} was sent successfully");
                     }
                 });
@@ -177,27 +207,6 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         return base.DisposeAsync();
     }
 
-    // /// <inheritdoc/>
-    // public Task AbortTransaction(CancellationToken token)
-    // {
-    //     return Task.CompletedTask;
-    // }
-    //
-    // /// <inheritdoc/>
-    // public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId)
-    // {
-    // }
-    //
-    // /// <inheritdoc/>
-    // public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata)
-    // {
-    // }
-
-    private ISender BuildSender()
-    {
-        return new Sender(Config, _accumulator, KafkaCluster, _loggerFactory);
-    }
-
     private void Close(TimeSpan timeSpan, bool swallowException)
     {
         _tokenSource.Cancel(!swallowException);
@@ -207,27 +216,6 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             _senderTask.Dispose();
         }
     }
-
-    // private short ConfigureAcks(ProducerConfig config, ILogger logger)
-    // {
-    //     var acks = (short)Config.Acks;
-    //
-    //     if (!config.IdempotenceEnabled)
-    //     {
-    //         return acks;
-    //     }
-    //
-    //     if (Config.Acks == Acks.NoSet)
-    //     {
-    //         Logger.OverrideDefaultAcks(acks);
-    //     }
-    //     else if (acks != -1)
-    //     {
-    //         throw new KafkaConfigException("Must set {0} to all in order to use the idempotent");
-    //     }
-    //
-    //     return acks;
-    // }
 
     private static int LingerMs(ProducerConfig config)
     {
@@ -302,7 +290,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     {
         if (_closed)
         {
-            throw new KafkaException(EM.ProducerClosed);
+            throw new KafkaException(EM.Producer_WasClosed);
         }
     }
 
@@ -312,7 +300,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         bool isFireAndForget,
         CancellationToken token = default)
     {
-        _logger.ProduceMessage(topicPartition);
+        _logger.ProduceMessageTrace(topicPartition);
 
         ThrowIfProducerClosed();
 
@@ -320,30 +308,31 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
         try
         {
-            // Получаем данные по разделам топика, для случаев, если пользователь отключил полное обновление метаданных  
-            await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
+            // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
+            var _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token).ConfigureAwait(false);
 
             var headers = message.Headers;
-            var serializedKey = await SerializeKeyAsync(message.Key);
-            var serializedValue = await SerializeValueAsync(message.Value);
+            headers.SetReadOnly();
 
-            // Пробуем вычислить раздел  
-            if (topicPartition.Partition.IsSpecial)
-            {
-                topicPartition.Partition = await _partitioner.PartitionAsync(
-                    topicPartition.Topic,
-                    typeof(TKey),
-                    serializedKey,
-                    typeof(TValue),
-                    serializedValue,
-                    KafkaCluster,
-                    token);
-            }
-
-            headers.SetReadOnly(); //Запрещаем изменение заголовков, пока не будут отправлены данные
+            var serializedKey = await SerializeKeyAsync(message.Key).ConfigureAwait(false);
+            var serializedValue = await SerializeValueAsync(message.Value).ConfigureAwait(false);
 
             var serializedSize = Records.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
+
+            // Trying to get a partition if it is not set  
+            if (topicPartition.Partition.IsSpecial)
+            {
+                topicPartition.Partition = await _partitioner.PartitionAsync(
+                        topicPartition.Topic,
+                        typeof(TKey),
+                        serializedKey,
+                        typeof(TValue),
+                        serializedValue,
+                        KafkaCluster,
+                        token)
+                    .ConfigureAwait(false);
+            }
 
             var appendResult = _accumulator.Append(
                 topicPartition,
@@ -354,23 +343,37 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
             if (appendResult.BatchIsFull || appendResult.NewBatchCreated)
             {
-                _sender.Wakeup();
+                _messagesSender.Wakeup();
             }
+
+            _producerMetrics.AppendBytes(topicPartition, appendResult.AppendedBytes);
 
             if (!isFireAndForget)
             {
-                var sendResult = await appendResult.SendResult!.Task;
+                var sendResult = await appendResult
+                    .SendResult!
+                    .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token)
+                    .ConfigureAwait(false);
 
                 var topicPartitionOffset = new TopicPartitionOffset(topicPartition, sendResult.Offset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.Persisted, topicPartitionOffset);
             }
-
+            else
             {
                 var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.PossiblyPersisted, topicPartitionOffset);
             }
+
+        }
+        catch (TimeoutException)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, "Timeout exception");
+
+            var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
+
+            return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.NotPersisted, topicPartitionOffset);
         }
         catch (Exception exc)
         {
@@ -380,24 +383,34 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
     }
 
+    /// <summary>
+    /// Make sure the record size is valid.
+    /// </summary>
     private void EnsureValidRecordSize(int size)
     {
         if (size > _maxRequestSize)
         {
-            throw new KafkaException($"Размер записи слишком большой и превышает параметр {_maxRequestSize}");
+            var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.MaxRequestSize), _maxRequestSize);
+
+            throw new KafkaException(message);
         }
 
+        // ReSharper disable once InvertIf
         if (size > _totalMemorySize)
         {
-            throw new KafkaException($"Размер записи слишком большой и превышает параметр {_totalMemorySize}");
+            var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.TotalMemorySize), _totalMemorySize);
+
+            throw new KafkaException(message);
         }
     }
 
-    private async Task<byte[]> SerializeKeyAsync(TKey key)
+    private Task<byte[]> SerializeKeyAsync(TKey key)
     {
         try
         {
-            return await _keySerializer.SerializeAsync(key);
+            return _keySerializer.PreferAsync
+                ? _keySerializer.SerializeAsync(key)
+                : Task.FromResult(_keySerializer.Serialize(key));
         }
         catch (Exception exc)
         {
@@ -405,11 +418,13 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
     }
 
-    private async Task<byte[]> SerializeValueAsync(TValue value)
+    private Task<byte[]> SerializeValueAsync(TValue value)
     {
         try
         {
-            return await _valueSerializer.SerializeAsync(value);
+            return _valueSerializer.PreferAsync
+                ? _valueSerializer.SerializeAsync(value)
+                : Task.FromResult(_valueSerializer.Serialize(value));
         }
         catch (Exception exc)
         {

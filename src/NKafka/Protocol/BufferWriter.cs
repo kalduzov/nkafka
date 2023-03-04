@@ -29,6 +29,8 @@ namespace NKafka.Protocol;
 /// </summary>
 public class BufferWriter
 {
+    private const int _NULL_VAR_INT_VALUE = -1;
+
     private readonly Stream _stream;
     private readonly bool _lenReserved;
 
@@ -118,6 +120,11 @@ public class BufferWriter
         _stream.WriteVarInt(value);
     }
 
+    public void WriteNullVarInt()
+    {
+        _stream.WriteVarInt(_NULL_VAR_INT_VALUE);
+    }
+
     public void WriteVarLong(long value)
     {
         _stream.WriteVarInt64(value);
@@ -144,9 +151,14 @@ public class BufferWriter
         _stream.Write(value);
     }
 
+    public void WriteBytesWithLength(ReadOnlySpan<byte> value)
+    {
+        _stream.WriteVarInt(value.Length);
+        _stream.Write(value);
+    }
+
     public void WriteRecords(IRecords records)
     {
-        //if (records is )
         _stream.Write(records.Buffer);
     }
 

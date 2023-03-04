@@ -29,10 +29,10 @@ namespace NKafka.Serialization;
 public interface IAsyncSerializer<in T>
 {
     /// <summary>
-    /// Предпочитать асинхронный метод для сериализации
+    /// Prefer async method for serialization
     /// </summary>
     /// <remarks>
-    /// Если установлено данное свойство, то клиент будет вызывать метод SerializeAsync для сериализации, в противном случае Serialize.
+    /// If this property is set then the client will call the <see cref="SerializeAsync"/> method to serialize, otherwise <see cref="Serialize"/>
     /// </remarks>>
     bool PreferAsync => true;
 

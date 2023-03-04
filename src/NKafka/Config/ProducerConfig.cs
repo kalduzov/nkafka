@@ -21,6 +21,8 @@
  * limitations under the License.
  */
 
+using NKafka.Metrics;
+
 namespace NKafka.Config;
 
 public record ProducerConfig: CommonConfig
@@ -109,6 +111,11 @@ public record ProducerConfig: CommonConfig
     public bool IdempotenceEnabled => false;
 
     public int TransactionTimeoutMs { get; set; } = 6000;
+
+    /// <summary>
+    /// Gives the producer access to the implementation of the metrics provider
+    /// </summary>
+    public IProducerMetrics Metrics { get; set; } = new NullProducerMetrics();
 
     /// <summary>
     /// Creates a new configuration based on the current one

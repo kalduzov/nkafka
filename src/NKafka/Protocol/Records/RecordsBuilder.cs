@@ -170,7 +170,7 @@ internal class RecordsBuilder
 
         var offsetDelta = (int)(offset - _baseOffset);
         var timestampDelta = timestamp - _baseTimestamp!.Value;
-        var sizeInBytes = Record.WriteTo(_appendBuffer, offsetDelta, timestampDelta, key, value, headers);
+        var sizeInBytes = 0; // Record.WriteTo(_appendBuffer.writet, offsetDelta, timestampDelta, key, value, headers);
         RecordWritten(offset, timestamp, sizeInBytes);
     }
 

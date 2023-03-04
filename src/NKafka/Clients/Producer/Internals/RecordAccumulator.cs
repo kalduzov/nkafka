@@ -30,27 +30,29 @@ using Microsoft.IO;
 using NKafka.Collections;
 using NKafka.Config;
 using NKafka.Exceptions;
+using NKafka.Metrics;
 using NKafka.Protocol;
 using NKafka.Protocol.Records;
+using NKafka.Resources;
 
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
 /// Manages the distribution of messages by batches
 /// </summary>
-internal sealed class RecordAccumulator
+internal sealed class RecordAccumulator: IRecordAccumulator
 {
-    private class TopicInfo
+    private class TopicBatches
     {
         public ConcurrentDictionary<Partition, Deque<ProducerBatch>> Batches { get; }
 
-        public TopicInfo()
+        public TopicBatches()
         {
             Batches = new ConcurrentDictionary<Partition, Deque<ProducerBatch>>();
         }
     }
 
-    private readonly ConcurrentDictionary<string, TopicInfo> _topicInfos = new();
+    private readonly ConcurrentDictionary<string, TopicBatches> _topicBatchesMap;
     private readonly int _batchSize;
     private readonly ArrayPool<byte> _bufferPool;
     private readonly RecyclableMemoryStreamManager _memoryStreamManager;
@@ -63,6 +65,7 @@ internal sealed class RecordAccumulator
     private readonly ITransactionManager _transactionManager;
     private volatile int _appendsInProgress;
     private volatile int _flushesInProgress = 0;
+    private readonly IProducerMetrics _metrics;
 
     public RecordAccumulator(
         ProducerConfig config,
@@ -70,6 +73,8 @@ internal sealed class RecordAccumulator
         int deliveryTimeoutMs,
         ILoggerFactory loggerFactory)
     {
+        _topicBatchesMap = new();
+        _metrics = config.Metrics;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
         _logger = loggerFactory.CreateLogger<RecordAccumulator>();
@@ -86,12 +91,12 @@ internal sealed class RecordAccumulator
     /// <summary>
     /// Append new message to accumulator
     /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="timestamp"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    /// <param name="headers"></param>
-    /// <returns></returns>
+    /// <param name="topicPartition">Partition to which the message should be sent</param>
+    /// <param name="timestamp">The timestamp when this message was created</param>
+    /// <param name="key">Message key</param>
+    /// <param name="value">Message value</param>
+    /// <param name="headers">Message headers</param>
+    /// <returns>Returns the result of adding the message to the accumulator</returns>
     public RecordAppendResult Append(
         TopicPartition topicPartition,
         long timestamp,
@@ -101,7 +106,8 @@ internal sealed class RecordAccumulator
     {
         Interlocked.Increment(ref _appendsInProgress);
 
-        var topicInfo = _topicInfos.GetOrAdd(topicPartition.Topic, new TopicInfo()); //Список батчей для конкретного топика разделенных по разделам
+        // list of batches for a specific topic divided by partitions
+        var topicBatches = _topicBatchesMap.GetOrAdd(topicPartition.Topic, new TopicBatches());
 
         var buffer = Stream.Null;
 
@@ -111,13 +117,14 @@ internal sealed class RecordAccumulator
             {
                 var effectivePartition = topicPartition.Partition.Value;
 
-                //Получаем очередь, содержащую батчи для добавления записей
-                var deque = topicInfo.Batches.GetOrAdd(effectivePartition, _ => new Deque<ProducerBatch>());
+                // get a queue containing batches for adding records
+                var deque = topicBatches.Batches.GetOrAdd(effectivePartition, _ => new Deque<ProducerBatch>());
 
-                lock (deque)
+                lock (deque) //only one thread can add data to the queue
                 {
-                    if (TryAppend(timestamp, key, value, headers, deque, out var appendResult)) //Батч был, данные удалось добавить
+                    if (TryAppend(timestamp, key, value, headers, deque, out var appendResult))
                     {
+                        //the data could be added because a suitable batch already existed
                         return appendResult!;
                     }
                 }
@@ -190,7 +197,7 @@ internal sealed class RecordAccumulator
     }
 
     /// <summary>
-    /// Попытка добавить данные в какой-либо батч для раздела
+    /// Attempt to add data to any batch for a partiotion
     /// </summary>
     /// <exception cref="KafkaException"></exception>
     private bool TryAppend(
@@ -199,16 +206,16 @@ internal sealed class RecordAccumulator
         byte[] value,
         Headers headers,
         Deque<ProducerBatch> deque,
-        out RecordAppendResult? recordAppendResult)
+        out RecordAppendResult recordAppendResult)
     {
-        recordAppendResult = null;
+        recordAppendResult = new NoneAppendResult();
 
-        if (_closed) //Продюсер был закрыт, значит все операции в нем более не доступны
+        if (_closed) //The producer was closed, which means that all operations in it no longer went through
         {
-            throw new KafkaException("Producer closed while send in progress");
+            throw new ProduceException(ExceptionMessages.Producer_WasClosed);
         }
 
-        var last = deque.PeekFront(); //Получаем последний батч из очереди
+        var last = deque.PeekFront(); //get the last batch from the queue
 
         if (last is null)
         {
@@ -217,7 +224,7 @@ internal sealed class RecordAccumulator
 
         var initialBytes = last.EstimatedSizeInBytes;
 
-        if (!last.TryAppend(timestamp, key, value, headers, out var recordMetadataTask))
+        if (!last.TryAppend(timestamp, key, value, headers, out var sendResultTask))
         {
             last.CloseForRecordAppends();
 
@@ -225,7 +232,7 @@ internal sealed class RecordAccumulator
         }
         var appendedBytes = last.EstimatedSizeInBytes - initialBytes;
 
-        recordAppendResult = new RecordAppendResult(recordMetadataTask, deque.Count > 1 || last.IsFull, false, appendedBytes);
+        recordAppendResult = new RecordAppendResult(sendResultTask, deque.Count > 1 || last.IsFull, false, appendedBytes);
 
         return true;
     }
@@ -251,7 +258,7 @@ internal sealed class RecordAccumulator
         var readyNodes = new HashSet<Node>();
         var unknownLeaderTopics = new HashSet<string>();
 
-        foreach (var topicInfo in _topicInfos)
+        foreach (var topicInfo in _topicBatchesMap)
         {
             var topic = topicInfo.Key;
             PartitionReady(kafkaCluster, topic, topicInfo.Value, readyNodes, unknownLeaderTopics);
@@ -262,11 +269,11 @@ internal sealed class RecordAccumulator
 
     private void PartitionReady(IKafkaCluster cluster,
         string topic,
-        TopicInfo topicInfo,
+        TopicBatches topicBatches,
         HashSet<Node> readyNodes,
         HashSet<string> unknownLeaderTopics)
     {
-        var batches = topicInfo.Batches;
+        var batches = topicBatches.Batches;
 
         int[]? queueSizes = null;
         int[]? partitionIds = null;
@@ -327,18 +334,5 @@ internal sealed class RecordAccumulator
     private void BatchReady(TopicPartition part, Node leader, bool full, HashSet<Node> readyNodes)
     {
         //if (!readyNodes.Contains(leader) && )
-    }
-
-    public class ReadyCheckResult
-    {
-        public HashSet<Node> ReadyNodes { get; }
-
-        public HashSet<string> UnknownLeaderTopics { get; }
-
-        public ReadyCheckResult(HashSet<Node> readyNodes, HashSet<string> unknownLeaderTopics)
-        {
-            ReadyNodes = readyNodes;
-            UnknownLeaderTopics = unknownLeaderTopics;
-        }
     }
 }

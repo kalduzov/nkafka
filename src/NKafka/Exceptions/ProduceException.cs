@@ -21,10 +21,23 @@
  * limitations under the License.
  */
 
-namespace NKafka.Clients.Producer;
+namespace NKafka.Exceptions;
 
-public class ProduceException: Exception
+/// <summary>
+/// 
+/// </summary>
+public class ProduceException: KafkaException
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    public ProduceException(string message)
+        : base(message)
+    {
+
+    }
+
     public ProduceException(Exception exc)
         : base("", exc)
     {

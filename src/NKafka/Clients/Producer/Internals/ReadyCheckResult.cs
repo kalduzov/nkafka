@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -21,9 +21,15 @@
 
 namespace NKafka.Clients.Producer.Internals;
 
-internal interface ISender
+internal class ReadyCheckResult
 {
-    void RunAsync(object? cts);
+    public HashSet<Node> ReadyNodes { get; }
 
-    void Wakeup();
+    public HashSet<string> UnknownLeaderTopics { get; }
+
+    public ReadyCheckResult(HashSet<Node> readyNodes, HashSet<string> unknownLeaderTopics)
+    {
+        ReadyNodes = readyNodes;
+        UnknownLeaderTopics = unknownLeaderTopics;
+    }
 }

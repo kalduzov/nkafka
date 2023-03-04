@@ -22,29 +22,56 @@
 using Microsoft.Extensions.Logging;
 
 using NKafka.Config;
+using NKafka.Metrics;
 
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
-/// Класс, обрабатывющий 
+/// Implementation of a manager interface for sending messages in a kafka cluster
 /// </summary>
-internal class Sender: ISender
+internal class MessagesSender: IMessagesSender
 {
-    private readonly ProducerConfig _producerConfig;
-    private readonly RecordAccumulator _recordAccumulator;
+    private readonly ProducerConfig _config;
+    private readonly IRecordAccumulator _recordAccumulator;
     private readonly IKafkaCluster _kafkaCluster;
-    private readonly ILogger<Sender> _logger;
+    private readonly ILogger<MessagesSender> _logger;
+    private CancellationTokenSource _tokenSource = new();
+    private readonly IProducerMetrics _metrics;
 
-    public Sender(ProducerConfig producerConfig, RecordAccumulator recordAccumulator, IKafkaCluster kafkaCluster, ILoggerFactory loggerFactory)
+    public MessagesSender(ProducerConfig config, IRecordAccumulator recordAccumulator, IKafkaCluster kafkaCluster, ILoggerFactory loggerFactory)
     {
-        _producerConfig = producerConfig;
+        _config = config;
+        _metrics = config.Metrics;
         _recordAccumulator = recordAccumulator;
         _kafkaCluster = kafkaCluster;
-        _logger = loggerFactory.CreateLogger<Sender>();
+        _logger = loggerFactory.CreateLogger<MessagesSender>();
 
     }
 
-    public async void RunAsync(object? cts)
+    /// <inheritdoc/>
+    public Task StartAsync(CancellationToken stoppingToken)
+    {
+        _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+
+        return Task.Factory.StartNew(RunAsync, this, TaskCreationOptions.LongRunning | TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+
+    /// <inheritdoc/>
+    public void Sleep()
+    {
+    }
+
+    /// <inheritdoc/>
+    public void Wakeup()
+    {
+    }
+
+    /// <inheritdoc/>
+    public void Stop(TimeSpan timeout)
+    {
+    }
+
+    private async void RunAsync(object? messageSender)
     {
         var oldThreadName = Thread.CurrentThread.Name;
         Thread.CurrentThread.Name = "Kafka producer I/O thread";
@@ -53,17 +80,17 @@ internal class Sender: ISender
 
         try
         {
-            if (cts is not CancellationTokenSource cancellationTokenSource)
+            if (messageSender is not MessagesSender sender)
             {
-                throw new ArgumentException("На вход метода ожидался тип 'CancellationTokenSource'", nameof(cts));
+                throw new ArgumentException("На вход метода ожидался тип 'MessagesSender'", nameof(messageSender));
             }
-            var token = cancellationTokenSource.Token;
+            var token = sender._tokenSource.Token;
 
             while (!token.IsCancellationRequested)
             {
                 //todo вызов этого цикла без паузы постоянно нагружает SOH
                 await RunOnceAsync(token).ConfigureAwait(false);
-                await Task.Delay(TimeSpan.FromMilliseconds(_producerConfig.RetryBackoffMs), token).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromMilliseconds(_config.RetryBackoffMs), token).ConfigureAwait(false);
             }
 
             //todo, после основного цикла нужно подчистить все ресурсы
@@ -80,10 +107,6 @@ internal class Sender: ISender
         {
             Thread.CurrentThread.Name = oldThreadName;
         }
-    }
-
-    public void Wakeup()
-    {
     }
 
     private async Task RunOnceAsync(CancellationToken token)

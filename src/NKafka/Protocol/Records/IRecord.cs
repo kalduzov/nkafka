@@ -25,21 +25,33 @@ namespace NKafka.Protocol.Records;
 
 public interface IRecord
 {
+    /// <summary>
+    /// Full record length
+    /// </summary>
     public int Length { get; set; }
 
     /// <summary>
-    /// The timestamp of the first Record in the batch. The timestamp of each Record in the RecordBatch is its 'TimestampDelta' + 'FirstTimestamp'.
+    ///
     /// </summary>
     public sbyte Attributes { get; set; }
 
     public long TimestampDelta { get; set; }
 
+    /// <summary>
+    /// The offset of this record in the log
+    /// </summary>
     public long OffsetDelta { get; set; }
 
     public long KeyLength => Key.LongLength;
 
+    /// <summary>
+    /// The record's key
+    /// </summary>
     public byte[] Key { get; set; }
 
+    /// <summary>
+    /// The record's value
+    /// </summary>
     public byte[] Value { get; set; }
 
     /// <summary>

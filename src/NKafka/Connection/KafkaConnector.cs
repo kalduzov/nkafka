@@ -44,6 +44,8 @@ namespace NKafka.Connection;
 /// </summary>
 internal sealed partial class KafkaConnector: IKafkaConnector
 {
+    private long _totalBytesSent;
+
     private readonly bool _apiVersionRequest;
     private readonly ArrayPool<byte> _arrayPool;
     private readonly string _clientId;
@@ -235,7 +237,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
             if (CanWrite)
             {
-                request.Write(_stream, true, _messageMaxBytes);
+                var bytesSent = request.Write(_stream, true, _messageMaxBytes);
+                _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
             }
             else
             {

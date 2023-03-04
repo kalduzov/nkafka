@@ -19,10 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Text;
-
 using NKafka.Config;
-using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol.Records;
 
@@ -36,8 +33,6 @@ public sealed class Records: IRecords
     private const int _NO_PARTITION_LEADER_EPOCH = -1;
     private const short _NO_PRODUCER_EPOCH = -1;
 
-
-
     public Records(BufferReader reader)
     {
         Read(reader);
@@ -48,7 +43,7 @@ public sealed class Records: IRecords
     /// </summary>
     public int SizeInBytes { get; set; }
 
-    public byte[] Buffer { get; set; }
+    public byte[] Buffer { get; set; } = Array.Empty<byte>();
 
     private void Read(BufferReader reader)
     {
@@ -126,17 +121,15 @@ public sealed class Records: IRecords
     }
 
     /// <summary>
-    /// Вычисляем верхний порог размера записи
+    /// An estimate of the upper bound on the record size in bytes
     /// </summary>
     internal static int EstimateSizeInBytesUpperBound(byte[]? serializedKey, byte[]? serializedValue, Headers headers)
     {
         var keySize = serializedKey?.Length ?? -1;
         var valueSize = serializedValue?.Length ?? -1;
 
-        return RECORD_BATCH_OVERHEAD + _MAX_RECORD_OVERHEAD + Record.SizeOf(keySize, valueSize, headers);
+        return RECORD_BATCH_OVERHEAD + _MAX_RECORD_OVERHEAD + RecordExtensions.SizeOf(keySize, valueSize, headers);
     }
-
-
 
     public override string ToString()
     {

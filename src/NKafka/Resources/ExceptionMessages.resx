@@ -44,7 +44,7 @@
   <data name="PartitionerNotFound" xml:space="preserve">
         <value>No partitioning method found</value>
     </data>
-  <data name="ProducerClosed" xml:space="preserve">
+  <data name="Producer_WasClosed" xml:space="preserve">
         <value>The operation cannot be performed because the producer was closed</value>
     </data>
   <data name="PartitionerCreateError" xml:space="preserve">
@@ -55,5 +55,11 @@
     </data>
   <data name="Producer_CreateError" xml:space="preserve">
         <value>Failed to construct kafka producer</value>
+    </data>
+  <data name="Producer_SizeVeryLarge" xml:space="preserve">
+        <value>The record size is too large and exceeds the parameter {0} {1}</value>
+    </data>
+  <data name="Producer_NoAvailablePartitions" xml:space="preserve">
+        <value>There are no partitions available for the topic {0}</value>
     </data>
 </root>

@@ -56,7 +56,7 @@ public readonly struct SendMessage
         RequestMessage = requestMessage;
     }
 
-    public void Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
+    public long Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
     {
         using var stream = _streamManager.GetStream();
         var writer = new BufferWriter(stream);
@@ -74,5 +74,7 @@ public readonly struct SendMessage
         }
 
         stream.WriteTo(writableStream);
+
+        return stream.Length;
     }
 }

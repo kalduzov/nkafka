@@ -1,8 +1,8 @@
-//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,23 +19,18 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Clients.Producer.Internals;
+namespace NKafka.Metrics;
 
-internal class StickyPartitionInfo
+/// <summary>
+/// Provides methods for emitting producer metrics
+/// </summary>
+public interface IProducerMetrics
 {
-    private volatile int _producedBytes;
-
-    public int ProducedBytes => _producedBytes;
-
-    public StickyPartitionInfo(Partition partition)
+    void AppendBytes(TopicPartition topicPartition, int appendBytes)
     {
-        Partition = partition;
     }
 
-    public Partition Partition { get; }
-
-    public int AddAndGet(int appendBytes)
+    void SentBytes(TopicPartition topicPartition, int sentBytes)
     {
-        return Interlocked.Add(ref _producedBytes, appendBytes);
     }
 }

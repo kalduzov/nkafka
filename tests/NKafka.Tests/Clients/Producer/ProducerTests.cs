@@ -21,9 +21,12 @@
 
 using Microsoft.Extensions.Logging.Abstractions;
 
+using NKafka.Clients.Producer;
+using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Messages;
+using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Producer;
 
@@ -36,6 +39,32 @@ public abstract class ProducerTests
         var connectionPool = CreateKafkaConnectorPool();
 
         return new KafkaCluster(clusterConfig, NullLoggerFactory.Instance, connectionPool);
+    }
+
+    protected static IProducer<TKey, TValue> CreateProducerForTests<TKey, TValue>(ProducerConfig config)
+        where TKey : notnull
+        where TValue : notnull
+    {
+        var kafkaClusterMock = new Mock<IKafkaCluster>();
+        kafkaClusterMock.SetupGet(c => c.Closed).Returns(true);
+
+        var transactionManagerMock = new Mock<ITransactionManager>();
+        var recordAccumulatorMock = new Mock<IRecordAccumulator>();
+        recordAccumulatorMock
+            .Setup(x => x.Append(It.Is<TopicPartition>(tp => tp.Partition == 1 && tp.Topic == "test_topic"), It.IsAny<long>(), It.IsAny<byte[]>(), It.IsAny<byte[]>(), It.IsAny<Headers>()))
+            .Returns(new RecordAppendResult(new SendResultTask(new TaskCompletionSource(), 1, 0, 0, 0), false, true, 10));
+
+        var messageSenderMock = new Mock<IMessagesSender>();
+
+        return new Producer<TKey, TValue>(kafkaClusterMock.Object,
+            "test_producer",
+            config,
+            NoneSerializer<TKey>.Instance,
+            NoneSerializer<TValue>.Instance,
+            transactionManagerMock.Object,
+            recordAccumulatorMock.Object,
+            messageSenderMock.Object,
+            NullLoggerFactory.Instance);
     }
 
     private static IKafkaConnectorPool CreateKafkaConnectorPool()

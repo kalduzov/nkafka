@@ -96,11 +96,47 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Такой метод распределения по разделам не найден.
+        ///   Looks up a localized string similar to The class selected as the custom partitioning algorithm cannot be created.
+        /// </summary>
+        internal static string PartitionerCreateError {
+            get {
+                return ResourceManager.GetString("PartitionerCreateError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No partitioning method found.
         /// </summary>
         internal static string PartitionerNotFound {
             get {
                 return ResourceManager.GetString("PartitionerNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to construct kafka producer.
+        /// </summary>
+        internal static string Producer_CreateError {
+            get {
+                return ResourceManager.GetString("Producer_CreateError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Serializer not specified and there is no default serializer defined for type {0}..
+        /// </summary>
+        internal static string Producer_SerializerError {
+            get {
+                return ResourceManager.GetString("Producer_SerializerError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The operation cannot be performed because the producer was closed.
+        /// </summary>
+        internal static string ProducerClosed {
+            get {
+                return ResourceManager.GetString("ProducerClosed", resourceCulture);
             }
         }
         

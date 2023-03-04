@@ -87,6 +87,33 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to In the settings, the type of distribution by sections Custom is specified, but the custom class is not specified.
+        /// </summary>
+        internal static string PartitionerConfig_CustomClassNotFound {
+            get {
+                return ResourceManager.GetString("PartitionerConfig_CustomClassNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified custom type does not inherit the &apos;IPartitioner&apos; interface.
+        /// </summary>
+        internal static string PartitionerConfig_InterfaceInvalid {
+            get {
+                return ResourceManager.GetString("PartitionerConfig_InterfaceInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The settings specify a custom partitioning algorithm class, but the distribution type is specified other than Custom.
+        /// </summary>
+        internal static string PartitionerConfig_TypePartitionerInvalid {
+            get {
+                return ResourceManager.GetString("PartitionerConfig_TypePartitionerInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The SecurityProtocols property is configured to work with Sasl, but there is no configuration for Sasl..
         /// </summary>
         internal static string Sasl_no_configured {

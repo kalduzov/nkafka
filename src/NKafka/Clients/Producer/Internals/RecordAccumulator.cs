@@ -35,6 +35,9 @@ using NKafka.Protocol.Records;
 
 namespace NKafka.Clients.Producer.Internals;
 
+/// <summary>
+/// Manages the distribution of messages by batches
+/// </summary>
 internal sealed class RecordAccumulator
 {
     private class TopicInfo
@@ -230,11 +233,12 @@ internal sealed class RecordAccumulator
     /// <summary>
     /// Отправляет все скопившиеся батчи 
     /// </summary>
-    public void FlushAll()
+    /// <param name="timeSpan"></param>
+    public void FlushAll(TimeSpan timeSpan)
     {
     }
 
-    public Task FlushAllAsync()
+    public Task FlushAllAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
     }
@@ -274,7 +278,7 @@ internal sealed class RecordAccumulator
             var part = new TopicPartition(topic, entry.Key);
             var leader = cluster.LeaderFor(part);
 
-            if (leader is not null && queueSizes is not null)
+            if (leader != Node.NoNode && queueSizes is not null)
             {
                 ++queueSizesIndex;
                 partitionIds[queueSizesIndex] = part.Partition;

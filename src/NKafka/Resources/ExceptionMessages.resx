@@ -32,16 +32,28 @@
     <data name="SaslVersionInvalid" xml:space="preserve">
         <value>The current version of Sasl is not correct</value>
     </data>
-    <data name="SaslMechanismInvalid" xml:space="preserve">
+  <data name="SaslMechanismInvalid" xml:space="preserve">
         <value>An unsupported mechanism for Sasl was specified</value>
     </data>
-    <data name="NoController" xml:space="preserve">
+  <data name="NoController" xml:space="preserve">
         <value>Controller not set</value>
     </data>
-    <data name="NoConnectionToController" xml:space="preserve">
+  <data name="NoConnectionToController" xml:space="preserve">
         <value>Connector to controller not found</value>
     </data>
-    <data name="PartitionerNotFound" xml:space="preserve">
-        <value>Такой метод распределения по разделам не найден</value>
+  <data name="PartitionerNotFound" xml:space="preserve">
+        <value>No partitioning method found</value>
+    </data>
+  <data name="ProducerClosed" xml:space="preserve">
+        <value>The operation cannot be performed because the producer was closed</value>
+    </data>
+  <data name="PartitionerCreateError" xml:space="preserve">
+        <value>The class selected as the custom partitioning algorithm cannot be created</value>
+    </data>
+  <data name="Producer_SerializerError" xml:space="preserve">
+        <value>Serializer not specified and there is no default serializer defined for type {0}.</value>
+    </data>
+  <data name="Producer_CreateError" xml:space="preserve">
+        <value>Failed to construct kafka producer</value>
     </data>
 </root>

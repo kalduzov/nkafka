@@ -31,8 +31,9 @@ using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Records;
-using NKafka.Resources;
 using NKafka.Serialization;
+
+using EM = NKafka.Resources.ExceptionMessages;
 
 namespace NKafka.Clients.Producer;
 
@@ -107,56 +108,41 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
         catch (Exception exc)
         {
-            Close(TimeSpan.Zero, true); //возможно уже что-то успело создаться, поэтому пробуем подчистить все за собой 
+            Close(TimeSpan.Zero, true); //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves. 
 
-            throw new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Failed to construct kafka producer", exc);
+            throw new KafkaException(EM.Producer_CreateError, exc);
         }
-    }
-
-    private ISender BuildSender()
-    {
-        return new Sender(Config, _accumulator, KafkaCluster, _loggerFactory);
     }
 
     string IProducer.Name => _name;
 
-    /// <summary>
-    ///     Fire and forget produce message
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
+    /// <inheritdoc/>
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
-        //using var activity = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, true);
-
         InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
                 task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.WriteLine($"Отправка сообщения {message} прошла успешно");
+                        Debug.WriteLine($"The message {message} was sent successfully");
                     }
                 });
     }
 
-    /// <summary>
-    /// </summary>
+    /// <inheritdoc/>
     public Task FlushAsync(CancellationToken token)
     {
-        return Task.CompletedTask;
+        return _accumulator.FlushAllAsync(token);
     }
 
+    /// <inheritdoc/>
     public void Flush(TimeSpan timeout)
     {
+        _accumulator.FlushAll(timeout);
     }
 
-    /// <summary>
-    /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     public Task<DeliveryResult<TKey, TValue>> ProduceAsync(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
@@ -165,16 +151,19 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         return InternalProduceAsync(topicPartition, message, false, token);
     }
 
+    /// <inheritdoc/>
     public IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic)
     {
         throw new NotImplementedException();
     }
 
+    /// <inheritdoc/>
     public void Close(TimeSpan timeout)
     {
         _closed = true;
     }
 
+    /// <inheritdoc/>
     public ValueTask CloseAsync(CancellationToken token)
     {
         _closed = true;
@@ -188,17 +177,25 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         return base.DisposeAsync();
     }
 
-    public Task AbortTransaction(CancellationToken token)
-    {
-        return Task.CompletedTask;
-    }
+    // /// <inheritdoc/>
+    // public Task AbortTransaction(CancellationToken token)
+    // {
+    //     return Task.CompletedTask;
+    // }
+    //
+    // /// <inheritdoc/>
+    // public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId)
+    // {
+    // }
+    //
+    // /// <inheritdoc/>
+    // public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata)
+    // {
+    // }
 
-    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, string consumerGroupId)
+    private ISender BuildSender()
     {
-    }
-
-    public void SendOffsetsToTransaction(Dictionary<TopicPartition, OffsetAndMetadata> offsets, ConsumerGroupMetadata groupMetadata)
-    {
+        return new Sender(Config, _accumulator, KafkaCluster, _loggerFactory);
     }
 
     private void Close(TimeSpan timeSpan, bool swallowException)
@@ -264,17 +261,14 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
                         if (partitionerClass is null)
                         {
-                            throw new ArgumentException(
-                                "Класс, выбранный в качестве пользовательского алгоритма распределения по разделам, не может быть создан.");
+                            throw new ArgumentException(EM.PartitionerCreateError);
                         }
 
                         return (IPartitioner)partitionerClass;
                     }
                     catch (Exception exc)
                     {
-                        throw new ArgumentException(
-                            "Класс, выбранный в качестве пользовательского алгоритма распределения по разделам, не может быть создан.",
-                            exc);
+                        throw new ArgumentException(EM.PartitionerCreateError, exc);
                     }
                 }
             case Partitioner.Default:
@@ -282,7 +276,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             case Partitioner.RoundRobinPartitioner:
                 return new RoundRobinPartitioner();
             default:
-                throw new ArgumentOutOfRangeException(nameof(partitionerConfig), ExceptionMessages.PartitionerNotFound);
+                throw new ArgumentOutOfRangeException(nameof(partitionerConfig), EM.PartitionerNotFound);
         }
     }
 
@@ -293,13 +287,14 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             return serializer;
         }
 
-        if (!_defaultSerializers.TryGetValue(typeof(T), out var ser))
+        if (_defaultSerializers.TryGetValue(typeof(T), out var ser))
         {
-            throw new ArgumentNullException(
-                $"Serializer not specified and there is no default serializer defined for type {typeof(T).Name}.");
+            return (IAsyncSerializer<T>)ser;
         }
 
-        return (IAsyncSerializer<T>)ser;
+        var errorMessage = string.Format(EM.Producer_SerializerError, typeof(T).Name);
+
+        throw new ArgumentNullException(errorMessage);
 
     }
 
@@ -307,20 +302,8 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     {
         if (_closed)
         {
-            throw new KafkaException("Невозможно выполнить операцию, т.к. продюсер был закрыт");
+            throw new KafkaException(EM.ProducerClosed);
         }
-    }
-
-    /// <summary>
-    /// </summary>
-    public Task FlushAsync()
-    {
-        return _accumulator.FlushAllAsync();
-    }
-
-    public void Flush()
-    {
-        _accumulator.FlushAll();
     }
 
     private async Task<DeliveryResult<TKey, TValue>> InternalProduceAsync(

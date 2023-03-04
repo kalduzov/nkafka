@@ -53,26 +53,29 @@ public record ProducerConfig: CommonConfig
     public PartitionerConfig PartitionerConfig { get; set; } = new();
 
     /// <summary>
-    /// Время ожидания наполнения батча записей на отправку
-    /// </summary>
-    /// Через не ранее чем через lingerMs батч, даже если он еще не заполнен - будет отправлен в брокер.
-    /// Если стоит 0, то такой батч будет отправлен в следующем цикле отправки сообщений 
+    /// Waiting time for filling a batch of records to be sent
+    /// <p>
+    /// <br/>
+    /// Not earlier than through <b>lingerMs</b> the batch, even if it is not completely filled yet, will be sent to the broker.
+    /// If set to <b>0</b>, then such a batch will be sent in the next message sending cycle
+    /// </p>
+    /// </summary> 
     public double LingerMs { get; set; } = 0;
 
     /// <summary>
-    /// Тип подтверждения доставки сообщений
+    /// Type of message delivery confirmation
     /// </summary>
     public Acks Acks { get; set; } = Acks.All;
 
     /// <summary>
-    /// Максимальный размер запроса
+    /// Maximum request size
     /// </summary>
     public int MaxRequestSize { get; set; } = 1024 * 1024;
 
     public long TotalMemorySize { get; set; }
 
     /// <summary>
-    /// Тип сжатия записей
+    /// Record compression type
     /// </summary>
     public CompressionType CompressionType { get; set; } = CompressionType.None;
 
@@ -81,7 +84,7 @@ public record ProducerConfig: CommonConfig
     public string? TransactionalId { get; set; }
 
     /// <summary>
-    /// Максимальный размер отдного пакета с записями
+    /// Maximum size of one batch with records
     /// </summary>
     public int BatchSize { get; set; } = 16384;
 
@@ -108,7 +111,7 @@ public record ProducerConfig: CommonConfig
     public int TransactionTimeoutMs { get; set; } = 6000;
 
     /// <summary>
-    /// Создает новую конфигурацию на базе текущей
+    /// Creates a new configuration based on the current one
     /// </summary>
     public static ProducerConfig BaseFrom(CommonConfig config)
     {
@@ -122,9 +125,9 @@ public record ProducerConfig: CommonConfig
     }
 
     /// <summary>
-    /// Мержит основную конфигурацию с текущей
+    /// Merges the main configuration with the current one
     /// </summary>
-    /// <remarks>Все параметры текущей конфигурации перезаписываются параметрами основной</remarks>
+    /// <remarks>All parameters of the current configuration are overwritten by the parameters of the main</remarks>
     public ProducerConfig MergeFrom(CommonConfig config)
     {
         return this with

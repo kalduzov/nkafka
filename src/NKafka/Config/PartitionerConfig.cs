@@ -22,17 +22,19 @@
 using NKafka.Clients.Producer;
 using NKafka.Exceptions;
 
+using CEM = NKafka.Resources.ConfigExceptionMessages;
+
 namespace NKafka.Config;
 
 public class PartitionerConfig
 {
     /// <summary>
-    /// Тип алгоритма распределения сообщений по разделам 
+    /// Algorithm type for distributing messages into partitions 
     /// </summary>
     public Partitioner Partitioner { get; set; } = Partitioner.Default;
 
     /// <summary>
-    /// Тип класса для пользовательского алгоритма распределения по разделам. 
+    /// Class type for custom partitioning algorithm
     /// </summary>
     public Type CustomPartitionerClass { get; set; } = typeof(object);
 
@@ -42,27 +44,18 @@ public class PartitionerConfig
         {
             if (Partitioner != Partitioner.Custom)
             {
-                throw new KafkaConfigException(
-                    nameof(Partitioner),
-                    Partitioner,
-                    "В настройках указан пользовательский класс алгоритма распределения по разделам, но тип распределения указан отличный от Custom");
+                throw new KafkaConfigException(nameof(Partitioner), Partitioner, CEM.PartitionerConfig_TypePartitionerInvalid);
             }
 
             if (!typeof(IPartitioner).IsAssignableFrom(CustomPartitionerClass))
             {
-                throw new KafkaConfigException(
-                    nameof(CustomPartitionerClass),
-                    CustomPartitionerClass,
-                    "Указанный пользовательский тип не наследует интерфейс 'IPartitioner'");
+                throw new KafkaConfigException(nameof(CustomPartitionerClass), CustomPartitionerClass, CEM.PartitionerConfig_InterfaceInvalid);
             }
         }
 
         if (CustomPartitionerClass == typeof(object) && Partitioner == Partitioner.Custom)
         {
-            throw new KafkaConfigException(
-                nameof(CustomPartitionerClass),
-                CustomPartitionerClass,
-                "В настройках указан выбран тип распределения по разделам Custom, но не указан пользовательский класс");
+            throw new KafkaConfigException(nameof(CustomPartitionerClass), CustomPartitionerClass, CEM.PartitionerConfig_CustomClassNotFound);
         }
     }
 }

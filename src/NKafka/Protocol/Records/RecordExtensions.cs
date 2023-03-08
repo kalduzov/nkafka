@@ -27,7 +27,7 @@ namespace NKafka.Protocol.Records;
 
 internal static class RecordExtensions
 {
-    private static readonly int _nullVarIntSizeBytes = -1.SizeOfVarUInt();
+    private static readonly int _nullVarIntSizeBytes = (-1).SizeOfVarInt();
 
     private static int SizeOfBodyInBytes(int offsetDelta,
         long timestampDelta,
@@ -43,14 +43,14 @@ internal static class RecordExtensions
 
     private static int SizeOfBodyInBytes(int offsetDelta,
         long timestampDelta,
-        int key,
+        int keySize,
         int value,
         Headers headers)
     {
         var size = 1;
-        size += offsetDelta.SizeOfVarUInt();
+        size += offsetDelta.SizeOfVarInt();
         size += timestampDelta.SizeOfVarLong();
-        size += SizeOf(key, value, headers);
+        size += SizeOf(keySize, value, headers);
 
         return size;
     }
@@ -59,57 +59,51 @@ internal static class RecordExtensions
     {
         var size = 0;
 
-        size += keySize < 0 ? _nullVarIntSizeBytes : keySize.SizeOfVarUInt() + keySize;
-        size += valueSize < 0 ? _nullVarIntSizeBytes : valueSize.SizeOfVarUInt() + valueSize;
+        size += keySize < 0 ? _nullVarIntSizeBytes : keySize.SizeOfVarInt() + keySize;
+        size += valueSize < 0 ? _nullVarIntSizeBytes : valueSize.SizeOfVarInt() + valueSize;
 
-        size += headers.Count.SizeOfVarUInt();
+        size += headers.Count.SizeOfVarInt();
 
         foreach (var header in headers)
         {
             var headerKeySize = Encoding.UTF8.GetByteCount(header.Key);
-            size += headerKeySize.SizeOfVarUInt() + headerKeySize;
-            size += header.Value is null ? _nullVarIntSizeBytes : header.Value.Length.SizeOfVarUInt() + header.Value.Length;
+            size += headerKeySize.SizeOfVarInt() + headerKeySize;
+            size += header.Value is null ? _nullVarIntSizeBytes : header.Value.Length.SizeOfVarInt() + header.Value.Length;
         }
 
         return size;
     }
 
-    public static int WriteTo(this IRecord record,
-        BufferWriter appendBuffer,
-        int offsetDelta,
-        long timestampDelta,
-        byte[]? key,
-        byte[]? value,
-        Headers headers)
+    public static int WriteTo(this IRecord record, BufferWriter appendBuffer)
     {
-        var sizeInBytes = SizeOfBodyInBytes(offsetDelta, timestampDelta, key, value, headers);
+        var sizeInBytes = SizeOfBodyInBytes((int)record.OffsetDelta, record.TimestampDelta, record.Key, record.Value, record.Headers);
         appendBuffer.WriteVarInt(sizeInBytes);
         const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
         appendBuffer.WriteByte(attributes);
-        appendBuffer.WriteVarLong(timestampDelta);
-        appendBuffer.WriteVarInt(offsetDelta);
+        appendBuffer.WriteVarLong(record.TimestampDelta);
+        appendBuffer.WriteVarLong(record.OffsetDelta);
 
-        if (key is null)
+        if (record.Key is null)
         {
             appendBuffer.WriteNullVarInt();
         }
         else
         {
-            appendBuffer.WriteBytesWithLength(key);
+            appendBuffer.WriteBytesWithLength(record.Key);
         }
 
-        if (value is null)
+        if (record.Value is null)
         {
             appendBuffer.WriteNullVarInt();
         }
         else
         {
-            appendBuffer.WriteBytesWithLength(value);
+            appendBuffer.WriteBytesWithLength(record.Value);
         }
 
-        appendBuffer.WriteVarInt(headers.Count);
+        appendBuffer.WriteVarInt(record.Headers.Count);
 
-        foreach (var header in headers)
+        foreach (var header in record.Headers)
         {
             var headerKey = Encoding.UTF8.GetBytes(header.Key);
             appendBuffer.WriteBytesWithLength(headerKey);
@@ -124,7 +118,7 @@ internal static class RecordExtensions
             }
         }
 
-        return sizeInBytes.SizeOfVarUInt() + sizeInBytes;
+        return sizeInBytes.SizeOfVarInt() + sizeInBytes;
     }
 
     public static Record ReadFrom(this BufferReader bufferReader)

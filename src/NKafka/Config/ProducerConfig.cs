@@ -30,27 +30,30 @@ public record ProducerConfig: CommonConfig
     public static readonly ProducerConfig EmptyProducerConfig = new();
 
     /// <summary>
-    ///     Specifies whether to enable notification of delivery reports. Typically
-    ///     you should set this parameter to true. Set it to false for "fire and
-    ///     forget" semantics and a small boost in performance.
-    ///     default: true
+    /// Specifies whether to enable notification of delivery reports. Typically
+    /// you should set this parameter to true. Set it to false for "fire and
+    /// forget" semantics and a small boost in performance.
+    /// default: true
     /// </summary>
+    /// <remarks>
+    /// If the producer is used only to send "fire and forget" semantics, then it makes sense to set this field to false
+    /// to avoid unnecessary processing of responses from the server.
+    /// </remarks>
     public bool EnableDeliveryReports { get; set; } = true;
 
     /// <summary>
-    /// Таймаут на доставку сообщения
+    /// Message delivery timeout
     /// </summary>
     /// <remarks>
-    /// Продюсер будет пытаться отправить сообщения до истечения данного таймаута
+    /// The producer will try to send messages before this timeout expires.
     /// </remarks>
     public int DeliveryTimeoutMs { get; set; } = 120 * 1000;
 
     /// <summary>
-    /// Конфигурация алгоритма распределения сообщений по разделам
+    /// Сonfiguration of the message distribution algorithm by sections
     /// </summary>
-    /// <remarks>По умалчанию выставлено значение для свойства Partitioner = Default, и в качестве алгоритма будет использоваться адаптивное распределение.
-    ///
-    /// Подробнее можно прочитать в https://cwiki.apache.org/confluence/display/KAFKA/KIP-794%3A+Strictly+Uniform+Sticky+Partitioner
+    /// <remarks>
+    /// By default, the value for the Partitioner = Default property is set, and roundrobin will be used as the algorithm
     /// </remarks>
     public PartitionerConfig PartitionerConfig { get; set; } = new();
 
@@ -74,43 +77,20 @@ public record ProducerConfig: CommonConfig
     /// </summary>
     public int MaxRequestSize { get; set; } = 1024 * 1024;
 
-    public long TotalMemorySize { get; set; }
-
     /// <summary>
     /// Record compression type
     /// </summary>
     public CompressionType CompressionType { get; set; } = CompressionType.None;
 
-    public long MaxBlockTimeMs { get; set; }
-
-    public string? TransactionalId { get; set; }
-
     /// <summary>
     /// Maximum size of one batch with records
     /// </summary>
-    public int BatchSize { get; set; } = 16384;
+    public int BatchSize { get; set; } = 65535;
 
     /// <summary>
     /// The total bytes of memory the producer can use to buffer records waiting to be sent to the server.
     /// </summary>
     public int BufferMemory { get; set; } = 32 * 1024 * 1024;
-
-    public long MetadataMaxAgeConfig { get; set; }
-
-    public long MetadataMaxIdleConfig { get; set; }
-
-    /// <summary>
-    /// The maximum number of unacknowledged requests the client will send on a single connection before blocking.
-    /// Note that if this config is set to be greater than 1 and <see cref="IdempotenceEnabled" /> is set to false, there
-    /// is a risk of message re-ordering after a failed send due to retries (i.e., if retries are enabled)
-    /// default: 5
-    /// importance: low
-    /// </summary>
-    public int MaxInFlightPerRequest { get; set; } = 5;
-
-    public bool IdempotenceEnabled => false;
-
-    public int TransactionTimeoutMs { get; set; } = 6000;
 
     /// <summary>
     /// Gives the producer access to the implementation of the metrics provider

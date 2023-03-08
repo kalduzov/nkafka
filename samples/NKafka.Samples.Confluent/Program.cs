@@ -25,28 +25,21 @@ using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 
 var stopwatch = Stopwatch.StartNew();
-var adminClientBuilder = new AdminClientBuilder(
+var producerBuilder = new ProducerBuilder<Null, string>(
     new AdminClientConfig
     {
-        BootstrapServers = "localhost:29124",
+        BootstrapServers = "localhost:29091",
     });
 
-using var adminClient = adminClientBuilder.Build();
+using var producer = producerBuilder.Build();
 
-for (var i = 1000; i < 1500; i++)
+for (var i = 0; i < 10; i++)
 {
-    await adminClient.CreateTopicsAsync(
-        new[]
+    producer.Produce("test",
+        new Message<Null, string>
         {
-            new TopicSpecification
-            {
-                Name = "test-protocol" + (i * 200),
-                NumPartitions = 20,
-                ReplicationFactor = 2
-            }
+            Value = "test"
         });
-
-    //await kafkaCluster.RefreshMetadataAsync();
 }
 
 Console.WriteLine($"All OK. {stopwatch.Elapsed}");

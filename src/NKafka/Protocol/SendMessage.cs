@@ -64,7 +64,7 @@ public readonly struct SendMessage
         Header.Write(writer, _headerVersion);
         RequestMessage.Write(writer, _messageVersion);
 
-        writer.End();
+        writer.WriteSizeToStart();
 
         if (stream.Length > messageMaxBytes && throwIfSizeLargeThen)
         {

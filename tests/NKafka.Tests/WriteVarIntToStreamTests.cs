@@ -29,6 +29,7 @@ public class WriteVarIntToStreamTests
     [InlineData(0x1, 0x1, 1)]
     [InlineData(0x0, 0x0, 1)]
     [InlineData(0x12C, 0x2AC, 2)]
+    [InlineData(0x14, 0x14, 1)]
     public void WriteVarUInt64Test(ulong value, ulong calculateValue, int countBytes)
     {
         using var stream = new MemoryStream(5);
@@ -59,6 +60,31 @@ public class WriteVarIntToStreamTests
         var array = stream.ToArray();
         Array.Resize(ref array, 8);
         var checkValue = BitConverter.ToUInt64(array);
+        checkValue.Should().Be(calculateValue);
+    }
+
+    [Theory]
+    [InlineData(0x0, 0x0, 1)]
+    [InlineData(-0x1, 0x1, 1)]
+    [InlineData(0x1, 0x2, 1)]
+    [InlineData(-0x2, 0x3, 1)]
+    [InlineData(0x2, 0x4, 1)]
+    [InlineData(0x3, 0x6, 1)]
+    [InlineData(0x4, 0x8, 1)]
+    [InlineData(0x5, 0xA, 1)]
+    [InlineData(0x6, 0xC, 1)]
+    [InlineData(0xA, 0x14, 1)]
+    public void WriteVarInt32Test(int value, uint calculateValue, int countBytes)
+    {
+        using var stream = new MemoryStream(5);
+
+        var count = stream.WriteVarInt(value);
+
+        count.Should().Be(countBytes);
+
+        var array = stream.ToArray();
+        Array.Resize(ref array, 4);
+        var checkValue = BitConverter.ToUInt32(array);
         checkValue.Should().Be(calculateValue);
     }
 }

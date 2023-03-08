@@ -146,7 +146,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.WriteLine($"The message {message} was sent successfully");
+                        //Debug.WriteLine($"The message {message} was sent successfully");
 
                         return;
                     }
@@ -398,7 +398,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         // ReSharper disable once InvertIf
         if (size > _totalMemorySize)
         {
-            var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.TotalMemorySize), _totalMemorySize);
+            var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.BufferMemory), _totalMemorySize);
 
             throw new KafkaException(message);
         }

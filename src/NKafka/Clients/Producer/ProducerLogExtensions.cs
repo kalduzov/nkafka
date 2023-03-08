@@ -38,4 +38,7 @@ internal static partial class ProducerLogExtensions
 
     [LoggerMessage(EventId = 503, Level = LogLevel.Error, Message = Utils.LOGGER_PREFIX + "Topic message producing error {TopicPartition}")]
     public static partial void ProduceMessageError(this ILogger logger, Exception exc, TopicPartition topicPartition);
+
+    [LoggerMessage(EventId = 504, Level = LogLevel.Trace, Message = Utils.LOGGER_PREFIX + "Add new batch for {TopicPartition}")]
+    public static partial void AddNewBatchTrace(this ILogger logger, TopicPartition topicPartition);
 }

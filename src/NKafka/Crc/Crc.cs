@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,14 +19,36 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Protocol.Records;
+using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.X86;
 
-public interface IRecords
+namespace NKafka.Crc;
+
+public static class Crc
 {
-    /// <summary>
-    /// The size of these records in bytes.
-    /// </summary>
-    int SizeInBytes { get; set; }
+    private static readonly ICrc32C _crc32C;
 
-    BufferWriter Buffer { get; set; }
+    static Crc()
+    {
+        if (Sse42.IsSupported)
+        {
+            _crc32C = new HardwareX86Crc32C();
+
+            return;
+        }
+
+        if (Crc32.Arm64.IsSupported)
+        {
+            _crc32C = new ArmCrc32C();
+
+            return;
+        }
+
+        _crc32C = new NativeCrc32C();
+    }
+
+    public static uint Calculate(Span<byte> span)
+    {
+        return _crc32C.Calculate(span);
+    }
 }

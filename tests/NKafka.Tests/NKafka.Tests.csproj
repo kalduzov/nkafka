@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Folder Include="Messages" />
-    <Folder Include="Protocol\Records" />
   </ItemGroup>
 
 </Project>

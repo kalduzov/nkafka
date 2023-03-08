@@ -36,18 +36,18 @@ public class Record: IRecord
     /// </summary>
     public int Length { get; set; }
 
+    public sbyte Attributes { get; set; }
+
     /// <summary>
     /// The timestamp of the first Record in the batch. The timestamp of each Record in the RecordBatch is its 'TimestampDelta' + 'FirstTimestamp'.
     /// </summary>
-    public sbyte Attributes { get; set; }
-
     public long TimestampDelta { get; set; }
 
     public long OffsetDelta { get; set; }
 
-    public byte[] Key { get; set; }
+    public byte[]? Key { get; set; }
 
-    public byte[] Value { get; set; }
+    public byte[]? Value { get; set; }
 
     /// <summary>
     /// Introduced in 0.11.0.0 for KIP-82, Kafka now supports application level record level headers.

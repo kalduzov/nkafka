@@ -47,12 +47,12 @@ public interface IRecord
     /// <summary>
     /// The record's key
     /// </summary>
-    public byte[] Key { get; set; }
+    public byte[]? Key { get; set; }
 
     /// <summary>
     /// The record's value
     /// </summary>
-    public byte[] Value { get; set; }
+    public byte[]? Value { get; set; }
 
     /// <summary>
     /// Introduced in 0.11.0.0 for KIP-82, Kafka now supports application level record level headers.

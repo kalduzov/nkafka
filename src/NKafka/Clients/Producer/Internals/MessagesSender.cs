@@ -22,7 +22,9 @@
 using Microsoft.Extensions.Logging;
 
 using NKafka.Config;
+using NKafka.Messages;
 using NKafka.Metrics;
+using NKafka.Protocol;
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -116,19 +118,49 @@ internal class MessagesSender: IMessagesSender
 
     private async Task SendProducerDataAsync(CancellationToken token)
     {
-        var result = _recordAccumulator.GetReadyBatches(_kafkaCluster);
+        var batches = _recordAccumulator.PullBathes(_kafkaCluster, _config.MaxRequestSize);
 
-        // В батчах присутствуют партиции топиков для которых нет лидера в метаданных кластера
-        // такое может происходить в нескольких случаях:
-        // 1. Полное обновление метаданных отключено, а продюсер отправляет данные не учитывая реального положения дел
-        // 2. Во время работы клиента появился новый топик и по нему еще не пришли обновления из брокеров, мы уже хотим отправить данные по нему.
-        if (result.UnknownLeaderTopics.Count > 0)
+        foreach (var batch in batches)
         {
-            _logger.LogDebug("Requesting metadata update due to unknown leader topics from the batched records: {Topics}",
-                string.Join(',', result.UnknownLeaderTopics));
-            await _kafkaCluster.RefreshMetadataAsync(token, result.UnknownLeaderTopics).ConfigureAwait(false);
+            var node = _kafkaCluster.LeaderFor(batch.TopicPartition);
+            var produceRequestMessage = new ProduceRequestMessage
+            {
+                Acks = (short)_config.Acks,
+                TopicData = new ProduceRequestMessage.TopicProduceDataCollection
+                {
+                    new()
+                    {
+                        Name = batch.TopicPartition.Topic,
+                        PartitionData = new List<ProduceRequestMessage.PartitionProduceDataMessage>
+                        {
+                            new()
+                            {
+                                Index = batch.TopicPartition.Partition,
+                                Records = batch.GetAsRecords()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = await _kafkaCluster.SendAsync<ProduceResponseMessage, ProduceRequestMessage>(produceRequestMessage, node.Id, token);
+
+            foreach (var response in result.Responses)
+            {
+                foreach (var partitionResponse in response.PartitionResponses)
+                {
+                    if (partitionResponse.Code == ErrorCodes.None)
+                    {
+                        batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
+                    }
+                    else
+                    {
+                        _logger.LogTrace("Error: {ErrorCode}", partitionResponse.Code);
+                        batch.Fail(partitionResponse.Code);
+                    }
+                }
+            }
         }
 
-        //_recordAccumulator.
     }
 }

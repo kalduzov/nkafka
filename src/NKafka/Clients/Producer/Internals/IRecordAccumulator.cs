@@ -22,7 +22,7 @@
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
-/// 
+/// Provides an interface for a record accumulator
 /// </summary>
 internal interface IRecordAccumulator
 {
@@ -30,8 +30,22 @@ internal interface IRecordAccumulator
 
     void FlushAll(TimeSpan timeout);
 
-    ReadyCheckResult GetReadyBatches(IKafkaCluster kafkaCluster);
+    /// <summary>
+    /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size
+    /// </summary>
+    /// <param name="kafkaCluster"></param>
+    /// <param name="maxRequestSize">Maximum request size</param>
+    IEnumerable<ProducerBatch> PullBathes(IKafkaCluster kafkaCluster, int maxRequestSize);
 
+    /// <summary>
+    /// Adds a new record to the accumulator
+    /// </summary>
+    /// <param name="topicPartition">Topic partition for which the entry is added</param>
+    /// <param name="timestampUnixTimestampMs">Timestamp for adding an entry</param>
+    /// <param name="serializedKey">Serialized uncompressed representation of the key</param>
+    /// <param name="serializedValue">Serialized uncompressed representation of the value</param>
+    /// <param name="headers">Record headers</param>
+    /// <returns>The status of the add record operation</returns>
     RecordAppendResult Append(TopicPartition topicPartition,
         long timestampUnixTimestampMs,
         byte[] serializedKey,

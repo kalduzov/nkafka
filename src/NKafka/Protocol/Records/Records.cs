@@ -19,8 +19,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Config;
-
 namespace NKafka.Protocol.Records;
 
 public sealed class Records: IRecords
@@ -33,6 +31,11 @@ public sealed class Records: IRecords
     private const int _NO_PARTITION_LEADER_EPOCH = -1;
     private const short _NO_PRODUCER_EPOCH = -1;
 
+    public Records()
+    {
+
+    }
+
     public Records(BufferReader reader)
     {
         Read(reader);
@@ -43,81 +46,10 @@ public sealed class Records: IRecords
     /// </summary>
     public int SizeInBytes { get; set; }
 
-    public byte[] Buffer { get; set; } = Array.Empty<byte>();
+    public BufferWriter Buffer { get; set; } = new(Stream.Null);
 
     private void Read(BufferReader reader)
     {
-    }
-
-    internal static RecordsBuilder Builder(BufferWriter buffer, CompressionType compressionType, TimestampType timestampType, long baseOffset)
-    {
-        var logAppendTime = NO_TIMESTAMP;
-
-        if (timestampType == TimestampType.LogAppendTime)
-        {
-            logAppendTime = Timestamp.DateTimeToUnixTimestampMs(DateTime.Now);
-        }
-
-        return Builder(buffer,
-            compressionType,
-            timestampType,
-            baseOffset,
-            logAppendTime,
-            _NO_PRODUCER_ID,
-            _NO_PRODUCER_EPOCH,
-            _NO_SEQUENCE,
-            isTransactional: false,
-            _NO_PARTITION_LEADER_EPOCH);
-    }
-
-    internal static RecordsBuilder Builder(BufferWriter buffer,
-        CompressionType compressionType,
-        TimestampType timestampType,
-        long baseOffset,
-        long logAppendTime,
-        long producerId,
-        short producerEpoch,
-        int baseSequence,
-        bool isTransactional,
-        int partitionLeaderEpoch)
-    {
-        return Builder(buffer,
-            compressionType,
-            timestampType,
-            baseOffset,
-            logAppendTime,
-            producerId,
-            producerEpoch,
-            baseSequence,
-            isTransactional,
-            isControlBatch: false,
-            partitionLeaderEpoch);
-    }
-
-    internal static RecordsBuilder Builder(BufferWriter buffer,
-        CompressionType compressionType,
-        TimestampType timestampType,
-        long baseOffset,
-        long logAppendTime,
-        long producerId,
-        short producerEpoch,
-        int baseSequence,
-        bool isTransactional,
-        bool isControlBatch,
-        int partitionLeaderEpoch)
-    {
-        return new RecordsBuilder(buffer,
-            compressionType,
-            timestampType,
-            baseOffset,
-            logAppendTime,
-            producerId,
-            producerEpoch,
-            baseSequence,
-            isTransactional,
-            isControlBatch,
-            partitionLeaderEpoch,
-            buffer.Remaining);
     }
 
     /// <summary>
@@ -128,7 +60,7 @@ public sealed class Records: IRecords
         var keySize = serializedKey?.Length ?? -1;
         var valueSize = serializedValue?.Length ?? -1;
 
-        return RECORD_BATCH_OVERHEAD + _MAX_RECORD_OVERHEAD + RecordExtensions.SizeOf(keySize, valueSize, headers);
+        return _MAX_RECORD_OVERHEAD + RecordExtensions.SizeOf(keySize, valueSize, headers);
     }
 
     public override string ToString()

@@ -84,7 +84,7 @@ internal class MockStream: Stream
                         var response = new ApiVersionsResponseMessage();
                         response.Write(writer, requestData.ApiVersion);
 
-                        writer.End();
+                        writer.WriteSizeToStart();
 
                         break;
                     }

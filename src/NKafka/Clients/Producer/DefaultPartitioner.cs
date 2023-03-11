@@ -19,6 +19,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Exceptions;
+
+using EM = NKafka.Resources.ExceptionMessages;
+
 namespace NKafka.Clients.Producer;
 
 /// <summary>
@@ -41,6 +45,14 @@ internal class DefaultPartitioner: IPartitioner
         where TValue : notnull
     {
         var availablePartitions = cluster.GetAvailablePartitions(topic);
+
+        if (availablePartitions.Count == 0)
+        {
+            var message = string.Format(EM.Producer_NoAvailablePartitions, topic);
+
+            throw new ProduceException(message);
+        }
+
         var maxPartitionIndex = availablePartitions.Max();
 
         return new ValueTask<int>(_random.Next(maxPartitionIndex + 1));

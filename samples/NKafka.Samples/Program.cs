@@ -6,6 +6,7 @@ using NKafka;
 using NKafka.Config;
 
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 var stopwatch = Stopwatch.StartNew();
 
@@ -20,6 +21,7 @@ var clusterConfig = new ClusterConfig
     //Ssl = new SslSettings(),
     ClusterInitTimeoutMs = 160000, //160сек для отладки
     MetadataUpdateTimeoutMs = 10000, //10 секунд на обновление данных по кластеру
+    //MessageMaxBytes = 400000
     //MessageMaxBytes = 20,
 };
 
@@ -39,8 +41,8 @@ var clusterConfig = new ClusterConfig
 //     .Build();
 //
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .MinimumLevel.Verbose()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+    .MinimumLevel.Information()
     .CreateLogger();
 
 var loggerFactory = LoggerFactory.Create(
@@ -78,10 +80,11 @@ await using var producer = kafkaCluster.BuildProducer<Null, string>(new Producer
     PartitionerConfig = new PartitionerConfig
     {
         Partitioner = Partitioner.RoundRobinPartitioner
-    }
+    },
+    BatchSize = 1000
 });
 
-foreach (var val in Enumerable.Range(0, 100))
+foreach (var val in Enumerable.Range(0, 10))
 {
     var test = new Message<Null, string>(Null.Instance, "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test" + val);
     producer.Produce("test", test);

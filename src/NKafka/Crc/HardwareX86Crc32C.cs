@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,23 +19,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Clients.Producer.Internals;
+using System.Runtime.Intrinsics.X86;
 
-internal class StickyPartitionInfo
+namespace NKafka.Crc;
+
+internal class HardwareX86Crc32C: ICrc32C
 {
-    private volatile int _producedBytes;
-
-    public int ProducedBytes => _producedBytes;
-
-    public StickyPartitionInfo(Partition partition)
+    public uint Calculate(Span<byte> span)
     {
-        Partition = partition;
-    }
+        var crc = 0xFFFFFFFF;
 
-    public Partition Partition { get; }
+        // ReSharper disable once ForCanBeConvertedToForeach
+        for (var i = 0; i < span.Length; i++)
+        {
+            crc = Sse42.Crc32(crc, span[i]);
+        }
 
-    public int AddAndGet(int appendBytes)
-    {
-        return Interlocked.Add(ref _producedBytes, appendBytes);
+        return crc ^ 0xFFFFFFFF;
     }
 }

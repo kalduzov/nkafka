@@ -28,7 +28,7 @@ using System.Runtime.CompilerServices;
 namespace NKafka.Collections;
 
 /// <summary>
-/// Реализация double ended queue за базу взята internal реализация System.Collections.Generic.Deque&lt;T&gt;
+/// The implementation of the double ended queue is based on the internal implementation of System.Collections.Generic.Deque&lt;T&gt;
 /// </summary>
 [DebuggerDisplay("Count = {Count}")]
 internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection<T>

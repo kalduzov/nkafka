@@ -40,5 +40,6 @@
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.5"/>
+    <PackageVersion Include="xunit.skippablefact" Version="1.4.13"/>
   </ItemGroup>
 </Project>

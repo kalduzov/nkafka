@@ -7,7 +7,7 @@ services:
     hostname: zookeeper-1
     container_name: zookeeper-1
     ports:
-      - "2181"
+      - "2181:2181"
     environment:
       ZOOKEEPER_SERVER_ID: '1'
       ZOOKEEPER_SERVERS: 'zookeeper-1:2888:3888;zookeeper-2:2888:3888;zookeeper-3:2888:3888'
@@ -18,7 +18,10 @@ services:
       ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
       ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - zookeeper-1.dev
+  
   zookeeper-2:
     image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
     restart: always
@@ -36,7 +39,10 @@ services:
       ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
       ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - zookeeper-2.dev
+  
   zookeeper-3:
     image: 'confluentinc/cp-zookeeper:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
     restart: always
@@ -54,7 +60,9 @@ services:
       ZOOKEEPER_SYNC_LIMIT: '${ZOOKEEPER_SYNC_LIMIT}'
       ZOOKEEPER_MAX_CLIENT_CONNS: '${ZOOKEEPER_MAX_CLIENT_CONNS}'
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - zookeeper-3.dev
 
   broker-1:
     image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
@@ -84,7 +92,9 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_LOG4J_ROOT_LOGLEVEL: '${KAFKA_LOG4J_ROOT_LOGLEVEL}'
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - broker-1.dev
 
   broker-2:
     image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
@@ -113,7 +123,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - broker-2.dev
   
   broker-3:
     image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
@@ -142,7 +154,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - broker-3.dev
   
   broker-4:
     image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
@@ -171,7 +185,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - broker-4.dev
   
   broker-5:
     image: 'confluentinc/cp-kafka:${CONFLUENT_PLATFORM_VERSION:-7.0.0}'
@@ -200,7 +216,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     networks:
-      - kafka-network
+      kafka:
+        aliases:
+          - broker-5.dev
 
   jaeger:
     image: jaegertracing/all-in-one
@@ -210,8 +228,8 @@ services:
       - "6831:6831/udp"
       - "16686:16686"
     networks:
-      - kafka-network
+      - kafka
 
 networks:
-  kafka-network:
+  kafka:
     driver: bridge

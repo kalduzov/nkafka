@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,14 +19,18 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Protocol.Records;
+namespace NKafka.Metrics;
 
-public interface IRecords
+/// <summary>
+/// Provides methods for emitting producer metrics
+/// </summary>
+public interface IProducerMetrics
 {
-    /// <summary>
-    /// The size of these records in bytes.
-    /// </summary>
-    int SizeInBytes { get; set; }
+    void AppendBytes(TopicPartition topicPartition, int appendBytes)
+    {
+    }
 
-    BufferWriter Buffer { get; set; }
+    void SentBytes(TopicPartition topicPartition, int sentBytes)
+    {
+    }
 }

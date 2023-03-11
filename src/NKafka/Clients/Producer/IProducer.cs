@@ -48,15 +48,36 @@ public interface IProducer<TKey, TValue>: IProducer
     where TValue : notnull
 {
     /// <summary>
+    /// Sends all pending accumulated messages and waits for a response to the result of the send
     /// </summary>
+    /// <param name="token"></param>
     Task FlushAsync(CancellationToken token);
 
+    /// <summary>
+    /// Sends all pending accumulated messages and waits for a response to the result of the send
+    /// </summary>
+    /// <param name="timeout">Send timeout</param>
+    /// <remarks>The method blocks for the timeout</remarks>
     void Flush(TimeSpan timeout);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="topic"></param>
+    /// <returns></returns>
     IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="timeout"></param>
     void Close(TimeSpan timeout);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="token"></param>
+    /// <returns></returns>
     ValueTask CloseAsync(CancellationToken token);
 
     #region Produce
@@ -160,51 +181,84 @@ public interface IProducer<TKey, TValue>: IProducer
 
     #endregion Produce
 
-    #region Transaction
-
-    void InitTransactions(TimeSpan timeout)
-    {
-        throw new NotImplementedException();
-    }
-
-    void BeginTransaction()
-    {
-        throw new NotImplementedException();
-    }
-
-    void CommitTransaction(TimeSpan timeout)
-    {
-        throw new NotImplementedException();
-    }
-
-    void CommitTransaction()
-    {
-        throw new NotImplementedException();
-    }
-
-    void AbortTransaction(TimeSpan timeout)
-    {
-        throw new NotImplementedException();
-    }
-
-    void AbortTransaction()
-    {
-        throw new NotImplementedException();
-    }
-
-    void SendOffsetsToTransaction(IEnumerable<TopicPartitionOffset> offsets, IConsumerGroupMetadata groupMetadata)
-    {
-        throw new NotImplementedException();
-    }
-
-    #endregion
+    // #region Transaction
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <param name="timeout"></param>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void InitTransactions(TimeSpan timeout);
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void BeginTransaction()
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <param name="timeout"></param>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void CommitTransaction(TimeSpan timeout)
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void CommitTransaction()
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <param name="timeout"></param>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void AbortTransaction(TimeSpan timeout)
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void AbortTransaction()
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // /// <summary>
+    // /// 
+    // /// </summary>
+    // /// <param name="offsets"></param>
+    // /// <param name="groupMetadata"></param>
+    // /// <exception cref="NotImplementedException"></exception>
+    // void SendOffsetsToTransaction(IEnumerable<TopicPartitionOffset> offsets, IConsumerGroupMetadata groupMetadata)
+    // {
+    //     throw new NotImplementedException();
+    // }
+    //
+    // #endregion
 }
 
 public interface IConsumerGroupMetadata
-{ }
+{
+}
 
 public class ConsumerGroupMetadata
-{ }
+{
+}
 
 public class OffsetAndMetadata
-{ }
+{
+}

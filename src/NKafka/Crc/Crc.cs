@@ -1,8 +1,8 @@
-//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,11 +19,36 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Clients.Producer.Internals;
+using System.Runtime.Intrinsics.Arm;
+using System.Runtime.Intrinsics.X86;
 
-internal interface ISender
+namespace NKafka.Crc;
+
+public static class Crc
 {
-    void RunAsync(object? cts);
+    private static readonly ICrc32C _crc32C;
 
-    void Wakeup();
+    static Crc()
+    {
+        if (Sse42.IsSupported)
+        {
+            _crc32C = new HardwareX86Crc32C();
+
+            return;
+        }
+
+        if (Crc32.Arm64.IsSupported)
+        {
+            _crc32C = new ArmCrc32C();
+
+            return;
+        }
+
+        _crc32C = new NativeCrc32C();
+    }
+
+    public static uint Calculate(Span<byte> span)
+    {
+        return _crc32C.Calculate(span);
+    }
 }

@@ -19,9 +19,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Microsoft.Extensions.Logging.Abstractions;
+
+using NKafka.Clients.Producer;
+using NKafka.Clients.Producer.Internals;
+using NKafka.Config;
+using NKafka.Exceptions;
+using NKafka.Serialization;
+
 namespace NKafka.Tests.Clients.Producer;
 
-public class CreateProducerTests: ProducerTests
+public sealed class CreateProducerTests: ProducerTests
 {
     [Fact]
     public async Task BuildProducer_DefaultConfig_Successful()
@@ -32,5 +40,70 @@ public class CreateProducerTests: ProducerTests
 
         await using var producer = cluster.BuildProducer<int, string>();
         producer.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void CtorSimpleProducer_Successful()
+    {
+        var kafkaCluster = CreateKafkaClusterForTests();
+
+        var action = () => new Producer<int, string>(kafkaCluster,
+            "test_producer",
+            new ProducerConfig(),
+            NoneSerializer<int>.Instance,
+            NoneSerializer<string>.Instance,
+            NullLoggerFactory.Instance);
+
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public void CtorProducer_Successful()
+    {
+        var kafkaCluster = CreateKafkaClusterForTests();
+
+        var transactionManagerMock = new Mock<ITransactionManager>();
+        var recordAccumulatorMock = new Mock<IRecordAccumulator>();
+        var messageSenderMock = new Mock<IMessagesSender>();
+
+        var action = () => new Producer<int, string>(kafkaCluster,
+            "test_producer",
+            new ProducerConfig(),
+            NoneSerializer<int>.Instance,
+            NoneSerializer<string>.Instance,
+            transactionManagerMock.Object,
+            recordAccumulatorMock.Object,
+            messageSenderMock.Object,
+            NullLoggerFactory.Instance);
+
+        action.Should().NotThrow();
+    }
+
+    [Fact]
+    public void CtorProducer_WhenBadConfig_ShouldThrowException()
+    {
+        var kafkaCluster = CreateKafkaClusterForTests();
+
+        var transactionManagerMock = new Mock<ITransactionManager>();
+        var recordAccumulatorMock = new Mock<IRecordAccumulator>();
+        var messageSenderMock = new Mock<IMessagesSender>();
+
+        var action = () => new Producer<int, string>(kafkaCluster,
+            "test_producer",
+            new ProducerConfig
+            {
+                PartitionerConfig = new PartitionerConfig
+                {
+                    Partitioner = (Partitioner)4
+                }
+            },
+            NoneSerializer<int>.Instance,
+            NoneSerializer<string>.Instance,
+            transactionManagerMock.Object,
+            recordAccumulatorMock.Object,
+            messageSenderMock.Object,
+            NullLoggerFactory.Instance);
+
+        action.Should().Throw<KafkaException>().Which.Message.Should().Be(Resources.ExceptionMessages.Producer_CreateError);
     }
 }

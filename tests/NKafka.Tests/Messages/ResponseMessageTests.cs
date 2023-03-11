@@ -31,7 +31,7 @@ public class ResponseMessageTests<T>
         using var stream = new MemoryStream();
         var writer = new BufferWriter(stream);
         message.Write(writer, version);
-        writer.End();
+        writer.WriteSizeToStart();
 
         var serializeMessage = stream.ToArray()[4..]; //Первые 4 байта - это длинна сообщения;
 

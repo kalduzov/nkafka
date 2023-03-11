@@ -26,12 +26,12 @@ namespace NKafka.Clients.Producer.Internals;
 /// <summary>
 /// Metadata about a record just appended to the record accumulator
 /// </summary>
-/// <param name="BatchIsFull">Указывает, что результат добавления записи аккумулятор привел к полной загрузке пачки записей</param>
-/// <param name="NewBatchCreated">Указывает, что в процессе добавления записи была создана новая пачка</param>
-/// <param name="AppendedBytes">Размер добавленных записей в пачку</param>
-/// <param name="SendResult"></param>
+/// <param name="BatchIsFull">Indicates that the batch was completely filled as a result of adding a record</param>
+/// <param name="NewBatchCreated">Indicates that a new batch was created in the process of adding a record</param>
+/// <param name="AppendedBytes">The size of the added record in the batch</param>
+/// <param name="SendResult">Batch send result</param>
 internal record RecordAppendResult(
-    RecordMetadataTask? SendResult,
+    SendResultTask? SendResult,
     bool BatchIsFull,
     bool NewBatchCreated,
     int AppendedBytes);

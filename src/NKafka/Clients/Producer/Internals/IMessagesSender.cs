@@ -19,26 +19,31 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Protocol;
+namespace NKafka.Clients.Producer.Internals;
 
-namespace NKafka.Tests.Messages;
-
-public class RequestMessageTests<T>
-    where T : IMessage, new()
+/// <summary>
+/// Provides a manager interface for sending messages to a kafka cluster
+/// </summary>
+internal interface IMessagesSender
 {
-    protected void SerializeAndDeserializeMessage(T message, ApiVersion version)
-    {
-        using var stream = new MemoryStream();
-        var writer = new BufferWriter(stream);
-        message.Write(writer, version);
-        writer.WriteSizeToStart();
+    /// <summary>
+    /// The process of sending batches with messages starts.
+    /// </summary>
+    Task StartAsync(CancellationToken stoppingToken);
 
-        var serializeMessage = stream.ToArray()[4..]; //Первые 4 байта - это длинна сообщения
+    /// <summary>
+    /// Stops the process of sending messages until the Wakeup method is called 
+    /// </summary>
+    void Sleep();
 
-        var reader = new BufferReader(serializeMessage);
-        var deserializeMessage = new T();
-        deserializeMessage.Read(reader, version);
+    /// <summary>
+    /// Completely stops all sending batches with messages
+    /// </summary>
+    /// <param name="timeout"></param>
+    void Stop(TimeSpan timeout);
 
-        message.Should().BeEquivalentTo(deserializeMessage);
-    }
+    /// <summary>
+    /// Wakes up the manager for further sending batches with messages
+    /// </summary>
+    void Wakeup();
 }

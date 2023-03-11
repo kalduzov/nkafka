@@ -21,12 +21,14 @@
  * limitations under the License.
  */
 
+using System.Collections;
+
 namespace NKafka;
 
 /// <summary>
 /// Information about kafka partition
 /// </summary>
-public class TopicPartition
+public class TopicPartition: IEqualityComparer<TopicPartition>
 {
     /// <summary>
     /// Topic name
@@ -64,5 +66,52 @@ public class TopicPartition
     public override int GetHashCode()
     {
         return HashCode.Combine(Topic, Partition);
+    }
+
+    /// <summary>Determines whether the specified object is equal to the current object.</summary>
+    /// <param name="obj">The object to compare with the current object.</param>
+    /// <returns>
+    /// <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
+    public override bool Equals(object? obj)
+    {
+        return Equals(this, (TopicPartition)obj);
+    }
+
+    /// <summary>Returns a string that represents the current object.</summary>
+    /// <returns>A string that represents the current object.</returns>
+    public override string ToString()
+    {
+        return $"Topic = {Topic}, Partition = {Partition}";
+    }
+
+    public bool Equals(TopicPartition x, TopicPartition y)
+    {
+        if (ReferenceEquals(x, y))
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(x, null))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(y, null))
+        {
+            return false;
+        }
+
+        if (x.GetType() != y.GetType())
+        {
+            return false;
+        }
+
+        return x.Topic == y.Topic
+               && x.Partition.Equals(y.Partition);
+    }
+
+    public int GetHashCode(TopicPartition obj)
+    {
+        return HashCode.Combine(obj.Topic, obj.Partition);
     }
 }

@@ -205,10 +205,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         return InternalRefreshMetadataAsync(topics, token: token);
     }
 
-    /// <summary>
-    /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <inheritdoc />
     public Task OpenAsync(CancellationToken token)
     {
         return OpenInternalAsync(token);

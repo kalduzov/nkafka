@@ -126,7 +126,7 @@ internal static class VarIntExtensions
 
             if (b < 0x80)
             {
-                if (i >= 5 || (i == 4 && b > 1))
+                if (i >= 5 || i == 4 && b > 1)
                 {
                     return -(i + 1);
                 }
@@ -140,19 +140,24 @@ internal static class VarIntExtensions
         }
     }
 
+    internal static int SizeOfVarInt(this int value)
+    {
+        return SizeOfVarUInt(value << 1 ^ value >> 31);
+    }
+
     internal static int SizeOfVarUInt(this int value)
     {
         var leadingZeros = BitOperations.LeadingZeroCount((uint)value);
-        var leadingZerosBelow38DividedBy7 = ((38 - leadingZeros) * 0b10010010010010011) >> 19;
+        var leadingZerosBelow38DividedBy7 = (38 - leadingZeros) * 0b10010010010010011 >> 19;
 
         return leadingZerosBelow38DividedBy7 + (leadingZeros >> 5);
     }
 
     internal static int SizeOfVarLong(this long value)
     {
-        var v = (value << 1) ^ (value >> 63);
+        var v = value << 1 ^ value >> 63;
         var leadingZeros = BitOperations.LeadingZeroCount((ulong)v);
-        var leadingZerosBelow70DividedBy7 = ((70 - leadingZeros) * 0b10010010010010011) >> 19;
+        var leadingZerosBelow70DividedBy7 = (70 - leadingZeros) * 0b10010010010010011 >> 19;
 
         return leadingZerosBelow70DividedBy7 + (leadingZeros >> 6);
     }

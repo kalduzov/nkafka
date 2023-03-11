@@ -77,7 +77,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// Returns a list of partitions for a topic
     /// </summary>
     /// <remarks>If the data is not in the internal cache, then a request is made to the broker for this information.</remarks>
-    /// <exception cref="ProtocolKafkaException">Бросается в случае, если такого топика нет в кафке</exception>
+    /// <exception cref="ProtocolKafkaException">Throws if there is no such topic in kafka</exception>
     ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);
 
     /// <summary>
@@ -113,7 +113,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         where TValue : notnull;
 
     /// <summary>
-    /// Создает консьюмера связанного с текущим кластером
+    /// Creates a consumer associated with the current cluster
     /// </summary>
     /// <param name="consumeGroupName">Название группы консьюмера</param>
     /// <param name="consumerConfig">Конфигурация консьюмера</param>
@@ -129,23 +129,26 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         where TValue : notnull;
 
     /// <summary>
-    /// Обновляет метаданные по указанным топикам
+    /// Updates metadata for the specified topics
     /// </summary>
     /// <param name="token"></param>
-    /// <param name="topics">Список топиков, по которым необходимо получить информацию из брокеров</param>
-    /// <remarks>Если топики не указаны, будет возвращена информация по всем топикам кластера</remarks>
+    /// <param name="topics">List of topics for which you need to get information from brokers</param>
+    /// <remarks>If no topics are specified, information on all cluster topics will be returned</remarks>
     Task RefreshMetadataAsync(CancellationToken token = default, IEnumerable<string>? topics = null);
 
     /// <summary>
-    /// 
+    /// Opens a network connection to a kafka broker and initializes metadata for the entire kafka cluster
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
     Task OpenAsync(CancellationToken token);
 
     /// <summary>
-    /// Отправляет запрос в произвольный брокер
+    /// Sends a request to the cluster
     /// </summary>
+    /// <param name="message">Request to send to the broker</param>
+    /// <param name="token"></param>
+    /// <remarks>The broker for processing the request will be selected the least loaded. If the request requires a controller, it will be selected</remarks>
     internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(
         TRequestMessage message,
         CancellationToken token)
@@ -153,8 +156,11 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         where TRequestMessage : class, IRequestMessage;
 
     /// <summary>
-    /// Отправляет запрос в указанный брокер
+    /// Sends a request to the specified broker
     /// </summary>
+    /// <param name="message">Request to send to the broker</param>
+    /// <param name="nodeId">Broker ID</param>
+    /// <param name="token"></param>
     internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(
         TRequestMessage message,
         int nodeId,
@@ -163,27 +169,28 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         where TRequestMessage : class, IRequestMessage;
 
     /// <summary>
-    /// Возвращает список доступных разделов для топика
-    /// Доступные разделов - это те, к которым сейчас можно обратиться из клиента.
-    /// Т.е. брокеры, на которых находятся данные разделы, в сети и к ним можно сделать запрос.
+    /// Returns a list of available partitions for a topic.
+    /// Available partitions are those that can now be accessed from the client
+    /// In other words, the brokers on which these sections are located are online and you can make a request to them
     /// </summary>
-    /// <param name="topic">Имя топика</param>
+    /// <param name="topic">Topic name</param>
     /// <remarks>
-    /// Данный метод возвращает данные, который были получены при вызове методов GetPartitionsAsync, RefreshMetadataAsync
-    /// или фоновым обновление данных по кластеру 
+    /// This method returns the data that was received when calling the GetPartitionsAsync, RefreshMetadataAsync methods
+    /// or background metadata update on the cluster 
     /// </remarks>
     /// <returns>
-    /// Список доступных разделов или пустую коллекцию, если такие разделы пока не доступны
+    /// List of available partitions or an empty collection if such sections are not yet available
     /// </returns>
     IReadOnlyList<Partition> GetAvailablePartitions(string topic);
 
     /// <summary>
-    /// Возвращает лидера для указннаго раздела в топике
+    /// Returns the leader for the specified partition in the topic
     /// </summary>
-    Node? LeaderFor(TopicPartition topicPartition);
+    /// <returns>A valid node for the specified partition, or NoNode if the node was not found</returns>
+    Node LeaderFor(TopicPartition topicPartition);
 
     /// <summary>
-    /// Возвращает информацию о разделах для указанного топика
+    /// Returns partitions metadata information for the specified topic
     /// </summary>
     IReadOnlyCollection<PartitionMetadata> PartitionsForTopic(string topic);
 }

@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,26 +19,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Protocol;
+namespace NKafka.Metrics;
 
-namespace NKafka.Tests.Messages;
-
-public class RequestMessageTests<T>
-    where T : IMessage, new()
+/// <summary>
+/// Implements a default stub for producer metrics
+/// </summary>
+public class NullProducerMetrics: IProducerMetrics
 {
-    protected void SerializeAndDeserializeMessage(T message, ApiVersion version)
-    {
-        using var stream = new MemoryStream();
-        var writer = new BufferWriter(stream);
-        message.Write(writer, version);
-        writer.WriteSizeToStart();
-
-        var serializeMessage = stream.ToArray()[4..]; //Первые 4 байта - это длинна сообщения
-
-        var reader = new BufferReader(serializeMessage);
-        var deserializeMessage = new T();
-        deserializeMessage.Read(reader, version);
-
-        message.Should().BeEquivalentTo(deserializeMessage);
-    }
 }

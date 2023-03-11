@@ -26,6 +26,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="FluentAssertions"/>
+    <PackageReference Include="xunit.skippablefact"/>
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit"/>

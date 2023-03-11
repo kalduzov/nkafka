@@ -25,12 +25,12 @@ namespace NKafka;
 
 public readonly struct Timestamp: IEquatable<Timestamp>
 {
-    private const long _RD_KAFKA_NO_TIMESTAMP = 0;
+    private const long _NO_TIMESTAMP = 0;
 
     /// <summary>
     ///     A read-only field representing an unspecified timestamp.
     /// </summary>
-    public static Timestamp Default => new(_RD_KAFKA_NO_TIMESTAMP, TimestampType.NotAvailable);
+    public static Timestamp Default => new(_NO_TIMESTAMP, TimestampType.NotAvailable);
 
     /// <summary>
     ///     Unix epoch as a UTC DateTime. Unix time is defined as

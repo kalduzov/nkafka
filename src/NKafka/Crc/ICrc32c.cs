@@ -2,7 +2,7 @@
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,14 +19,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Protocol.Records;
+namespace NKafka.Crc;
 
-public interface IRecords
+public interface ICrc32C
 {
-    /// <summary>
-    /// The size of these records in bytes.
-    /// </summary>
-    int SizeInBytes { get; set; }
-
-    BufferWriter Buffer { get; set; }
+    uint Calculate(Span<byte> span);
 }

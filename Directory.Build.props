@@ -10,4 +10,12 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <Target Name="CustomVersion" AfterTargets="MinVer">
+    <PropertyGroup>
+      <FileVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</FileVersion>
+      <AssemblyVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</AssemblyVersion>
+      <PackageVersion>$(MinVerVersion)</PackageVersion>
+    </PropertyGroup>
+  </Target>
 </Project>

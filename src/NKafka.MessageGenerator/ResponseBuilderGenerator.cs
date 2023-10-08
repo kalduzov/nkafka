@@ -38,6 +38,7 @@ public class ResponseBuilderGenerator
     {
         _headerGenerator.AppendUsing("NKafka.Exceptions");
         _headerGenerator.AppendUsing("NKafka.Messages");
+        _headerGenerator.AppendUsing("NKafka.Protocol.Buffers");
         _headerGenerator.Generate();
 
         GenerateResponseBuilder(responseInformation);
@@ -64,14 +65,14 @@ public class ResponseBuilderGenerator
         _codeGenerator.IncrementIndent();
         _codeGenerator.AppendLine("var reader = new BufferReader(span);");
         _codeGenerator.AppendLine("var headerVersion = apiKey.GetResponseHeaderVersion(apiVersion);");
-        _codeGenerator.AppendLine("ProcessHeader(reader, headerVersion);");
+        _codeGenerator.AppendLine("ProcessHeader(ref reader, headerVersion);");
         _codeGenerator.AppendLine("return apiKey switch");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
 
         foreach (var (apiKeyName, _, className) in responses)
         {
-            _codeGenerator.AppendLine($"ApiKeys.{apiKeyName} => new {className}(reader, apiVersion),");
+            _codeGenerator.AppendLine($"ApiKeys.{apiKeyName} => new {className}(ref reader, apiVersion),");
         }
 
         _codeGenerator.AppendLine("_ => throw new UnsupportedVersionException($\"Unsupported API key {apiKey}\")");

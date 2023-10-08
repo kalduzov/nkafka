@@ -23,13 +23,25 @@
 
 namespace NKafka.Exceptions;
 
+/// <summary>
+/// 
+/// </summary>
 public class ClusterKafkaException: KafkaException
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
     public ClusterKafkaException(string message)
         : base(message)
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
     public ClusterKafkaException(string message, Exception innerException)
         : base(message, innerException)
     {

@@ -21,7 +21,15 @@
 
 namespace NKafka.Crc;
 
+/// <summary>
+/// 
+/// </summary>
 public interface ICrc32C
 {
-    uint Calculate(Span<byte> span);
+    /// <summary>
+    /// Calculate crc32c
+    /// </summary>
+    /// <param name="span"></param>
+    /// <returns></returns>
+    uint Calculate(ReadOnlySpan<byte> span);
 }

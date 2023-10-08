@@ -1,3 +1,24 @@
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// 
+//  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// 
+//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+// 
+//  Author: Aleksey Kalduzov
+//  Email: alexei.kalduzov@gmail.com
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 using System.Collections.Immutable;
 
 using Newtonsoft.Json;
@@ -61,7 +82,7 @@ public class FieldSpecification
 
         if (Versions == null)
         {
-            throw new ArgumentException("You must specify the version of the {name} structure.");
+            throw new ArgumentException($"You must specify the version of the {name} structure.");
         }
 
         Fields = (fields ?? Array.Empty<FieldSpecification>()).ToImmutableArray();
@@ -321,7 +342,7 @@ public class FieldSpecification
                         return "Guid.Empty";
                     }
 
-                    Guid.Parse(Default);
+                    _ = Guid.Parse(Default); // We check that the default value for Guid is exactly guid.
 
                     return $"Guid.Parse(\"{Default}\")";
                 }
@@ -332,7 +353,7 @@ public class FieldSpecification
                         return "0.0";
                     }
 
-                    var _ = Convert.ToDouble(Default);
+                    _ = Convert.ToDouble(Default);
 
                     return Default;
                 }
@@ -355,7 +376,7 @@ public class FieldSpecification
                         return "null";
                     }
 
-                    if (!string.IsNullOrWhiteSpace(Default))
+                    if (Default.Length > 0)
                     {
                         throw new ArgumentException(
                             $"Invalid default for bytes field {Name}. The only valid default for a bytes field is empty or null.");
@@ -372,7 +393,7 @@ public class FieldSpecification
 
         if (Type.IsStruct)
         {
-            if (!string.IsNullOrWhiteSpace(Default))
+            if (Default.Length > 0)
             {
                 throw new ArgumentException($"Invalid default for struct field {Name}: custom defaults are not supported for struct fields.");
             }
@@ -389,7 +410,7 @@ public class FieldSpecification
                 return "null";
             }
 
-            if (!string.IsNullOrWhiteSpace(Default))
+            if (Default.Length > 0)
             {
                 throw new ArgumentException(
                     $"Invalid default for array field {Name}. The only valid default for an array field is the empty array or null.");

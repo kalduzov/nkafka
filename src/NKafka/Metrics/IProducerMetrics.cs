@@ -26,10 +26,20 @@ namespace NKafka.Metrics;
 /// </summary>
 public interface IProducerMetrics
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="appendBytes"></param>
     void AppendBytes(TopicPartition topicPartition, int appendBytes)
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="sentBytes"></param>
     void SentBytes(TopicPartition topicPartition, int sentBytes)
     {
     }

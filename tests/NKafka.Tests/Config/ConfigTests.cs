@@ -31,12 +31,7 @@ public sealed class ConfigTests
     {
         var config = new TestCommonConfig();
 
-        void Validate()
-        {
-            config.Validate();
-        }
-
-        FluentActions.Invoking(Validate)
+        FluentActions.Invoking(() => config.Validate())
             .Should()
             .Throw<KafkaConfigException>()
             .Which.OptionName.Should()
@@ -54,12 +49,7 @@ public sealed class ConfigTests
             }
         };
 
-        void Validate()
-        {
-            config.Validate();
-        }
-
-        FluentActions.Invoking(Validate).Should().NotThrow();
+        FluentActions.Invoking(() => config.Validate()).Should().NotThrow();
     }
 
     [Fact]
@@ -67,15 +57,10 @@ public sealed class ConfigTests
     {
         var config = new TestCommonConfig
         {
-            BootstrapServers = null
+            BootstrapServers = null!
         };
 
-        void Validate()
-        {
-            config.Validate();
-        }
-
-        FluentActions.Invoking(Validate)
+        FluentActions.Invoking(() => config.Validate())
             .Should()
             .Throw<KafkaConfigException>()
             .Which.OptionName.Should()
@@ -91,23 +76,18 @@ public sealed class ConfigTests
             {
                 "test"
             },
-            BrokerVersion = null!
+            FallbackBrokerVersion = null!
         };
 
-        void Validate()
-        {
-            config.Validate();
-        }
-
-        FluentActions.Invoking(Validate)
+        FluentActions.Invoking(() => config.Validate())
             .Should()
             .Throw<KafkaConfigException>()
             .Which.OptionName.Should()
-            .Be(nameof(config.BrokerVersion));
+            .Be(nameof(config.FallbackBrokerVersion));
     }
 
     [Fact]
-    public void Validate_WhenBrokerVersionSetAsIncorrect_MustByThrowException()
+    public void Validate_WhenBrokerVersionSetAsIncorrect_ShouldByThrowException()
     {
         var config = new TestCommonConfig
         {
@@ -115,25 +95,18 @@ public sealed class ConfigTests
             {
                 "test"
             },
-            BrokerVersion = new Version(4, 0)
+            FallbackBrokerVersion = new Version(4, 0)
         };
 
-        void Validate()
-        {
-            config.Validate();
-        }
-
-        FluentActions.Invoking(Validate)
+        FluentActions.Invoking(() => config.Validate())
             .Should()
             .Throw<KafkaConfigException>()
             .Which.OptionName.Should()
-            .Be(nameof(config.BrokerVersion));
+            .Be(nameof(config.FallbackBrokerVersion));
     }
 
     [Theory]
     [InlineData("0.0")]
-    [InlineData("1.0")]
-    [InlineData("1.1")]
     [InlineData("2.0")]
     [InlineData("2.1")]
     [InlineData("2.2")]
@@ -156,7 +129,7 @@ public sealed class ConfigTests
             {
                 "test"
             },
-            BrokerVersion = Version.Parse(version)
+            FallbackBrokerVersion = Version.Parse(version)
         };
 
         config.Validate();

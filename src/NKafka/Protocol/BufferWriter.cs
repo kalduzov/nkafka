@@ -19,34 +19,48 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Buffers;
+using System.Runtime.CompilerServices;
+
 using NKafka.Protocol.Extensions;
-using NKafka.Protocol.Records;
 
 namespace NKafka.Protocol;
 
 /// <summary>
 /// A helper class for writing the required types to the stream for sending to kafka
 /// </summary>
-public sealed class BufferWriter
+public sealed class BufferWriter: IBufferWriter<byte>
 {
     private const int _LEN_DATA = 4;
     private const int _NULL_VAR_INT_VALUE = -1;
 
     private readonly Stream _stream;
     private readonly int _lenReserved;
+    private int _writtenCount = 0;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public long Position
     {
         get => _stream.Position;
         set => _stream.Position = value;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public long Length => _stream.Length;
 
     /// <summary>
     /// How much space is left in the stream
     /// </summary>
     public long Remaining => _stream.Length - _stream.Position;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public int WrittenCount => _writtenCount;
 
     /// <summary>
     /// Создает новый класс для записи
@@ -64,6 +78,11 @@ public sealed class BufferWriter
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="value"></param>
     public void PutUInt(int position, uint value)
     {
         var currentPosition = _stream.Position;
@@ -72,106 +91,210 @@ public sealed class BufferWriter
         _stream.Position = currentPosition;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteByte(byte value)
     {
         _stream.WriteByte(value);
+        Advance(sizeof(byte));
+
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteBool(bool value)
     {
         _stream.WriteByte(value.AsByte());
+        Advance(sizeof(bool));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteSByte(sbyte value)
     {
         _stream.WriteByte((byte)value);
+        Advance(sizeof(sbyte));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteShort(short value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(short));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteUShort(ushort value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(ushort));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteInt(int value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(int));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteUInt(uint value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(uint));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteLong(long value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(long));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteULong(ulong value)
     {
         _stream.Write(value.ToBigEndian());
+        Advance(sizeof(ulong));
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteVarUInt(uint value)
     {
-        _stream.WriteVarUInt(value);
+        var len = _stream.WriteVarUInt(value);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteVarUInt(int value)
     {
-        _stream.WriteVarUInt((uint)value);
+        var len = _stream.WriteVarUInt((uint)value);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteVarInt(int value)
     {
-        _stream.WriteVarInt(value);
+        var len = _stream.WriteVarInt(value);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void WriteNullVarInt()
     {
-        _stream.WriteVarInt(_NULL_VAR_INT_VALUE);
+        var len = _stream.WriteVarInt(_NULL_VAR_INT_VALUE);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteVarLong(long value)
     {
-        _stream.WriteVarInt64(value);
+        var len = _stream.WriteVarInt64(value);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteVarULong(ulong value)
     {
-        _stream.WriteVarUInt64(value);
+        var len = _stream.WriteVarUInt64(value);
+        Advance(len);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteGuid(Guid value)
     {
-        _stream.Write(value.ToByteArray());
+        var bytes = value.ToByteArray();
+        _stream.Write(bytes);
+        Advance(bytes.Length);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteDouble(double value)
     {
         var bytes = BitConverter.GetBytes(value);
         _stream.Write(bytes);
+        Advance(bytes.Length);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteBytes(ReadOnlySpan<byte> value)
     {
         _stream.Write(value);
+        Advance(value.Length);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
     public void WriteBytesWithLength(ReadOnlySpan<byte> value)
     {
-        _stream.WriteVarInt(value.Length);
+        var len = _stream.WriteVarInt(value.Length);
         _stream.Write(value);
+        Advance(len + value.Length);
     }
 
-    public void WriteRecords(IRecords records)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="records"></param>
+    public void WriteRecords(Records.Records records)
     {
-        _stream.Write(records.Buffer.AsSpan(0, records.SizeInBytes));
+        foreach (var batch in records.Batches)
+        {
+            _stream.Write(batch.Buffer.AsSpan(0, records.SizeInBytes));
+            Advance(records.SizeInBytes);
+        }
     }
 
     /// <summary>
@@ -188,13 +311,42 @@ public sealed class BufferWriter
         WriteInt(_stream.Length == 0 ? 0 : streamLen);
     }
 
-    private void CopyTo(BufferWriter bufferWriter)
-    {
-        _stream.CopyTo(bufferWriter._stream);
-    }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="offset"></param>
+    /// <param name="len"></param>
+    /// <returns></returns>
     public Span<byte> AsSpan(int offset, int len)
     {
         return ((MemoryStream)_stream).GetBuffer().AsSpan(offset, len - offset);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Span<byte> WrittenSpan => AsSpan(0, (int)Position);
+
+    /// <inheritdoc />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Advance(int count)
+    {
+        if (count == 0)
+        {
+            return;
+        }
+        _writtenCount += count;
+    }
+
+    /// <inheritdoc />
+    public Memory<byte> GetMemory(int sizeHint = 0)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public Span<byte> GetSpan(int sizeHint = 0)
+    {
+        return AsSpan(0, sizeHint);
     }
 }

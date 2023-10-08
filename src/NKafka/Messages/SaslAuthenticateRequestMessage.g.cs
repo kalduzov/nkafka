@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message SaslAuthenticateRequestMessage
+/// </summary>
 public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEquatable<SaslAuthenticateRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SaslAuthenticate;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The SASL authentication bytes from the client, as defined by the SASL mechanism.
     /// </summary>
     public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
+    /// <summary>
+    /// The basic constructor of the message SaslAuthenticateRequestMessage
+    /// </summary>
     public SaslAuthenticateRequestMessage()
     {
     }
 
-    public SaslAuthenticateRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message SaslAuthenticateRequestMessage
+    /// </summary>
+    public SaslAuthenticateRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -103,6 +122,7 @@ public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -131,11 +151,13 @@ public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is SaslAuthenticateRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(SaslAuthenticateRequestMessage? other)
     {
         if (other is null)
@@ -149,6 +171,7 @@ public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEq
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -156,6 +179,7 @@ public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEq
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "SaslAuthenticateRequestMessage("

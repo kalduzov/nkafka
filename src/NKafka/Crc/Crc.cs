@@ -24,6 +24,9 @@ using System.Runtime.Intrinsics.X86;
 
 namespace NKafka.Crc;
 
+/// <summary>
+/// 
+/// </summary>
 public static class Crc
 {
     private static readonly ICrc32C _crc32C;
@@ -47,7 +50,12 @@ public static class Crc
         _crc32C = new NativeCrc32C();
     }
 
-    public static uint Calculate(Span<byte> span)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="span"></param>
+    /// <returns></returns>
+    public static uint Calculate(ReadOnlySpan<byte> span)
     {
         return _crc32C.Calculate(span);
     }

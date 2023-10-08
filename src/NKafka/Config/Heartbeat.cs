@@ -21,6 +21,9 @@
 
 namespace NKafka.Config;
 
+/// <summary>
+/// 
+/// </summary>
 public record HeartbeatSettings
 {
     /// <summary>

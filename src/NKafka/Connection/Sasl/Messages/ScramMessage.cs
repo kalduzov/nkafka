@@ -23,26 +23,45 @@ using System.Text;
 
 namespace NKafka.Connection.Sasl.Messages;
 
+/// <summary>
+/// 
+/// </summary>
 public abstract class ScramMessage
 {
-    protected const string ALPHA = "[A-Za-z]+";
+#pragma warning disable CS1591
+    private const string _ALPHA = "[A-Za-z]+";
+    private const string _BASE64_CHAR = "[a-zA-Z0-9/+]";
+    private const string _VALUE = "[\\x01-\\x7F-[,]]+";
+
     protected const string VALUE_SAFE = "[\\x01-\\x7F-[=,]]+";
-    protected const string VALUE = "[\\x01-\\x7F-[,]]+";
     protected const string PRINTABLE = "[\\x21-\\x7E-[,]]+";
     protected const string SASL_NAME = "(?:[\\x01-\\x7F-[=,]]|=2C|=3D)+";
-    protected const string BASE64_CHAR = "[a-zA-Z0-9/+]";
-    protected const string BASE64 = $"(?:{BASE64_CHAR}{{4}})*(?:{BASE64_CHAR}{{3}}=|{BASE64_CHAR}{{2}}==)?";
-    protected const string RESERVED = $"(m={VALUE},)?";
-    protected const string EXTENSIONS = $"(,{ALPHA}={VALUE})*";
+    protected const string BASE64 = $"(?:{_BASE64_CHAR}{{4}})*(?:{_BASE64_CHAR}{{3}}=|{_BASE64_CHAR}{{2}}==)?";
+    protected const string RESERVED = $"(m={_VALUE},)?";
+    protected const string EXTENSIONS = $"(,{_ALPHA}={_VALUE})*";
+#pragma warning restore CS1591
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public abstract string ToMessage();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public byte[] ToBytes()
     {
         return Encoding.UTF8.GetBytes(ToMessage());
     }
 
-    protected string ToMessage(Span<byte> messageBytes)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="messageBytes"></param>
+    /// <returns></returns>
+    protected static string ToMessage(Span<byte> messageBytes)
     {
         return Encoding.UTF8.GetString(messageBytes);
     }

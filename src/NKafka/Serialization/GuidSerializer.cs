@@ -31,18 +31,10 @@ namespace NKafka.Serialization;
 public sealed class GuidSerializer: IAsyncSerializer<Guid>
 {
     /// <inheritdoc/>
-    public bool PreferAsync => false;
-
-    /// <inheritdoc/>
-    public Task<byte[]> SerializeAsync(Guid data)
-    {
-        return Task.FromResult(Serialize(data));
-    }
-
-    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(Guid data)
     {
-        return data.ToByteArray();
+        return data.ToByteArray(); //todo опасно, нужно подумать какой формат использовать.
+                                   //т.к. другие языки могут использовать другую сериализацию guid
     }
 }

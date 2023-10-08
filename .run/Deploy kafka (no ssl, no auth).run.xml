@@ -2,12 +2,13 @@
   <configuration default="false" name="Deploy kafka (no ssl, no auth)" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
-          <option name="composeProjectName" value="test-no-ssl-and-sasl"/>
-          <option name="envFilePath" value="c:\git\nkafka\infra\.env"/>
-          <option name="sourceFilePath" value="infra/docker-compose.yml"/>
+        <option name="composeProjectName" value="test-no-ssl-and-sasl" />
+        <option name="envFilePath" value="c:\git\nkafka\infra\.env" />
+        <option name="sourceFilePath" value="infra/docker-compose.yml" />
+        <option name="upRemoveOrphans" value="true" />
       </settings>
     </deployment>
-    <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isPublishEnabled="true" />
+    <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />
     <method v="2" />
   </configuration>
 </component>

@@ -10,8 +10,4 @@
     <PackageReference Include="Newtonsoft.Json"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions" />
-  </ItemGroup>
-
 </Project>

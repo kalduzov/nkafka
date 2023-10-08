@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ApiVersionsResponseMessage
+/// </summary>
 public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquatable<ApiVersionsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The top-level error code.
@@ -65,12 +73,12 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     public SupportedFeatureKeyCollection SupportedFeatures { get; set; } = new ();
 
     /// <summary>
-    /// The monotonically increasing epoch for the finalized features information. Valid values are >= 0. A value of -1 is special and represents unknown epoch.
+    /// The monotonically increasing epoch for the finalized features information. Valid values are &gt;= 0. A value of -1 is special and represents unknown epoch.
     /// </summary>
     public long FinalizedFeaturesEpoch { get; set; } = -1;
 
     /// <summary>
-    /// List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch >= 0.
+    /// List of cluster-wide finalized features. The information is valid only if FinalizedFeaturesEpoch &gt;= 0.
     /// </summary>
     public FinalizedFeatureKeyCollection FinalizedFeatures { get; set; } = new ();
 
@@ -79,17 +87,25 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// </summary>
     public bool ZkMigrationReady { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message ApiVersionsResponseMessage
+    /// </summary>
     public ApiVersionsResponseMessage()
     {
     }
 
-    public ApiVersionsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ApiVersionsResponseMessage
+    /// </summary>
+    public ApiVersionsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         {
@@ -106,7 +122,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     var newCollection = new ApiVersionCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ApiVersionMessage(reader, version));
+                        newCollection.Add(new ApiVersionMessage(ref reader, version));
                     }
                     ApiKeys = newCollection;
                 }
@@ -124,7 +140,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     var newCollection = new ApiVersionCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ApiVersionMessage(reader, version));
+                        newCollection.Add(new ApiVersionMessage(ref reader, version));
                     }
                     ApiKeys = newCollection;
                 }
@@ -169,7 +185,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                             var newCollection = new SupportedFeatureKeyCollection(arrayLength);
                             for (var i = 0; i < arrayLength; i++)
                             {
-                                newCollection.Add(new SupportedFeatureKeyMessage(reader, version));
+                                newCollection.Add(new SupportedFeatureKeyMessage(ref reader, version));
                             }
                             SupportedFeatures = newCollection;
                         }
@@ -193,7 +209,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                             var newCollection = new FinalizedFeatureKeyCollection(arrayLength);
                             for (var i = 0; i < arrayLength; i++)
                             {
-                                newCollection.Add(new FinalizedFeatureKeyMessage(reader, version));
+                                newCollection.Add(new FinalizedFeatureKeyMessage(ref reader, version));
                             }
                             FinalizedFeatures = newCollection;
                         }
@@ -212,6 +228,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -318,11 +335,13 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ApiVersionsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ApiVersionsResponseMessage? other)
     {
         if (other is null)
@@ -390,6 +409,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -397,6 +417,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ApiVersionsResponseMessage("
@@ -410,9 +431,16 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message ApiVersionMessage
+    /// </summary>
     public sealed partial class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The API index.
@@ -429,17 +457,25 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         /// </summary>
         public short MaxVersion { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message ApiVersionMessage
+        /// </summary>
         public ApiVersionMessage()
         {
         }
 
-        public ApiVersionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message ApiVersionMessage
+        /// </summary>
+        public ApiVersionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -466,6 +502,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -488,11 +525,13 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is ApiVersionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(ApiVersionMessage? other)
         {
             if (other is null)
@@ -514,6 +553,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -521,6 +561,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "ApiVersionMessage("
@@ -531,25 +572,42 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message ApiVersionCollection
+    /// </summary>
     public sealed partial class ApiVersionCollection: HashSet<ApiVersionMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public ApiVersionCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public ApiVersionCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<ApiVersionMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message SupportedFeatureKeyMessage
+    /// </summary>
     public sealed partial class SupportedFeatureKeyMessage: IMessage, IEquatable<SupportedFeatureKeyMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The name of the feature.
@@ -566,17 +624,25 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         /// </summary>
         public short MaxVersion { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message SupportedFeatureKeyMessage
+        /// </summary>
         public SupportedFeatureKeyMessage()
         {
         }
 
-        public SupportedFeatureKeyMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message SupportedFeatureKeyMessage
+        /// </summary>
+        public SupportedFeatureKeyMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -615,6 +681,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version3)
@@ -635,11 +702,13 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is SupportedFeatureKeyMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(SupportedFeatureKeyMessage? other)
         {
             if (other is null)
@@ -671,6 +740,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -678,6 +748,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "SupportedFeatureKeyMessage("
@@ -688,25 +759,42 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message SupportedFeatureKeyCollection
+    /// </summary>
     public sealed partial class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public SupportedFeatureKeyCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public SupportedFeatureKeyCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<SupportedFeatureKeyMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message FinalizedFeatureKeyMessage
+    /// </summary>
     public sealed partial class FinalizedFeatureKeyMessage: IMessage, IEquatable<FinalizedFeatureKeyMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The name of the feature.
@@ -723,17 +811,25 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         /// </summary>
         public short MinVersionLevel { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message FinalizedFeatureKeyMessage
+        /// </summary>
         public FinalizedFeatureKeyMessage()
         {
         }
 
-        public FinalizedFeatureKeyMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message FinalizedFeatureKeyMessage
+        /// </summary>
+        public FinalizedFeatureKeyMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -772,6 +868,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version3)
@@ -792,11 +889,13 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is FinalizedFeatureKeyMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(FinalizedFeatureKeyMessage? other)
         {
             if (other is null)
@@ -828,6 +927,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -835,6 +935,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "FinalizedFeatureKeyMessage("
@@ -845,16 +946,26 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message FinalizedFeatureKeyCollection
+    /// </summary>
     public sealed partial class FinalizedFeatureKeyCollection: HashSet<FinalizedFeatureKeyMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public FinalizedFeatureKeyCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public FinalizedFeatureKeyCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<FinalizedFeatureKeyMessage>)obj);

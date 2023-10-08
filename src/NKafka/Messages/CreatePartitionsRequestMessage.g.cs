@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message CreatePartitionsRequestMessage
+/// </summary>
 public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<CreatePartitionsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.CreatePartitions;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// Each topic that we want to create new partitions inside.
@@ -60,21 +71,29 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
     public int TimeoutMs { get; set; } = 0;
 
     /// <summary>
-    /// If true, then validate the request, but don't actually increase the number of partitions.
+    /// If true, then validate the request, but don&#39;t actually increase the number of partitions.
     /// </summary>
     public bool ValidateOnly { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message CreatePartitionsRequestMessage
+    /// </summary>
     public CreatePartitionsRequestMessage()
     {
     }
 
-    public CreatePartitionsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message CreatePartitionsRequestMessage
+    /// </summary>
+    public CreatePartitionsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version2)
@@ -90,7 +109,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     var newCollection = new CreatePartitionsTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatePartitionsTopicMessage(reader, version));
+                        newCollection.Add(new CreatePartitionsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -108,7 +127,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     var newCollection = new CreatePartitionsTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatePartitionsTopicMessage(reader, version));
+                        newCollection.Add(new CreatePartitionsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -134,6 +153,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -171,11 +191,13 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is CreatePartitionsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(CreatePartitionsRequestMessage? other)
     {
         if (other is null)
@@ -207,6 +229,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -214,6 +237,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "CreatePartitionsRequestMessage("
@@ -223,9 +247,16 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatePartitionsTopicMessage
+    /// </summary>
     public sealed partial class CreatePartitionsTopicMessage: IMessage, IEquatable<CreatePartitionsTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -242,17 +273,25 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         /// </summary>
         public List<CreatePartitionsAssignmentMessage> Assignments { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message CreatePartitionsTopicMessage
+        /// </summary>
         public CreatePartitionsTopicMessage()
         {
         }
 
-        public CreatePartitionsTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreatePartitionsTopicMessage
+        /// </summary>
+        public CreatePartitionsTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -296,7 +335,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                         var newCollection = new List<CreatePartitionsAssignmentMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreatePartitionsAssignmentMessage(reader, version));
+                            newCollection.Add(new CreatePartitionsAssignmentMessage(ref reader, version));
                         }
                         Assignments = newCollection;
                     }
@@ -314,7 +353,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                         var newCollection = new List<CreatePartitionsAssignmentMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreatePartitionsAssignmentMessage(reader, version));
+                            newCollection.Add(new CreatePartitionsAssignmentMessage(ref reader, version));
                         }
                         Assignments = newCollection;
                     }
@@ -338,6 +377,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -400,11 +440,13 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreatePartitionsTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreatePartitionsTopicMessage? other)
         {
             if (other is null)
@@ -446,6 +488,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -453,6 +496,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreatePartitionsTopicMessage("
@@ -463,26 +507,41 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatePartitionsAssignmentMessage
+    /// </summary>
     public sealed partial class CreatePartitionsAssignmentMessage: IMessage, IEquatable<CreatePartitionsAssignmentMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The assigned broker IDs.
         /// </summary>
         public List<int> BrokerIds { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message CreatePartitionsAssignmentMessage
+        /// </summary>
         public CreatePartitionsAssignmentMessage()
         {
         }
 
-        public CreatePartitionsAssignmentMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreatePartitionsAssignmentMessage
+        /// </summary>
+        public CreatePartitionsAssignmentMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -530,6 +589,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -561,11 +621,13 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreatePartitionsAssignmentMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreatePartitionsAssignmentMessage? other)
         {
             if (other is null)
@@ -589,6 +651,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -596,6 +659,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreatePartitionsAssignmentMessage("
@@ -604,16 +668,26 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatePartitionsTopicCollection
+    /// </summary>
     public sealed partial class CreatePartitionsTopicCollection: HashSet<CreatePartitionsTopicMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public CreatePartitionsTopicCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public CreatePartitionsTopicCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<CreatePartitionsTopicMessage>)obj);

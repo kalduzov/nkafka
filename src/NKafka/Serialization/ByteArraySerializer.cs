@@ -25,15 +25,12 @@ using System.Runtime.CompilerServices;
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class ByteArraySerializer: IAsyncSerializer<byte[]>
 {
-    public bool PreferAsync => false;
-
-    public Task<byte[]> SerializeAsync(byte[] data)
-    {
-        return Task.FromResult(data);
-    }
-
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(byte[] data)
     {

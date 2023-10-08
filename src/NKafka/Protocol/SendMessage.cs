@@ -26,7 +26,10 @@ using NKafka.Messages;
 
 namespace NKafka.Protocol;
 
-public readonly struct SendMessage
+/// <summary>
+/// 
+/// </summary>
+internal readonly struct SendMessage
 {
     private readonly ApiVersion _messageVersion;
     private readonly ApiVersion _headerVersion;
@@ -56,6 +59,14 @@ public readonly struct SendMessage
         RequestMessage = requestMessage;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="writableStream"></param>
+    /// <param name="throwIfSizeLargeThen"></param>
+    /// <param name="messageMaxBytes"></param>
+    /// <returns></returns>
+    /// <exception cref="ProtocolKafkaException"></exception>
     public long Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
     {
         using var stream = _streamManager.GetStream();

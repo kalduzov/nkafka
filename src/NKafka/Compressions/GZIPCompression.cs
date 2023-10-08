@@ -23,8 +23,12 @@
 
 namespace NKafka.Compressions;
 
+/// <summary>
+/// 
+/// </summary>
 public class GZIPCompression: ICompression
 {
+    /// <inheritdoc />
     public byte[] Decode(byte[] data)
     {
         return new byte[]
@@ -32,6 +36,7 @@ public class GZIPCompression: ICompression
         };
     }
 
+    /// <inheritdoc />
     public byte[] Encode(byte[] data)
     {
         return new byte[]

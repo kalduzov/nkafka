@@ -29,14 +29,15 @@ using Microsoft.IO;
 using NKafka.Config;
 using NKafka.Exceptions;
 
+using EM = NKafka.Resources.ExceptionMessages;
+
 namespace NKafka.Connection;
 
 internal partial class KafkaConnectorPool: IKafkaConnectorPool
 {
     private readonly bool _apiVersionRequest;
-    private readonly ConcurrentDictionary<int, Node> _brokers = new(); //список всех брокеров по их id
-
-    private readonly ConcurrentDictionary<Node, List<IKafkaConnector>> _brokersConnectors = new(); //Список всех соединений с брокерами
+    private readonly ConcurrentDictionary<int, Node> _brokers = new(); // The dictionary of all broker nodes by their id
+    private readonly ConcurrentDictionary<Node, List<IKafkaConnector>> _brokersConnectors = new(); // The dictionary of all connections with broker nodes
     private readonly string _clientId;
     private readonly int _closeConnectionTimeoutMs;
     private readonly int _connectionsMaxIdleMs;
@@ -45,16 +46,18 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
     private readonly int _maxInflightRequests;
     private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly int _messageMaxBytes;
-    private readonly Random _random = new();
     private readonly int _receiveBufferBytes;
     private readonly int _requestTimeoutMs;
     private readonly SaslSettings _saslSettings;
     private readonly SecurityProtocols _securityProtocol;
 
-    //Посевные соединения, используются только на начальном этапе жизни пула. Во время работы они очищаются
-    private readonly ConcurrentDictionary<EndPoint, IKafkaConnector> _seedConnectors;
+    // Seed connections are used only at the initial stage of the life of the pool. They are cleaned during operation.
+    private readonly Dictionary<EndPoint, IKafkaConnector> _seedConnectors;
     private readonly SocketFactory _socketFactory;
     private readonly SslSettings _sslSettings;
+
+    private readonly INumberCounter _seedConnectorsNumberCounter;
+    private readonly INumberCounter _brokersNumberCounter;
 
     public KafkaConnectorPool(
         IReadOnlyCollection<Node> seedBrokers,
@@ -83,21 +86,125 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         _clientId = clientId;
         _apiVersionRequest = apiVersionRequest;
         _loggerFactory = loggerFactory;
-        _seedConnectors = new ConcurrentDictionary<EndPoint, IKafkaConnector>();
+        _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
         _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
         _socketFactory = new SocketFactory();
         _memoryStreamManager = new RecyclableMemoryStreamManager(1024, messageMaxBytes / 16, messageMaxBytes);
+        _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedBrokers.Count);
+        _brokersNumberCounter = new RandomNumberCounter();
 
         InitSeedConnectors(seedBrokers);
+
     }
 
-    public bool TryGetConnector(int nodeId, out IKafkaConnector connector)
+    //only for tests
+    internal KafkaConnectorPool(
+        IReadOnlyCollection<IKafkaConnector> brokerConnectors,
+        IReadOnlyCollection<IKafkaConnector> seedConnectors,
+        SslSettings sslSettings,
+        SaslSettings saslSettings,
+        int maxInflightRequests,
+        int messageMaxBytes,
+        int closeConnectionTimeoutMs,
+        int connectionsMaxIdleMs,
+        int requestTimeoutMs,
+        int receiveBufferBytes,
+        SecurityProtocols securityProtocol,
+        string clientId,
+        bool apiVersionRequest,
+        ILoggerFactory loggerFactory)
     {
+        _sslSettings = sslSettings;
+        _saslSettings = saslSettings;
+        _maxInflightRequests = maxInflightRequests;
+        _messageMaxBytes = messageMaxBytes;
+        _closeConnectionTimeoutMs = closeConnectionTimeoutMs;
+        _connectionsMaxIdleMs = connectionsMaxIdleMs;
+        _requestTimeoutMs = requestTimeoutMs;
+        _receiveBufferBytes = receiveBufferBytes;
+        _securityProtocol = securityProtocol;
+        _clientId = clientId;
+        _apiVersionRequest = apiVersionRequest;
+        _loggerFactory = loggerFactory;
+        _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
+        _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
+        _socketFactory = new SocketFactory();
+        _memoryStreamManager = new RecyclableMemoryStreamManager(1024, messageMaxBytes / 16, messageMaxBytes);
+        _brokersNumberCounter = new RandomNumberCounter();
+        _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedConnectors.Count);
+
+        foreach (var connector in seedConnectors)
+        {
+            if (_seedConnectors.TryAdd(connector.Endpoint, connector) is not true)
+            {
+                throw new ArgumentException("Коллекция не может содержать элементы, которые относятся к одному и тому же адресу", nameof(seedConnectors));
+            }
+        }
+
+        // Для тестов сбрасываем внутреннее состояние пула до корректного.
+        // Если есть готовые брокеры - посевные адреса брокеров больше не нужны 
+        if (brokerConnectors.Count != 0)
+        {
+            _seedConnectors.Clear();
+        }
+
+        var connectorsByNodeId = brokerConnectors.GroupBy(c => c.NodeId);
+
+        foreach (var groupByNodeId in connectorsByNodeId)
+        {
+            var first = groupByNodeId.First();
+            var (host, port) = Utils.GetHostAndPort(first.Endpoint.ToString());
+            var node = new Node(groupByNodeId.Key, host, port);
+            _brokers.TryAdd(groupByNodeId.Key, node);
+
+            foreach (var connector in groupByNodeId.Select(c => c))
+            {
+                _brokersConnectors.AddOrUpdate(node,
+                    _ => new List<IKafkaConnector>
+                    {
+                        connector
+                    },
+                    (_, nodes) =>
+                    {
+                        nodes.Add(connector);
+
+                        return nodes;
+                    });
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Возвращает все рабочие соединения
+    /// </summary>
+    public IEnumerable<IKafkaConnector> GetAllOpenedConnectors()
+    {
+        foreach (var connectors in _brokersConnectors.Values)
+        {
+            foreach (var connector in connectors)
+            {
+                if (connector.ConnectorState == KafkaConnector.State.Open)
+                {
+                    yield return connector;
+                }
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public bool TryGetConnector(int nodeId, bool isDedicated, out IKafkaConnector connector)
+    {
+        if (isDedicated)
+        {
+            return TryDedicateConnector(nodeId, out connector);
+        }
+
         if (_brokers.TryGetValue(nodeId, out var node))
         {
             if (_brokersConnectors.TryGetValue(node, out var connectors))
             {
-                connector = connectors[0]; //todo пока берем только первый, потом надо разобраться какой точно нужно взять
+                connector = connectors.Count == 1 ? connectors[0] : TakeLeastLoaded(connectors);
 
                 return true;
             }
@@ -108,23 +215,88 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         return false;
     }
 
-    public IKafkaConnector GetRandomConnector()
+    private static IKafkaConnector TakeLeastLoaded(IReadOnlyList<IKafkaConnector> connectors)
+    {
+        if (connectors.Count == 0)
+        {
+            throw new ConnectionKafkaException("Отсутсвуют физические подключения");
+        }
+
+        var currentNumberInflightRequests = 0;
+        var selectedIndex = 0;
+
+        for (var i = 0; i < connectors.Count; i++)
+        {
+            var connector = connectors[i];
+
+            if (connector.IsDedicated)
+            {
+                continue; //на выделенные соединения запросы делает только координатор
+            }
+
+            var inflightRequests = connector.CurrentNumberInflightRequests;
+
+            if (inflightRequests == 0)
+            {
+                selectedIndex = i;
+
+                break;
+            }
+
+            if (currentNumberInflightRequests > inflightRequests)
+            {
+                selectedIndex = i;
+            }
+            currentNumberInflightRequests = inflightRequests;
+        }
+
+        return connectors[selectedIndex];
+    }
+
+    private bool TryDedicateConnector(int nodeId, out IKafkaConnector connector)
+    {
+        if (_brokers.TryGetValue(nodeId, out var node))
+        {
+            connector = CreateConnector(node, true);
+
+            return true;
+        }
+        connector = null!;
+
+        return false;
+    }
+
+    public IKafkaConnector GetConnector()
     {
         if (_brokers.IsEmpty)
         {
-            if (_seedConnectors.IsEmpty)
-            {
-                throw new ConnectorNotFoundException("Пул не содержит ни одного доступного соединения");
-            }
-
-            //todo allocation но всего лишь один раз за работу
-            return _seedConnectors.Values.AsEnumerable().Shuffle().First();
+            return GetSeedConnectorAsRoundRobin();
         }
 
-        var index = _random.Next(_brokers.Count);
+        var node = GetBrokerAsRandom();
+        var listConnectors = _brokersConnectors[node];
+
+        return TakeLeastLoaded(listConnectors);
+    }
+
+    private Node GetBrokerAsRandom()
+    {
+        var index = _brokersNumberCounter.GetNextNumber(_brokers.Count);
         var broker = ((ReadOnlyCollection<int>)_brokers.Keys)[index];
 
-        return _brokersConnectors[_brokers[broker]].First();
+        return _brokers[broker];
+    }
+
+    private IKafkaConnector GetSeedConnectorAsRoundRobin()
+    {
+        if (_seedConnectors.Count == 0)
+        {
+            throw new ConnectorNotFoundException(EM.ConnectorPool_NoAvailableConnections);
+        }
+
+        var index = _seedConnectorsNumberCounter.GetNextNumber();
+
+        return _seedConnectors.ToArray()[index].Value;
     }
 
     public async ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token = default)
@@ -144,16 +316,18 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
 
             foreach (var connector in connectors)
             {
-                if (connector.ConnectorState != KafkaConnector.State.Open)
+                if (connector.ConnectorState == KafkaConnector.State.Open)
                 {
-                    try
-                    {
-                        await connector.OpenAsync(token).ConfigureAwait(false);
-                    }
-                    catch
-                    {
-                        deadConnections.Add(connector);
-                    }
+                    continue;
+                }
+
+                try
+                {
+                    await connector.OpenAsync(token);
+                }
+                catch
+                {
+                    deadConnections.Add(connector);
                 }
             }
 
@@ -201,12 +375,18 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
     {
         foreach (var broker in seedBrokers)
         {
+            if (_seedConnectors.ContainsKey(broker.EndPoint))
+            {
+                _logger.IgnoreBootstrapEndpointWarning(broker.EndPoint);
+
+                continue;
+            }
             var connector = CreateConnector(broker);
-            _seedConnectors.TryAdd(broker.EndPoint, connector);
+            _seedConnectors.Add(broker.EndPoint, connector);
         }
     }
 
-    private IKafkaConnector CreateConnector(Node node)
+    private KafkaConnector CreateConnector(Node node, bool isDedicated = false)
     {
         _logger.CreateConnectorTrace(node.EndPoint);
 
@@ -227,7 +407,8 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
             _memoryStreamManager,
             _loggerFactory)
         {
-            NodeId = node.Id
+            NodeId = node.Id,
+            IsDedicated = isDedicated
         };
     }
 
@@ -238,13 +419,14 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
             return connectors;
         }
 
-        if (!_seedConnectors.TryRemove(node.EndPoint, out var connector))
+        //todo: Нужно на 100% исключить вероятность доступа к переменной _seedConnectors из разных потоков 
+        if (_seedConnectors.Count == 0 || !_seedConnectors.Remove(node.EndPoint, out var connector))
         {
-            connector = CreateConnector(node);
+            connector = CreateConnector(node: node, isDedicated: false);
         }
         else
         {
-            connector.NodeId = node.Id;
+            connector.NodeId = node.Id; // Теоретически id брокера на конкретном адресе может измениться
         }
 
         connectors.Add(connector);

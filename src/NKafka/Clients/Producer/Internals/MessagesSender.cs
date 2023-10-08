@@ -22,6 +22,7 @@
 using Microsoft.Extensions.Logging;
 
 using NKafka.Config;
+using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
 using NKafka.Protocol;
@@ -91,8 +92,8 @@ internal class MessagesSender: IMessagesSender
             while (!token.IsCancellationRequested)
             {
                 //todo вызов этого цикла без паузы постоянно нагружает SOH
-                await RunOnceAsync(token).ConfigureAwait(false);
-                await Task.Delay(TimeSpan.FromMilliseconds(_config.RetryBackoffMs), token).ConfigureAwait(false);
+                await RunOnceAsync(token);
+                await Task.Delay(TimeSpan.FromMilliseconds(_config.RetryBackoffMs), token);
             }
 
             //todo, после основного цикла нужно подчистить все ресурсы
@@ -113,7 +114,7 @@ internal class MessagesSender: IMessagesSender
 
     private async Task RunOnceAsync(CancellationToken token)
     {
-        await SendProducerDataAsync(token).ConfigureAwait(false);
+        await SendProducerDataAsync(token);
     }
 
     private async Task SendProducerDataAsync(CancellationToken token)
@@ -122,7 +123,8 @@ internal class MessagesSender: IMessagesSender
 
         foreach (var batch in batches)
         {
-            var node = _kafkaCluster.LeaderFor(batch.TopicPartition);
+            var node = await TryGetNodeAsync(batch.TopicPartition, token);
+
             var produceRequestMessage = new ProduceRequestMessage
             {
                 Acks = (short)_config.Acks,
@@ -162,5 +164,35 @@ internal class MessagesSender: IMessagesSender
             }
         }
 
+    }
+
+    private async Task<Node> TryGetNodeAsync(TopicPartition topicPartition, CancellationToken token)
+    {
+        // Пробуем получить лидера для парцитии.
+        // Если вернулась пустая нода, считаем что данных по лидеру нет в метаданных.
+        // Просим кластер обновить метаданные для указанного топика, если по прежнему не удалось получить лидера - кидаем исключение
+        var node = _kafkaCluster.LeaderFor(topicPartition);
+
+        if (node != Node.NoNode)
+        {
+            return node;
+        }
+
+        await _kafkaCluster.RefreshMetadataAsync(
+            new[]
+            {
+                topicPartition.Topic
+            },
+            token);
+
+        node = _kafkaCluster.LeaderFor(topicPartition);
+
+        if (node == Node.NoNode)
+        {
+            // todo данное исключение нужно обрабатывать для батча и перевыставлять батч на отправку позже
+            throw new ProduceException("Отсутствует лидер для указанной парции");
+        }
+
+        return node;
     }
 }

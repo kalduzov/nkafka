@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message SaslHandshakeRequestMessage
+/// </summary>
 public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquatable<SaslHandshakeRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SaslHandshake;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The SASL mechanism chosen by the client.
     /// </summary>
     public string Mechanism { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The basic constructor of the message SaslHandshakeRequestMessage
+    /// </summary>
     public SaslHandshakeRequestMessage()
     {
     }
 
-    public SaslHandshakeRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message SaslHandshakeRequestMessage
+    /// </summary>
+    public SaslHandshakeRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -85,6 +104,7 @@ public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquat
         UnknownTaggedFields = null;
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -101,11 +121,13 @@ public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is SaslHandshakeRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(SaslHandshakeRequestMessage? other)
     {
         if (other is null)
@@ -129,6 +151,7 @@ public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquat
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -136,6 +159,7 @@ public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquat
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "SaslHandshakeRequestMessage("

@@ -27,31 +27,30 @@ using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Consumer;
 
-public class ConsumerTests
+public partial class ConsumerTests: IDisposable
 {
-    private readonly IKafkaCluster _kafkaCluster;
-
-    public ConsumerTests()
-    {
-        _kafkaCluster = BuildMockForKafkaCluster();
-    }
+    private readonly IKafkaCluster _kafkaCluster = BuildMockForKafkaCluster();
 
     [Fact]
     public void Ctor_WithSerializersIsNull_Success()
     {
         var config = new ConsumerConfig();
 
+        FluentActions.Invoking(Ctor).Should().NotThrow();
+
+        return;
+
         void Ctor()
         {
-            var _ = new Consumer<Null, Null>(
-                _kafkaCluster,
-                config,
-                null,
-                null,
-                NullLoggerFactory.Instance);
+            _ = new Consumer<Null, Null>(
+                kafkaCluster: _kafkaCluster,
+                config: config,
+                keyDeserializer: null,
+                valueDeserializer: null,
+                fetcher: null,
+                coordinator: null,
+                loggerFactory: NullLoggerFactory.Instance);
         }
-
-        FluentActions.Invoking(Ctor).Should().NotThrow();
     }
 
     [Fact]
@@ -59,56 +58,60 @@ public class ConsumerTests
     {
         var config = new ConsumerConfig();
 
-        var stringSerializer = new StringSerializer();
+        var stringDeserializer = new StringDeserializer();
 
         void Ctor()
         {
             var _ = new Consumer<string, string>(
                 _kafkaCluster,
                 config,
-                stringSerializer,
-                stringSerializer,
+                stringDeserializer,
+                stringDeserializer,
+                null!,
+                null!,
                 NullLoggerFactory.Instance);
         }
 
         FluentActions.Invoking(Ctor).Should().NotThrow();
     }
 
-    [Fact]
-    public async Task Subscribe_Success()
-    {
-        var config = new ConsumerConfig();
-
-        await using var consumer = _kafkaCluster.BuildConsumer<Null, Null>("testConsumer");
-        var channel = consumer.Subscribe("test");
-
-        // await foreach (var record in channel.ReadAllAsync())
-        // {
-        // }
-    }
-
     private static IKafkaCluster BuildMockForKafkaCluster()
     {
-        var mockCluster = new Mock<IKafkaCluster>();
+        var mockCluster = Substitute.For<IKafkaCluster>();
 
-        mockCluster.Setup(
-                c => c.BuildConsumer(
-                    "testConsumer",
-                    It.IsAny<ConsumerConfig?>(),
-                    It.IsAny<IAsyncSerializer<Null>?>(),
-                    It.IsAny<IAsyncSerializer<Null>?>()))
-            .Returns(new Mock<IConsumer<Null, Null>>().Object);
+        var consumer = Substitute.For<IConsumer<int, string>>();
+
+        mockCluster.BuildConsumer(Arg.Any<ConsumerConfig>(),
+                Arg.Any<IAsyncDeserializer<int>>(),
+                Arg.Any<IAsyncDeserializer<string>>())
+            .Returns(consumer);
 
         var brokers = BuildBrokersMock();
-        mockCluster.Setup(x => x.Brokers).Returns(brokers);
+        mockCluster.Brokers.Returns(brokers);
 
-        return mockCluster.Object;
+        return mockCluster;
     }
 
     private static IReadOnlyCollection<Node> BuildBrokersMock()
     {
         var list = new List<Node>(5);
 
+        var coordinator = BuildBrokerCoordinator();
+
+        list.Add(coordinator);
+
         return list;
+    }
+
+    private static Node BuildBrokerCoordinator()
+    {
+        return new Node(1, "localhost", 9092);
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    void IDisposable.Dispose()
+    {
+        _kafkaCluster.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

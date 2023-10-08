@@ -23,13 +23,22 @@
 
 namespace NKafka.Exceptions;
 
+/// <summary>
+/// 
+/// </summary>
 public class KafkaConfigException: KafkaException
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public string OptionName { get; }
 
     /// <summary>
-    /// Create a new exception
+    /// Initializes a new instance of the <see cref="KafkaConfigException"/> class.
     /// </summary>
+    /// <param name="optionName"></param>
+    /// <param name="value"></param>
+    /// <param name="message"></param>
     public KafkaConfigException(string optionName, object value, string? message = null)
         : base($"Invalid value '{value}' for configuration '{optionName}'{(message == null ? "" : $": {message}")}")
     {

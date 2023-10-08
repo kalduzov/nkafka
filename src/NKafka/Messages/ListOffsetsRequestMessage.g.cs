@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ListOffsetsRequestMessage
+/// </summary>
 public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListOffsetsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ListOffsets;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The broker ID of the requestor, or -1 if this request is being made by a normal consumer.
@@ -64,17 +75,25 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
     /// </summary>
     public List<ListOffsetsTopicMessage> Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message ListOffsetsRequestMessage
+    /// </summary>
     public ListOffsetsRequestMessage()
     {
     }
 
-    public ListOffsetsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ListOffsetsRequestMessage
+    /// </summary>
+    public ListOffsetsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ReplicaId = reader.ReadInt();
         if (version >= ApiVersion.Version2)
@@ -99,7 +118,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                     var newCollection = new List<ListOffsetsTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ListOffsetsTopicMessage(reader, version));
+                        newCollection.Add(new ListOffsetsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -117,7 +136,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                     var newCollection = new List<ListOffsetsTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ListOffsetsTopicMessage(reader, version));
+                        newCollection.Add(new ListOffsetsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -141,6 +160,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -188,11 +208,13 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ListOffsetsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ListOffsetsRequestMessage? other)
     {
         if (other is null)
@@ -224,6 +246,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -231,6 +254,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ListOffsetsRequestMessage("
@@ -240,9 +264,16 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message ListOffsetsTopicMessage
+    /// </summary>
     public sealed partial class ListOffsetsTopicMessage: IMessage, IEquatable<ListOffsetsTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -254,17 +285,25 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// </summary>
         public List<ListOffsetsPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message ListOffsetsTopicMessage
+        /// </summary>
         public ListOffsetsTopicMessage()
         {
         }
 
-        public ListOffsetsTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message ListOffsetsTopicMessage
+        /// </summary>
+        public ListOffsetsTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -307,7 +346,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                         var newCollection = new List<ListOffsetsPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new ListOffsetsPartitionMessage(reader, version));
+                            newCollection.Add(new ListOffsetsPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -325,7 +364,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                         var newCollection = new List<ListOffsetsPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new ListOffsetsPartitionMessage(reader, version));
+                            newCollection.Add(new ListOffsetsPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -349,6 +388,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -396,11 +436,13 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is ListOffsetsTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(ListOffsetsTopicMessage? other)
         {
             if (other is null)
@@ -438,6 +480,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -445,6 +488,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "ListOffsetsTopicMessage("
@@ -454,9 +498,16 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message ListOffsetsPartitionMessage
+    /// </summary>
     public sealed partial class ListOffsetsPartitionMessage: IMessage, IEquatable<ListOffsetsPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -478,17 +529,25 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// </summary>
         public int MaxNumOffsets { get; set; } = 1;
 
+        /// <summary>
+        /// The basic constructor of the message ListOffsetsPartitionMessage
+        /// </summary>
         public ListOffsetsPartitionMessage()
         {
         }
 
-        public ListOffsetsPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message ListOffsetsPartitionMessage
+        /// </summary>
+        public ListOffsetsPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -530,6 +589,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -566,11 +626,13 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is ListOffsetsPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(ListOffsetsPartitionMessage? other)
         {
             if (other is null)
@@ -596,6 +658,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -603,6 +666,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "ListOffsetsPartitionMessage("

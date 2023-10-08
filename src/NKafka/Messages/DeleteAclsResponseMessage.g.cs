@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteAclsResponseMessage
+/// </summary>
 public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquatable<DeleteAclsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
     /// </summary>
     public List<DeleteAclsFilterResultMessage> FilterResults { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DeleteAclsResponseMessage
+    /// </summary>
     public DeleteAclsResponseMessage()
     {
     }
 
-    public DeleteAclsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteAclsResponseMessage
+    /// </summary>
+    public DeleteAclsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -78,7 +94,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<DeleteAclsFilterResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteAclsFilterResultMessage(reader, version));
+                        newCollection.Add(new DeleteAclsFilterResultMessage(ref reader, version));
                     }
                     FilterResults = newCollection;
                 }
@@ -96,7 +112,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<DeleteAclsFilterResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteAclsFilterResultMessage(reader, version));
+                        newCollection.Add(new DeleteAclsFilterResultMessage(ref reader, version));
                     }
                     FilterResults = newCollection;
                 }
@@ -120,6 +136,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -156,11 +173,13 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteAclsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteAclsResponseMessage? other)
     {
         if (other is null)
@@ -188,6 +207,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -195,6 +215,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteAclsResponseMessage("
@@ -203,9 +224,16 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteAclsFilterResultMessage
+    /// </summary>
     public sealed partial class DeleteAclsFilterResultMessage: IMessage, IEquatable<DeleteAclsFilterResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if the filter succeeded.
@@ -225,17 +253,25 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         /// </summary>
         public List<DeleteAclsMatchingAclMessage> MatchingAcls { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message DeleteAclsFilterResultMessage
+        /// </summary>
         public DeleteAclsFilterResultMessage()
         {
         }
 
-        public DeleteAclsFilterResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteAclsFilterResultMessage
+        /// </summary>
+        public DeleteAclsFilterResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -279,7 +315,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                         var newCollection = new List<DeleteAclsMatchingAclMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DeleteAclsMatchingAclMessage(reader, version));
+                            newCollection.Add(new DeleteAclsMatchingAclMessage(ref reader, version));
                         }
                         MatchingAcls = newCollection;
                     }
@@ -297,7 +333,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                         var newCollection = new List<DeleteAclsMatchingAclMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DeleteAclsMatchingAclMessage(reader, version));
+                            newCollection.Add(new DeleteAclsMatchingAclMessage(ref reader, version));
                         }
                         MatchingAcls = newCollection;
                     }
@@ -321,6 +357,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -381,11 +418,13 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteAclsFilterResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteAclsFilterResultMessage? other)
         {
             if (other is null)
@@ -427,6 +466,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -434,6 +474,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteAclsFilterResultMessage("
@@ -444,9 +485,16 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteAclsMatchingAclMessage
+    /// </summary>
     public sealed partial class DeleteAclsMatchingAclMessage: IMessage, IEquatable<DeleteAclsMatchingAclMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The deletion error code, or 0 if the deletion succeeded.
@@ -496,17 +544,25 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message DeleteAclsMatchingAclMessage
+        /// </summary>
         public DeleteAclsMatchingAclMessage()
         {
         }
 
-        public DeleteAclsMatchingAclMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteAclsMatchingAclMessage
+        /// </summary>
+        public DeleteAclsMatchingAclMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -634,6 +690,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -728,11 +785,13 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteAclsMatchingAclMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteAclsMatchingAclMessage? other)
         {
             if (other is null)
@@ -818,6 +877,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -826,6 +886,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteAclsMatchingAclMessage("

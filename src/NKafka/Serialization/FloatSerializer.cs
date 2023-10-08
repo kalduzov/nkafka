@@ -27,15 +27,12 @@ using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class FloatSerializer: IAsyncSerializer<float>
 {
-    public bool PreferAsync => false;
-
-    public Task<byte[]> SerializeAsync(float data)
-    {
-        return Task.FromResult(Serialize(data));
-    }
-
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(float data)
     {

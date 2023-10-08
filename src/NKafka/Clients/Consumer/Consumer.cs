@@ -19,14 +19,19 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Threading.Channels;
 
 using Microsoft.Extensions.Logging;
 
+using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
 using NKafka.Exceptions;
+using NKafka.Messages;
+using NKafka.Protocol;
 using NKafka.Serialization;
+
+using EM = NKafka.Resources.ExceptionMessages;
 
 namespace NKafka.Clients.Consumer;
 
@@ -34,110 +39,228 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     where TKey : notnull
     where TValue : notnull
 {
-    private readonly ConcurrentDictionary<string, Channel<ConsumerRecord<TKey, TValue>>> _channelsByTopics;
-    private readonly IAsyncSerializer<TKey>? _keySerializer;
-    private readonly IAsyncSerializer<TValue>? _valueSerializer;
+    // ReSharper disable once StaticMemberInGenericType
+    private static readonly Dictionary<Type, object> _defaultDeserializers = new()
+    {
+        [typeof(Null)] = Deserializers.Null,
+        [typeof(int)] = Deserializers.Int,
+        [typeof(long)] = Deserializers.Long,
+        [typeof(string)] = Deserializers.String,
+        [typeof(float)] = Deserializers.Float,
+        [typeof(double)] = Deserializers.Double,
+        [typeof(byte[])] = Deserializers.ByteArray,
+        [typeof(short)] = Deserializers.Short,
+        [typeof(Guid)] = Deserializers.Guid
+    };
 
-    public Consumer(
+    // ReSharper disable once StaticMemberInGenericType
+    private static ulong _consumerInstanceId;
+
+    private Channel<ConsumerRecord<TKey, TValue>>? _currentChannel;
+    private readonly IFetcher<TKey, TValue> _fetcher;
+    private readonly ICoordinator _coordinator;
+    private readonly ILogger _logger;
+    private Subscription? _currentSubscription;
+    private readonly SemaphoreSlim _subscribeSyncBlock;
+
+    public string GroupId { get; }
+
+    public ulong ConsumerInstanceId { get; }
+
+    /// <inheritdoc />
+    public IReadOnlyList<TopicPartition> Assignment { get; } = Array.Empty<TopicPartition>();
+
+    internal Consumer(IKafkaCluster kafkaCluster,
+        ConsumerConfig config,
+        IAsyncDeserializer<TKey> keyDeserializer,
+        IAsyncDeserializer<TValue> valuedDeserializer,
+        ILoggerFactory loggerFactory)
+        :
+        this(kafkaCluster, config, keyDeserializer, valuedDeserializer, null, null, loggerFactory)
+    {
+    }
+
+    internal Consumer(
         IKafkaCluster kafkaCluster,
         ConsumerConfig config,
-        IAsyncSerializer<TKey>? keySerializer,
-        IAsyncSerializer<TValue>? valueSerializer,
+        IAsyncDeserializer<TKey> keyDeserializer,
+        IAsyncDeserializer<TValue> valueDeserializer,
+        IFetcher<TKey, TValue>? fetcher,
+        ICoordinator? coordinator,
         ILoggerFactory loggerFactory)
         : base(kafkaCluster, config, loggerFactory)
     {
-        _keySerializer = keySerializer;
-        _valueSerializer = valueSerializer;
-        _channelsByTopics = new ConcurrentDictionary<string, Channel<ConsumerRecord<TKey, TValue>>>();
+        ConsumerInstanceId = Interlocked.Increment(ref _consumerInstanceId);
+        _subscribeSyncBlock = new SemaphoreSlim(1, 1);
+        GroupId = config.GroupId;
+        config.EventListeners.ToImmutableList();
+        _logger = LoggerFactory.CreateLogger(GetType());
+
+        _coordinator = coordinator
+                       ?? new Coordinator(kafkaCluster,
+                           config.GroupId,
+                           config.Heartbeat,
+                           config.PartitionAssignors.ToDictionary(x => x.Name),
+                           config.EnableAutoCommit,
+                           config.AutoCommitIntervalMs,
+                           config.RebalanceTimeoutMs,
+                           config.SessionTimeoutMs,
+                           config.MaxRetries,
+                           config.RetryBackoffMs,
+                           config.Metrics,
+                           LoggerFactory);
+
+        _fetcher = fetcher
+                   ?? new Fetcher<TKey, TValue>(kafkaCluster,
+                       InitializeDeserializer(keyDeserializer),
+                       InitializeDeserializer(valueDeserializer),
+                       config.FetchMinBytes,
+                       config.FetchMaxBytes,
+                       config.FetchMaxWaitMs,
+                       config.CheckCrc32,
+                       config.IsolationLevel,
+                       LoggerFactory);
+
+    }
+
+    /// <inheritdoc/>
+    public ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(string topicName, CancellationToken token = default)
+    {
+        return SubscribeAsync(new[]
+            {
+                topicName
+            },
+            token);
+    }
+
+    /// <inheritdoc />
+    public async ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics, CancellationToken token = default)
+    {
+        try
+        {
+            if (_subscribeSyncBlock.CurrentCount == 0)
+            {
+                throw new ConsumerException("Уже идет операция подписки, нельзя подписываться параллельно");
+            }
+
+            await _subscribeSyncBlock.WaitAsync(token);
+
+            CheckTopics(topics);
+
+            await UnsubscribeAsync(token); //Всегда пересоздаем подписку. Консьюмер может быть подписан только на один набор топиков за раз
+
+            _currentSubscription = new Subscription(topics, Config.AutoOffsetReset, Config.PartitionAssignors);
+
+            if (!await _coordinator.NewSessionAsync(_currentSubscription, token))
+            {
+                throw new KafkaException("Не удалось создать новую сессию");
+            }
+
+            var channel = BuildChannel();
+
+            _currentChannel = channel;
+
+            await _fetcher.StartAsync(_currentSubscription, channel.Writer, token);
+
+            _logger.ConsumerNewSubscriptionTrace(ConsumerInstanceId, _currentSubscription);
+
+            return _currentChannel.Reader;
+
+        }
+        finally
+        {
+            _subscribeSyncBlock.Release();
+        }
+    }
+
+    private static IAsyncDeserializer<T> InitializeDeserializer<T>(IAsyncDeserializer<T> deserializer)
+    {
+        if (deserializer != NoneDeserializer<T>.Instance)
+        {
+            return deserializer;
+        }
+
+        if (_defaultDeserializers.TryGetValue(typeof(T), out var ser))
+        {
+            return (IAsyncDeserializer<T>)ser;
+        }
+
+        var errorMessage = string.Format(EM.Producer_SerializerError, typeof(T).Name);
+
+        throw new ArgumentNullException(errorMessage);
+
+    }
+
+    public async ValueTask UnsubscribeAsync(CancellationToken token)
+    {
+        _currentSubscription = null;
+        await _fetcher.StopAsync(token); //Сначала останавливаем все считывания из кафки
+        _currentChannel?.Writer.Complete();
+        await _coordinator.StopSessionAsync(token);
+    }
+
+    public async Task CommitOffsetAsync(CancellationToken token = default)
+    {
+        if (_currentSubscription is null)
+        {
+            _logger.LogWarning("Консьюмер не подписан ни на один топик");
+
+            return;
+        }
+
+        await _coordinator.CommitAsync(_currentSubscription.OffsetManager, token);
+    }
+
+    private static void CheckTopics(IReadOnlyCollection<string> topics)
+    {
+        ArgumentNullException.ThrowIfNull(topics);
+
+        if (topics.Count == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(topics), "Колекция должна содержать хотя бы один элемент");
+        }
+
+        foreach (var topic in topics)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+            {
+                throw new ArgumentNullException(nameof(topics), "Коллекция не может содержать не заданных или пустых имен топиков");
+            }
+        }
+    }
+
+    private Channel<ConsumerRecord<TKey, TValue>> BuildChannel()
+    {
+        if (_currentSubscription is null)
+        {
+            throw new KafkaException("Консьюмер не подписан ни на один топик.");
+        }
+
+        var logger = LoggerFactory.CreateLogger<ConsumerChannel<TKey, TValue>>();
+        var channel = new ConsumerChannel<TKey, TValue>(Config.ChannelSize,
+            Config.DropOldRecordsFromChannel,
+            _currentSubscription,
+            logger);
+
+        return channel;
     }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public override void Dispose()
     {
         base.Dispose();
+        _subscribeSyncBlock.Dispose();
     }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
     /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    public override async ValueTask DisposeAsync()
+    public override ValueTask DisposeAsync()
     {
-        await base.DisposeAsync();
-    }
+        var result = base.DisposeAsync();
 
-    /// <summary>Notifies the provider that an observer is to receive notifications.</summary>
-    /// <param name="observer">The object that is to receive notifications.</param>
-    /// <returns>A reference to an interface that allows observers to stop receiving notifications before the provider has finished sending them.</returns>
-    public IDisposable Subscribe(IObserver<ConsumerRecord<TKey, TValue>> observer)
-    {
-        return this;
-    }
+        _subscribeSyncBlock.Dispose();
 
-    /// <summary>Notifies the observer that the provider has finished sending push-based notifications.</summary>
-    public void OnCompleted()
-    {
-    }
+        return result;
 
-    /// <summary>Notifies the observer that the provider has experienced an error condition.</summary>
-    /// <param name="error">An object that provides additional information about the error.</param>
-    public void OnError(Exception error)
-    {
-    }
-
-    /// <summary>Provides the observer with new data.</summary>
-    /// <param name="value">The current notification information.</param>
-    public void OnNext(ConsumerRecord<TKey, TValue> value)
-    {
-    }
-
-    /// <inheritdoc/>
-    public ChannelReader<ConsumerRecord<TKey, TValue>> Subscribe(string topicName)
-    {
-        if (_channelsByTopics.ContainsKey(topicName))
-        {
-            throw new ClusterKafkaException("Подписка на данный топик уже существует, повторная подписка не возможна");
-        }
-
-        var channel = Channel.CreateBounded<ConsumerRecord<TKey, TValue>>(
-            new BoundedChannelOptions(50)
-            {
-                FullMode = BoundedChannelFullMode.Wait,
-                SingleWriter = true,
-                SingleReader = false
-            });
-
-        var resultChannel = _channelsByTopics.GetOrAdd(topicName, channel);
-
-        StartConsume(topicName);
-
-        return resultChannel.Reader;
-    }
-
-    public void Unsubscribe()
-    {
-        foreach (var channel in _channelsByTopics)
-        {
-            channel.Value.Writer.Complete();
-        }
-
-        _channelsByTopics.Clear();
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="topics"></param>
-    public void Unsubscribe(IReadOnlyCollection<string> topics)
-    {
-        foreach (var topic in topics)
-        {
-            if (_channelsByTopics.TryRemove(topic, out var channel))
-            {
-                channel.Writer.Complete();
-            }
-        }
-    }
-
-    private void StartConsume(string topicName)
-    {
     }
 }

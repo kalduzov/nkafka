@@ -31,20 +31,25 @@ public enum CompressionType
     /// <summary>
     ///     None
     /// </summary>
-    None,
+    None = 0,
 
     /// <summary>
     ///     Gzip
     /// </summary>
-    Gzip,
+    Gzip = 1,
 
     /// <summary>
     ///     Snappy
     /// </summary>
-    Snappy,
+    Snappy = 2,
 
     /// <summary>
     ///     Lz4
     /// </summary>
-    Lz4,
+    Lz4 = 3,
+
+    /// <summary>
+    ///     zstd
+    /// </summary>
+    ZStd = 4,
 }

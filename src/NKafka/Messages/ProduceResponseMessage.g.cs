@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ProduceResponseMessage
+/// </summary>
 public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable<ProduceResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// Each produce response
@@ -51,17 +59,25 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// </summary>
     public int ThrottleTimeMs { get; set; } = 0;
 
+    /// <summary>
+    /// The basic constructor of the message ProduceResponseMessage
+    /// </summary>
     public ProduceResponseMessage()
     {
     }
 
-    public ProduceResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ProduceResponseMessage
+    /// </summary>
+    public ProduceResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version9)
@@ -77,7 +93,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                     var newCollection = new TopicProduceResponseCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new TopicProduceResponseMessage(reader, version));
+                        newCollection.Add(new TopicProduceResponseMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -95,7 +111,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                     var newCollection = new TopicProduceResponseCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new TopicProduceResponseMessage(reader, version));
+                        newCollection.Add(new TopicProduceResponseMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -127,6 +143,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -166,11 +183,13 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ProduceResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ProduceResponseMessage? other)
     {
         if (other is null)
@@ -198,6 +217,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -205,6 +225,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ProduceResponseMessage("
@@ -213,9 +234,16 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message TopicProduceResponseMessage
+    /// </summary>
     public sealed partial class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name
@@ -227,17 +255,25 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         /// </summary>
         public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message TopicProduceResponseMessage
+        /// </summary>
         public TopicProduceResponseMessage()
         {
         }
 
-        public TopicProduceResponseMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message TopicProduceResponseMessage
+        /// </summary>
+        public TopicProduceResponseMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version9)
             {
@@ -280,7 +316,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                         var newCollection = new List<PartitionProduceResponseMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new PartitionProduceResponseMessage(reader, version));
+                            newCollection.Add(new PartitionProduceResponseMessage(ref reader, version));
                         }
                         PartitionResponses = newCollection;
                     }
@@ -298,7 +334,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                         var newCollection = new List<PartitionProduceResponseMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new PartitionProduceResponseMessage(reader, version));
+                            newCollection.Add(new PartitionProduceResponseMessage(ref reader, version));
                         }
                         PartitionResponses = newCollection;
                     }
@@ -322,6 +358,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -369,11 +406,13 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is TopicProduceResponseMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(TopicProduceResponseMessage? other)
         {
             if (other is null)
@@ -411,6 +450,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -418,6 +458,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "TopicProduceResponseMessage("
@@ -427,9 +468,16 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message PartitionProduceResponseMessage
+    /// </summary>
     public sealed partial class PartitionProduceResponseMessage: IMessage, IEquatable<PartitionProduceResponseMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -469,17 +517,25 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         /// </summary>
         public string? ErrorMessage { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message PartitionProduceResponseMessage
+        /// </summary>
         public PartitionProduceResponseMessage()
         {
         }
 
-        public PartitionProduceResponseMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message PartitionProduceResponseMessage
+        /// </summary>
+        public PartitionProduceResponseMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version9)
             {
@@ -519,7 +575,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                         var newCollection = new List<BatchIndexAndErrorMessageMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new BatchIndexAndErrorMessageMessage(reader, version));
+                            newCollection.Add(new BatchIndexAndErrorMessageMessage(ref reader, version));
                         }
                         RecordErrors = newCollection;
                     }
@@ -537,7 +593,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                         var newCollection = new List<BatchIndexAndErrorMessageMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new BatchIndexAndErrorMessageMessage(reader, version));
+                            newCollection.Add(new BatchIndexAndErrorMessageMessage(ref reader, version));
                         }
                         RecordErrors = newCollection;
                     }
@@ -593,6 +649,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -669,11 +726,13 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is PartitionProduceResponseMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(PartitionProduceResponseMessage? other)
         {
             if (other is null)
@@ -731,6 +790,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -738,6 +798,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "PartitionProduceResponseMessage("
@@ -752,9 +813,16 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message BatchIndexAndErrorMessageMessage
+    /// </summary>
     public sealed partial class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The batch index of the record that cause the batch to be dropped
@@ -766,17 +834,25 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         /// </summary>
         public string? BatchIndexErrorMessage { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message BatchIndexAndErrorMessageMessage
+        /// </summary>
         public BatchIndexAndErrorMessageMessage()
         {
         }
 
-        public BatchIndexAndErrorMessageMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message BatchIndexAndErrorMessageMessage
+        /// </summary>
+        public BatchIndexAndErrorMessageMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version9)
             {
@@ -824,6 +900,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version8)
@@ -872,11 +949,13 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is BatchIndexAndErrorMessageMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(BatchIndexAndErrorMessageMessage? other)
         {
             if (other is null)
@@ -904,6 +983,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -911,6 +991,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "BatchIndexAndErrorMessageMessage("
@@ -920,16 +1001,26 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message TopicProduceResponseCollection
+    /// </summary>
     public sealed partial class TopicProduceResponseCollection: HashSet<TopicProduceResponseMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public TopicProduceResponseCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public TopicProduceResponseCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<TopicProduceResponseMessage>)obj);

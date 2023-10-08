@@ -31,32 +31,48 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ResponseHeader
+/// </summary>
 public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The correlation ID of this response.
     /// </summary>
     public int CorrelationId { get; set; } = 0;
 
+    /// <summary>
+    /// The basic constructor of the message ResponseHeader
+    /// </summary>
     public ResponseHeader()
     {
     }
 
-    public ResponseHeader(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ResponseHeader
+    /// </summary>
+    public ResponseHeader(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         CorrelationId = reader.ReadInt();
         UnknownTaggedFields = null;
@@ -77,6 +93,7 @@ public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -97,11 +114,13 @@ public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ResponseHeader other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ResponseHeader? other)
     {
         if (other is null)
@@ -115,6 +134,7 @@ public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -122,6 +142,7 @@ public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ResponseHeader("

@@ -19,7 +19,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
 
@@ -31,9 +30,10 @@ namespace NKafka.Benchmarks;
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net60)]
 [SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net80)]
 public class CrcBenchmarks
 {
-    private static uint[] _lookupTable =
+    private static readonly uint[] _lookupTable =
     {
         0x00000000,
         0xf26b8303,
@@ -293,23 +293,23 @@ public class CrcBenchmarks
         0xad7d5351
     };
 
-    public byte[] buffer;
+    private byte[]? _buffer;
 
     [Params("test", "test dsakj askd hdf hsd", "test dsakj askd hdf hsd dsakjd kasjd kasjdkl jasdjasd A9DA SDLKA90asklaskldaskdaskdj")]
-    public string Text;
+    public string? Text;
 
     [GlobalSetup]
     public void Setup()
     {
-        buffer = Encoding.UTF8.GetBytes(Text);
+        _buffer = Encoding.UTF8.GetBytes(Text!);
     }
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public uint CalculateNative()
     {
         var crc = 0xFFFFFFFF;
 
-        foreach (var b in buffer)
+        foreach (var b in _buffer!)
         {
             crc = crc >> 8 ^ _lookupTable[(crc ^ b) & 0xff];
         }
@@ -317,16 +317,24 @@ public class CrcBenchmarks
         return crc ^ 0xFFFFFFFF;
     }
 
-    [Benchmark(Baseline = true)]
+    [Benchmark]
     public uint CalculateWithHardwareSupport()
     {
         var crc = 0xFFFFFFFF;
 
-        foreach (var b in buffer)
+        foreach (var b in _buffer!)
         {
             crc = Sse42.Crc32(crc, b);
         }
 
         return crc ^ 0xFFFFFFFF;
+    }
+
+    [Benchmark]
+    public uint CalculateSystemIoHashing()
+    {
+        var res = System.IO.Hashing.Crc32.Hash(_buffer!);
+
+        return res[0];
     }
 }

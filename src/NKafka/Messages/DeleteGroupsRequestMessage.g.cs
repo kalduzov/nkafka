@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteGroupsRequestMessage
+/// </summary>
 public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<DeleteGroupsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteGroups;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The group names to delete.
     /// </summary>
     public List<string> GroupsNames { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DeleteGroupsRequestMessage
+    /// </summary>
     public DeleteGroupsRequestMessage()
     {
     }
 
-    public DeleteGroupsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteGroupsRequestMessage
+    /// </summary>
+    public DeleteGroupsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version2)
@@ -148,6 +167,7 @@ public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -191,11 +211,13 @@ public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteGroupsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteGroupsRequestMessage? other)
     {
         if (other is null)
@@ -219,6 +241,7 @@ public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -226,6 +249,7 @@ public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteGroupsRequestMessage("

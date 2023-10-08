@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DescribeConfigsRequestMessage
+/// </summary>
 public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<DescribeConfigsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DescribeConfigs;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The resources whose configurations we want to describe.
@@ -64,17 +75,25 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
     /// </summary>
     public bool IncludeDocumentation { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message DescribeConfigsRequestMessage
+    /// </summary>
     public DescribeConfigsRequestMessage()
     {
     }
 
-    public DescribeConfigsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DescribeConfigsRequestMessage
+    /// </summary>
+    public DescribeConfigsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version4)
@@ -90,7 +109,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
                     var newCollection = new List<DescribeConfigsResourceMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribeConfigsResourceMessage(reader, version));
+                        newCollection.Add(new DescribeConfigsResourceMessage(ref reader, version));
                     }
                     Resources = newCollection;
                 }
@@ -108,7 +127,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
                     var newCollection = new List<DescribeConfigsResourceMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribeConfigsResourceMessage(reader, version));
+                        newCollection.Add(new DescribeConfigsResourceMessage(ref reader, version));
                     }
                     Resources = newCollection;
                 }
@@ -148,6 +167,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -205,11 +225,13 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DescribeConfigsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DescribeConfigsRequestMessage? other)
     {
         if (other is null)
@@ -241,6 +263,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -248,6 +271,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DescribeConfigsRequestMessage("
@@ -257,9 +281,16 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribeConfigsResourceMessage
+    /// </summary>
     public sealed partial class DescribeConfigsResourceMessage: IMessage, IEquatable<DescribeConfigsResourceMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The resource type.
@@ -276,17 +307,25 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
         /// </summary>
         public List<string> ConfigurationKeys { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message DescribeConfigsResourceMessage
+        /// </summary>
         public DescribeConfigsResourceMessage()
         {
         }
 
-        public DescribeConfigsResourceMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribeConfigsResourceMessage
+        /// </summary>
+        public DescribeConfigsResourceMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -398,6 +437,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -468,11 +508,13 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribeConfigsResourceMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribeConfigsResourceMessage? other)
         {
             if (other is null)
@@ -514,6 +556,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -521,6 +564,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribeConfigsResourceMessage("

@@ -24,6 +24,7 @@
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Text;
 
 using FastEnumUtility;
 
@@ -94,7 +95,31 @@ internal static class KafkaDiagnosticsSource
 
     public static Activity? CreateTopics(IReadOnlyCollection<TopicDetail> topics)
     {
-        var activity = _activitySource.StartActivity()?.SetStatus(ActivityStatusCode.Ok);
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics.Count <= 0 || activity is null)
+        {
+            return activity;
+        }
+        var sb = new StringBuilder();
+
+        var first = true;
+
+        foreach (var topic in topics)
+        {
+            if (!first)
+            {
+                sb.Append(',');
+            }
+            sb.Append(topic);
+
+            if (first)
+            {
+                first = false;
+            }
+        }
+        activity?.AddTag("topics", sb.ToString());
 
         return activity;
     }

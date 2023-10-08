@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message SyncGroupRequestMessage
+/// </summary>
 public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SyncGroup;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The unique group identifier.
@@ -84,17 +95,25 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
     /// </summary>
     public List<SyncGroupRequestAssignmentMessage> Assignments { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message SyncGroupRequestMessage
+    /// </summary>
     public SyncGroupRequestMessage()
     {
     }
 
-    public SyncGroupRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message SyncGroupRequestMessage
+    /// </summary>
+    public SyncGroupRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -227,7 +246,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
                     var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
+                        newCollection.Add(new SyncGroupRequestAssignmentMessage(ref reader, version));
                     }
                     Assignments = newCollection;
                 }
@@ -245,7 +264,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
                     var newCollection = new List<SyncGroupRequestAssignmentMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new SyncGroupRequestAssignmentMessage(reader, version));
+                        newCollection.Add(new SyncGroupRequestAssignmentMessage(ref reader, version));
                     }
                     Assignments = newCollection;
                 }
@@ -269,6 +288,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -389,11 +409,13 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is SyncGroupRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(SyncGroupRequestMessage? other)
     {
         if (other is null)
@@ -491,6 +513,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -498,6 +521,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "SyncGroupRequestMessage("
@@ -511,9 +535,16 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message SyncGroupRequestAssignmentMessage
+    /// </summary>
     public sealed partial class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The ID of the member to assign.
@@ -525,17 +556,25 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
         /// </summary>
         public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
+        /// <summary>
+        /// The basic constructor of the message SyncGroupRequestAssignmentMessage
+        /// </summary>
         public SyncGroupRequestAssignmentMessage()
         {
         }
 
-        public SyncGroupRequestAssignmentMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message SyncGroupRequestAssignmentMessage
+        /// </summary>
+        public SyncGroupRequestAssignmentMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version5)
             {
@@ -601,6 +640,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -641,11 +681,13 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is SyncGroupRequestAssignmentMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(SyncGroupRequestAssignmentMessage? other)
         {
             if (other is null)
@@ -673,6 +715,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -680,6 +723,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "SyncGroupRequestAssignmentMessage("

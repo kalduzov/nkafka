@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DescribeConfigsResponseMessage
+/// </summary>
 public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IEquatable<DescribeConfigsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
     /// </summary>
     public List<DescribeConfigsResultMessage> Results { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DescribeConfigsResponseMessage
+    /// </summary>
     public DescribeConfigsResponseMessage()
     {
     }
 
-    public DescribeConfigsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DescribeConfigsResponseMessage
+    /// </summary>
+    public DescribeConfigsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -78,7 +94,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                     var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribeConfigsResultMessage(reader, version));
+                        newCollection.Add(new DescribeConfigsResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -96,7 +112,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                     var newCollection = new List<DescribeConfigsResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribeConfigsResultMessage(reader, version));
+                        newCollection.Add(new DescribeConfigsResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -120,6 +136,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -156,11 +173,13 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DescribeConfigsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DescribeConfigsResponseMessage? other)
     {
         if (other is null)
@@ -188,6 +207,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -195,6 +215,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DescribeConfigsResponseMessage("
@@ -203,9 +224,16 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribeConfigsResultMessage
+    /// </summary>
     public sealed partial class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The error code, or 0 if we were able to successfully describe the configurations.
@@ -235,17 +263,25 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         /// </summary>
         public List<DescribeConfigsResourceResultMessage> Configs { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message DescribeConfigsResultMessage
+        /// </summary>
         public DescribeConfigsResultMessage()
         {
         }
 
-        public DescribeConfigsResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribeConfigsResultMessage
+        /// </summary>
+        public DescribeConfigsResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -313,7 +349,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                         var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
+                            newCollection.Add(new DescribeConfigsResourceResultMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -331,7 +367,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                         var newCollection = new List<DescribeConfigsResourceResultMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribeConfigsResourceResultMessage(reader, version));
+                            newCollection.Add(new DescribeConfigsResourceResultMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -355,6 +391,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -428,11 +465,13 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribeConfigsResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribeConfigsResultMessage? other)
         {
             if (other is null)
@@ -492,6 +531,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -499,6 +539,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribeConfigsResultMessage("
@@ -511,9 +552,16 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribeConfigsResourceResultMessage
+    /// </summary>
     public sealed partial class DescribeConfigsResourceResultMessage: IMessage, IEquatable<DescribeConfigsResourceResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The configuration name.
@@ -560,17 +608,25 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         /// </summary>
         public string Documentation { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message DescribeConfigsResourceResultMessage
+        /// </summary>
         public DescribeConfigsResourceResultMessage()
         {
         }
 
-        public DescribeConfigsResourceResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribeConfigsResourceResultMessage
+        /// </summary>
+        public DescribeConfigsResourceResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -655,7 +711,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                         var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
+                            newCollection.Add(new DescribeConfigsSynonymMessage(ref reader, version));
                         }
                         Synonyms = newCollection;
                     }
@@ -673,7 +729,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                         var newCollection = new List<DescribeConfigsSynonymMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribeConfigsSynonymMessage(reader, version));
+                            newCollection.Add(new DescribeConfigsSynonymMessage(ref reader, version));
                         }
                         Synonyms = newCollection;
                     }
@@ -737,6 +793,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -859,11 +916,13 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribeConfigsResourceResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribeConfigsResourceResultMessage? other)
         {
             if (other is null)
@@ -949,6 +1008,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -957,6 +1017,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribeConfigsResourceResultMessage("
@@ -973,9 +1034,16 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribeConfigsSynonymMessage
+    /// </summary>
     public sealed partial class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The synonym name.
@@ -992,17 +1060,25 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
         /// </summary>
         public sbyte Source { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message DescribeConfigsSynonymMessage
+        /// </summary>
         public DescribeConfigsSynonymMessage()
         {
         }
 
-        public DescribeConfigsSynonymMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribeConfigsSynonymMessage
+        /// </summary>
+        public DescribeConfigsSynonymMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -1073,6 +1149,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version1)
@@ -1133,11 +1210,13 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribeConfigsSynonymMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribeConfigsSynonymMessage? other)
         {
             if (other is null)
@@ -1179,6 +1258,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1186,6 +1266,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribeConfigsSynonymMessage("

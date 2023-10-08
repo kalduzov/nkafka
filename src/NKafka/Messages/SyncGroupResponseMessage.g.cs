@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message SyncGroupResponseMessage
+/// </summary>
 public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncGroupResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -69,17 +77,25 @@ public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatab
     /// </summary>
     public byte[] Assignment { get; set; } = Array.Empty<byte>();
 
+    /// <summary>
+    /// The basic constructor of the message SyncGroupResponseMessage
+    /// </summary>
     public SyncGroupResponseMessage()
     {
     }
 
-    public SyncGroupResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message SyncGroupResponseMessage
+    /// </summary>
+    public SyncGroupResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -169,6 +185,7 @@ public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -228,11 +245,13 @@ public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is SyncGroupResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(SyncGroupResponseMessage? other)
     {
         if (other is null)
@@ -282,6 +301,7 @@ public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatab
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -289,6 +309,7 @@ public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatab
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "SyncGroupResponseMessage("

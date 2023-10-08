@@ -31,16 +31,25 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message SaslAuthenticateResponseMessage
+/// </summary>
 public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, IEquatable<SaslAuthenticateResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
 
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
+
+    /// <inheritdoc />
     public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
@@ -66,17 +75,25 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
     /// </summary>
     public long SessionLifetimeMs { get; set; } = 0;
 
+    /// <summary>
+    /// The basic constructor of the message SaslAuthenticateResponseMessage
+    /// </summary>
     public SaslAuthenticateResponseMessage()
     {
     }
 
-    public SaslAuthenticateResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message SaslAuthenticateResponseMessage
+    /// </summary>
+    public SaslAuthenticateResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         {
@@ -147,6 +164,7 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -204,11 +222,13 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is SaslAuthenticateResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(SaslAuthenticateResponseMessage? other)
     {
         if (other is null)
@@ -244,6 +264,7 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -251,6 +272,7 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "SaslAuthenticateResponseMessage("

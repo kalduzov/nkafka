@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message AlterConfigsResponseMessage
+/// </summary>
 public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEquatable<AlterConfigsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// Duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
     /// </summary>
     public List<AlterConfigsResourceResponseMessage> Responses { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message AlterConfigsResponseMessage
+    /// </summary>
     public AlterConfigsResponseMessage()
     {
     }
 
-    public AlterConfigsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message AlterConfigsResponseMessage
+    /// </summary>
+    public AlterConfigsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -78,7 +94,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
                     var newCollection = new List<AlterConfigsResourceResponseMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AlterConfigsResourceResponseMessage(reader, version));
+                        newCollection.Add(new AlterConfigsResourceResponseMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -96,7 +112,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
                     var newCollection = new List<AlterConfigsResourceResponseMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AlterConfigsResourceResponseMessage(reader, version));
+                        newCollection.Add(new AlterConfigsResourceResponseMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -120,6 +136,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -156,11 +173,13 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is AlterConfigsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(AlterConfigsResponseMessage? other)
     {
         if (other is null)
@@ -188,6 +207,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -195,6 +215,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "AlterConfigsResponseMessage("
@@ -203,9 +224,16 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterConfigsResourceResponseMessage
+    /// </summary>
     public sealed partial class AlterConfigsResourceResponseMessage: IMessage, IEquatable<AlterConfigsResourceResponseMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The resource error code.
@@ -230,17 +258,25 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
         /// </summary>
         public string ResourceName { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message AlterConfigsResourceResponseMessage
+        /// </summary>
         public AlterConfigsResourceResponseMessage()
         {
         }
 
-        public AlterConfigsResourceResponseMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message AlterConfigsResourceResponseMessage
+        /// </summary>
+        public AlterConfigsResourceResponseMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version2)
             {
@@ -312,6 +348,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -369,11 +406,13 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is AlterConfigsResourceResponseMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(AlterConfigsResourceResponseMessage? other)
         {
             if (other is null)
@@ -419,6 +458,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -426,6 +466,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "AlterConfigsResourceResponseMessage("

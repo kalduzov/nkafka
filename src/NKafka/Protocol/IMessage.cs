@@ -19,6 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Protocol.Buffers;
+
 namespace NKafka.Protocol;
 
 /// <summary>
@@ -32,6 +34,11 @@ public interface IMessage
     public List<TaggedField>? UnknownTaggedFields { get; set; }
 
     /// <summary>
+    /// Размер входящего буфера
+    /// </summary>
+    public int IncomingBufferLength { get; }
+
+    /// <summary>
     /// Writes out this message to the given writer
     /// </summary>
     public void Write(BufferWriter writer, ApiVersion version);
@@ -39,5 +46,5 @@ public interface IMessage
     /// <summary>
     /// Reads this message from the given BufferReader. This will overwrite all relevant fields with information from the byte buffer
     /// </summary>
-    public void Read(BufferReader reader, ApiVersion version);
+    public void Read(ref BufferReader reader, ApiVersion version);
 }

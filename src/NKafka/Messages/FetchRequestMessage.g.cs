@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message FetchRequestMessage
+/// </summary>
 public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<FetchRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Fetch;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The clusterId if known. This is used to validate metadata fetches prior to broker registration.
@@ -104,17 +115,25 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// </summary>
     public string RackId { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The basic constructor of the message FetchRequestMessage
+    /// </summary>
     public FetchRequestMessage()
     {
     }
 
-    public FetchRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message FetchRequestMessage
+    /// </summary>
+    public FetchRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             ClusterId = null;
@@ -168,7 +187,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                     var newCollection = new List<FetchTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new FetchTopicMessage(reader, version));
+                        newCollection.Add(new FetchTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -186,7 +205,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                     var newCollection = new List<FetchTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new FetchTopicMessage(reader, version));
+                        newCollection.Add(new FetchTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -207,7 +226,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                     var newCollection = new List<ForgottenTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ForgottenTopicMessage(reader, version));
+                        newCollection.Add(new ForgottenTopicMessage(ref reader, version));
                     }
                     ForgottenTopicsData = newCollection;
                 }
@@ -225,7 +244,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                     var newCollection = new List<ForgottenTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ForgottenTopicMessage(reader, version));
+                        newCollection.Add(new ForgottenTopicMessage(ref reader, version));
                     }
                     ForgottenTopicsData = newCollection;
                 }
@@ -299,6 +318,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -409,11 +429,13 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is FetchRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(FetchRequestMessage? other)
     {
         if (other is null)
@@ -507,6 +529,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -515,6 +538,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "FetchRequestMessage("
@@ -532,9 +556,16 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message FetchTopicMessage
+    /// </summary>
     public sealed partial class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The name of the topic to fetch.
@@ -551,17 +582,25 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// </summary>
         public List<FetchPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message FetchTopicMessage
+        /// </summary>
         public FetchTopicMessage()
         {
         }
 
-        public FetchTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message FetchTopicMessage
+        /// </summary>
+        public FetchTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version13)
             {
@@ -617,7 +656,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                         var newCollection = new List<FetchPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new FetchPartitionMessage(reader, version));
+                            newCollection.Add(new FetchPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -635,7 +674,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                         var newCollection = new List<FetchPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new FetchPartitionMessage(reader, version));
+                            newCollection.Add(new FetchPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -659,6 +698,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -713,11 +753,13 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is FetchTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(FetchTopicMessage? other)
         {
             if (other is null)
@@ -759,6 +801,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -766,6 +809,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "FetchTopicMessage("
@@ -776,9 +820,16 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message FetchPartitionMessage
+    /// </summary>
     public sealed partial class FetchPartitionMessage: IMessage, IEquatable<FetchPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -810,17 +861,25 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// </summary>
         public int PartitionMaxBytes { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message FetchPartitionMessage
+        /// </summary>
         public FetchPartitionMessage()
         {
         }
 
-        public FetchPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message FetchPartitionMessage
+        /// </summary>
+        public FetchPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version13)
             {
@@ -871,6 +930,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -912,11 +972,13 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is FetchPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(FetchPartitionMessage? other)
         {
             if (other is null)
@@ -950,6 +1012,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -957,6 +1020,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "FetchPartitionMessage("
@@ -970,9 +1034,16 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message ForgottenTopicMessage
+    /// </summary>
     public sealed partial class ForgottenTopicMessage: IMessage, IEquatable<ForgottenTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -989,17 +1060,25 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// </summary>
         public List<int> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message ForgottenTopicMessage
+        /// </summary>
         public ForgottenTopicMessage()
         {
         }
 
-        public ForgottenTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message ForgottenTopicMessage
+        /// </summary>
+        public ForgottenTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version13)
             {
@@ -1083,6 +1162,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version7)
@@ -1137,11 +1217,13 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is ForgottenTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(ForgottenTopicMessage? other)
         {
             if (other is null)
@@ -1183,6 +1265,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1190,6 +1273,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "ForgottenTopicMessage("

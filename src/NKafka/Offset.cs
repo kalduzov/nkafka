@@ -29,25 +29,7 @@ namespace NKafka;
 /// <remarks>This structure is borrowed from the Confluent.Fafka library</remarks>
 public readonly struct Offset: IEquatable<Offset>
 {
-    private const long _OFFSET_BEGINNING = -2;
-    private const long _OFFSET_END = -1;
-    private const long _OFFSET_STORED = -1000;
     private const long _OFFSET_INVALID = -1001;
-
-    /// <summary>
-    /// A special value that refers to the beginning of a partition.
-    /// </summary>
-    public static readonly Offset Beginning = new(_OFFSET_BEGINNING);
-
-    /// <summary>
-    /// A special value that refers to the end of a partition.
-    /// </summary>
-    public static readonly Offset End = new(_OFFSET_END);
-
-    /// <summary>
-    /// A special value that refers to the stored offset for a partition.
-    /// </summary>
-    public static readonly Offset Stored = new(_OFFSET_STORED);
 
     /// <summary>
     /// A special value that refers to an invalid, unassigned or default partition offset.
@@ -69,12 +51,6 @@ public readonly struct Offset: IEquatable<Offset>
     ///     Gets the long value corresponding to this offset.
     /// </summary>
     public long Value { get; }
-
-    /// <summary>
-    ///     Gets whether or not this is one of the special
-    ///     offset values.
-    /// </summary>
-    public bool IsSpecial => Value is _OFFSET_BEGINNING or _OFFSET_END or _OFFSET_STORED or _OFFSET_INVALID;
 
     /// <summary>
     ///     Tests whether this Offset value is equal to the specified object.
@@ -286,13 +262,6 @@ public readonly struct Offset: IEquatable<Offset>
     /// </returns>
     public override string ToString()
     {
-        return Value switch
-        {
-            _OFFSET_BEGINNING => $"Beginning [{_OFFSET_BEGINNING}]",
-            _OFFSET_END => $"End [{_OFFSET_END}]",
-            _OFFSET_STORED => $"Stored [{_OFFSET_STORED}]",
-            _OFFSET_INVALID => $"Unset [{_OFFSET_INVALID}]",
-            _ => Value.ToString()
-        };
+        return Value.ToString();
     }
 }

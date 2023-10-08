@@ -150,7 +150,7 @@ public interface IFieldType
 
         public static readonly RecordsFieldType Instance = new();
 
-        public string ClrName => "IRecords";
+        public string ClrName => "Records";
 
         public bool SerializationIsDifferentInFlexibleVersions => true;
 

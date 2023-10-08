@@ -78,7 +78,7 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BrokerVersion not set.
+        ///   Looks up a localized string similar to FallbackBrokerVersion not set.
         /// </summary>
         internal static string NoBrokerVersion {
             get {

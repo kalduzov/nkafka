@@ -26,11 +26,20 @@ namespace NKafka.Exceptions;
 /// </summary>
 public class ConnectionKafkaException: KafkaException
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
     public ConnectionKafkaException(string message)
         : base(message)
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
     public ConnectionKafkaException(string message, Exception innerException)
         : base(message, innerException)
     {

@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message AddOffsetsToTxnRequestMessage
+/// </summary>
 public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.AddOffsetsToTxn;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The transactional id corresponding to the transaction.
@@ -69,17 +80,25 @@ public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEqu
     /// </summary>
     public string GroupId { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The basic constructor of the message AddOffsetsToTxnRequestMessage
+    /// </summary>
     public AddOffsetsToTxnRequestMessage()
     {
     }
 
-    public AddOffsetsToTxnRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message AddOffsetsToTxnRequestMessage
+    /// </summary>
+    public AddOffsetsToTxnRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -147,6 +166,7 @@ public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -192,11 +212,13 @@ public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is AddOffsetsToTxnRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(AddOffsetsToTxnRequestMessage? other)
     {
         if (other is null)
@@ -242,6 +264,7 @@ public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEqu
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -249,6 +272,7 @@ public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "AddOffsetsToTxnRequestMessage("

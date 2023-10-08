@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message MetadataRequestMessage
+/// </summary>
 public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<MetadataRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Metadata;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The topics to fetch metadata for.
@@ -69,17 +80,25 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
     /// </summary>
     public bool IncludeTopicAuthorizedOperations { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message MetadataRequestMessage
+    /// </summary>
     public MetadataRequestMessage()
     {
     }
 
-    public MetadataRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message MetadataRequestMessage
+    /// </summary>
+    public MetadataRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version9)
@@ -95,7 +114,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                     var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataRequestTopicMessage(reader, version));
+                        newCollection.Add(new MetadataRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -120,7 +139,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                     var newCollection = new List<MetadataRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataRequestTopicMessage(reader, version));
+                        newCollection.Add(new MetadataRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -168,6 +187,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -256,11 +276,13 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is MetadataRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(MetadataRequestMessage? other)
     {
         if (other is null)
@@ -296,6 +318,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -303,6 +326,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "MetadataRequestMessage("
@@ -313,9 +337,16 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataRequestTopicMessage
+    /// </summary>
     public sealed partial class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic id.
@@ -327,17 +358,25 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message MetadataRequestTopicMessage
+        /// </summary>
         public MetadataRequestTopicMessage()
         {
         }
 
-        public MetadataRequestTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MetadataRequestTopicMessage
+        /// </summary>
+        public MetadataRequestTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version12)
             {
@@ -399,6 +438,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -445,11 +485,13 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MetadataRequestTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MetadataRequestTopicMessage? other)
         {
             if (other is null)
@@ -477,6 +519,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -484,6 +527,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MetadataRequestTopicMessage("

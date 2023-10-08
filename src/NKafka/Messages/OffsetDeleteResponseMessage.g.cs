@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message OffsetDeleteResponseMessage
+/// </summary>
 public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<OffsetDeleteResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The top-level error code, or 0 if there was no error.
@@ -59,17 +67,25 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
     /// </summary>
     public OffsetDeleteResponseTopicCollection Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message OffsetDeleteResponseMessage
+    /// </summary>
     public OffsetDeleteResponseMessage()
     {
     }
 
-    public OffsetDeleteResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message OffsetDeleteResponseMessage
+    /// </summary>
+    public OffsetDeleteResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ErrorCode = reader.ReadShort();
         ThrottleTimeMs = reader.ReadInt();
@@ -85,7 +101,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
                 var newCollection = new OffsetDeleteResponseTopicCollection(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new OffsetDeleteResponseTopicMessage(reader, version));
+                    newCollection.Add(new OffsetDeleteResponseTopicMessage(ref reader, version));
                 }
                 Topics = newCollection;
             }
@@ -93,6 +109,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         UnknownTaggedFields = null;
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -111,11 +128,13 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is OffsetDeleteResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(OffsetDeleteResponseMessage? other)
     {
         if (other is null)
@@ -147,6 +166,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -154,6 +174,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "OffsetDeleteResponseMessage("
@@ -163,9 +184,16 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteResponseTopicMessage
+    /// </summary>
     public sealed partial class OffsetDeleteResponseTopicMessage: IMessage, IEquatable<OffsetDeleteResponseTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -177,17 +205,25 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         /// </summary>
         public OffsetDeleteResponsePartitionCollection Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetDeleteResponseTopicMessage
+        /// </summary>
         public OffsetDeleteResponseTopicMessage()
         {
         }
 
-        public OffsetDeleteResponseTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetDeleteResponseTopicMessage
+        /// </summary>
+        public OffsetDeleteResponseTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -221,7 +257,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
                     var newCollection = new OffsetDeleteResponsePartitionCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetDeleteResponsePartitionMessage(reader, version));
+                        newCollection.Add(new OffsetDeleteResponsePartitionMessage(ref reader, version));
                     }
                     Partitions = newCollection;
                 }
@@ -229,6 +265,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             UnknownTaggedFields = null;
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -250,11 +287,13 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetDeleteResponseTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetDeleteResponseTopicMessage? other)
         {
             if (other is null)
@@ -292,6 +331,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -299,6 +339,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetDeleteResponseTopicMessage("
@@ -308,9 +349,16 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteResponsePartitionMessage
+    /// </summary>
     public sealed partial class OffsetDeleteResponsePartitionMessage: IMessage, IEquatable<OffsetDeleteResponsePartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -325,17 +373,25 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         /// <inheritdoc />
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetDeleteResponsePartitionMessage
+        /// </summary>
         public OffsetDeleteResponsePartitionMessage()
         {
         }
 
-        public OffsetDeleteResponsePartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetDeleteResponsePartitionMessage
+        /// </summary>
+        public OffsetDeleteResponsePartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -346,6 +402,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             UnknownTaggedFields = null;
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -359,11 +416,13 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetDeleteResponsePartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetDeleteResponsePartitionMessage? other)
         {
             if (other is null)
@@ -381,6 +440,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -388,6 +448,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetDeleteResponsePartitionMessage("
@@ -397,32 +458,52 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteResponsePartitionCollection
+    /// </summary>
     public sealed partial class OffsetDeleteResponsePartitionCollection: HashSet<OffsetDeleteResponsePartitionMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public OffsetDeleteResponsePartitionCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public OffsetDeleteResponsePartitionCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<OffsetDeleteResponsePartitionMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteResponseTopicCollection
+    /// </summary>
     public sealed partial class OffsetDeleteResponseTopicCollection: HashSet<OffsetDeleteResponseTopicMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public OffsetDeleteResponseTopicCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public OffsetDeleteResponseTopicCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<OffsetDeleteResponseTopicMessage>)obj);

@@ -29,7 +29,7 @@ internal class SendResultTask: TaskCompletionSource<RecordMetadata>
     private readonly int _serializedKeySize;
     private readonly int _serializedValueSize;
 
-    public RecordMetadata Value { get; set; }
+    //public RecordMetadata Value { get; set; }
 
     public SendResultTask(
         TaskCompletionSource result,

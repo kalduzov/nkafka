@@ -22,7 +22,7 @@
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// A new topic to be created via <see cref="IAdminClient.CreateTopicsAsync(System.Collections.Generic.IReadOnlyCollection{TopicDetail},System.Threading.CancellationToken)"/> 
+/// A new topic to be created via <see cref="IAdminClient.CreateTopicsAsync"/> 
 /// </summary>
 public record TopicDetail(string Name,
     int Partitions,

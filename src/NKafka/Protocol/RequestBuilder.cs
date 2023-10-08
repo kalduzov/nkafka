@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Messages;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Protocol;
 
@@ -28,8 +29,8 @@ namespace NKafka.Protocol;
 /// </summary>
 internal static partial class RequestBuilder
 {
-    private static void ProcessHeader(BufferReader reader, ApiVersion headerVersion)
+    private static void ProcessHeader(ref BufferReader reader, ApiVersion headerVersion)
     {
-        _ = new RequestHeader(reader, headerVersion); // Пока поля с тегами нам не нужны
+        _ = new RequestHeader(ref reader, headerVersion); // Пока поля с тегами нам не нужны
     }
 }

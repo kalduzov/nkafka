@@ -30,4 +30,25 @@ public sealed partial class FindCoordinatorResponseMessage
     {
         return version >= ApiVersion.Version2;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public CoordinatorMessage GetCoordinator()
+    {
+        if (Coordinators.Count == 0)
+        {
+            return new CoordinatorMessage
+            {
+                NodeId = NodeId,
+                ErrorCode = ErrorCode,
+                Host = Host,
+                Port = Port,
+                ErrorMessage = ErrorMessage
+            };
+        }
+
+        return Coordinators[0];
+    }
 }

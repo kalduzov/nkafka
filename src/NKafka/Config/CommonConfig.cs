@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,12 +75,13 @@ public abstract record CommonConfig
 
     /// <summary>
     /// Request broker's supported API versions to adjust functionality to available protocol features.
-    /// If set to false, or the ApiVersionRequest fails, the fallback version `broker.version.fallback` will be used.
-    /// **NOTE**:
-    /// Depends on broker version >=0.10.0. If the request is not supported by (an older) broker the
-    /// `broker.version.fallback` fallback is used.
+    /// If set to false, or the ApiVersionRequest fails, the fallback version `FallbackBrokerVersion` will be used.
+    /// <p>
     /// default: true
+    /// </p>
+    /// <p>
     /// importance: high
+    /// </p>
     /// </summary>
     public bool ApiVersionRequest { get; set; } = true;
 
@@ -147,9 +148,8 @@ public abstract record CommonConfig
     public int RequestTimeoutMs { get; set; } = 30 * 1000;
 
     /// <summary>
-    ///     The amount of time to wait before attempting to retry a failed request to a given topic partition.
+    ///     The amount of time to wait before attempting to retry a failed request.
     ///     This avoids repeatedly sending requests in a tight loop under some failure scenarios.
-    ///     retry.backoff.ms
     /// </summary>
     public long RetryBackoffMs { get; set; } = 100L;
 
@@ -168,11 +168,6 @@ public abstract record CommonConfig
     public int MaxInflightRequests => 100;
 
     /// <summary>
-    /// Настройки проверки состояния соединений
-    /// </summary>
-    public HeartbeatSettings Heartbeat { get; set; } = new();
-
-    /// <summary>
     /// The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
     ///
     /// default - 32768
@@ -180,13 +175,32 @@ public abstract record CommonConfig
     public int ReceiveBufferBytes { get; set; } = 32768;
 
     /// <summary>
-    /// Версия брокеров кафки в кластере
+    /// Создавать ли топики автоматически
     /// </summary>
-    /// <remarks>Клиент поддерживает минимально версию 1.0. Максимальная версия 3.0.
-    /// Если задано данное свойство, то клиент не обращается к серверу за списком версий,
+    /// <remarks>Если установлена данная опция, то запрос на получение метаданных, при наличии имени топика в обработке,
+    /// и отсутствии его в кластере, будет создавать его, если настройки кластера это допускают</remarks>
+    public bool AllowAutoTopicCreation { get; set; } = false;
+
+    /// <summary>
+    /// Версия брокеров кафки в кластере по умолчанию, если вдруг по какойто-то причине не удалось получить список поддерживаемых версий API с самого брокера
+    /// </summary>
+    /// <remarks>Клиент поддерживает минимально версию 2.0. Максимальная версия 3.4.
+    /// Если свойство `ApiVersionRequest` is true, то клиент не обращается к серверу за списком версий,
     /// а использует предустановленный набор для конкретной версии. Это помогает уменьшить время инициализации соединения
     /// с брокером за счет отстуствия одного запроса за списком поддерживаемого брокером API</remarks>
-    public Version BrokerVersion { get; set; } = SupportVersionsExtensions.NotSetVersion;
+    /// <remarks>По умолчанию версия значение версии не установлено и всегде делается запрос за поддерживаемой версией брокера</remarks>
+    public Version FallbackBrokerVersion { get; set; } = SupportVersionsExtensions.Version20;
+
+    /// <summary>
+    /// Если данный флаг устновлен в true, то при инициализации кластера будет выбираться минимально поддерживаемая версия для всех брокеров.
+    /// Если false, то для каждого брокера будет выбираться самая высокая поддерживаемая версия
+    /// </summary>
+    /// <br/>
+    /// <br/>
+    /// <p>
+    /// Это свойство завязано на два других параметра конфигурации `BrokerVesion`
+    /// </p>
+    public bool UseMinimalSupportVersion { get; set; } = true;
 
     /// <summary>
     /// Конкретные значения конфигурации для каждого брокера
@@ -235,24 +249,24 @@ public abstract record CommonConfig
 
     private void BrokerVersionValidate()
     {
-        if (BrokerVersion is null)
+        if (FallbackBrokerVersion is null)
         {
             throw new KafkaConfigException(
-                nameof(BrokerVersion),
-                BrokerVersion!,
+                nameof(FallbackBrokerVersion),
+                FallbackBrokerVersion!,
                 ConfigExceptionMessages.NoBrokerVersion);
         }
 
-        if (BrokerVersion == SupportVersionsExtensions.NotSetVersion)
+        if (FallbackBrokerVersion == SupportVersionsExtensions.NotSetVersion)
         {
             return;
         }
 
-        if (!SupportVersionsExtensions.IsSupportKafkaVersion(BrokerVersion, out var minMaxVersions))
+        if (!SupportVersionsExtensions.IsSupportKafkaVersion(FallbackBrokerVersion, out var minMaxVersions))
         {
             throw new KafkaConfigException(
-                nameof(BrokerVersion),
-                BrokerVersion,
+                nameof(FallbackBrokerVersion),
+                FallbackBrokerVersion,
                 string.Format(ConfigExceptionMessages.BrokerVersionInvalid, minMaxVersions.Min, minMaxVersions.Max));
         }
     }

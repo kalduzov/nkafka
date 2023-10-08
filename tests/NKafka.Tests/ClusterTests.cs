@@ -1,67 +1,76 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
+/*
+ * Copyright © 2022 Aleksey Kalduzov. All rights reserved
+ *
+ * Author: Aleksey Kalduzov
+ * Email: alexei.kalduzov@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Exceptions;
 using NKafka.Messages;
+using NKafka.Protocol;
 
 namespace NKafka.Tests;
 
-public class ClusterTests
+public partial class ClusterTests
 {
-    private readonly Mock<IKafkaConnectorPool> _mockConnectorPool;
+    private readonly IKafkaConnectorPool _connectorPool;
 
     public ClusterTests()
     {
-        _mockConnectorPool = new Mock<IKafkaConnectorPool>();
+        _connectorPool = Substitute.For<IKafkaConnectorPool>();
         var connector1 = SetupConnector(1);
         var connector2 = SetupConnector(2);
 
-        _mockConnectorPool.Setup(pool => pool.TryGetConnector(-1, out connector1))
-            .Returns(true);
+        _connectorPool.TryGetConnector(-1, false, out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[2] = connector1;
 
-        _mockConnectorPool.Setup(pool => pool.TryGetConnector(1, out connector1))
-            .Returns(true);
+                return true;
+            });
 
-        _mockConnectorPool.Setup(pool => pool.TryGetConnector(2, out connector2))
-            .Returns(true);
-    }
+        _connectorPool.TryGetConnector(1, false, out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[2] = connector1;
 
-    private static IKafkaConnector SetupConnector(int nodeId)
-    {
-        var connector = new Mock<IKafkaConnector>();
+                return true;
+            });
 
-        connector.Setup(
-                x => x.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
-                    It.IsAny<MetadataRequestMessage>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<CancellationToken>()))
-            .ReturnsAsync(
-                new MetadataResponseMessage
-                {
-                    Brokers = new MetadataResponseMessage.MetadataResponseBrokerCollection(2)
-                    {
-                        new()
-                        {
-                            NodeId = 1,
-                            Host = "localhost1",
-                            Port = 1000,
-                            Rack = null
-                        },
-                        new()
-                        {
-                            NodeId = 2,
-                            Host = "localhost2",
-                            Port = 1000,
-                            Rack = null
-                        }
-                    },
-                    ControllerId = 1,
-                    ClusterId = "test_cluster"
-                },
-                TimeSpan.FromMilliseconds(10)); //используем задержку как имитацию сетевого вызова
+        _connectorPool.TryGetConnector(2, false, out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[2] = connector2;
 
-        return connector.Object;
+                return true;
+            });
+
+        _connectorPool.GetAllOpenedConnectors()
+            .Returns(new[]
+            {
+                connector1,
+                connector2
+            });
     }
 
     [Fact(DisplayName = "Create new cluster when timeout must be throw ClusterKafkaException")]
@@ -80,7 +89,7 @@ public class ClusterTests
             () => clusterConfig.CreateClusterInternalAsync(
                 NullLoggerFactory.Instance,
                 true,
-                _mockConnectorPool.Object,
+                _connectorPool,
                 CancellationToken.None));
 
         await awaiting.Should().ThrowAsync<ClusterKafkaException>();
@@ -101,7 +110,7 @@ public class ClusterTests
         await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
             NullLoggerFactory.Instance,
             true,
-            _mockConnectorPool.Object,
+            _connectorPool,
             CancellationToken.None);
         kafkaCluster.Brokers.Should().HaveCount(2);
         kafkaCluster.Controller.Should().NotBeNull();
@@ -124,7 +133,7 @@ public class ClusterTests
         var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
             NullLoggerFactory.Instance,
             true,
-            _mockConnectorPool.Object,
+            _connectorPool,
             CancellationToken.None); //no call dispose!
         var func = FluentActions.Invoking(() => kafkaCluster.BuildProducer<int, string>());
         func.Should().NotThrow();
@@ -144,7 +153,7 @@ public class ClusterTests
         await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
             NullLoggerFactory.Instance,
             true,
-            _mockConnectorPool.Object,
+            _connectorPool,
             CancellationToken.None);
         await using var producer = kafkaCluster.BuildProducer<int, string>();
 
@@ -165,10 +174,52 @@ public class ClusterTests
         await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
             NullLoggerFactory.Instance,
             true,
-            _mockConnectorPool.Object,
+            _connectorPool,
             CancellationToken.None);
         await using var producer = kafkaCluster.BuildProducer<int, string>("test_producer");
 
         producer.Name.Should().Be("test_producer");
+    }
+
+    private static IKafkaConnector SetupConnector(int nodeId)
+    {
+        var connector = Substitute.For<IKafkaConnector>();
+        connector.NodeId.Returns(nodeId);
+        connector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
+                Arg.Any<MetadataRequestMessage>(),
+                Arg.Any<bool>(),
+                Arg.Any<CancellationToken>())
+            .Returns(async _ =>
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(10)); //используем задержку как имитацию сетевого вызова
+
+                    return new MetadataResponseMessage
+                    {
+                        Brokers = new MetadataResponseMessage.MetadataResponseBrokerCollection(2)
+                        {
+                            new()
+                            {
+                                NodeId = 1,
+                                Host = "localhost1",
+                                Port = 1000,
+                                Rack = null
+                            },
+                            new()
+                            {
+                                NodeId = 2,
+                                Host = "localhost2",
+                                Port = 1000,
+                                Rack = null
+                            }
+                        },
+                        ControllerId = 1,
+                        ClusterId = "test_cluster"
+                    };
+                }
+            );
+
+        connector.SupportVersions.Returns(_apiVersions[nodeId - 1]);
+
+        return connector;
     }
 }

@@ -23,6 +23,11 @@
 
 namespace NKafka.Protocol;
 
+#pragma warning disable CS1591
+
+/// <summary>
+/// 
+/// </summary>
 public enum ApiKeys: short
 {
     None = -1,

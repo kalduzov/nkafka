@@ -23,6 +23,11 @@
 
 namespace NKafka.Clients.Producer;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TValue"></typeparam>
 public class DeliveryResult<TKey, TValue>
     where TKey : notnull
     where TValue : notnull
@@ -33,7 +38,7 @@ public class DeliveryResult<TKey, TValue>
     /// <summary>
     ///     The topic associated with the message.
     /// </summary>
-    public string Topic { get; private set; }
+    public string Topic { get; private set; } = string.Empty;
 
     /// <summary>
     ///     The partition associated with the message.
@@ -79,14 +84,32 @@ public class DeliveryResult<TKey, TValue>
     /// </summary>
     public Message<TKey, TValue> Message { get; private set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public TKey Key => Message.Key;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public TValue Value => Message.Value;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Timestamp Timestamp => Message.Timestamp;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Headers Headers => Message.Headers;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="persisted"></param>
+    /// <param name="topicPartitionOffset"></param>
     public DeliveryResult(Message<TKey, TValue> message, PersistenceStatus persisted, TopicPartitionOffset topicPartitionOffset)
     {
         Message = message;

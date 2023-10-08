@@ -1,45 +1,65 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <OpenTelemtryVersion>1.6.0</OpenTelemtryVersion>
+    <BenchmarkDotNetVersion>0.13.8</BenchmarkDotNetVersion>
+    <Net8Version>8.0.0-rc.1.23419.4</Net8Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3"/>
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="6.0.0"/>
     <PackageVersion Include="System.IO.Pipelines" Version="6.0.3"/>
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="6.0.0"/>
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="3.1.0"/>
+    <PackageVersion Include="System.IO.Hashing" Version="6.0.0"/>
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0"/>
-    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="7.0.1"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1"/>
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="7.0.2"/>
     <PackageVersion Include="System.IO.Pipelines" Version="7.0.0"/>
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0"/>
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="7.0.0"/>
+    <PackageVersion Include="System.IO.Hashing" Version="7.0.0"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="$(Net8Version)"/>
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="$(Net8Version)"/>
+    <PackageVersion Include="System.IO.Pipelines" Version="$(Net8Version)"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(Net8Version)"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(Net8Version)"/>
+    <PackageVersion Include="System.IO.Hashing" Version="$(Net8Version)"/>
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="7.0.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.1"/>
+    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2"/>
     <PackageVersion Include="FastEnum" Version="1.8.0"/>
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3"/>
-    <PackageVersion Include="Moq" Version="4.18.4"/>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.5.0"/>
-    <PackageVersion Include="xunit" Version="2.4.2"/>
-    <PackageVersion Include="xunit.runner.visualstudio" Version="2.4.5"/>
-    <PackageVersion Include="coverlet.collector" Version="3.2.0"/>
-    <PackageVersion Include="FluentAssertions" Version="6.10.0"/>
-    <PackageVersion Include="OpenTelemetry" Version="1.4.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="1.4.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0" />
-    <PackageVersion Include="Serilog" Version="2.12.0" />
-    <PackageVersion Include="Serilog.Extensions.Logging" Version="3.1.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="4.1.0" />
-    <PackageVersion Include="Confluent.Kafka" Version="2.0.2" />
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
-    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.13.5"/>
+    <PackageVersion Include="NSubstitute" Version="5.1.0"/>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2"/>
+    <PackageVersion Include="xunit" Version="2.5.1"/>
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.1"/>
+    <PackageVersion Include="coverlet.collector" Version="6.0.0"/>
+    <PackageVersion Include="FluentAssertions" Version="6.12.0"/>
+
+    <PackageVersion Include="OpenTelemetry" Version="$(OpenTelemtryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemtryVersion)"/>
+    <PackageVersion Include="OpenTelemetry.Exporter.Jaeger" Version="$(OpenTelemtryVersion)-rc.1"/>
+
+    <PackageVersion Include="Serilog" Version="3.0.1"/>
+
+    <PackageVersion Include="Serilog.Sinks.Console" Version="4.1.0"/>
+    <PackageVersion Include="Confluent.Kafka" Version="2.2.0"/>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
+
+    <PackageVersion Include="BenchmarkDotNet" Version="$(BenchmarkDotNetVersion)"/>
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="$(BenchmarkDotNetVersion)"/>
+
     <PackageVersion Include="xunit.skippablefact" Version="1.4.13"/>
     <PackageVersion Include="MinVer" Version="4.3.0"/>
   </ItemGroup>

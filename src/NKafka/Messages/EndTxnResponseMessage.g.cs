@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message EndTxnResponseMessage
+/// </summary>
 public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<EndTxnResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -54,17 +62,25 @@ public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<
     /// <inheritdoc />
     public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+    /// <summary>
+    /// The basic constructor of the message EndTxnResponseMessage
+    /// </summary>
     public EndTxnResponseMessage()
     {
     }
 
-    public EndTxnResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message EndTxnResponseMessage
+    /// </summary>
+    public EndTxnResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         ErrorCode = reader.ReadShort();
@@ -86,6 +102,7 @@ public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -107,11 +124,13 @@ public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is EndTxnResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(EndTxnResponseMessage? other)
     {
         if (other is null)
@@ -129,6 +148,7 @@ public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -136,6 +156,7 @@ public sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatable<
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "EndTxnResponseMessage("

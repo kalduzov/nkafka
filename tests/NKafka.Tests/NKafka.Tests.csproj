@@ -5,7 +5,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Messages" />
+    <Compile Update="Clients\Consumer\Internal\CoordinatorTests.NewSession.cs">
+      <DependentUpon>CoordinatorTests.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Serialization\SerializerDeserializerTests.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SerializerDeserializerTests.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Serialization\SerializerDeserializerTests.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SerializerDeserializerTests.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
 </Project>

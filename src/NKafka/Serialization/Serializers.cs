@@ -23,23 +23,53 @@
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public static class Serializers
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<string> String = new StringSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<Null> Null = new NullSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<long> Long = new LongSerializer();
 
-    public static readonly IAsyncSerializer<int> Int = new IntegerSerializer();
+    /// <summary>
+    /// 
+    /// </summary>
+    public static readonly IAsyncSerializer<int> Int = new IntSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<float> Float = new FloatSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<double> Double = new DoubleSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<Guid> Guid = new GuidSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<short> Short = new ShortSerializer();
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IAsyncSerializer<byte[]> ByteArray = new ByteArraySerializer();
 }

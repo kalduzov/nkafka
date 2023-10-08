@@ -21,13 +21,18 @@
 
 namespace NKafka.Exceptions;
 
+/// <summary>
+/// 
+/// </summary>
 public class UnsupportedVersionException: KafkaException
 {
+    /// <inheritdoc />
     public UnsupportedVersionException(string message)
         : base(message)
     {
     }
 
+    /// <inheritdoc />
     public UnsupportedVersionException(string message, Exception innerException)
         : base(message, innerException)
     {

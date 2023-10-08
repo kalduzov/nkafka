@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message JoinGroupRequestMessage
+/// </summary>
 public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.JoinGroup;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The group identifier.
@@ -89,17 +100,25 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
     /// </summary>
     public string? Reason { get; set; } = null;
 
+    /// <summary>
+    /// The basic constructor of the message JoinGroupRequestMessage
+    /// </summary>
     public JoinGroupRequestMessage()
     {
     }
 
-    public JoinGroupRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message JoinGroupRequestMessage
+    /// </summary>
+    public JoinGroupRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -221,7 +240,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
                     var newCollection = new JoinGroupRequestProtocolCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new JoinGroupRequestProtocolMessage(reader, version));
+                        newCollection.Add(new JoinGroupRequestProtocolMessage(ref reader, version));
                     }
                     Protocols = newCollection;
                 }
@@ -239,7 +258,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
                     var newCollection = new JoinGroupRequestProtocolCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new JoinGroupRequestProtocolMessage(reader, version));
+                        newCollection.Add(new JoinGroupRequestProtocolMessage(ref reader, version));
                     }
                     Protocols = newCollection;
                 }
@@ -284,6 +303,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -407,11 +427,13 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is JoinGroupRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(JoinGroupRequestMessage? other)
     {
         if (other is null)
@@ -513,6 +535,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -521,6 +544,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "JoinGroupRequestMessage("
@@ -535,9 +559,16 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message JoinGroupRequestProtocolMessage
+    /// </summary>
     public sealed partial class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The protocol name.
@@ -549,17 +580,25 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         /// </summary>
         public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
+        /// <summary>
+        /// The basic constructor of the message JoinGroupRequestProtocolMessage
+        /// </summary>
         public JoinGroupRequestProtocolMessage()
         {
         }
 
-        public JoinGroupRequestProtocolMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message JoinGroupRequestProtocolMessage
+        /// </summary>
+        public JoinGroupRequestProtocolMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version9)
             {
@@ -625,6 +664,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -665,11 +705,13 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is JoinGroupRequestProtocolMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(JoinGroupRequestProtocolMessage? other)
         {
             if (other is null)
@@ -697,6 +739,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -704,6 +747,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "JoinGroupRequestProtocolMessage("
@@ -713,16 +757,26 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message JoinGroupRequestProtocolCollection
+    /// </summary>
     public sealed partial class JoinGroupRequestProtocolCollection: HashSet<JoinGroupRequestProtocolMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public JoinGroupRequestProtocolCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public JoinGroupRequestProtocolCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<JoinGroupRequestProtocolMessage>)obj);

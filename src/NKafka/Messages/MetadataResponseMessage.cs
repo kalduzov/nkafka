@@ -23,8 +23,14 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed partial class MetadataResponseMessage
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed partial class MetadataResponseBrokerCollection
     {
         internal IReadOnlyDictionary<int, Node> ConvertToNodes()
@@ -40,6 +46,7 @@ public sealed partial class MetadataResponseMessage
             return dictionary;
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             throw new NotImplementedException();

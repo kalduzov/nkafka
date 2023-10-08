@@ -27,6 +27,9 @@ using NKafka.Serialization;
 
 namespace NKafka;
 
+/// <summary>
+/// 
+/// </summary>
 public static class ProducerExtensions
 {
     private const string _DEFAULT_PRODUCER_NAME_FORMAT = "__DefaultProducer<{0},{1}>";
@@ -61,6 +64,14 @@ public static class ProducerExtensions
         return kafkaCluster.BuildProducer<TKey, TValue>(name, producerConfig);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="kafkaCluster"></param>
+    /// <param name="name"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
     public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster, string name)
         where TKey : notnull
         where TValue : notnull
@@ -68,6 +79,15 @@ public static class ProducerExtensions
         return kafkaCluster.BuildProducer<TKey, TValue>(name, ProducerConfig.EmptyProducerConfig);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="kafkaCluster"></param>
+    /// <param name="name"></param>
+    /// <param name="producerConfig"></param>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
     public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster, string name, ProducerConfig producerConfig)
         where TKey : notnull
         where TValue : notnull

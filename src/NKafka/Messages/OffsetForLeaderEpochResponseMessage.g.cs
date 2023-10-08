@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message OffsetForLeaderEpochResponseMessage
+/// </summary>
 public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
     /// </summary>
     public OffsetForLeaderTopicResultCollection Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message OffsetForLeaderEpochResponseMessage
+    /// </summary>
     public OffsetForLeaderEpochResponseMessage()
     {
     }
 
-    public OffsetForLeaderEpochResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message OffsetForLeaderEpochResponseMessage
+    /// </summary>
+    public OffsetForLeaderEpochResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version2)
         {
@@ -85,7 +101,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
                     var newCollection = new OffsetForLeaderTopicResultCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
+                        newCollection.Add(new OffsetForLeaderTopicResultMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -103,7 +119,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
                     var newCollection = new OffsetForLeaderTopicResultCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetForLeaderTopicResultMessage(reader, version));
+                        newCollection.Add(new OffsetForLeaderTopicResultMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -127,6 +143,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -166,11 +183,13 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is OffsetForLeaderEpochResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(OffsetForLeaderEpochResponseMessage? other)
     {
         if (other is null)
@@ -198,6 +217,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -205,6 +225,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "OffsetForLeaderEpochResponseMessage("
@@ -213,9 +234,16 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetForLeaderTopicResultMessage
+    /// </summary>
     public sealed partial class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -227,17 +255,25 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         /// </summary>
         public List<EpochEndOffsetMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetForLeaderTopicResultMessage
+        /// </summary>
         public OffsetForLeaderTopicResultMessage()
         {
         }
 
-        public OffsetForLeaderTopicResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetForLeaderTopicResultMessage
+        /// </summary>
+        public OffsetForLeaderTopicResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -280,7 +316,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
                         var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new EpochEndOffsetMessage(reader, version));
+                            newCollection.Add(new EpochEndOffsetMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -298,7 +334,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
                         var newCollection = new List<EpochEndOffsetMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new EpochEndOffsetMessage(reader, version));
+                            newCollection.Add(new EpochEndOffsetMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -322,6 +358,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -369,11 +406,13 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetForLeaderTopicResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetForLeaderTopicResultMessage? other)
         {
             if (other is null)
@@ -411,6 +450,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -418,6 +458,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetForLeaderTopicResultMessage("
@@ -427,9 +468,16 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message EpochEndOffsetMessage
+    /// </summary>
     public sealed partial class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The error code 0, or if there was no error.
@@ -454,17 +502,25 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
+        /// <summary>
+        /// The basic constructor of the message EpochEndOffsetMessage
+        /// </summary>
         public EpochEndOffsetMessage()
         {
         }
 
-        public EpochEndOffsetMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message EpochEndOffsetMessage
+        /// </summary>
+        public EpochEndOffsetMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -499,6 +555,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -525,11 +582,13 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is EpochEndOffsetMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(EpochEndOffsetMessage? other)
         {
             if (other is null)
@@ -555,6 +614,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -562,6 +622,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "EpochEndOffsetMessage("
@@ -573,16 +634,26 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetForLeaderTopicResultCollection
+    /// </summary>
     public sealed partial class OffsetForLeaderTopicResultCollection: HashSet<OffsetForLeaderTopicResultMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public OffsetForLeaderTopicResultCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public OffsetForLeaderTopicResultCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<OffsetForLeaderTopicResultMessage>)obj);

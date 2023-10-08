@@ -129,7 +129,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 if (stream == Stream.Null)
                 {
                     // We calculate what buffer size we need and try to get it 
-                    var size = Math.Max(_batchSize, Records.EstimateSizeInBytesUpperBound(key, value, headers));
+                    var size = Math.Max(_batchSize, RecordsBatch.EstimateSizeInBytesUpperBound(key, value, headers));
                     stream = _memoryStreamManager.GetStream();
                     stream.SetLength(size);
                 }
@@ -268,7 +268,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                         break;
                     }
 
-                    if (batch.IsReady)
+                    if (batch.IsReady) //todo всегда true, надо что-то с этим сделать
                     {
                         batch = topicBatch.PopFront();
                     }

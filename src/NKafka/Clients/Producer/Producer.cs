@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -121,7 +121,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
 
-            _transactionManager = transactionManager ?? new TransactionManager();
+            _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
             _accumulator = recordAccumulator ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, loggerFactory);
             _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, loggerFactory);
             _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
@@ -140,23 +140,25 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     /// <inheritdoc/>
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
+        var tp = topicPartition;
         var _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
                 task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        //Debug.WriteLine($"The message {message} was sent successfully");
+                        Debug.WriteLine($"The message {task.Result.Message} was sent successfully");
 
                         return;
                     }
 
-                    if (task.IsFaulted)
+                    if (!task.IsFaulted)
                     {
-                        _logger.ProduceMessageError(task.Exception!, topicPartition);
-
-                        Debug.WriteLine($"The message {message} was sent successfully");
+                        return;
                     }
+
+                    _logger.ProduceMessageError(task.Exception!, tp);
+
                 });
     }
 
@@ -309,29 +311,31 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            var _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token).ConfigureAwait(false);
+            var _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
 
             var headers = message.Headers;
             headers.SetReadOnly();
 
-            var serializedKey = await SerializeKeyAsync(message.Key).ConfigureAwait(false);
-            var serializedValue = await SerializeValueAsync(message.Value).ConfigureAwait(false);
+            var serializedKey = await SerializeKeyAsync(message.Key);
+            var serializedValue = await SerializeValueAsync(message.Value);
 
-            var serializedSize = Records.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
+            var serializedSize = RecordsBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
 
             // Trying to get a partition if it is not set  
             if (topicPartition.Partition.IsSpecial)
             {
-                topicPartition.Partition = await _partitioner.PartitionAsync(
-                        topicPartition.Topic,
-                        typeof(TKey),
-                        serializedKey,
-                        typeof(TValue),
-                        serializedValue,
-                        KafkaCluster,
-                        token)
-                    .ConfigureAwait(false);
+                var computedPartition = await _partitioner.PartitionAsync(
+                    topicPartition.Topic,
+                    typeof(TKey),
+                    serializedKey,
+                    typeof(TValue),
+                    serializedValue,
+                    KafkaCluster,
+                    token);
+
+                topicPartition.Partition = computedPartition;
+
             }
 
             var appendResult = _accumulator.Append(
@@ -352,8 +356,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             {
                 var sendResult = await appendResult
                     .SendResult!
-                    .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token)
-                    .ConfigureAwait(false);
+                    .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token);
 
                 var topicPartitionOffset = new TopicPartitionOffset(topicPartition, sendResult.Offset);
 

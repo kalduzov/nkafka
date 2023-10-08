@@ -23,6 +23,9 @@
 
 namespace NKafka;
 
+/// <summary>
+/// 
+/// </summary>
 public readonly struct Timestamp: IEquatable<Timestamp>
 {
     private const long _NO_TIMESTAMP = 0;
@@ -197,11 +200,23 @@ public readonly struct Timestamp: IEquatable<Timestamp>
         return !(a == b);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator >(Timestamp a, Timestamp b)
     {
         return a.UnixTimestampMs > b.UnixTimestampMs;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
     public static bool operator <(Timestamp a, Timestamp b)
     {
         return a.UnixTimestampMs < b.UnixTimestampMs;

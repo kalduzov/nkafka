@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message CreatePartitionsResponseMessage
+/// </summary>
 public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, IEquatable<CreatePartitionsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
     /// </summary>
     public List<CreatePartitionsTopicResultMessage> Results { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message CreatePartitionsResponseMessage
+    /// </summary>
     public CreatePartitionsResponseMessage()
     {
     }
 
-    public CreatePartitionsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message CreatePartitionsResponseMessage
+    /// </summary>
+    public CreatePartitionsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -78,7 +94,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
                     var newCollection = new List<CreatePartitionsTopicResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatePartitionsTopicResultMessage(reader, version));
+                        newCollection.Add(new CreatePartitionsTopicResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -96,7 +112,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
                     var newCollection = new List<CreatePartitionsTopicResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatePartitionsTopicResultMessage(reader, version));
+                        newCollection.Add(new CreatePartitionsTopicResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -120,6 +136,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -156,11 +173,13 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is CreatePartitionsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(CreatePartitionsResponseMessage? other)
     {
         if (other is null)
@@ -188,6 +207,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -195,6 +215,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "CreatePartitionsResponseMessage("
@@ -203,9 +224,16 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatePartitionsTopicResultMessage
+    /// </summary>
     public sealed partial class CreatePartitionsTopicResultMessage: IMessage, IEquatable<CreatePartitionsTopicResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -225,17 +253,25 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
         /// </summary>
         public string? ErrorMessage { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message CreatePartitionsTopicResultMessage
+        /// </summary>
         public CreatePartitionsTopicResultMessage()
         {
         }
 
-        public CreatePartitionsTopicResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreatePartitionsTopicResultMessage
+        /// </summary>
+        public CreatePartitionsTopicResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -306,6 +342,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -362,11 +399,13 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreatePartitionsTopicResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreatePartitionsTopicResultMessage? other)
         {
             if (other is null)
@@ -408,6 +447,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -415,6 +455,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreatePartitionsTopicResultMessage("

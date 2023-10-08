@@ -31,6 +31,19 @@ namespace NKafka.MessageGenerator.Specifications;
 public record MessageSpecification
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public static readonly MessageSpecification Empty = new(
+        apiKey: -1,
+        type: MessageType.None,
+        listeners: Array.Empty<RequestListenerType>(),
+        name: string.Empty,
+        validVersions: string.Empty,
+        flexibleVersions: "0+",
+        fields: Array.Empty<FieldSpecification>(),
+        commonStructs: Array.Empty<StructSpecification>());
+
+    /// <summary>
     /// Message api key 
     /// </summary>
     public short ApiKey { get; }

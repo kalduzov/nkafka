@@ -25,6 +25,6 @@ namespace NKafka.Connection.Sasl;
 
 internal static partial class SaslLogExtensions
 {
-    [LoggerMessage(EventId = 100, Level = LogLevel.Debug, Message = Utils.LOGGER_PREFIX + "Setting SASL/{Mechanism} client state to {State}")]
+    [LoggerMessage(EventId = LogExtensions.SASL_EVENT_BASE_ID, Level = LogLevel.Debug, Message = LogExtensions.LOGGER_PREFIX + "Setting SASL/{Mechanism} client state to {State}")]
     public static partial void SaslChangeClientState(this ILogger logger, ScramMechanism mechanism, ScramSaslClient.State state);
 }

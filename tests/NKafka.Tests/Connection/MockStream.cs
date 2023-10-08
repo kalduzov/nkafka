@@ -26,6 +26,7 @@ using Microsoft.IO;
 
 using NKafka.Messages;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests.Connection;
 

@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message FindCoordinatorRequestMessage
+/// </summary>
 public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<FindCoordinatorRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.FindCoordinator;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The coordinator key.
@@ -64,17 +75,25 @@ public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEqu
     /// </summary>
     public List<string> CoordinatorKeys { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message FindCoordinatorRequestMessage
+    /// </summary>
     public FindCoordinatorRequestMessage()
     {
     }
 
-    public FindCoordinatorRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message FindCoordinatorRequestMessage
+    /// </summary>
+    public FindCoordinatorRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version <= ApiVersion.Version3)
         {
@@ -165,6 +184,7 @@ public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -236,11 +256,13 @@ public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is FindCoordinatorRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(FindCoordinatorRequestMessage? other)
     {
         if (other is null)
@@ -282,6 +304,7 @@ public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEqu
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -289,6 +312,7 @@ public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "FindCoordinatorRequestMessage("

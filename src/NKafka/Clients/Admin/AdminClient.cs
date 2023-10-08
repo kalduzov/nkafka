@@ -51,7 +51,6 @@ internal class AdminClient: IAdminClient
         return default;
     }
 
-    /// <inheritdoc/>
     public async Task<CreateTopicsResult> CreateTopicsAsync(IReadOnlyCollection<TopicDetail> topics, CancellationToken token = default)
     {
         _logger.CallMethodTrace();

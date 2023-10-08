@@ -19,7 +19,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Net;
 using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.Logging;
@@ -27,57 +26,52 @@ using Microsoft.Extensions.Logging;
 namespace NKafka;
 
 /// <summary>
-/// Содержит все атоматически сгенерированные методы расширения для логирования сообщений в библиотеке
+/// Contains all auto-generated extension methods for logging messages
 /// </summary>
 internal static partial class LogExtensions
 {
-    [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = Utils.LOGGER_PREFIX + "Creating new cluster")]
-    public static partial void CreateCluster(this ILogger logger);
+    internal const int KAFKA_CONNECTOR_EVENT_BASE_ID = 1000;
+    internal const int KAFKA_CONNECTOR_POOL_EVENT_BASE_ID = 2000;
+    internal const int SASL_EVENT_BASE_ID = 3000;
+    internal const int PRODUCER_EVENT_BASE_ID = 5000;
+    internal const int CONSUMER_EVENT_BASE_ID = 6000;
 
-    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = Utils.LOGGER_PREFIX + "OverrideDefaultAcks {Acks}")]
+    internal const string LOGGER_PREFIX = "[Kafka] ";
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Trace, Message = LOGGER_PREFIX + "Creating new cluster")]
+    public static partial void CreateClusterTrace(this ILogger logger);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = LOGGER_PREFIX + "OverrideDefaultAcks {Acks}")]
     public static partial void OverrideDefaultAcks(this ILogger logger, short acks);
 
     [LoggerMessage(
         EventId = 3,
         Level = LogLevel.Warning,
-        Message = Utils.LOGGER_PREFIX
-                  + "Интервал обновления метаданных слишком маленький. Попробуйте подобрать большее значенией. Текущее значение MetadataMaxAge {MetadataMaxAge}ms")]
+        Message = LOGGER_PREFIX
+                  + "The metadata update interval is too short. Try to choose a larger value. Current value of MetadataMaxAge {MetadataMaxAge}ms")]
     public static partial void WarningMetadataMaxAge(this ILogger logger, int metadataMaxAge);
 
     [LoggerMessage(
         EventId = 4,
         Level = LogLevel.Trace,
-        Message = Utils.LOGGER_PREFIX + "UpdateMetadata start. Count {Count}")]
+        Message = LOGGER_PREFIX + "UpdateMetadata start. Count {Count}")]
     public static partial void UpdateMetadataStart(this ILogger logger, int count);
 
     [LoggerMessage(
         EventId = 5,
         Level = LogLevel.Trace,
-        Message = Utils.LOGGER_PREFIX + "Update metadata end. Count {Count}, Time {Time}")]
+        Message = LOGGER_PREFIX + "UpdateLastReadingOffset metadata end. Count {Count}, Time {Time}")]
     public static partial void UpdateMetadataEnd(this ILogger logger, int count, TimeSpan time);
 
     [LoggerMessage(
         EventId = 6,
         Level = LogLevel.Error,
-        Message = Utils.LOGGER_PREFIX + "Update metadata error. Count {Count}")]
+        Message = LOGGER_PREFIX + "UpdateLastReadingOffset metadata error. Count {Count}")]
     public static partial void UpdateMetadataError(this ILogger logger, Exception exc, int count);
-
-    [LoggerMessage(
-        EventId = 7,
-        Level = LogLevel.Trace,
-        Message = Utils.LOGGER_PREFIX + "New kafka connector on {EndPoint} created")]
-    public static partial void CreateConnectorTrace(this ILogger logger, EndPoint endPoint);
 
     [LoggerMessage(
         EventId = 8,
         Level = LogLevel.Trace,
-        Message = Utils.LOGGER_PREFIX + "'{MemberName}' has been called")]
+        Message = LOGGER_PREFIX + "'{MemberName}' has been called")]
     public static partial void CallMethodTrace(this ILogger logger, [CallerMemberName] string memberName = "");
-
-    [LoggerMessage(
-        EventId = 9,
-        Level = LogLevel.Information,
-        Message =
-            Utils.LOGGER_PREFIX + "Connection at address {EndPoint} to broker {NodeId} was dropped due to inactivity for {ConnectionsMaxIdleMs} ms.")]
-    public static partial void ConnectionReset(this ILogger logger, EndPoint endpoint, int nodeId, int connectionsMaxIdleMs);
 }

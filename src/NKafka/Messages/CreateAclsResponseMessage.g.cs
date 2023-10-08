@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message CreateAclsResponseMessage
+/// </summary>
 public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquatable<CreateAclsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
     /// </summary>
     public List<AclCreationResultMessage> Results { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message CreateAclsResponseMessage
+    /// </summary>
     public CreateAclsResponseMessage()
     {
     }
 
-    public CreateAclsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message CreateAclsResponseMessage
+    /// </summary>
+    public CreateAclsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -78,7 +94,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<AclCreationResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AclCreationResultMessage(reader, version));
+                        newCollection.Add(new AclCreationResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -96,7 +112,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<AclCreationResultMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AclCreationResultMessage(reader, version));
+                        newCollection.Add(new AclCreationResultMessage(ref reader, version));
                     }
                     Results = newCollection;
                 }
@@ -120,6 +136,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -156,11 +173,13 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is CreateAclsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(CreateAclsResponseMessage? other)
     {
         if (other is null)
@@ -188,6 +207,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -195,6 +215,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "CreateAclsResponseMessage("
@@ -203,9 +224,16 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message AclCreationResultMessage
+    /// </summary>
     public sealed partial class AclCreationResultMessage: IMessage, IEquatable<AclCreationResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The result error, or zero if there was no error.
@@ -220,17 +248,25 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
         /// </summary>
         public string ErrorMessage { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message AclCreationResultMessage
+        /// </summary>
         public AclCreationResultMessage()
         {
         }
 
-        public AclCreationResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message AclCreationResultMessage
+        /// </summary>
+        public AclCreationResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -278,6 +314,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -322,11 +359,13 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is AclCreationResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(AclCreationResultMessage? other)
         {
             if (other is null)
@@ -354,6 +393,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -361,6 +401,7 @@ public sealed partial class CreateAclsResponseMessage: IResponseMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "AclCreationResultMessage("

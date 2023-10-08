@@ -53,13 +53,19 @@
   <data name="Producer_SerializerError" xml:space="preserve">
         <value>Serializer not specified and there is no default serializer defined for type {0}.</value>
     </data>
-  <data name="Producer_CreateError" xml:space="preserve">
+    <data name="Producer_CreateError" xml:space="preserve">
         <value>Failed to construct kafka producer</value>
     </data>
-  <data name="Producer_SizeVeryLarge" xml:space="preserve">
+    <data name="Producer_SizeVeryLarge" xml:space="preserve">
         <value>The record size is too large and exceeds the parameter {0} {1}</value>
     </data>
-  <data name="Producer_NoAvailablePartitions" xml:space="preserve">
+    <data name="Producer_NoAvailablePartitions" xml:space="preserve">
         <value>There are no partitions available for the topic {0}</value>
+    </data>
+    <data name="ConnectorPool_NoAvailableConnections" xml:space="preserve">
+        <value>The pool does not contain any available connections</value>
+    </data>
+    <data name="NoBatchedFindCoordinatorsExceptionMessage" xml:space="preserve">
+        <value>Список идентификаторов групп должен содержать только один элемент. Фича с несколькими группами доступна начиная с 4 версии API</value>
     </data>
 </root>

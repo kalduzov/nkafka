@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message OffsetCommitRequestMessage
+/// </summary>
 public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquatable<OffsetCommitRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.OffsetCommit;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The unique group identifier.
@@ -79,17 +90,25 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     /// </summary>
     public List<OffsetCommitRequestTopicMessage> Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message OffsetCommitRequestMessage
+    /// </summary>
     public OffsetCommitRequestMessage()
     {
     }
 
-    public OffsetCommitRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message OffsetCommitRequestMessage
+    /// </summary>
+    public OffsetCommitRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -200,7 +219,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                     var newCollection = new List<OffsetCommitRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetCommitRequestTopicMessage(reader, version));
+                        newCollection.Add(new OffsetCommitRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -218,7 +237,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                     var newCollection = new List<OffsetCommitRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetCommitRequestTopicMessage(reader, version));
+                        newCollection.Add(new OffsetCommitRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -242,6 +261,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -346,11 +366,13 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is OffsetCommitRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(OffsetCommitRequestMessage? other)
     {
         if (other is null)
@@ -424,6 +446,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -431,6 +454,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "OffsetCommitRequestMessage("
@@ -443,9 +467,16 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetCommitRequestTopicMessage
+    /// </summary>
     public sealed partial class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -457,17 +488,25 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public List<OffsetCommitRequestPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetCommitRequestTopicMessage
+        /// </summary>
         public OffsetCommitRequestTopicMessage()
         {
         }
 
-        public OffsetCommitRequestTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetCommitRequestTopicMessage
+        /// </summary>
+        public OffsetCommitRequestTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version8)
             {
@@ -510,7 +549,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                         var newCollection = new List<OffsetCommitRequestPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new OffsetCommitRequestPartitionMessage(reader, version));
+                            newCollection.Add(new OffsetCommitRequestPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -528,7 +567,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                         var newCollection = new List<OffsetCommitRequestPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new OffsetCommitRequestPartitionMessage(reader, version));
+                            newCollection.Add(new OffsetCommitRequestPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -552,6 +591,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -599,11 +639,13 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetCommitRequestTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetCommitRequestTopicMessage? other)
         {
             if (other is null)
@@ -641,6 +683,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -648,6 +691,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetCommitRequestTopicMessage("
@@ -657,9 +701,16 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetCommitRequestPartitionMessage
+    /// </summary>
     public sealed partial class OffsetCommitRequestPartitionMessage: IMessage, IEquatable<OffsetCommitRequestPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -686,17 +737,25 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public string CommittedMetadata { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetCommitRequestPartitionMessage
+        /// </summary>
         public OffsetCommitRequestPartitionMessage()
         {
         }
 
-        public OffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetCommitRequestPartitionMessage
+        /// </summary>
+        public OffsetCommitRequestPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version8)
             {
@@ -761,6 +820,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -821,11 +881,13 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetCommitRequestPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetCommitRequestPartitionMessage? other)
         {
             if (other is null)
@@ -865,6 +927,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -872,6 +935,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetCommitRequestPartitionMessage("

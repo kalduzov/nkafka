@@ -42,10 +42,16 @@ tab_width = 4
 insert_final_newline = false
 end_of_line = crlf
 
-[*.{csproj, vbproj, vcxproj, vcxproj.filters, proj, projitems, shproj}]
+
+dotnet_diagnostic.CS1806.severity = error
+dotnet_diagnostic.CS1820.severity = error
+dotnet_diagnostic.CS1825.severity = error
+dotnet_diagnostic.CA1826.severity = error
+
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 2
 
-[*.{props, targets, ruleset, config, nuspec, resx, vsixmanifest, vsct}]
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
 indent_size = 2
 
 [*.json]

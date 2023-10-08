@@ -19,7 +19,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Microsoft.Extensions.Logging;
+
+using NKafka.Config;
+
 namespace NKafka.Clients.Producer.Internals;
 
 internal class TransactionManager: ITransactionManager
-{ }
+{
+    private readonly string _transactionalId;
+    private readonly int _transactionTimeoutMs;
+    private readonly ILogger<TransactionManager> _logger;
+
+    public TransactionManager(ProducerConfig config, ILoggerFactory loggerFactory)
+    {
+        _transactionalId = config.TransactionalId;
+        _transactionTimeoutMs = config.TransactionTimeoutMs;
+        _logger = loggerFactory.CreateLogger<TransactionManager>();
+    }
+}

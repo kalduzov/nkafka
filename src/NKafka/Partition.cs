@@ -208,6 +208,11 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
         return Value.GetHashCode();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public int CompareTo(Partition other)
     {
         return Value.CompareTo(other.Value);

@@ -69,11 +69,29 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The pool does not contain any available connections.
+        /// </summary>
+        internal static string ConnectorPool_NoAvailableConnections {
+            get {
+                return ResourceManager.GetString("ConnectorPool_NoAvailableConnections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Kafka message header key cannot be null.
         /// </summary>
         internal static string Kafka_message_header_key_cannot_be_null {
             get {
                 return ResourceManager.GetString("Kafka_message_header_key_cannot_be_null", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Список идентификаторов групп должен содержать только один элемент. Фича с несколькими группами доступна начиная с 4 версии API.
+        /// </summary>
+        internal static string NoBatchedFindCoordinatorsExceptionMessage {
+            get {
+                return ResourceManager.GetString("NoBatchedFindCoordinatorsExceptionMessage", resourceCulture);
             }
         }
         

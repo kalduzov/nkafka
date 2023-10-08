@@ -33,7 +33,7 @@ internal class ClientFinalMessage: ScramMessage
 
     public string Nonce { get; set; }
 
-    public byte[] Proof { get; set; }
+    public byte[] Proof { get; set; } = Array.Empty<byte>();
 
     public ClientFinalMessage(byte[] messageBytes)
     {

@@ -1,3 +1,24 @@
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// 
+//  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// 
+//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+// 
+//  Author: Aleksey Kalduzov
+//  Email: alexei.kalduzov@gmail.com
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
 using System.Diagnostics;
 
 using NKafka.Exceptions;
@@ -14,10 +35,10 @@ internal sealed partial class KafkaConnector
     private async Task ResponseReaderTask()
     {
         /*
-         * Задача на чтение запускается при постановке нового запроса в очередь ожидания 
+         * Задача на чтение запускается при постановке нового запроса в очередь ожидания
          * Задача не завершается, пока в очереди запросов есть хотя бы один не обработанный запрос
          *
-         * 
+         *
          * в случае если данные для запроса так и не придут, скорее всего было потеряно соединение
          * с брокером и тогда нужно будет удалить все запросы и сбросить соединение
          */
@@ -49,7 +70,7 @@ internal sealed partial class KafkaConnector
                 // А потом еще надо прочитать это количество байт.
                 // В идельном случае можно вообще не вычитывать весь буфер, а последовательным чтением сразу формировать нужный класс ответа 
                 // Pipelines требуют свободного "потока", который будет сливать данные из сокета - его можно сделать один на весь пулл подключений aka NIO из java 
-                var countReadBytes = await _stream.ReadAsync(intBuffer).ConfigureAwait(false);
+                var countReadBytes = await _stream.ReadAsync(intBuffer);
                 _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, countReadBytes);
 
                 var responseLen = ReadInt32BigEndian(intBuffer.Span);
@@ -64,12 +85,10 @@ internal sealed partial class KafkaConnector
                     throw new ProtocolKafkaException(ErrorCodes.None, "Отправлен некорректный запрос к брокеру. Брокер вернул 0 байт.");
                 }
 
-                var responseIdLen = await _stream.ReadAsync(intBuffer).ConfigureAwait(false);
+                var responseIdLen = await _stream.ReadAsync(intBuffer);
                 _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, responseIdLen);
 
                 var requestId = ReadInt32BigEndian(intBuffer.Span);
-
-                Debug.WriteLine($"Get new message from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={responseLen}");
 
                 var bodyLen = responseLen - responseIdLen;
                 var buffer = _arrayPool.Rent(responseLen);
@@ -83,12 +102,11 @@ internal sealed partial class KafkaConnector
 
                 var currentRead = 0;
                 var leftRead = bodyLen;
-                var startPosition = responseIdLen + currentRead;
+                var startPosition = responseIdLen;
 
                 do
                 {
-                    currentRead = await _stream.ReadAsync(buffer.AsMemory(startPosition, leftRead))
-                        .ConfigureAwait(false);
+                    currentRead = await _stream.ReadAsync(buffer.AsMemory(startPosition, leftRead));
                     _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, currentRead);
 
                     leftRead -= currentRead;
@@ -117,6 +135,8 @@ internal sealed partial class KafkaConnector
         {
             if (_inFlightRequests.TryRemove(requestId, out var responseInfo))
             {
+                Debug.WriteLine($"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen + 4}");
+
                 if (token.IsCancellationRequested)
                 {
                     responseInfo.SetCanceled(token);
@@ -126,17 +146,10 @@ internal sealed partial class KafkaConnector
 
                 try
                 {
-                    var message = responseInfo.BuildResponseMessage(buffer);
+                    var message = responseInfo.BuildResponseMessage(buffer, bodyLen);
+                    _logger.GotResponseTrace(message, NodeId);
                     UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen);
-
-                    if (message.IsSuccessStatusCode)
-                    {
-                        responseInfo.SetResult(message);
-                    }
-                    else
-                    {
-                        throw new ProtocolKafkaException(message.Code, "");
-                    }
+                    responseInfo.SetResult(message);
                 }
                 catch (ProtocolKafkaException exc)
                 {

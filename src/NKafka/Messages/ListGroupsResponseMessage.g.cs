@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ListGroupsResponseMessage
+/// </summary>
 public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquatable<ListGroupsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -59,17 +67,25 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
     /// </summary>
     public List<ListedGroupMessage> Groups { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message ListGroupsResponseMessage
+    /// </summary>
     public ListGroupsResponseMessage()
     {
     }
 
-    public ListGroupsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ListGroupsResponseMessage
+    /// </summary>
+    public ListGroupsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -94,7 +110,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<ListedGroupMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ListedGroupMessage(reader, version));
+                        newCollection.Add(new ListedGroupMessage(ref reader, version));
                     }
                     Groups = newCollection;
                 }
@@ -112,7 +128,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<ListedGroupMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new ListedGroupMessage(reader, version));
+                        newCollection.Add(new ListedGroupMessage(ref reader, version));
                     }
                     Groups = newCollection;
                 }
@@ -136,6 +152,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -176,11 +193,13 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ListGroupsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ListGroupsResponseMessage? other)
     {
         if (other is null)
@@ -212,6 +231,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -219,6 +239,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ListGroupsResponseMessage("
@@ -228,9 +249,16 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message ListedGroupMessage
+    /// </summary>
     public sealed partial class ListedGroupMessage: IMessage, IEquatable<ListedGroupMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The group ID.
@@ -247,17 +275,25 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         /// </summary>
         public string GroupState { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message ListedGroupMessage
+        /// </summary>
         public ListedGroupMessage()
         {
         }
 
-        public ListedGroupMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message ListedGroupMessage
+        /// </summary>
+        public ListedGroupMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -348,6 +384,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -399,11 +436,13 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is ListedGroupMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(ListedGroupMessage? other)
         {
             if (other is null)
@@ -455,6 +494,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -462,6 +502,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "ListedGroupMessage("

@@ -23,9 +23,22 @@
 
 namespace NKafka.Compressions;
 
+/// <summary>
+/// 
+/// </summary>
 public interface ICompression
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     byte[] Decode(byte[] data);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
     byte[] Encode(byte[] data);
 }

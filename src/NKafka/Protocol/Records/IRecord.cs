@@ -23,7 +23,7 @@
 
 namespace NKafka.Protocol.Records;
 
-public interface IRecord
+internal interface IRecord
 {
     /// <summary>
     /// Full record length
@@ -42,7 +42,7 @@ public interface IRecord
     /// </summary>
     public long OffsetDelta { get; set; }
 
-    public long KeyLength => Key.LongLength;
+    public long KeyLength => Key?.LongLength ?? 0;
 
     /// <summary>
     /// The record's key

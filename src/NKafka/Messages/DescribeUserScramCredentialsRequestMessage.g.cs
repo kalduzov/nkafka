@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DescribeUserScramCredentialsRequestMessage
+/// </summary>
 public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<DescribeUserScramCredentialsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DescribeUserScramCredentials;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The users to describe, or null/empty to describe all users.
     /// </summary>
     public List<UserNameMessage> Users { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DescribeUserScramCredentialsRequestMessage
+    /// </summary>
     public DescribeUserScramCredentialsRequestMessage()
     {
     }
 
-    public DescribeUserScramCredentialsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DescribeUserScramCredentialsRequestMessage
+    /// </summary>
+    public DescribeUserScramCredentialsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int arrayLength;
@@ -78,7 +97,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
                 var newCollection = new List<UserNameMessage>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new UserNameMessage(reader, version));
+                    newCollection.Add(new UserNameMessage(ref reader, version));
                 }
                 Users = newCollection;
             }
@@ -98,6 +117,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -119,11 +139,13 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
         rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DescribeUserScramCredentialsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DescribeUserScramCredentialsRequestMessage? other)
     {
         if (other is null)
@@ -147,6 +169,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -154,6 +177,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DescribeUserScramCredentialsRequestMessage("
@@ -161,26 +185,41 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message UserNameMessage
+    /// </summary>
     public sealed partial class UserNameMessage: IMessage, IEquatable<UserNameMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The user name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message UserNameMessage
+        /// </summary>
         public UserNameMessage()
         {
         }
 
-        public UserNameMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message UserNameMessage
+        /// </summary>
+        public UserNameMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -217,6 +256,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -231,11 +271,13 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is UserNameMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(UserNameMessage? other)
         {
             if (other is null)
@@ -259,6 +301,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -266,6 +309,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "UserNameMessage("

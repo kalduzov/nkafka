@@ -25,15 +25,12 @@ using System.Runtime.CompilerServices;
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class ShortSerializer: IAsyncSerializer<short>
 {
-    public bool PreferAsync => false;
-
-    public Task<byte[]> SerializeAsync(short data)
-    {
-        return Task.FromResult(Serialize(data));
-    }
-
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(short data)
     {

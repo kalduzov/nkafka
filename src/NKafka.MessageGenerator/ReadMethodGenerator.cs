@@ -39,7 +39,8 @@ internal class ReadMethodGenerator: IMethodGenerator
     public void Generate(string className, StructSpecification structSpecification, Versions parentVersions, Versions messageFlexibleVersions)
     {
         MessageFlexibleVersions = messageFlexibleVersions;
-        _codeGenerator.AppendLine("public void Read(BufferReader reader, ApiVersion version)");
+        _codeGenerator.AppendLine("/// <inheritdoc />");
+        _codeGenerator.AppendLine("public void Read(ref BufferReader reader, ApiVersion version)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
 
@@ -211,7 +212,7 @@ internal class ReadMethodGenerator: IMethodGenerator
             case IFieldType.Float64FieldType:
                 return "reader.ReadDouble()";
             case IFieldType.StructType:
-                return $"new {type.ClrName}Message(reader, version)";
+                return $"new {type.ClrName}Message(ref reader, version)";
             default:
                 throw new Exception($"Unsupported field type {type}");
         }

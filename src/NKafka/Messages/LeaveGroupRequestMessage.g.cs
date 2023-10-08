@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message LeaveGroupRequestMessage
+/// </summary>
 public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.LeaveGroup;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The ID of the group to leave.
@@ -64,17 +75,25 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
     /// </summary>
     public List<MemberIdentityMessage> Members { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message LeaveGroupRequestMessage
+    /// </summary>
     public LeaveGroupRequestMessage()
     {
     }
 
-    public LeaveGroupRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message LeaveGroupRequestMessage
+    /// </summary>
+    public LeaveGroupRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -135,7 +154,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
                     var newCollection = new List<MemberIdentityMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MemberIdentityMessage(reader, version));
+                        newCollection.Add(new MemberIdentityMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -153,7 +172,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
                     var newCollection = new List<MemberIdentityMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MemberIdentityMessage(reader, version));
+                        newCollection.Add(new MemberIdentityMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -181,6 +200,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -253,11 +273,13 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is LeaveGroupRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(LeaveGroupRequestMessage? other)
     {
         if (other is null)
@@ -309,6 +331,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -316,6 +339,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "LeaveGroupRequestMessage("
@@ -325,9 +349,16 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message MemberIdentityMessage
+    /// </summary>
     public sealed partial class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The member ID to remove from the group.
@@ -344,17 +375,25 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
         /// </summary>
         public string? Reason { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message MemberIdentityMessage
+        /// </summary>
         public MemberIdentityMessage()
         {
         }
 
-        public MemberIdentityMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MemberIdentityMessage
+        /// </summary>
+        public MemberIdentityMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version5)
             {
@@ -445,6 +484,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version3)
@@ -517,11 +557,13 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MemberIdentityMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MemberIdentityMessage? other)
         {
             if (other is null)
@@ -573,6 +615,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -580,6 +623,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MemberIdentityMessage("

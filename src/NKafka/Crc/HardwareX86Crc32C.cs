@@ -25,9 +25,9 @@ namespace NKafka.Crc;
 
 internal class HardwareX86Crc32C: ICrc32C
 {
-    public uint Calculate(Span<byte> span)
+    public uint Calculate(ReadOnlySpan<byte> span)
     {
-        var crc = 0xFFFFFFFF;
+        var crc = 0xFFFFFFFFu;
 
         // ReSharper disable once ForCanBeConvertedToForeach
         for (var i = 0; i < span.Length; i++)

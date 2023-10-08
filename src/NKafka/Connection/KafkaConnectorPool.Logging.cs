@@ -19,7 +19,26 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Net;
+
+using Microsoft.Extensions.Logging;
+
 namespace NKafka.Connection;
 
 internal partial class KafkaConnectorPool
-{ }
+{
+}
+
+internal static partial class KafkaConnectorPoolLoggerExtensions
+{
+    [LoggerMessage(
+        EventId = LogExtensions.KAFKA_CONNECTOR_POOL_EVENT_BASE_ID,
+        Level = LogLevel.Trace,
+        Message = LogExtensions.LOGGER_PREFIX + "New kafka connector on {EndPoint} created")]
+    public static partial void CreateConnectorTrace(this ILogger<KafkaConnectorPool> logger, EndPoint endPoint);
+
+    [LoggerMessage(EventId = LogExtensions.KAFKA_CONNECTOR_POOL_EVENT_BASE_ID + 1,
+        Level = LogLevel.Warning,
+        Message = LogExtensions.LOGGER_PREFIX + "Список bootstrap брокеров содержит повторы. Адрес {EndPoint} уже присутствует в списке. Текущий адрес будет проигнорирован.")]
+    public static partial void IgnoreBootstrapEndpointWarning(this ILogger<KafkaConnectorPool> logger, EndPoint endPoint);
+}

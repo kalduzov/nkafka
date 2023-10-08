@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,7 +79,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }
@@ -93,7 +97,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }
@@ -107,7 +115,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }
@@ -121,7 +133,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }
@@ -135,7 +151,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }
@@ -149,7 +169,11 @@ internal static class ProtocolWriterExtensions
             value = ReverseEndianness(value);
         }
 
+#if NET8_0_OR_GREATER
+        MemoryMarshal.Write(destination, in value);
+#else
         MemoryMarshal.Write(destination, ref value);
+#endif
 
         return destination.ToArray();
     }

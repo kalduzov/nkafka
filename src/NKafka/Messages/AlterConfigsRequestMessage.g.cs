@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message AlterConfigsRequestMessage
+/// </summary>
 public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquatable<AlterConfigsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.AlterConfigs;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The updates for each resource.
@@ -59,17 +70,25 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
     /// </summary>
     public bool ValidateOnly { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message AlterConfigsRequestMessage
+    /// </summary>
     public AlterConfigsRequestMessage()
     {
     }
 
-    public AlterConfigsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message AlterConfigsRequestMessage
+    /// </summary>
+    public AlterConfigsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version2)
@@ -85,7 +104,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                     var newCollection = new AlterConfigsResourceCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AlterConfigsResourceMessage(reader, version));
+                        newCollection.Add(new AlterConfigsResourceMessage(ref reader, version));
                     }
                     Resources = newCollection;
                 }
@@ -103,7 +122,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                     var newCollection = new AlterConfigsResourceCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new AlterConfigsResourceMessage(reader, version));
+                        newCollection.Add(new AlterConfigsResourceMessage(ref reader, version));
                     }
                     Resources = newCollection;
                 }
@@ -128,6 +147,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -164,11 +184,13 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is AlterConfigsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(AlterConfigsRequestMessage? other)
     {
         if (other is null)
@@ -196,6 +218,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -203,6 +226,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "AlterConfigsRequestMessage("
@@ -211,9 +235,16 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterConfigsResourceMessage
+    /// </summary>
     public sealed partial class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The resource type.
@@ -230,17 +261,25 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public AlterableConfigCollection Configs { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message AlterConfigsResourceMessage
+        /// </summary>
         public AlterConfigsResourceMessage()
         {
         }
 
-        public AlterConfigsResourceMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message AlterConfigsResourceMessage
+        /// </summary>
+        public AlterConfigsResourceMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version2)
             {
@@ -284,7 +323,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new AlterableConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new AlterableConfigMessage(reader, version));
+                            newCollection.Add(new AlterableConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -302,7 +341,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new AlterableConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new AlterableConfigMessage(reader, version));
+                            newCollection.Add(new AlterableConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -326,6 +365,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -374,11 +414,13 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is AlterConfigsResourceMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(AlterConfigsResourceMessage? other)
         {
             if (other is null)
@@ -420,6 +462,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -427,6 +470,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "AlterConfigsResourceMessage("
@@ -437,9 +481,16 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterableConfigMessage
+    /// </summary>
     public sealed partial class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The configuration key name.
@@ -451,17 +502,25 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public string Value { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message AlterableConfigMessage
+        /// </summary>
         public AlterableConfigMessage()
         {
         }
 
-        public AlterableConfigMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message AlterableConfigMessage
+        /// </summary>
+        public AlterableConfigMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version2)
             {
@@ -531,6 +590,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -586,11 +646,13 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is AlterableConfigMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(AlterableConfigMessage? other)
         {
             if (other is null)
@@ -628,6 +690,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -635,6 +698,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "AlterableConfigMessage("
@@ -644,32 +708,52 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterableConfigCollection
+    /// </summary>
     public sealed partial class AlterableConfigCollection: HashSet<AlterableConfigMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public AlterableConfigCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public AlterableConfigCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<AlterableConfigMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterConfigsResourceCollection
+    /// </summary>
     public sealed partial class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public AlterConfigsResourceCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public AlterConfigsResourceCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<AlterConfigsResourceMessage>)obj);

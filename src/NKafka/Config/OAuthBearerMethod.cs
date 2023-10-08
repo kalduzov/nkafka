@@ -26,6 +26,13 @@ namespace NKafka.Config;
 /// </summary>
 public enum OAuthBearerMethod
 {
+    /// <summary>
+    /// 
+    /// </summary>
     Default = 0,
+
+    /// <summary>
+    /// 
+    /// </summary>
     Oidc = 1
 }

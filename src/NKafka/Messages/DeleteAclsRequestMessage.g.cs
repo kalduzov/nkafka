@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteAclsRequestMessage
+/// </summary>
 public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatable<DeleteAclsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteAcls;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The filters to use when deleting ACLs.
     /// </summary>
     public List<DeleteAclsFilterMessage> Filters { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DeleteAclsRequestMessage
+    /// </summary>
     public DeleteAclsRequestMessage()
     {
     }
 
-    public DeleteAclsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteAclsRequestMessage
+    /// </summary>
+    public DeleteAclsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version2)
@@ -80,7 +99,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
                     var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteAclsFilterMessage(reader, version));
+                        newCollection.Add(new DeleteAclsFilterMessage(ref reader, version));
                     }
                     Filters = newCollection;
                 }
@@ -98,7 +117,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
                     var newCollection = new List<DeleteAclsFilterMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteAclsFilterMessage(reader, version));
+                        newCollection.Add(new DeleteAclsFilterMessage(ref reader, version));
                     }
                     Filters = newCollection;
                 }
@@ -122,6 +141,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -157,11 +177,13 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteAclsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteAclsRequestMessage? other)
     {
         if (other is null)
@@ -185,6 +207,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -192,6 +215,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteAclsRequestMessage("
@@ -199,9 +223,16 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteAclsFilterMessage
+    /// </summary>
     public sealed partial class DeleteAclsFilterMessage: IMessage, IEquatable<DeleteAclsFilterMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The resource type.
@@ -238,17 +269,25 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
         /// </summary>
         public sbyte PermissionType { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message DeleteAclsFilterMessage
+        /// </summary>
         public DeleteAclsFilterMessage()
         {
         }
 
-        public DeleteAclsFilterMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteAclsFilterMessage
+        /// </summary>
+        public DeleteAclsFilterMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -352,6 +391,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -457,11 +497,13 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteAclsFilterMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteAclsFilterMessage? other)
         {
             if (other is null)
@@ -529,6 +571,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -536,6 +579,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteAclsFilterMessage("

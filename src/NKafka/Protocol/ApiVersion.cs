@@ -23,9 +23,14 @@
 
 namespace NKafka.Protocol;
 
+#pragma warning disable CS1591
+
+/// <summary>
+/// 
+/// </summary>
 public enum ApiVersion: short
 {
-    LastVersion = Version13,
+    LastVersion = Version14,
 
     Version0 = 0x0000,
     Version1 = 0x0001,
@@ -41,5 +46,7 @@ public enum ApiVersion: short
     Version11 = 0x000B,
     Version12 = 0x000C,
     Version13 = 0x000D,
+#pragma warning disable CA1069
     Version14 = 0x000E
+#pragma warning restore CA1069
 }

@@ -26,15 +26,27 @@ namespace NKafka.Connection.Sasl;
 /// </summary>
 public class SaslException: Exception
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public SaslException()
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
     public SaslException(string message)
         : base(message)
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
     public SaslException(string message, Exception innerException)
         : base(message, innerException)
     {

@@ -31,15 +31,6 @@ namespace NKafka.Serialization;
 public sealed class LongSerializer: IAsyncSerializer<long>
 {
     /// <inheritdoc/>
-    public bool PreferAsync => false;
-
-    /// <inheritdoc/>
-    public Task<byte[]> SerializeAsync(long data)
-    {
-        return Task.FromResult(Serialize(data));
-    }
-
-    /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(long data)
     {

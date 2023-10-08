@@ -29,7 +29,7 @@ public class GuidSerializerTests
     public async Task SerializeAsync_Successful()
     {
         var value = Guid.NewGuid();
-        var serializer = new GuidSerializer();
+        IAsyncSerializer<Guid> serializer = new GuidSerializer();
         var result = await serializer.SerializeAsync(value);
 
         result.Should().BeEquivalentTo(value.ToByteArray());
@@ -39,7 +39,7 @@ public class GuidSerializerTests
     public void Serialize_Successful()
     {
         var value = Guid.NewGuid();
-        var serializer = new GuidSerializer();
+        IAsyncSerializer<Guid> serializer = new GuidSerializer();
         var result = serializer.Serialize(value);
         serializer.PreferAsync.Should().BeFalse();
         result.Should().BeEquivalentTo(value.ToByteArray());

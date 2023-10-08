@@ -38,6 +38,10 @@ public class ProduceException: KafkaException
 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="exc"></param>
     public ProduceException(Exception exc)
         : base("", exc)
     {

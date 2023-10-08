@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteRecordsRequestMessage
+/// </summary>
 public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<DeleteRecordsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteRecords;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// Each topic that we want to delete records from.
@@ -59,17 +70,25 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
     /// </summary>
     public int TimeoutMs { get; set; } = 0;
 
+    /// <summary>
+    /// The basic constructor of the message DeleteRecordsRequestMessage
+    /// </summary>
     public DeleteRecordsRequestMessage()
     {
     }
 
-    public DeleteRecordsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteRecordsRequestMessage
+    /// </summary>
+    public DeleteRecordsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version2)
@@ -85,7 +104,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
                     var newCollection = new List<DeleteRecordsTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteRecordsTopicMessage(reader, version));
+                        newCollection.Add(new DeleteRecordsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -103,7 +122,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
                     var newCollection = new List<DeleteRecordsTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeleteRecordsTopicMessage(reader, version));
+                        newCollection.Add(new DeleteRecordsTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -128,6 +147,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -164,11 +184,13 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteRecordsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteRecordsRequestMessage? other)
     {
         if (other is null)
@@ -196,6 +218,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -203,6 +226,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteRecordsRequestMessage("
@@ -211,9 +235,16 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteRecordsTopicMessage
+    /// </summary>
     public sealed partial class DeleteRecordsTopicMessage: IMessage, IEquatable<DeleteRecordsTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -225,17 +256,25 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         /// </summary>
         public List<DeleteRecordsPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message DeleteRecordsTopicMessage
+        /// </summary>
         public DeleteRecordsTopicMessage()
         {
         }
 
-        public DeleteRecordsTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteRecordsTopicMessage
+        /// </summary>
+        public DeleteRecordsTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version2)
             {
@@ -278,7 +317,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
                         var newCollection = new List<DeleteRecordsPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DeleteRecordsPartitionMessage(reader, version));
+                            newCollection.Add(new DeleteRecordsPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -296,7 +335,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
                         var newCollection = new List<DeleteRecordsPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DeleteRecordsPartitionMessage(reader, version));
+                            newCollection.Add(new DeleteRecordsPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -320,6 +359,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -367,11 +407,13 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteRecordsTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteRecordsTopicMessage? other)
         {
             if (other is null)
@@ -409,6 +451,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -416,6 +459,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteRecordsTopicMessage("
@@ -425,9 +469,16 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteRecordsPartitionMessage
+    /// </summary>
     public sealed partial class DeleteRecordsPartitionMessage: IMessage, IEquatable<DeleteRecordsPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -439,17 +490,25 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
         /// </summary>
         public long Offset { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message DeleteRecordsPartitionMessage
+        /// </summary>
         public DeleteRecordsPartitionMessage()
         {
         }
 
-        public DeleteRecordsPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteRecordsPartitionMessage
+        /// </summary>
+        public DeleteRecordsPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version2)
             {
@@ -475,6 +534,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -496,11 +556,13 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteRecordsPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteRecordsPartitionMessage? other)
         {
             if (other is null)
@@ -518,6 +580,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -525,6 +588,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteRecordsPartitionMessage("

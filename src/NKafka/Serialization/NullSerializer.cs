@@ -21,17 +21,17 @@
  * limitations under the License.
  */
 
+using System.Runtime.CompilerServices;
+
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class NullSerializer: IAsyncSerializer<Null>
 {
-    public bool PreferAsync => false;
-
-    public Task<byte[]> SerializeAsync(Null data)
-    {
-        return Task.FromResult<byte[]>(null!);
-    }
-
+    /// <inheritdoc />
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(Null data)
     {
         return null!;

@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message InitProducerIdRequestMessage
+/// </summary>
 public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEquatable<InitProducerIdRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.InitProducerId;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The transactional id, or null if the producer is not transactional.
@@ -65,21 +76,29 @@ public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEqua
     public long ProducerId { get; set; } = -1;
 
     /// <summary>
-    /// The producer's current epoch. This will be checked against the producer epoch on the broker, and the request will return an error if they do not match.
+    /// The producer&#39;s current epoch. This will be checked against the producer epoch on the broker, and the request will return an error if they do not match.
     /// </summary>
     public short ProducerEpoch { get; set; } = -1;
 
+    /// <summary>
+    /// The basic constructor of the message InitProducerIdRequestMessage
+    /// </summary>
     public InitProducerIdRequestMessage()
     {
     }
 
-    public InitProducerIdRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message InitProducerIdRequestMessage
+    /// </summary>
+    public InitProducerIdRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -139,6 +158,7 @@ public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -205,11 +225,13 @@ public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is InitProducerIdRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(InitProducerIdRequestMessage? other)
     {
         if (other is null)
@@ -245,6 +267,7 @@ public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEqua
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -252,6 +275,7 @@ public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEqua
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "InitProducerIdRequestMessage("

@@ -30,15 +30,6 @@ namespace NKafka;
 
 internal static class Utils
 {
-    internal const string LOGGER_PREFIX = "[Kafka] ";
-
-    internal static EndPoint BuildEndPoint(string bootstrapServer)
-    {
-        var (host, port) = GetHostAndPort(bootstrapServer);
-
-        return BuildEndPoint(host, port);
-    }
-
     internal static EndPoint BuildEndPoint(string host, int port)
     {
         if (string.IsNullOrWhiteSpace(host) || port == -1)

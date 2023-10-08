@@ -56,6 +56,43 @@ Console.ReadKey();
 
 ```
 
+### Simple consumer messages
+
+```csharp
+
+using NKafka;
+using NKafka.Config;
+
+var clusterConfig = new ClusterConfig
+{
+    BootstrapServers = new[]
+    {
+        "127.0.0.1:29091"
+    },
+};
+
+await using var kafkaCluster = await clusterConfig.CreateClusterAsync();
+
+await using var consumer = kafkaCluster.BuildConsumer<Null, int>(new ConsumerConfig
+{
+    GroupId = "consumer-group"
+});
+
+var channel = consumer.Subscribe("test_topic");
+
+while (await channel.WaitToReadAsync())
+{
+    var message = await channel.ReadAsync();
+    Console.WriteLine(message.Message.Value);
+    await consumer.CommitOffsetAsync(message.TopicPartition, CancellationToken.None);
+} //Infinite reading of data from a channel
+consumer.Unsubscribe();
+
+
+Console.ReadKey();
+
+```
+
 ## Getting started with the repository
 
 ```

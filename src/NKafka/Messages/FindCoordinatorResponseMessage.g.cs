@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message FindCoordinatorResponseMessage
+/// </summary>
 public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IEquatable<FindCoordinatorResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -79,17 +87,25 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
     /// </summary>
     public List<CoordinatorMessage> Coordinators { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message FindCoordinatorResponseMessage
+    /// </summary>
     public FindCoordinatorResponseMessage()
     {
     }
 
-    public FindCoordinatorResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message FindCoordinatorResponseMessage
+    /// </summary>
+    public FindCoordinatorResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -192,7 +208,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
                 var newCollection = new List<CoordinatorMessage>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new CoordinatorMessage(reader, version));
+                    newCollection.Add(new CoordinatorMessage(ref reader, version));
                 }
                 Coordinators = newCollection;
             }
@@ -219,6 +235,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -339,11 +356,13 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is FindCoordinatorResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(FindCoordinatorResponseMessage? other)
     {
         if (other is null)
@@ -411,6 +430,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -418,6 +438,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "FindCoordinatorResponseMessage("
@@ -431,9 +452,16 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message CoordinatorMessage
+    /// </summary>
     public sealed partial class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The coordinator key.
@@ -468,17 +496,25 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         /// </summary>
         public string ErrorMessage { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message CoordinatorMessage
+        /// </summary>
         public CoordinatorMessage()
         {
         }
 
-        public CoordinatorMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CoordinatorMessage
+        /// </summary>
+        public CoordinatorMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version4)
             {
@@ -550,6 +586,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version4)
@@ -586,11 +623,13 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CoordinatorMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CoordinatorMessage? other)
         {
             if (other is null)
@@ -654,6 +693,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -661,6 +701,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CoordinatorMessage("

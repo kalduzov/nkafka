@@ -31,40 +31,59 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ListGroupsRequestMessage
+/// </summary>
 public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGroupsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ListGroups;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The states of the groups we want to list. If empty all groups are returned with their state.
     /// </summary>
     public List<string> StatesFilter { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message ListGroupsRequestMessage
+    /// </summary>
     public ListGroupsRequestMessage()
     {
     }
 
-    public ListGroupsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ListGroupsRequestMessage
+    /// </summary>
+    public ListGroupsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version4)
         {
@@ -119,6 +138,7 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -157,11 +177,13 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ListGroupsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ListGroupsRequestMessage? other)
     {
         if (other is null)
@@ -185,6 +207,7 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -192,6 +215,7 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ListGroupsRequestMessage("

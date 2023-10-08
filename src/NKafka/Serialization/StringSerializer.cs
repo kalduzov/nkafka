@@ -21,23 +21,39 @@
  * limitations under the License.
  */
 
+using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Unicode;
+
+using NKafka.Exceptions;
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
 public sealed class StringSerializer: IAsyncSerializer<string>
 {
-    public bool PreferAsync => false;
-
-    public Task<byte[]> SerializeAsync(string data)
-    {
-        return Task.FromResult(Serialize(data));
-    }
-
+    /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(string data)
     {
+        var source = data.AsSpan();
+
+        var maxByteCount = Encoding.UTF8.GetByteCount(source);
+        var dest = GC.AllocateArray<byte>(maxByteCount);
+
+#if NET7_0_OR_GREATER
+        var status = Utf8.FromUtf16(source, dest, out _, out _, replaceInvalidSequences: false);
+
+        if (status != OperationStatus.Done)
+        {
+            throw new KafkaException("Cannot serialize data.");
+        }
+        return dest;
+#else
         return Encoding.UTF8.GetBytes(data);
+#endif
     }
 }

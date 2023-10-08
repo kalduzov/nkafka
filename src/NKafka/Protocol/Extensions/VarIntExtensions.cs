@@ -126,7 +126,7 @@ internal static class VarIntExtensions
 
             if (b < 0x80)
             {
-                if (i >= 5 || i == 4 && b > 1)
+                if (i == 4 && b > 1 || i >= 5)
                 {
                     return -(i + 1);
                 }

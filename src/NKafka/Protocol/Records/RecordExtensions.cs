@@ -21,6 +21,7 @@
 
 using System.Text;
 
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol.Records;

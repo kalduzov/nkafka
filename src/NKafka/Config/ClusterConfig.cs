@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,14 +32,16 @@ public record ClusterConfig: CommonConfig
 {
     /// <summary>
     /// Metadata update timeout
+    /// <br/><br/>
+    /// <p><b>Default</b> - 5 minutes</p>
     /// </summary>
-    /// <remarks>Default - 5 minutes</remarks>
     public int MetadataUpdateTimeoutMs { get; set; } = 5 * 60 * 1000;
 
     /// <summary>
-    ///     Cluster initialization timeout 
+    /// Cluster initialization timeout
+    /// <br/><br/>
+    /// <p><b>Default</b> - 15 seconds</p> 
     /// </summary>
-    /// <remarks>Default - 15 seconds</remarks>
     public int ClusterInitTimeoutMs { get; set; } = 15 * 1000;
 
     /// <summary>
@@ -49,7 +51,7 @@ public record ClusterConfig: CommonConfig
     /// A full update of the metadata can greatly inflate the memory if there are a lot of topics and partitions in the cluster.
     /// If the metadata is not completely updated, then data is requested only for those topics that are used by the cluster client
     /// </remarks>
-    public bool IsFullUpdateMetadata { get; set; } = true;
+    public bool IsFullUpdateMetadata { get; set; } = false;
 
     /// <summary>
     /// Validates the settings and throws an exception if the settings are invalid or missing required ones

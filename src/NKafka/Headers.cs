@@ -34,6 +34,9 @@ namespace NKafka;
 /// </summary>
 public class Headers: IEnumerable<IHeader>
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly Headers Empty = new EmptyHeaders();
 
     private readonly List<IHeader> _headers;
@@ -51,6 +54,10 @@ public class Headers: IEnumerable<IHeader>
     /// </summary>
     public int Count => _headers.Count;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="headers"></param>
     public Headers(IEnumerable<Header>? headers)
     {
         _headers = headers is null ? new() : new List<IHeader>(headers);
@@ -182,6 +189,9 @@ public class Headers: IEnumerable<IHeader>
         _headers.RemoveAll(a => a.Key == key);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void SetReadOnly()
     {
     }

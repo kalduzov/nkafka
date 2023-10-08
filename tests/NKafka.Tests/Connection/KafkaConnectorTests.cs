@@ -19,40 +19,22 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Net;
-using System.Net.Security;
-using System.Net.Sockets;
-
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.IO;
 
 using NKafka.Config;
 using NKafka.Connection;
+using NKafka.Tests.Connection.Fixtures;
 
 namespace NKafka.Tests.Connection;
 
-public class KafkaConnectorTests
+public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
 {
-    private readonly IPEndPoint _endPoint = new(IPAddress.Loopback, 9000);
-    private bool _isConnected;
-    private readonly Mock<ISocketFactory> _socketFactoryMock;
+    private readonly ConnectorFixture _fixture;
 
-    public KafkaConnectorTests()
+    public KafkaConnectorTests(ConnectorFixture fixture)
     {
-        Mock<ISocketProxy> socketMock = new();
-
-        socketMock.Setup(s => s.ConnectAsync(_endPoint, It.IsAny<CancellationToken>())).Callback(() => _isConnected = true);
-        socketMock.Setup(s => s.Connected).Returns(_isConnected);
-
-        Stream mockStream = new MockStream();
-
-        var remoteCertificateValidationCallback = new RemoteCertificateValidationCallback((_, _, _, _) => true);
-        var sslStreamMock = new Mock<SslStream>(mockStream, false, remoteCertificateValidationCallback);
-
-        _socketFactoryMock = new Mock<ISocketFactory>();
-        _socketFactoryMock.Setup(sf => sf.CreateSocket(SocketType.Stream, ProtocolType.Tcp, 0)).Returns(socketMock.Object);
-        _socketFactoryMock.Setup(sf => sf.CreateNetworkStream(It.IsAny<Socket>(), It.IsAny<bool>())).Returns(mockStream);
-        _socketFactoryMock.Setup(sf => sf.CreateSslStream(It.IsAny<Stream>())).Returns(sslStreamMock.Object);
+        _fixture = fixture;
     }
 
     [Fact]
@@ -60,7 +42,7 @@ public class KafkaConnectorTests
     {
         IKafkaConnector CreateConnector()
             => new KafkaConnector(
-                _endPoint,
+                _fixture.EndPoint,
                 100,
                 1000,
                 1000,
@@ -72,7 +54,7 @@ public class KafkaConnectorTests
                 SslSettings.None,
                 "test",
                 true,
-                _socketFactoryMock.Object,
+                _fixture.SocketFactory,
                 new RecyclableMemoryStreamManager(),
                 NullLoggerFactory.Instance);
 
@@ -85,7 +67,7 @@ public class KafkaConnectorTests
     public async Task ConnectorOpen_Successful(bool apiRequest)
     {
         var kafkaConnector = new KafkaConnector(
-            _endPoint,
+            _fixture.EndPoint,
             100,
             1000,
             1000,
@@ -97,7 +79,7 @@ public class KafkaConnectorTests
             SslSettings.None,
             "test",
             apiRequest,
-            _socketFactoryMock.Object,
+            _fixture.SocketFactory,
             new RecyclableMemoryStreamManager(),
             NullLoggerFactory.Instance);
 

@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message TxnOffsetCommitRequestMessage
+/// </summary>
 public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEquatable<TxnOffsetCommitRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.TxnOffsetCommit;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The ID of the transaction.
@@ -89,17 +100,25 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
     /// </summary>
     public List<TxnOffsetCommitRequestTopicMessage> Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message TxnOffsetCommitRequestMessage
+    /// </summary>
     public TxnOffsetCommitRequestMessage()
     {
     }
 
-    public TxnOffsetCommitRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message TxnOffsetCommitRequestMessage
+    /// </summary>
+    public TxnOffsetCommitRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -213,7 +232,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
                     var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
+                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -231,7 +250,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
                     var newCollection = new List<TxnOffsetCommitRequestTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(reader, version));
+                        newCollection.Add(new TxnOffsetCommitRequestTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -255,6 +274,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -362,11 +382,13 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(TxnOffsetCommitRequestMessage? other)
     {
         if (other is null)
@@ -458,6 +480,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -466,6 +489,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "TxnOffsetCommitRequestMessage("
@@ -480,9 +504,16 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message TxnOffsetCommitRequestTopicMessage
+    /// </summary>
     public sealed partial class TxnOffsetCommitRequestTopicMessage: IMessage, IEquatable<TxnOffsetCommitRequestTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -494,17 +525,25 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         /// </summary>
         public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message TxnOffsetCommitRequestTopicMessage
+        /// </summary>
         public TxnOffsetCommitRequestTopicMessage()
         {
         }
 
-        public TxnOffsetCommitRequestTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message TxnOffsetCommitRequestTopicMessage
+        /// </summary>
+        public TxnOffsetCommitRequestTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -547,7 +586,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
                         var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
+                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -565,7 +604,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
                         var newCollection = new List<TxnOffsetCommitRequestPartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(reader, version));
+                            newCollection.Add(new TxnOffsetCommitRequestPartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -589,6 +628,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -636,11 +676,13 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(TxnOffsetCommitRequestTopicMessage? other)
         {
             if (other is null)
@@ -678,6 +720,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -685,6 +728,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "TxnOffsetCommitRequestTopicMessage("
@@ -694,9 +738,16 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message TxnOffsetCommitRequestPartitionMessage
+    /// </summary>
     public sealed partial class TxnOffsetCommitRequestPartitionMessage: IMessage, IEquatable<TxnOffsetCommitRequestPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The index of the partition within the topic.
@@ -718,17 +769,25 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         /// </summary>
         public string CommittedMetadata { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message TxnOffsetCommitRequestPartitionMessage
+        /// </summary>
         public TxnOffsetCommitRequestPartitionMessage()
         {
         }
 
-        public TxnOffsetCommitRequestPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message TxnOffsetCommitRequestPartitionMessage
+        /// </summary>
+        public TxnOffsetCommitRequestPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version3)
             {
@@ -785,6 +844,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -834,11 +894,13 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is TxnOffsetCommitRequestPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(TxnOffsetCommitRequestPartitionMessage? other)
         {
             if (other is null)
@@ -874,6 +936,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -881,6 +944,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "TxnOffsetCommitRequestPartitionMessage("

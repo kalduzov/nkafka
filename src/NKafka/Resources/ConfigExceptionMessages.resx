@@ -31,7 +31,7 @@
         <value>Incorrect broker version set. Minimum supported {0} Maximum supported {0}</value>
     </data>
   <data name="NoBrokerVersion" xml:space="preserve">
-        <value>BrokerVersion not set</value>
+        <value>FallbackBrokerVersion not set</value>
     </data>
   <data name="PartitionerConfig_TypePartitionerInvalid" xml:space="preserve">
         <value>The settings specify a custom partitioning algorithm class, but the distribution type is specified other than Custom</value>

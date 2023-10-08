@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message ApiVersionsRequestMessage
+/// </summary>
 public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVersionsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ApiVersions;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The name of the client.
@@ -59,17 +70,25 @@ public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatab
     /// </summary>
     public string ClientSoftwareVersion { get; set; } = string.Empty;
 
+    /// <summary>
+    /// The basic constructor of the message ApiVersionsRequestMessage
+    /// </summary>
     public ApiVersionsRequestMessage()
     {
     }
 
-    public ApiVersionsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message ApiVersionsRequestMessage
+    /// </summary>
+    public ApiVersionsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version3)
         {
@@ -131,6 +150,7 @@ public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -166,11 +186,13 @@ public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is ApiVersionsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(ApiVersionsRequestMessage? other)
     {
         if (other is null)
@@ -208,6 +230,7 @@ public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatab
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -215,6 +238,7 @@ public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatab
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "ApiVersionsRequestMessage("

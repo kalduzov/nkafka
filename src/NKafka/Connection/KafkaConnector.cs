@@ -26,7 +26,6 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
@@ -44,6 +43,8 @@ namespace NKafka.Connection;
 /// </summary>
 internal sealed partial class KafkaConnector: IKafkaConnector
 {
+    public static readonly IKafkaConnector Null = new NullConnector();
+
     private long _totalBytesSent;
 
     private readonly bool _apiVersionRequest;
@@ -54,7 +55,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 #pragma warning disable IDE0052
 
     //Нужно убрать этот механизм в KafkaConnectorPool
-    private readonly Timer _closeConnectionAfterTimeout; //todo Для каждого соединения будет кушаться поток из пула.
+    private readonly Timer _closeConnectionAfterTimeout;
 
 #pragma warning restore IDE0052
     private readonly int _closeConnectionTimeoutMs;
@@ -62,7 +63,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     /*
      * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
-     * соединение с брокером автоматически закроется 
+     * соединение с брокером автоматически закроется
      */
     private readonly Stopwatch _globalTimeWaiting = new();
 
@@ -79,20 +80,37 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly SecurityProtocols _securityProtocol;
     private readonly ISocketFactory _socketFactory;
 
-    private readonly ISocketProxy _socketProxy = default!;
+    private readonly ISocketProxy _socketProxy;
     private readonly SslSettings _sslSettings;
 
-    // todo со временем нужно убрать обработку сообщений из коннектора в KafkaConnectorPool
-    // так будет тратиться меньше ресурсов ThreadPool, а сама обработка будет максимально утилизировать работу потоков
+    // todo со временем нужно убрать обработку сообщений из коннектора в KafkaConnectorPool на отдельные потоки
+    // так будет тратиться меньше ресурсов ThreadPool, а сама обработка будет максимально утилизироваться на выделенных потоках
     private Task _processData = Task.CompletedTask;
     private volatile int _requestId = -1;
     private Stream _stream = Stream.Null;
-    private Dictionary<ApiKeys, (short, short)> _supportVersions = new(0);
+
+    /// <inheritdoc/>
+    public Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; private set; } = new(0);
 
     /// <summary>
     /// Можно ли писать в текущий поток?
     /// </summary>
     private bool CanWrite => _stream != Stream.Null && _stream.CanWrite;
+
+    /// <inheritdoc/>
+    public bool IsDedicated { get; init; }
+
+    /// <inheritdoc/>
+    public int NodeId { get; set; } = Node.NoNode.Id;
+
+    /// <inheritdoc/>
+    public State ConnectorState { get; private set; } = State.Closed;
+
+    /// <inheritdoc/>
+    public int CurrentNumberInflightRequests => _inFlightRequests.Count;
+
+    /// <inheritdoc/>
+    public EndPoint Endpoint { get; }
 
     internal KafkaConnector(
         EndPoint endPoint,
@@ -125,7 +143,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         _socketFactory = socketFactory;
         _memoryStreamManager = memoryStreamManager;
 
-        _arrayPool = ArrayPool<byte>.Create(messageMaxBytes, maxInflightRequests);
+        //_arrayPool = ArrayPool<byte>.Create(messageMaxBytes, maxInflightRequests);
+        _arrayPool = ArrayPool<byte>.Shared;
         _inFlightRequests = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, _maxInflightRequests);
         _logger = loggerFactory.CreateLogger<KafkaConnector>();
 
@@ -144,18 +163,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             });
     }
 
-    /// <inheritdoc/>
-    public int NodeId { get; set; } = Node.NoNode.Id;
-
-    /// <inheritdoc/>
-    public State ConnectorState { get; private set; } = State.Closed;
-
-    /// <inheritdoc/>
-    public int CurrentNumberInflightRequests => _inFlightRequests.Count;
-
-    /// <inheritdoc/>
-    public EndPoint Endpoint { get; }
-
     public async ValueTask OpenAsync(CancellationToken token)
     {
         await ReEstablishConnectionAsync(token);
@@ -169,7 +176,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         bool isInternalRequest,
         CancellationToken token)
     {
-        _logger.LogTrace("Send {Request} to {Brocker}", message, NodeId);
+        _logger.SendRequestTrace(message, NodeId);
 
         if (_inFlightRequests.Count >= _maxInflightRequests)
         {
@@ -180,7 +187,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
 
-        var contentVersion = message.ApiKey.GetSupportApiVersion(_supportVersions);
+        var contentVersion = message.ApiKey.GetEffectiveApiVersion(SupportVersions);
         var headerVersion = message.ApiKey.GetRequestHeaderVersion(contentVersion);
         var requestId = Interlocked.Increment(ref _requestId);
 
@@ -216,7 +223,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
-        var taskCompletionSource = new ResponseTaskCompletionSource(
+        var responseCompletionSource = new ResponseTaskCompletionSource(
             (ApiKeys)request.Header.RequestApiKey,
             (ApiVersion)request.Header.RequestApiVersion);
 
@@ -226,12 +233,12 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 var awaiter = state as ResponseTaskCompletionSource;
                 awaiter?.TrySetCanceled();
             },
-            taskCompletionSource,
+            responseCompletionSource,
             false);
 
         try
         {
-            _inFlightRequests.TryAdd(requestId, taskCompletionSource);
+            _inFlightRequests.TryAdd(requestId, responseCompletionSource);
             WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
             cts.CancelAfter(_requestTimeoutMs);
 
@@ -251,13 +258,13 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
             _inFlightRequests.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
 
-            if (!taskCompletionSource.Task.IsCanceled || !taskCompletionSource.Task.IsCompleted)
+            if (!responseCompletionSource.Task.IsCanceled || !responseCompletionSource.Task.IsCompleted)
             {
-                taskCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Не удалось отправить запрос", exc));
+                responseCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Не удалось отправить запрос", exc));
             }
         }
 
-        return (TResponseMessage)await taskCompletionSource.Task;
+        return (TResponseMessage)await responseCompletionSource.Task;
     }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
@@ -281,7 +288,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private void ResetConnection()
     {
-        _logger.ConnectionReset(Endpoint, NodeId, _connectionsMaxIdleMs);
+        _logger.ConnectionResetInformation(Endpoint, NodeId, _connectionsMaxIdleMs);
 
         ConnectorState = State.Closing;
         _stream.Dispose();
@@ -348,7 +355,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private async Task TryRequestApiSupportVersionsAsync(CancellationToken token)
     {
-        if (_supportVersions.Count != 0 || !_apiVersionRequest)
+        if (SupportVersions.Count != 0 || !_apiVersionRequest)
         {
             return;
         }
@@ -363,18 +370,18 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         if (response is { Code: ErrorCodes.None, ApiKeys.Count: 0 })
         {
-            _supportVersions = SupportVersionsExtensions.Default;
+            SupportVersions = SupportVersionsExtensions.Default;
         }
         else
         {
-            var supportVersions = new Dictionary<ApiKeys, (short, short)>(response.ApiKeys.Count);
+            var supportVersions = new Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)>(response.ApiKeys.Count);
 
             foreach (var apiKey in response.ApiKeys)
             {
-                supportVersions.Add((ApiKeys)apiKey.ApiKey, (apiKey.MinVersion, apiKey.MaxVersion));
+                supportVersions.Add((ApiKeys)apiKey.ApiKey, ((ApiVersion)apiKey.MinVersion, (ApiVersion)apiKey.MaxVersion));
             }
 
-            _supportVersions = supportVersions;
+            SupportVersions = supportVersions;
         }
     }
 
@@ -390,16 +397,11 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         // }
     }
 
-    private void ReleaseUnmanagedResources()
-    {
-        _stream.Dispose();
-        _socketProxy.Dispose();
-    }
-
     private void Dispose(bool disposing)
     {
         ConnectorState = State.Closing;
-        ReleaseUnmanagedResources();
+        _stream.Dispose();
+        _socketProxy.Dispose();
 
         if (disposing)
         {
@@ -425,20 +427,20 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private class ResponseTaskCompletionSource: TaskCompletionSource<IResponseMessage>
     {
-        private readonly ApiKeys _apiKey;
+        public ApiKeys ApiKey { get; }
 
         private readonly ApiVersion _version;
 
         public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
             : base(TaskCreationOptions.RunContinuationsAsynchronously)
         {
-            _apiKey = apiKey;
+            ApiKey = apiKey;
             _version = version;
         }
 
-        internal IResponseMessage BuildResponseMessage(byte[] span)
+        internal IResponseMessage BuildResponseMessage(byte[] span, int bodyLen)
         {
-            return ResponseBuilder.Build(_apiKey, _version, span);
+            return ResponseBuilder.Build(ApiKey, _version, span, bodyLen);
         }
     }
 }

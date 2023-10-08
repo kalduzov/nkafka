@@ -23,6 +23,9 @@
 
 namespace NKafka.Clients.Producer;
 
+/// <summary>
+/// 
+/// </summary>
 public enum PersistenceStatus
 {
     /// <summary>

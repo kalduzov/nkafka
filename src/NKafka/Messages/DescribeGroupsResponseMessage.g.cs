@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DescribeGroupsResponseMessage
+/// </summary>
 public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<DescribeGroupsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
     /// </summary>
     public List<DescribedGroupMessage> Groups { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DescribeGroupsResponseMessage
+    /// </summary>
     public DescribeGroupsResponseMessage()
     {
     }
 
-    public DescribeGroupsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DescribeGroupsResponseMessage
+    /// </summary>
+    public DescribeGroupsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -85,7 +101,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                     var newCollection = new List<DescribedGroupMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribedGroupMessage(reader, version));
+                        newCollection.Add(new DescribedGroupMessage(ref reader, version));
                     }
                     Groups = newCollection;
                 }
@@ -103,7 +119,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                     var newCollection = new List<DescribedGroupMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DescribedGroupMessage(reader, version));
+                        newCollection.Add(new DescribedGroupMessage(ref reader, version));
                     }
                     Groups = newCollection;
                 }
@@ -127,6 +143,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -166,11 +183,13 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DescribeGroupsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DescribeGroupsResponseMessage? other)
     {
         if (other is null)
@@ -198,6 +217,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -205,6 +225,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DescribeGroupsResponseMessage("
@@ -213,9 +234,16 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribedGroupMessage
+    /// </summary>
     public sealed partial class DescribedGroupMessage: IMessage, IEquatable<DescribedGroupMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The describe error, or 0 if there was no error.
@@ -255,17 +283,25 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         /// </summary>
         public int AuthorizedOperations { get; set; } = -2147483648;
 
+        /// <summary>
+        /// The basic constructor of the message DescribedGroupMessage
+        /// </summary>
         public DescribedGroupMessage()
         {
         }
 
-        public DescribedGroupMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribedGroupMessage
+        /// </summary>
+        public DescribedGroupMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version5)
             {
@@ -378,7 +414,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                         var newCollection = new List<DescribedGroupMemberMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribedGroupMemberMessage(reader, version));
+                            newCollection.Add(new DescribedGroupMemberMessage(ref reader, version));
                         }
                         Members = newCollection;
                     }
@@ -396,7 +432,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                         var newCollection = new List<DescribedGroupMemberMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new DescribedGroupMemberMessage(reader, version));
+                            newCollection.Add(new DescribedGroupMemberMessage(ref reader, version));
                         }
                         Members = newCollection;
                     }
@@ -428,6 +464,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -523,11 +560,13 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribedGroupMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribedGroupMessage? other)
         {
             if (other is null)
@@ -615,6 +654,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -622,6 +662,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribedGroupMessage("
@@ -636,9 +677,16 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DescribedGroupMemberMessage
+    /// </summary>
     public sealed partial class DescribedGroupMemberMessage: IMessage, IEquatable<DescribedGroupMemberMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The member ID assigned by the group coordinator.
@@ -651,7 +699,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         public string? GroupInstanceId { get; set; } = null;
 
         /// <summary>
-        /// The client ID used in the member's latest join group request.
+        /// The client ID used in the member&#39;s latest join group request.
         /// </summary>
         public string ClientId { get; set; } = string.Empty;
 
@@ -670,17 +718,25 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
         /// </summary>
         public byte[] MemberAssignment { get; set; } = Array.Empty<byte>();
 
+        /// <summary>
+        /// The basic constructor of the message DescribedGroupMemberMessage
+        /// </summary>
         public DescribedGroupMemberMessage()
         {
         }
 
-        public DescribedGroupMemberMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DescribedGroupMemberMessage
+        /// </summary>
+        public DescribedGroupMemberMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version5)
             {
@@ -839,6 +895,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -939,11 +996,13 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DescribedGroupMemberMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DescribedGroupMemberMessage? other)
         {
             if (other is null)
@@ -1017,6 +1076,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1024,6 +1084,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DescribedGroupMemberMessage("

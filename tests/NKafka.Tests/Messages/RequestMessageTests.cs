@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests.Messages;
 
@@ -37,7 +38,7 @@ public class RequestMessageTests<T>
 
         var reader = new BufferReader(serializeMessage);
         var deserializeMessage = new T();
-        deserializeMessage.Read(reader, version);
+        deserializeMessage.Read(ref reader, version);
 
         message.Should().BeEquivalentTo(deserializeMessage);
     }

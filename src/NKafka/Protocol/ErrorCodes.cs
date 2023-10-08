@@ -23,22 +23,86 @@
 
 namespace NKafka.Protocol;
 
+#pragma warning disable CS1591
+
+/// <summary>
+/// 
+/// </summary>
 public enum ErrorCodes: short
 {
+    /// <summary>
+    ///  An error occurred on the server for which the client doesn't have a corresponding error code. This is generally an unexpected error.
+    /// </summary>
     UnknownServerError = -0x1,
+
+    /// <summary>
+    /// No errors 
+    /// </summary>
     None = 0x0,
+
+    /// <summary>
+    /// No reset policy has been defined, and the offsets for these partitions are either larger or smaller than the range of offsets the server has for the given partition.
+    /// </summary>
     OffsetOutOfRange = 0x1,
+
+    /// <summary>
+    /// This error indicates a record has failed its internal CRC check, this generally indicates network or disk corruption.
+    /// </summary>
     CorruptMessage = 0x2,
+
+    /// <summary>
+    /// 
+    /// </summary>
     UnknownTopicOrPartition = 0x3,
+
+    /// <summary>
+    /// 
+    /// </summary>
     InvalidFetchSize = 0x4,
+
+    /// <summary>
+    /// 
+    /// </summary>
     LeaderNotAvailable = 0x5,
+
+    /// <summary>
+    /// 
+    /// </summary>
     NotLeaderOrFollower = 0x6,
+
+    /// <summary>
+    /// 
+    /// </summary>
     RequestTimedOut = 0x7,
+
+    /// <summary>
+    /// 
+    /// </summary>
     BrokerNotAvailable = 0x8,
+
+    /// <summary>
+    /// 
+    /// </summary>
     ReplicaNotAvailable = 0x9,
+
+    /// <summary>
+    /// 
+    /// </summary>
     MessageTooLarge = 10,
+
+    /// <summary>
+    /// 
+    /// </summary>
     StaleControllerEpoch = 11,
+
+    /// <summary>
+    /// 
+    /// </summary>
     OffsetMetadataTooLarge = 12,
+
+    /// <summary>
+    /// 
+    /// </summary>
     NetworkException = 13,
     CoordinatorLoadInProgress = 14,
     CoordinatorNotAvailable = 15,

@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message JoinGroupResponseMessage
+/// </summary>
 public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinGroupResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -89,17 +97,25 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
     /// </summary>
     public List<JoinGroupResponseMemberMessage> Members { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message JoinGroupResponseMessage
+    /// </summary>
     public JoinGroupResponseMessage()
     {
     }
 
-    public JoinGroupResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message JoinGroupResponseMessage
+    /// </summary>
+    public JoinGroupResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version2)
         {
@@ -230,7 +246,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
                     var newCollection = new List<JoinGroupResponseMemberMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new JoinGroupResponseMemberMessage(reader, version));
+                        newCollection.Add(new JoinGroupResponseMemberMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -248,7 +264,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
                     var newCollection = new List<JoinGroupResponseMemberMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new JoinGroupResponseMemberMessage(reader, version));
+                        newCollection.Add(new JoinGroupResponseMemberMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -272,6 +288,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -384,11 +401,13 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is JoinGroupResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(JoinGroupResponseMessage? other)
     {
         if (other is null)
@@ -484,6 +503,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -492,6 +512,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "JoinGroupResponseMessage("
@@ -507,9 +528,16 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message JoinGroupResponseMemberMessage
+    /// </summary>
     public sealed partial class JoinGroupResponseMemberMessage: IMessage, IEquatable<JoinGroupResponseMemberMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The group member ID.
@@ -526,17 +554,25 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
         /// </summary>
         public byte[] Metadata { get; set; } = Array.Empty<byte>();
 
+        /// <summary>
+        /// The basic constructor of the message JoinGroupResponseMemberMessage
+        /// </summary>
         public JoinGroupResponseMemberMessage()
         {
         }
 
-        public JoinGroupResponseMemberMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message JoinGroupResponseMemberMessage
+        /// </summary>
+        public JoinGroupResponseMemberMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version9)
             {
@@ -630,6 +666,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -697,11 +734,13 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is JoinGroupResponseMemberMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(JoinGroupResponseMemberMessage? other)
         {
             if (other is null)
@@ -743,6 +782,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -750,6 +790,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "JoinGroupResponseMemberMessage("

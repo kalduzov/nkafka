@@ -283,7 +283,7 @@ internal class NativeCrc32C: ICrc32C
         0xad7d5351
     };
 
-    public uint Calculate(Span<byte> span)
+    public uint Calculate(ReadOnlySpan<byte> span)
     {
         var crc = 0xFFFFFFFF;
 

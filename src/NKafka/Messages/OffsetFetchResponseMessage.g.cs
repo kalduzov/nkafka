@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message OffsetFetchResponseMessage
+/// </summary>
 public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquatable<OffsetFetchResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -64,17 +72,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// </summary>
     public List<OffsetFetchResponseGroupMessage> Groups { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message OffsetFetchResponseMessage
+    /// </summary>
     public OffsetFetchResponseMessage()
     {
     }
 
-    public OffsetFetchResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message OffsetFetchResponseMessage
+    /// </summary>
+    public OffsetFetchResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version3)
         {
@@ -99,7 +115,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                     var newCollection = new List<OffsetFetchResponseTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetFetchResponseTopicMessage(reader, version));
+                        newCollection.Add(new OffsetFetchResponseTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -117,7 +133,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                     var newCollection = new List<OffsetFetchResponseTopicMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetFetchResponseTopicMessage(reader, version));
+                        newCollection.Add(new OffsetFetchResponseTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -148,7 +164,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 var newCollection = new List<OffsetFetchResponseGroupMessage>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new OffsetFetchResponseGroupMessage(reader, version));
+                    newCollection.Add(new OffsetFetchResponseGroupMessage(ref reader, version));
                 }
                 Groups = newCollection;
             }
@@ -175,6 +191,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -243,11 +260,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is OffsetFetchResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(OffsetFetchResponseMessage? other)
     {
         if (other is null)
@@ -293,6 +312,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -300,6 +320,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "OffsetFetchResponseMessage("
@@ -310,9 +331,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetFetchResponseTopicMessage
+    /// </summary>
     public sealed partial class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -324,17 +352,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// </summary>
         public List<OffsetFetchResponsePartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetFetchResponseTopicMessage
+        /// </summary>
         public OffsetFetchResponseTopicMessage()
         {
         }
 
-        public OffsetFetchResponseTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetFetchResponseTopicMessage
+        /// </summary>
+        public OffsetFetchResponseTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             {
                 int length;
@@ -373,7 +409,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                         var newCollection = new List<OffsetFetchResponsePartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new OffsetFetchResponsePartitionMessage(reader, version));
+                            newCollection.Add(new OffsetFetchResponsePartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -391,7 +427,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                         var newCollection = new List<OffsetFetchResponsePartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new OffsetFetchResponsePartitionMessage(reader, version));
+                            newCollection.Add(new OffsetFetchResponsePartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -415,6 +451,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
@@ -466,11 +503,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetFetchResponseTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetFetchResponseTopicMessage? other)
         {
             if (other is null)
@@ -508,6 +547,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -515,6 +555,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetFetchResponseTopicMessage("
@@ -524,9 +565,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetFetchResponsePartitionMessage
+    /// </summary>
     public sealed partial class OffsetFetchResponsePartitionMessage: IMessage, IEquatable<OffsetFetchResponsePartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -556,17 +604,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetFetchResponsePartitionMessage
+        /// </summary>
         public OffsetFetchResponsePartitionMessage()
         {
         }
 
-        public OffsetFetchResponsePartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetFetchResponsePartitionMessage
+        /// </summary>
+        public OffsetFetchResponsePartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             PartitionIndex = reader.ReadInt();
             CommittedOffset = reader.ReadLong();
@@ -620,6 +676,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -670,11 +727,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetFetchResponsePartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetFetchResponsePartitionMessage? other)
         {
             if (other is null)
@@ -714,6 +773,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -721,6 +781,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetFetchResponsePartitionMessage("
@@ -733,9 +794,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetFetchResponseGroupMessage
+    /// </summary>
     public sealed partial class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The group ID.
@@ -755,17 +823,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetFetchResponseGroupMessage
+        /// </summary>
         public OffsetFetchResponseGroupMessage()
         {
         }
 
-        public OffsetFetchResponseGroupMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetFetchResponseGroupMessage
+        /// </summary>
+        public OffsetFetchResponseGroupMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version8)
             {
@@ -799,7 +875,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                     var newCollection = new List<OffsetFetchResponseTopicsMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetFetchResponseTopicsMessage(reader, version));
+                        newCollection.Add(new OffsetFetchResponseTopicsMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -820,6 +896,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version8)
@@ -844,11 +921,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetFetchResponseGroupMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetFetchResponseGroupMessage? other)
         {
             if (other is null)
@@ -890,6 +969,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -897,6 +977,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetFetchResponseGroupMessage("
@@ -907,9 +988,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetFetchResponseTopicsMessage
+    /// </summary>
     public sealed partial class OffsetFetchResponseTopicsMessage: IMessage, IEquatable<OffsetFetchResponseTopicsMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -921,17 +1009,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// </summary>
         public List<OffsetFetchResponsePartitionsMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetFetchResponseTopicsMessage
+        /// </summary>
         public OffsetFetchResponseTopicsMessage()
         {
         }
 
-        public OffsetFetchResponseTopicsMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetFetchResponseTopicsMessage
+        /// </summary>
+        public OffsetFetchResponseTopicsMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version8)
             {
@@ -965,7 +1061,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                     var newCollection = new List<OffsetFetchResponsePartitionsMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetFetchResponsePartitionsMessage(reader, version));
+                        newCollection.Add(new OffsetFetchResponsePartitionsMessage(ref reader, version));
                     }
                     Partitions = newCollection;
                 }
@@ -985,6 +1081,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -1004,11 +1101,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetFetchResponseTopicsMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetFetchResponseTopicsMessage? other)
         {
             if (other is null)
@@ -1046,6 +1145,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1053,6 +1153,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetFetchResponseTopicsMessage("
@@ -1062,9 +1163,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetFetchResponsePartitionsMessage
+    /// </summary>
     public sealed partial class OffsetFetchResponsePartitionsMessage: IMessage, IEquatable<OffsetFetchResponsePartitionsMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -1094,17 +1202,25 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetFetchResponsePartitionsMessage
+        /// </summary>
         public OffsetFetchResponsePartitionsMessage()
         {
         }
 
-        public OffsetFetchResponsePartitionsMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetFetchResponsePartitionsMessage
+        /// </summary>
+        public OffsetFetchResponsePartitionsMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version8)
             {
@@ -1145,6 +1261,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -1168,11 +1285,13 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetFetchResponsePartitionsMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetFetchResponsePartitionsMessage? other)
         {
             if (other is null)
@@ -1212,6 +1331,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1219,6 +1339,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetFetchResponsePartitionsMessage("

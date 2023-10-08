@@ -63,6 +63,7 @@ public class Message<TKey, TValue>
         Value = value;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return $"Message(Key={Key}, Value={Value}, Timestamp={Timestamp})";

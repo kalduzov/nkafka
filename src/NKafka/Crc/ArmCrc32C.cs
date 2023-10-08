@@ -25,7 +25,7 @@ namespace NKafka.Crc;
 
 internal class ArmCrc32C: ICrc32C
 {
-    public uint Calculate(Span<byte> span)
+    public uint Calculate(ReadOnlySpan<byte> span)
     {
         var crc = 0xFFFFFFFF;
 

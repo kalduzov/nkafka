@@ -21,6 +21,9 @@
 
 namespace NKafka.Clients.Admin;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IAdminClient: IClient
 {
     /// <summary>

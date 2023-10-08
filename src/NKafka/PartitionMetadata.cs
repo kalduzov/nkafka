@@ -22,7 +22,7 @@
 namespace NKafka;
 
 /// <summary>
-/// 
+/// Описывает состояние партиции 
 /// </summary>
 public readonly struct PartitionMetadata: IComparable<PartitionMetadata>
 {
@@ -44,20 +44,37 @@ public readonly struct PartitionMetadata: IComparable<PartitionMetadata>
         OfflineReplicas = offlineReplicas;
     }
 
+    /// <summary>
+    ///  Партиция
+    /// </summary>
     public Partition Partition { get; }
 
+    /// <summary>
+    /// Id ноды, которая является лидером для данной партиции
+    /// </summary>
     public int Leader { get; }
 
+    /// <summary>
+    /// Номер эпохи лидера
+    /// </summary>
     public int LeaderEpoch { get; }
 
+    /// <summary>
+    /// Список id нод, которые являются репликами
+    /// </summary>
     public IReadOnlyCollection<int> Replicas { get; }
 
+    /// <summary>
+    /// Список id нод, который являются сейчас isr репликами.
+    /// </summary>
     public IReadOnlyCollection<int> Isr { get; }
 
+    /// <summary>
+    /// Список id нод реплик, которые сейчас offline
+    /// </summary>
     public IReadOnlyCollection<int> OfflineReplicas { get; }
 
-    /// <summary>Serves as the default hash function.</summary>
-    /// <returns>A hash code for the current object.</returns>
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         return Partition;
@@ -66,7 +83,6 @@ public readonly struct PartitionMetadata: IComparable<PartitionMetadata>
     /// <inheritdoc/>
     public int CompareTo(PartitionMetadata other)
     {
-
         return Partition.CompareTo(other.Partition);
     }
 }

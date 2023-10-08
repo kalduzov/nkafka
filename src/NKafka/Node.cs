@@ -29,9 +29,19 @@ namespace NKafka;
 public record Node
 {
     /// <summary>
+    /// Id отстутствует
+    /// </summary>
+    internal const int NO_ID = -1;
+
+    /// <summary>
+    /// Еще не известный Id
+    /// </summary>
+    internal const int UNKNOWN_ID = -2;
+
+    /// <summary>
     /// No node information
     /// </summary>
-    public static Node NoNode { get; } = new(-1, "", -1);
+    public static Node NoNode { get; } = new(NO_ID, string.Empty, -1);
 
     /// <summary>
     /// The node id of this node

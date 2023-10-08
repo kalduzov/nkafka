@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteTopicsRequestMessage
+/// </summary>
 public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<DeleteTopicsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteTopics;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The name or topic ID of the topic
@@ -64,17 +75,25 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
     /// </summary>
     public int TimeoutMs { get; set; } = 0;
 
+    /// <summary>
+    /// The basic constructor of the message DeleteTopicsRequestMessage
+    /// </summary>
     public DeleteTopicsRequestMessage()
     {
     }
 
-    public DeleteTopicsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteTopicsRequestMessage
+    /// </summary>
+    public DeleteTopicsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version6)
         {
@@ -89,7 +108,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
                 var newCollection = new List<DeleteTopicStateMessage>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new DeleteTopicStateMessage(reader, version));
+                    newCollection.Add(new DeleteTopicStateMessage(ref reader, version));
                 }
                 Topics = newCollection;
             }
@@ -186,6 +205,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -248,11 +268,13 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteTopicsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteTopicsRequestMessage? other)
     {
         if (other is null)
@@ -294,6 +316,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -301,6 +324,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteTopicsRequestMessage("
@@ -310,9 +334,16 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DeleteTopicStateMessage
+    /// </summary>
     public sealed partial class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name
@@ -324,17 +355,25 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message DeleteTopicStateMessage
+        /// </summary>
         public DeleteTopicStateMessage()
         {
         }
 
-        public DeleteTopicStateMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeleteTopicStateMessage
+        /// </summary>
+        public DeleteTopicStateMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version6)
             {
@@ -372,6 +411,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version6)
@@ -396,11 +436,13 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeleteTopicStateMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeleteTopicStateMessage? other)
         {
             if (other is null)
@@ -428,6 +470,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -435,6 +478,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeleteTopicStateMessage("

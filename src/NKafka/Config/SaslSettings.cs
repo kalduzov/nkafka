@@ -69,11 +69,14 @@ public record SaslSettings
     /// </summary>
     public bool Handshake { get; set; } = true;
 
-    internal SaslSettings(bool isSet)
+    private SaslSettings(bool isSet)
     {
         IsSet = isSet;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public SaslSettings()
         : this(true)
     {
@@ -100,6 +103,12 @@ public record SaslSettings
         };
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="mechanism"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     public string MechanismAsString(SaslMechanism mechanism)
     {
         return mechanism switch

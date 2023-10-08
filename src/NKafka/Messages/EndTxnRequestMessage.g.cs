@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message EndTxnRequestMessage
+/// </summary>
 public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<EndTxnRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.EndTxn;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The ID of the transaction to end.
@@ -69,17 +80,25 @@ public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<En
     /// </summary>
     public bool Committed { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message EndTxnRequestMessage
+    /// </summary>
     public EndTxnRequestMessage()
     {
     }
 
-    public EndTxnRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message EndTxnRequestMessage
+    /// </summary>
+    public EndTxnRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -125,6 +144,7 @@ public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<En
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -159,11 +179,13 @@ public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<En
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is EndTxnRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(EndTxnRequestMessage? other)
     {
         if (other is null)
@@ -199,6 +221,7 @@ public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<En
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -206,6 +229,7 @@ public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<En
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "EndTxnRequestMessage("

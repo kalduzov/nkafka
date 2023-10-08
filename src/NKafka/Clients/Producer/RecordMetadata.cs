@@ -21,13 +21,28 @@
 
 namespace NKafka.Clients.Producer;
 
+/// <summary>
+/// 
+/// </summary>
 public record RecordMetadata
 {
-    public TopicPartition TopicPartition { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public TopicPartition? TopicPartition { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public Offset Offset { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int SerializedKeySize { get; set; }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public int SerializedValueSize { get; set; }
 }

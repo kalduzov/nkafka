@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message OffsetDeleteRequestMessage
+/// </summary>
 public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<OffsetDeleteRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.OffsetDelete;
 
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
     public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The unique group identifier.
@@ -59,17 +70,25 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
     /// </summary>
     public OffsetDeleteRequestTopicCollection Topics { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message OffsetDeleteRequestMessage
+    /// </summary>
     public OffsetDeleteRequestMessage()
     {
     }
 
-    public OffsetDeleteRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message OffsetDeleteRequestMessage
+    /// </summary>
+    public OffsetDeleteRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             int length;
@@ -99,7 +118,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
                 var newCollection = new OffsetDeleteRequestTopicCollection(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new OffsetDeleteRequestTopicMessage(reader, version));
+                    newCollection.Add(new OffsetDeleteRequestTopicMessage(ref reader, version));
                 }
                 Topics = newCollection;
             }
@@ -107,6 +126,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         UnknownTaggedFields = null;
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -128,11 +148,13 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is OffsetDeleteRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(OffsetDeleteRequestMessage? other)
     {
         if (other is null)
@@ -170,6 +192,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -177,6 +200,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "OffsetDeleteRequestMessage("
@@ -185,9 +209,16 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteRequestTopicMessage
+    /// </summary>
     public sealed partial class OffsetDeleteRequestTopicMessage: IMessage, IEquatable<OffsetDeleteRequestTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -199,17 +230,25 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public List<OffsetDeleteRequestPartitionMessage> Partitions { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message OffsetDeleteRequestTopicMessage
+        /// </summary>
         public OffsetDeleteRequestTopicMessage()
         {
         }
 
-        public OffsetDeleteRequestTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetDeleteRequestTopicMessage
+        /// </summary>
+        public OffsetDeleteRequestTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -243,7 +282,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
                     var newCollection = new List<OffsetDeleteRequestPartitionMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new OffsetDeleteRequestPartitionMessage(reader, version));
+                        newCollection.Add(new OffsetDeleteRequestPartitionMessage(ref reader, version));
                     }
                     Partitions = newCollection;
                 }
@@ -251,6 +290,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             UnknownTaggedFields = null;
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -272,11 +312,13 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetDeleteRequestTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetDeleteRequestTopicMessage? other)
         {
             if (other is null)
@@ -314,6 +356,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -321,6 +364,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetDeleteRequestTopicMessage("
@@ -330,26 +374,41 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteRequestPartitionMessage
+    /// </summary>
     public sealed partial class OffsetDeleteRequestPartitionMessage: IMessage, IEquatable<OffsetDeleteRequestPartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
         /// </summary>
         public int PartitionIndex { get; set; } = 0;
 
+        /// <summary>
+        /// The basic constructor of the message OffsetDeleteRequestPartitionMessage
+        /// </summary>
         public OffsetDeleteRequestPartitionMessage()
         {
         }
 
-        public OffsetDeleteRequestPartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message OffsetDeleteRequestPartitionMessage
+        /// </summary>
+        public OffsetDeleteRequestPartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -359,6 +418,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             UnknownTaggedFields = null;
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -371,11 +431,13 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is OffsetDeleteRequestPartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(OffsetDeleteRequestPartitionMessage? other)
         {
             if (other is null)
@@ -389,6 +451,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -396,6 +459,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "OffsetDeleteRequestPartitionMessage("
@@ -404,16 +468,26 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message OffsetDeleteRequestTopicCollection
+    /// </summary>
     public sealed partial class OffsetDeleteRequestTopicCollection: HashSet<OffsetDeleteRequestTopicMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public OffsetDeleteRequestTopicCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public OffsetDeleteRequestTopicCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<OffsetDeleteRequestTopicMessage>)obj);

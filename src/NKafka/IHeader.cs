@@ -23,6 +23,9 @@
 
 namespace NKafka;
 
+/// <summary>
+/// 
+/// </summary>
 public interface IHeader
 {
     /// <summary>

@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,42 +21,27 @@
  * limitations under the License.
  */
 
-using System.Runtime.Intrinsics.Arm;
-
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Records;
+
+using CrcUtils = NKafka.Crc.Crc;
 
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
 /// Contains batch data and metadata
 /// </summary>
-internal class ProducerBatch
+internal class ProducerBatch: RecordsBatch
 {
     /// <summary>
     /// Batch header length
     /// </summary>
     internal const int BATCH_HEADER_LEN = 54;
 
-    internal const int BATCH_OVERHEAD_BYTES = 61;
-    internal const int BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET = BATCH_OVERHEAD_BYTES - 4;
+    internal const int BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET = RECORD_BATCH_OVERHEAD - 4;
 
     internal const int ATTRIBUTES_OFFSET = 17;
-
-    // batch fields
-    private long _baseOffset;
-    private int _lenght = BATCH_OVERHEAD_BYTES;
-    private int _partitionLeaderEpoch;
-    private byte _magic = 2;
-    private uint _crc;
-    private short _attributes = 0;
-    private int _lastOffsetDelta = 0;
-    private long _baseTimestamp;
-    private long _maxTimestamp;
-    private long _producerId = -1;
-    private short _producerEpoch = -1;
-    private int _baseSequence = -1;
 
     private readonly TaskCompletionSource _produceRequestResult;
     private readonly BufferWriter _bufferWriter;
@@ -94,7 +79,7 @@ internal class ProducerBatch
         TopicPartition = topicPartition;
         _bufferWriter = bufferWriter;
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        _baseTimestamp = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
+        BaseTimestamp = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
     }
 
     internal ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter, long timestamp)
@@ -103,8 +88,8 @@ internal class ProducerBatch
         TopicPartition = topicPartition;
         _bufferWriter = bufferWriter;
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        _baseTimestamp = timestamp;
-        _maxTimestamp = timestamp;
+        BaseTimestamp = timestamp;
+        MaxTimestamp = timestamp;
     }
 
     /// <summary>
@@ -118,8 +103,7 @@ internal class ProducerBatch
         Headers headers,
         out SendResultTask? sendResultTask)
     {
-
-        var estimateSizeInBytesUpperBound = Records.EstimateSizeInBytesUpperBound(key, value, headers);
+        var estimateSizeInBytesUpperBound = EstimateSizeInBytesUpperBound(key, value, headers);
 
         if (_bufferWriter.Remaining - estimateSizeInBytesUpperBound < 0)
         {
@@ -170,39 +154,34 @@ internal class ProducerBatch
         {
             size += record.WriteTo(_bufferWriter);
         }
-        _lenght += size;
+        Length += size;
         _bufferWriter.Position = 0;
     }
 
     private void WriteHeader()
     {
-
         _bufferWriter.Position = 0;
         // https://kafka.apache.org/documentation/#recordbatch
-        _bufferWriter.WriteLong(_baseOffset);
-        _bufferWriter.WriteInt(_lenght - 12);
-        _bufferWriter.WriteInt(_partitionLeaderEpoch);
-        _bufferWriter.WriteByte(_magic);
-        _bufferWriter.WriteUInt(_crc); //reserve
-        _bufferWriter.WriteShort(_attributes);
-        _bufferWriter.WriteInt(_lastOffsetDelta);
-        _bufferWriter.WriteLong(_baseTimestamp);
-        _bufferWriter.WriteLong(_maxTimestamp);
-        _bufferWriter.WriteLong(_producerId);
-        _bufferWriter.WriteShort(_producerEpoch);
-        _bufferWriter.WriteInt(_baseSequence);
-        _crc = Crc.Crc.Calculate(_bufferWriter.AsSpan(ATTRIBUTES_OFFSET + 4, _lenght));
-        _bufferWriter.PutUInt(ATTRIBUTES_OFFSET, _crc); //
+        _bufferWriter.WriteLong(BaseOffset);
+        _bufferWriter.WriteInt(Length - 12);
+        _bufferWriter.WriteInt(PartitionLeaderEpoch);
+        _bufferWriter.WriteByte(Magic);
+        _bufferWriter.WriteUInt(Crc); //reserve
+        _bufferWriter.WriteShort(Attributes);
+        _bufferWriter.WriteInt(LastOffsetDelta);
+        _bufferWriter.WriteLong(BaseTimestamp);
+        _bufferWriter.WriteLong(MaxTimestamp);
+        _bufferWriter.WriteLong(ProducerId);
+        _bufferWriter.WriteShort(ProducerEpoch);
+        _bufferWriter.WriteInt(BaseSequence);
+        Crc = CrcUtils.Calculate(_bufferWriter.AsSpan(ATTRIBUTES_OFFSET + 4, Length));
+        _bufferWriter.PutUInt(ATTRIBUTES_OFFSET, Crc); //
         _bufferWriter.Position = 0;
     }
 
-    public IRecords GetAsRecords()
+    public Records GetAsRecords()
     {
-        return new Records
-        {
-            Buffer = _bufferWriter,
-            SizeInBytes = _lenght
-        };
+        return new Records(Length);
     }
 
     /// <summary>
@@ -217,7 +196,7 @@ internal class ProducerBatch
             recordTask.SetResult(new RecordMetadata
             {
                 TopicPartition = TopicPartition,
-                Offset = baseOffset++,
+                Offset = baseOffset++
             });
         }
         _produceRequestResult.SetResult();

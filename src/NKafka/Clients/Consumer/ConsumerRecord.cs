@@ -32,6 +32,10 @@ public class ConsumerRecord<TKey, TValue>
     where TKey : notnull
     where TValue : notnull
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
     public ConsumerRecord(Message<TKey, TValue> message)
     {
         Message = message;

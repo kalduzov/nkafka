@@ -26,7 +26,7 @@ using NKafka.Connection.Sasl.Messages;
 
 namespace NKafka.Tests.Connection.Sasl;
 
-public class ScramMessagesTests
+public class ScramMessagesTests: IDisposable
 {
     public static readonly IEnumerable<object[]> ValidExtensions = new[]
     {
@@ -194,5 +194,12 @@ public class ScramMessagesTests
         saslName.Should().Be(message.SaslName);
         nonce.Should().Be(message.Nonce);
         authorizationId.Should().Be(message.AuthorizationId);
+    }
+
+    /// <inheritdoc />
+    void IDisposable.Dispose()
+    {
+        _formatter.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

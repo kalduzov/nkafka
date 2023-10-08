@@ -26,6 +26,52 @@ using Newtonsoft.Json;
 using NKafka.MessageGenerator;
 using NKafka.MessageGenerator.Specifications;
 
+// Генерируем только запросы, необходимые для клиентской работы.
+// Если какой-то запрос отсутствует - нужно добавить его в этот массив
+string[] clientMessagesPattern =
+{
+    "AddOffsetsToTxn",
+    "AddPartitionsToTxn",
+    "ApiVersions",
+    "ConsumerProtocolAssignment",
+    "ConsumerProtocolSubscription",
+    "EndTxn",
+    "Fetch",
+    "FindCoordinator",
+    "Heartbeat",
+    "JoinGroup",
+    "LeaveGroup",
+    "ListOffsets",
+    "Metadata",
+    "OffsetCommit",
+    "OffsetFetch",
+    "Produce",
+    "RequestHeader",
+    "ResponseHeader",
+    "SaslAuthenticate",
+    "SaslHandshake",
+    "SyncGroup",
+    "CreateTopics",
+    "DescribeGroups",
+    "ListGroups",
+    "DeleteTopics",
+    "DeleteRecords",
+    "InitProducerId",
+    "OffsetForLeaderEpoch",
+    "TxnOffsetCommit",
+    "DescribeAcls",
+    "CreateAcls",
+    "DeleteAcls",
+    "DescribeConfigs",
+    "AlterConfigs",
+    "CreatePartitions",
+    "DeleteGroups",
+    "IncrementalAlterConfigs",
+    "OffsetDelete",
+    "DescribeUserScramCredentials",
+    "AlterUserScramCredentials"
+};
+
 Console.WriteLine("Kafka classes generator");
 Console.WriteLine();
 
@@ -41,6 +87,12 @@ switch (command)
     case "messages":
         {
             GenerateMessages();
+
+            break;
+        }
+    case "data":
+        {
+            GenerateDataMessages();
 
             break;
         }
@@ -60,6 +112,8 @@ switch (command)
         }
 }
 
+return;
+
 void GenerateMessages()
 {
     Console.WriteLine("Start messages generator");
@@ -74,7 +128,7 @@ void GenerateMessages()
         {
             switch (messageSpecification.Type)
             {
-                case MessageType.Request or MessageType.Response or MessageType.Header:
+                case MessageType.Request or MessageType.Response or MessageType.Header or MessageType.Data:
                     {
                         IMessageGenerator messageGenerator = new MessageGenerator("NKafka.Messages");
                         var result = messageGenerator.Generate(messageSpecification);
@@ -123,6 +177,14 @@ void GenerateMessages()
     {
         Console.WriteLine("Finish messages generator");
     }
+}
+
+void GenerateDataMessages()
+{
+    Console.WriteLine("Start data messages generator");
+
+    var files = GetFileResources();
+    var specifications = GetMessageSpecifications(files);
 }
 
 void GenerateTests()
@@ -213,7 +275,18 @@ IEnumerable<string> GetFileResources()
 {
     var pathToResources = Path.Combine(solutionDirectory, "resources", "message");
 
-    return Directory.GetFiles(pathToResources, "*.json");
+    return Directory.GetFiles(pathToResources, "*.json")
+        .Where(fullFileName =>
+        {
+            foreach (var pattern in clientMessagesPattern)
+            {
+
+                if (Path.GetFileNameWithoutExtension(fullFileName).StartsWith(pattern))
+                    return true;
+            }
+
+            return false;
+        });
 }
 
 string GetMessagesTestsDirectory()

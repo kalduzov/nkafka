@@ -59,11 +59,14 @@ public record SslSettings
     /// </summary>
     public string? RootCertificate { get; set; }
 
-    internal SslSettings(bool isSet)
+    private SslSettings(bool isSet)
     {
         IsSet = isSet;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public SslSettings()
         : this(true)
     {

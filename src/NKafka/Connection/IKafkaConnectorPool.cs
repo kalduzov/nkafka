@@ -21,11 +21,41 @@
 
 namespace NKafka.Connection;
 
+/// <summary>
+///     A pool of connections to a kafka cluster
+/// </summary>
 internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
 {
-    bool TryGetConnector(int nodeId, out IKafkaConnector connector);
+    /// <summary>
+    /// Возвращает все рабочие соединения
+    /// </summary>
+    IEnumerable<IKafkaConnector> GetAllOpenedConnectors();
 
-    IKafkaConnector GetRandomConnector();
+    /// <summary>
+    ///     Returns a connection to a specific broker
+    /// </summary>
+    /// <param name="nodeId">Broker id</param>
+    /// <param name="isDedicate">Create a dedicated connection or use an existing one</param>
+    /// <param name="connector">Created or existing connection</param>
+    /// <returns>true if the connection was successfully obtained or false otherwise</returns>
+    bool TryGetConnector(int nodeId, bool isDedicate, out IKafkaConnector connector);
 
+    /// <summary>
+    ///     Returns a connection
+    /// </summary>
+    /// <remarks>
+    ///     The connection to return is selected based on the state of the pool.
+    ///     If there is no information about the cluster brokers in the pool,
+    ///     then each method call will return a connection to the seed broker using the Rundrobin algorithm.
+    ///     If information about the broker is in the pool, then the least loaded connection to a randomly
+    ///     selected broker will be returned.
+    /// </remarks>
+    IKafkaConnector GetConnector();
+
+    /// <summary>
+    /// </summary>
+    /// <param name="nodes"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token = default);
 }

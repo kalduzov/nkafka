@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +21,22 @@
  * limitations under the License.
  */
 
-using System.Collections;
-
 namespace NKafka;
 
 /// <summary>
 /// Information about kafka partition
 /// </summary>
-public class TopicPartition: IEqualityComparer<TopicPartition>
+public class TopicPartition: IComparable<TopicPartition>
 {
     /// <summary>
     /// Topic name
     /// </summary>
-    public string Topic { get; init; }
+    public string Topic { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Guid TopicId { get; }
 
     /// <summary>
     /// Partition in topic
@@ -41,77 +44,84 @@ public class TopicPartition: IEqualityComparer<TopicPartition>
     public Partition Partition { get; set; }
 
     /// <summary>
-    /// 
+    /// Information about kafka partition
     /// </summary>
-    /// <param name="topic"></param>
-    /// <param name="partition"></param>
-    public TopicPartition(string topic, Partition partition)
+    public TopicPartition(string topic, Partition partition, Guid topicId = default)
     {
         if (string.IsNullOrWhiteSpace(topic))
         {
             throw new ArgumentNullException(nameof(topic));
         }
 
-        if (partition < Partition.Any) //не может быть значение раздела быть меньше -1 
+        if (partition < Partition.Any) // не может быть значение раздела быть меньше -1 
         {
             throw new ArgumentNullException(nameof(partition));
         }
 
         Topic = topic;
+        TopicId = topicId;
         Partition = partition;
     }
 
-    /// <summary>Serves as the default hash function.</summary>
-    /// <returns>A hash code for the current object.</returns>
+    /// <inheritdoc />
     public override int GetHashCode()
+        => Partition.GetHashCode() * 251 + Topic.GetHashCode();
+
+    /// <inheritdoc />
+    public int CompareTo(TopicPartition? other)
     {
-        return HashCode.Combine(Topic, Partition);
+        if (other is null)
+        {
+            return 1;
+        }
+        var topicComparison = string.Compare(Topic, other.Topic, StringComparison.Ordinal);
+
+        return topicComparison != 0 ? topicComparison : Partition.CompareTo(other.Partition);
     }
 
-    /// <summary>Determines whether the specified object is equal to the current object.</summary>
-    /// <param name="obj">The object to compare with the current object.</param>
-    /// <returns>
-    /// <see langword="true" /> if the specified object  is equal to the current object; otherwise, <see langword="false" />.</returns>
-    public override bool Equals(object? obj)
+    /// <inheritdoc />
+    public override bool Equals(object? other)
     {
-        return Equals(this, (TopicPartition)obj);
+        if (other is not TopicPartition topicPartition)
+        {
+            return false;
+        }
+
+        return Topic.Equals(topicPartition.Topic) && Partition == topicPartition.Partition;
     }
 
-    /// <summary>Returns a string that represents the current object.</summary>
-    /// <returns>A string that represents the current object.</returns>
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator ==(TopicPartition a, TopicPartition b)
+    {
+        if (a is null)
+        {
+            return (b is null);
+        }
+
+        return a.Equals(b);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool operator !=(TopicPartition a, TopicPartition b)
+        => !(a == b);
+
+    /// <inheritdoc />
     public override string ToString()
     {
-        return $"Topic = {Topic}, Partition = {Partition}";
-    }
-
-    public bool Equals(TopicPartition x, TopicPartition y)
-    {
-        if (ReferenceEquals(x, y))
-        {
-            return true;
-        }
-
-        if (ReferenceEquals(x, null))
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(y, null))
-        {
-            return false;
-        }
-
-        if (x.GetType() != y.GetType())
-        {
-            return false;
-        }
-
-        return x.Topic == y.Topic
-               && x.Partition.Equals(y.Partition);
-    }
-
-    public int GetHashCode(TopicPartition obj)
-    {
-        return HashCode.Combine(obj.Topic, obj.Partition);
+        return "TopicPartition("
+               + $"Topic={Topic}"
+               + $", Partition={Partition}"
+               + $", TopicId={TopicId}"
+               + ")";
     }
 }

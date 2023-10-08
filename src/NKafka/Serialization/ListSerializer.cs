@@ -31,14 +31,21 @@ using NKafka.Protocol.Extensions;
 
 namespace NKafka.Serialization;
 
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
 {
+    /// <inheritdoc />
+    public bool PreferAsync => true;
+
     private const int _NULL_ENTRY_VALUE = -1;
 
     // ReSharper disable once StaticMemberInGenericType
     private static readonly HashSet<Type> _fixedLengthSerializers = new()
     {
-        typeof(IntegerSerializer),
+        typeof(IntSerializer),
         typeof(ShortSerializer),
         typeof(DoubleSerializer),
         typeof(LongSerializer),
@@ -50,6 +57,10 @@ public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
 
     private readonly IAsyncSerializer<T> _serializer;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="serializer"></param>
     public ListSerializer(IAsyncSerializer<T> serializer)
     {
         _serializer = serializer;
@@ -57,6 +68,12 @@ public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
             _fixedLengthSerializers.Contains(serializer.GetType()) ? SerializationStrategy.ConstantSize : SerializationStrategy.VariableSize;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    /// <exception cref="ProtocolKafkaException"></exception>
     public async Task<byte[]> SerializeAsync(List<T> data)
     {
         try
@@ -101,6 +118,7 @@ public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
         }
     }
 
+    /// <inheritdoc />
     public byte[] Serialize(List<T> data)
     {
         throw new NotImplementedException();

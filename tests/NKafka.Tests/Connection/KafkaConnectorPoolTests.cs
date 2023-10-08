@@ -19,31 +19,41 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Net;
+
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Exceptions;
+using NKafka.Tests.Connection.Fixtures;
 
 namespace NKafka.Tests.Connection;
 
-public class KafkaConnectorPoolTests
+public class KafkaConnectorPoolTests: IClassFixture<ConnectorFixture>
 {
+    private readonly ConnectorFixture _fixture;
+
+    public KafkaConnectorPoolTests(ConnectorFixture fixture)
+    {
+        _fixture = fixture;
+    }
+
     [Fact]
     public void CreateConnectorPool_Successful()
     {
-        var connectorPool = CreateConnectorPoolForTests();
+        var connectorPool = CreateConnectorPool();
         connectorPool.Should().NotBeNull();
     }
 
     [Fact]
     public void GetConnectorFromPool_WhenNoConnectors_Successful()
     {
-        var connectorPool = CreateConnectorPoolForTests();
+        var connectorPool = CreateConnectorPool();
 
         IKafkaConnector GetConnector()
         {
-            return connectorPool.GetRandomConnector();
+            return connectorPool.GetConnector();
         }
 
         FluentActions.Invoking(GetConnector)
@@ -51,7 +61,89 @@ public class KafkaConnectorPoolTests
             .Throw<ConnectorNotFoundException>();
     }
 
-    private static KafkaConnectorPool CreateConnectorPoolForTests()
+    [Fact]
+    public void TryGetConnector_WithBrokers_Successful()
+    {
+        var config = new ClusterConfig();
+
+        var connectorPool = new KafkaConnectorPool(
+            _fixture.Borkers,
+            _fixture.SeedBrokers,
+            config.Ssl,
+            config.Sasl,
+            config.MaxInflightRequests,
+            config.MessageMaxBytes,
+            config.CloseConnectionTimeoutMs,
+            config.ConnectionsMaxIdleMs,
+            config.RequestTimeoutMs,
+            config.ReceiveBufferBytes,
+            config.SecurityProtocol,
+            config.ClientId,
+            config.ApiVersionRequest,
+            NullLoggerFactory.Instance);
+
+        var result = connectorPool.TryGetConnector(1, false, out var connector);
+        result.Should().BeTrue();
+        connector.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void GetConnector_WithSeeds_Successful()
+    {
+        var config = new ClusterConfig();
+
+        var connectorPool = new KafkaConnectorPool(
+            Array.Empty<IKafkaConnector>(),
+            _fixture.SeedBrokers,
+            config.Ssl,
+            config.Sasl,
+            config.MaxInflightRequests,
+            config.MessageMaxBytes,
+            config.CloseConnectionTimeoutMs,
+            config.ConnectionsMaxIdleMs,
+            config.RequestTimeoutMs,
+            config.ReceiveBufferBytes,
+            config.SecurityProtocol,
+            config.ClientId,
+            config.ApiVersionRequest,
+            NullLoggerFactory.Instance);
+
+        var connector = connectorPool.GetConnector();
+        connector.Should().NotBeNull();
+        ((IPEndPoint)connector.Endpoint).Port.Should().Be(9001);
+
+        connector = connectorPool.GetConnector();
+        connector.Should().NotBeNull();
+        ((IPEndPoint)connector.Endpoint).Port.Should().Be(9002);
+    }
+
+    [Fact]
+    public void GetConnector_WithBrokers_Successful()
+    {
+        var config = new ClusterConfig();
+
+        var connectorPool = new KafkaConnectorPool(
+            _fixture.Borkers,
+            _fixture.SeedBrokers,
+            config.Ssl,
+            config.Sasl,
+            config.MaxInflightRequests,
+            config.MessageMaxBytes,
+            config.CloseConnectionTimeoutMs,
+            config.ConnectionsMaxIdleMs,
+            config.RequestTimeoutMs,
+            config.ReceiveBufferBytes,
+            config.SecurityProtocol,
+            config.ClientId,
+            config.ApiVersionRequest,
+            NullLoggerFactory.Instance);
+
+        var connector = connectorPool.GetConnector();
+        connector.Should().NotBeNull();
+        connector.CurrentNumberInflightRequests.Should().Be(1);
+    }
+
+    private static KafkaConnectorPool CreateConnectorPool()
     {
         var config = new ClusterConfig();
 

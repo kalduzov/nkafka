@@ -37,6 +37,7 @@ public class NativeCrc32CTests
         + "remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing "
         + "Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
         0x43CF3B1D)]
+    [InlineData("123456789", 0xE3069283)]
     public void CalculateTest(string text, uint crc)
     {
         var data = Encoding.UTF8.GetBytes(text);

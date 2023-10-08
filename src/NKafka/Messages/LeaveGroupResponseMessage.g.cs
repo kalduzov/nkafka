@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message LeaveGroupResponseMessage
+/// </summary>
 public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquatable<LeaveGroupResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -59,17 +67,25 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
     /// </summary>
     public List<MemberResponseMessage> Members { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message LeaveGroupResponseMessage
+    /// </summary>
     public LeaveGroupResponseMessage()
     {
     }
 
-    public LeaveGroupResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message LeaveGroupResponseMessage
+    /// </summary>
+    public LeaveGroupResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -95,7 +111,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<MemberResponseMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MemberResponseMessage(reader, version));
+                        newCollection.Add(new MemberResponseMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -113,7 +129,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
                     var newCollection = new List<MemberResponseMessage>(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MemberResponseMessage(reader, version));
+                        newCollection.Add(new MemberResponseMessage(ref reader, version));
                     }
                     Members = newCollection;
                 }
@@ -141,6 +157,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -191,11 +208,13 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is LeaveGroupResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(LeaveGroupResponseMessage? other)
     {
         if (other is null)
@@ -227,6 +246,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -234,6 +254,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "LeaveGroupResponseMessage("
@@ -243,9 +264,16 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message MemberResponseMessage
+    /// </summary>
     public sealed partial class MemberResponseMessage: IMessage, IEquatable<MemberResponseMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The member ID to remove from the group.
@@ -265,17 +293,25 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
         /// <inheritdoc />
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
+        /// <summary>
+        /// The basic constructor of the message MemberResponseMessage
+        /// </summary>
         public MemberResponseMessage()
         {
         }
 
-        public MemberResponseMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MemberResponseMessage
+        /// </summary>
+        public MemberResponseMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version5)
             {
@@ -346,6 +382,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version3)
@@ -406,11 +443,13 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MemberResponseMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MemberResponseMessage? other)
         {
             if (other is null)
@@ -452,6 +491,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -459,6 +499,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MemberResponseMessage("

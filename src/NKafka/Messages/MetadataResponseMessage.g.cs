@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message MetadataResponseMessage
+/// </summary>
 public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatable<MetadataResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -71,17 +79,25 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// </summary>
     public int ClusterAuthorizedOperations { get; set; } = -2147483648;
 
+    /// <summary>
+    /// The basic constructor of the message MetadataResponseMessage
+    /// </summary>
     public MetadataResponseMessage()
     {
     }
 
-    public MetadataResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message MetadataResponseMessage
+    /// </summary>
+    public MetadataResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version3)
         {
@@ -105,7 +121,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                     var newCollection = new MetadataResponseBrokerCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
+                        newCollection.Add(new MetadataResponseBrokerMessage(ref reader, version));
                     }
                     Brokers = newCollection;
                 }
@@ -123,7 +139,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                     var newCollection = new MetadataResponseBrokerCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataResponseBrokerMessage(reader, version));
+                        newCollection.Add(new MetadataResponseBrokerMessage(ref reader, version));
                     }
                     Brokers = newCollection;
                 }
@@ -179,7 +195,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                     var newCollection = new MetadataResponseTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataResponseTopicMessage(reader, version));
+                        newCollection.Add(new MetadataResponseTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -197,7 +213,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                     var newCollection = new MetadataResponseTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new MetadataResponseTopicMessage(reader, version));
+                        newCollection.Add(new MetadataResponseTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -229,6 +245,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -326,11 +343,13 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is MetadataResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(MetadataResponseMessage? other)
     {
         if (other is null)
@@ -394,6 +413,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -401,6 +421,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "MetadataResponseMessage("
@@ -413,9 +434,16 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataResponseBrokerMessage
+    /// </summary>
     public sealed partial class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The broker ID.
@@ -437,17 +465,25 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         /// </summary>
         public string? Rack { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message MetadataResponseBrokerMessage
+        /// </summary>
         public MetadataResponseBrokerMessage()
         {
         }
 
-        public MetadataResponseBrokerMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MetadataResponseBrokerMessage
+        /// </summary>
+        public MetadataResponseBrokerMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version12)
             {
@@ -524,6 +560,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -584,11 +621,13 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MetadataResponseBrokerMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MetadataResponseBrokerMessage? other)
         {
             if (other is null)
@@ -634,6 +673,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -641,6 +681,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MetadataResponseBrokerMessage("
@@ -652,25 +693,42 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataResponseBrokerCollection
+    /// </summary>
     public sealed partial class MetadataResponseBrokerCollection: HashSet<MetadataResponseBrokerMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public MetadataResponseBrokerCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public MetadataResponseBrokerCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<MetadataResponseBrokerMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataResponseTopicMessage
+    /// </summary>
     public sealed partial class MetadataResponseTopicMessage: IMessage, IEquatable<MetadataResponseTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic error, or 0 if there was no error.
@@ -705,17 +763,25 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         /// </summary>
         public int TopicAuthorizedOperations { get; set; } = -2147483648;
 
+        /// <summary>
+        /// The basic constructor of the message MetadataResponseTopicMessage
+        /// </summary>
         public MetadataResponseTopicMessage()
         {
         }
 
-        public MetadataResponseTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MetadataResponseTopicMessage
+        /// </summary>
+        public MetadataResponseTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version12)
             {
@@ -782,7 +848,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                         var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
+                            newCollection.Add(new MetadataResponsePartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -800,7 +866,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                         var newCollection = new List<MetadataResponsePartitionMessage>(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new MetadataResponsePartitionMessage(reader, version));
+                            newCollection.Add(new MetadataResponsePartitionMessage(ref reader, version));
                         }
                         Partitions = newCollection;
                     }
@@ -832,6 +898,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -910,11 +977,13 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MetadataResponseTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MetadataResponseTopicMessage? other)
         {
             if (other is null)
@@ -968,6 +1037,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -975,6 +1045,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MetadataResponseTopicMessage("
@@ -988,9 +1059,16 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataResponsePartitionMessage
+    /// </summary>
     public sealed partial class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition error, or 0 if there was no error.
@@ -1030,17 +1108,25 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         /// </summary>
         public List<int> OfflineReplicas { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message MetadataResponsePartitionMessage
+        /// </summary>
         public MetadataResponsePartitionMessage()
         {
         }
 
-        public MetadataResponsePartitionMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message MetadataResponsePartitionMessage
+        /// </summary>
+        public MetadataResponsePartitionMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version12)
             {
@@ -1152,6 +1238,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -1217,11 +1304,13 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is MetadataResponsePartitionMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(MetadataResponsePartitionMessage? other)
         {
             if (other is null)
@@ -1289,6 +1378,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -1296,6 +1386,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "MetadataResponsePartitionMessage("
@@ -1310,16 +1401,26 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message MetadataResponseTopicCollection
+    /// </summary>
     public sealed partial class MetadataResponseTopicCollection: HashSet<MetadataResponseTopicMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public MetadataResponseTopicCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public MetadataResponseTopicCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<MetadataResponseTopicMessage>)obj);

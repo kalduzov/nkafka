@@ -31,23 +31,34 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message CreateTopicsRequestMessage
+/// </summary>
 public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquatable<CreateTopicsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.CreateTopics;
 
-    public const bool ONLY_CONTROLLER = true;
+    /// <summary>
+    /// Indicates whether the request is accessed by any broker or only by the controller
+    /// </summary>
+    public const bool ONLY_CONTROLLER = false;
 
     /// <inheritdoc />
     public bool OnlyController => ONLY_CONTROLLER;
 
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The topics to create.
@@ -60,21 +71,29 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     public int timeoutMs { get; set; } = 60000;
 
     /// <summary>
-    /// If true, check that the topics can be created as specified, but don't create anything.
+    /// If true, check that the topics can be created as specified, but don&#39;t create anything.
     /// </summary>
     public bool validateOnly { get; set; } = false;
 
+    /// <summary>
+    /// The basic constructor of the message CreateTopicsRequestMessage
+    /// </summary>
     public CreateTopicsRequestMessage()
     {
     }
 
-    public CreateTopicsRequestMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message CreateTopicsRequestMessage
+    /// </summary>
+    public CreateTopicsRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         {
             if (version >= ApiVersion.Version5)
@@ -90,7 +109,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                     var newCollection = new CreatableTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatableTopicMessage(reader, version));
+                        newCollection.Add(new CreatableTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -108,7 +127,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                     var newCollection = new CreatableTopicCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new CreatableTopicMessage(reader, version));
+                        newCollection.Add(new CreatableTopicMessage(ref reader, version));
                     }
                     Topics = newCollection;
                 }
@@ -141,6 +160,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -188,11 +208,13 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is CreateTopicsRequestMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(CreateTopicsRequestMessage? other)
     {
         if (other is null)
@@ -224,6 +246,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -231,6 +254,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "CreateTopicsRequestMessage("
@@ -240,9 +264,16 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatableTopicMessage
+    /// </summary>
     public sealed partial class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name.
@@ -269,17 +300,25 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public CreateableTopicConfigCollection Configs { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message CreatableTopicMessage
+        /// </summary>
         public CreatableTopicMessage()
         {
         }
 
-        public CreatableTopicMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreatableTopicMessage
+        /// </summary>
+        public CreatableTopicMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -324,7 +363,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new CreatableReplicaAssignmentCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
+                            newCollection.Add(new CreatableReplicaAssignmentMessage(ref reader, version));
                         }
                         Assignments = newCollection;
                     }
@@ -342,7 +381,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new CreatableReplicaAssignmentCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreatableReplicaAssignmentMessage(reader, version));
+                            newCollection.Add(new CreatableReplicaAssignmentMessage(ref reader, version));
                         }
                         Assignments = newCollection;
                     }
@@ -362,7 +401,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new CreateableTopicConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreateableTopicConfigMessage(reader, version));
+                            newCollection.Add(new CreateableTopicConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -380,7 +419,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                         var newCollection = new CreateableTopicConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreateableTopicConfigMessage(reader, version));
+                            newCollection.Add(new CreateableTopicConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -404,6 +443,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -469,11 +509,13 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreatableTopicMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreatableTopicMessage? other)
         {
             if (other is null)
@@ -533,6 +575,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -540,6 +583,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreatableTopicMessage("
@@ -552,9 +596,16 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatableReplicaAssignmentMessage
+    /// </summary>
     public sealed partial class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The partition index.
@@ -566,17 +617,25 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public List<int> BrokerIds { get; set; } = new ();
 
+        /// <summary>
+        /// The basic constructor of the message CreatableReplicaAssignmentMessage
+        /// </summary>
         public CreatableReplicaAssignmentMessage()
         {
         }
 
-        public CreatableReplicaAssignmentMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreatableReplicaAssignmentMessage
+        /// </summary>
+        public CreatableReplicaAssignmentMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -625,6 +684,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -657,11 +717,13 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreatableReplicaAssignmentMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreatableReplicaAssignmentMessage? other)
         {
             if (other is null)
@@ -689,6 +751,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -696,6 +759,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreatableReplicaAssignmentMessage("
@@ -705,25 +769,42 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatableReplicaAssignmentCollection
+    /// </summary>
     public sealed partial class CreatableReplicaAssignmentCollection: HashSet<CreatableReplicaAssignmentMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public CreatableReplicaAssignmentCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public CreatableReplicaAssignmentCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<CreatableReplicaAssignmentMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreateableTopicConfigMessage
+    /// </summary>
     public sealed partial class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The configuration name.
@@ -735,17 +816,25 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         /// </summary>
         public string Value { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message CreateableTopicConfigMessage
+        /// </summary>
         public CreateableTopicConfigMessage()
         {
         }
 
-        public CreateableTopicConfigMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message CreateableTopicConfigMessage
+        /// </summary>
+        public CreateableTopicConfigMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -815,6 +904,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -870,11 +960,13 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is CreateableTopicConfigMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(CreateableTopicConfigMessage? other)
         {
             if (other is null)
@@ -912,6 +1004,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -919,6 +1012,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "CreateableTopicConfigMessage("
@@ -928,32 +1022,52 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreateableTopicConfigCollection
+    /// </summary>
     public sealed partial class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public CreateableTopicConfigCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public CreateableTopicConfigCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<CreateableTopicConfigMessage>)obj);
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message CreatableTopicCollection
+    /// </summary>
     public sealed partial class CreatableTopicCollection: HashSet<CreatableTopicMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public CreatableTopicCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public CreatableTopicCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<CreatableTopicMessage>)obj);

@@ -250,15 +250,3 @@ public interface IProducer<TKey, TValue>: IProducer
     //
     // #endregion
 }
-
-public interface IConsumerGroupMetadata
-{
-}
-
-public class ConsumerGroupMetadata
-{
-}
-
-public class OffsetAndMetadata
-{
-}

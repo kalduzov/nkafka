@@ -24,8 +24,10 @@ using System.Net.Sockets;
 
 namespace NKafka.Connection;
 
+/// <inheritdoc />
 internal class SocketFactory: ISocketFactory
 {
+    /// <inheritdoc />
     public ISocketProxy CreateSocket(SocketType socketType, ProtocolType protocolType, int receiveBufferBytes)
     {
         var socketProxy = new SocketProxy(socketType, protocolType);
@@ -38,11 +40,13 @@ internal class SocketFactory: ISocketFactory
         return socketProxy;
     }
 
+    /// <inheritdoc />
     public Stream CreateNetworkStream(Socket socket, bool ownsSocket)
     {
         return new NetworkStream(socket, ownsSocket);
     }
 
+    /// <inheritdoc />
     public Stream CreateSslStream(Stream inputStream)
     {
         return new SslStream(inputStream, false, (_, _, _, _) => true); //skip server cert validation

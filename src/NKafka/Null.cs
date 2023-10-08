@@ -30,5 +30,8 @@ namespace NKafka;
 /// </summary>
 public readonly record struct Null
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly Null Instance = new();
 }

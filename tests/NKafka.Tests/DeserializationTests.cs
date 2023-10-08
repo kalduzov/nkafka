@@ -21,6 +21,7 @@
 
 using NKafka.Messages;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests;
 
@@ -392,10 +393,10 @@ public class DeserializationTests
         var len = bufferReader.ReadInt(); // длинна сообщения
         len.Should().Be(350);
 
-        var header = new ResponseHeader(bufferReader, ApiVersion.Version0);
+        var header = new ResponseHeader(ref bufferReader, ApiVersion.Version0);
         header.CorrelationId.Should().Be(1);
 
-        var response = new ApiVersionsResponseMessage(bufferReader, ApiVersion.Version0);
+        var response = new ApiVersionsResponseMessage(ref bufferReader, ApiVersion.Version0);
         response.ApiKeys.Count.Should().Be(56);
     }
 }

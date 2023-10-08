@@ -31,12 +31,17 @@ namespace NKafka.Connection;
 internal interface IKafkaConnector: IDisposable, IAsyncDisposable
 {
     /// <summary>
-    /// 
+    /// Is it a dedicated connection or not
+    /// </summary>
+    bool IsDedicated { get; }
+
+    /// <summary>
+    /// Broker ID
     /// </summary>
     int NodeId { get; set; }
 
     /// <summary>
-    /// 
+    /// Current connection state
     /// </summary>
     KafkaConnector.State ConnectorState { get; }
 
@@ -46,9 +51,14 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
     int CurrentNumberInflightRequests { get; }
 
     /// <summary>
-    /// 
+    /// Current connection address
     /// </summary>
     EndPoint Endpoint { get; }
+
+    /// <summary>
+    ///  
+    /// </summary>
+    Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; }
 
     /// <summary>
     /// Отправляет запрос в брокер

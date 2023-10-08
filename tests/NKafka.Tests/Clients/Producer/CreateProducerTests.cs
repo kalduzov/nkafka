@@ -29,7 +29,7 @@ using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Producer;
 
-public sealed class CreateProducerTests: ProducerTests
+public sealed class CreateProducerTests: ClientTests
 {
     [Fact]
     public async Task BuildProducer_DefaultConfig_Successful()
@@ -62,18 +62,18 @@ public sealed class CreateProducerTests: ProducerTests
     {
         var kafkaCluster = CreateKafkaClusterForTests();
 
-        var transactionManagerMock = new Mock<ITransactionManager>();
-        var recordAccumulatorMock = new Mock<IRecordAccumulator>();
-        var messageSenderMock = new Mock<IMessagesSender>();
+        var transactionManagerMock = Substitute.For<ITransactionManager>();
+        var recordAccumulatorMock = Substitute.For<IRecordAccumulator>();
+        var messageSenderMock = Substitute.For<IMessagesSender>();
 
         var action = () => new Producer<int, string>(kafkaCluster,
             "test_producer",
             new ProducerConfig(),
             NoneSerializer<int>.Instance,
             NoneSerializer<string>.Instance,
-            transactionManagerMock.Object,
-            recordAccumulatorMock.Object,
-            messageSenderMock.Object,
+            transactionManagerMock,
+            recordAccumulatorMock,
+            messageSenderMock,
             NullLoggerFactory.Instance);
 
         action.Should().NotThrow();
@@ -84,9 +84,9 @@ public sealed class CreateProducerTests: ProducerTests
     {
         var kafkaCluster = CreateKafkaClusterForTests();
 
-        var transactionManagerMock = new Mock<ITransactionManager>();
-        var recordAccumulatorMock = new Mock<IRecordAccumulator>();
-        var messageSenderMock = new Mock<IMessagesSender>();
+        var transactionManagerMock = Substitute.For<ITransactionManager>();
+        var recordAccumulatorMock = Substitute.For<IRecordAccumulator>();
+        var messageSenderMock = Substitute.For<IMessagesSender>();
 
         var action = () => new Producer<int, string>(kafkaCluster,
             "test_producer",
@@ -99,9 +99,9 @@ public sealed class CreateProducerTests: ProducerTests
             },
             NoneSerializer<int>.Instance,
             NoneSerializer<string>.Instance,
-            transactionManagerMock.Object,
-            recordAccumulatorMock.Object,
-            messageSenderMock.Object,
+            transactionManagerMock,
+            recordAccumulatorMock,
+            messageSenderMock,
             NullLoggerFactory.Instance);
 
         action.Should().Throw<KafkaException>().Which.Message.Should().Be(Resources.ExceptionMessages.Producer_CreateError);

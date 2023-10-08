@@ -40,6 +40,7 @@ internal class WriteMethodGenerator: IMethodGenerator
     {
         MessageFlexibleVersions = messageFlexibleVersions;
 
+        _codeGenerator.AppendLine("/// <inheritdoc />");
         _codeGenerator.AppendLine("public void Write(BufferWriter writer, ApiVersion version)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();

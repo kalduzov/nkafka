@@ -28,8 +28,23 @@ namespace NKafka.Config;
 /// </summary>
 public enum SecurityProtocols
 {
+    /// <summary>
+    /// 
+    /// </summary>
     PlainText = 0,
+
+    /// <summary>
+    /// 
+    /// </summary>
     Ssl = 1,
+
+    /// <summary>
+    /// 
+    /// </summary>
     SaslSsl = 2,
+
+    /// <summary>
+    /// 
+    /// </summary>
     SaslPlaintext = 3
 }

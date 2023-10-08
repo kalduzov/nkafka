@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message AlterUserScramCredentialsResponseMessage
+/// </summary>
 public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseMessage, IEquatable<AlterUserScramCredentialsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
     /// </summary>
     public List<AlterUserScramCredentialsResultMessage> Results { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message AlterUserScramCredentialsResponseMessage
+    /// </summary>
     public AlterUserScramCredentialsResponseMessage()
     {
     }
 
-    public AlterUserScramCredentialsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message AlterUserScramCredentialsResponseMessage
+    /// </summary>
+    public AlterUserScramCredentialsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
         {
@@ -76,7 +92,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
                 var newCollection = new List<AlterUserScramCredentialsResultMessage>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(new AlterUserScramCredentialsResultMessage(reader, version));
+                    newCollection.Add(new AlterUserScramCredentialsResultMessage(ref reader, version));
                 }
                 Results = newCollection;
             }
@@ -96,6 +112,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -111,11 +128,13 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         rawWriter.WriteRawTags(writer, int.MaxValue);
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is AlterUserScramCredentialsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(AlterUserScramCredentialsResponseMessage? other)
     {
         if (other is null)
@@ -143,6 +162,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -150,6 +170,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "AlterUserScramCredentialsResponseMessage("
@@ -158,9 +179,16 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message AlterUserScramCredentialsResultMessage
+    /// </summary>
     public sealed partial class AlterUserScramCredentialsResultMessage: IMessage, IEquatable<AlterUserScramCredentialsResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The user name.
@@ -180,17 +208,25 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         /// </summary>
         public string ErrorMessage { get; set; } = string.Empty;
 
+        /// <summary>
+        /// The basic constructor of the message AlterUserScramCredentialsResultMessage
+        /// </summary>
         public AlterUserScramCredentialsResultMessage()
         {
         }
 
-        public AlterUserScramCredentialsResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message AlterUserScramCredentialsResultMessage
+        /// </summary>
+        public AlterUserScramCredentialsResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version0)
             {
@@ -244,6 +280,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -269,11 +306,13 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is AlterUserScramCredentialsResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(AlterUserScramCredentialsResultMessage? other)
         {
             if (other is null)
@@ -315,6 +354,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -322,6 +362,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "AlterUserScramCredentialsResultMessage("

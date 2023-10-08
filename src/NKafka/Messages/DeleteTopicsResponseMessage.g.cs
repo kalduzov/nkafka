@@ -31,15 +31,23 @@
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 using NKafka.Protocol.Records;
 using System.Text;
 
 namespace NKafka.Messages;
 
+/// <summary>
+/// Describes the contract for message DeleteTopicsResponseMessage
+/// </summary>
 public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<DeleteTopicsResponseMessage>
 {
+    /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+    /// <inheritdoc />
+    public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
     /// The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota.
@@ -51,17 +59,25 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
     /// </summary>
     public DeletableTopicResultCollection Responses { get; set; } = new ();
 
+    /// <summary>
+    /// The basic constructor of the message DeleteTopicsResponseMessage
+    /// </summary>
     public DeleteTopicsResponseMessage()
     {
     }
 
-    public DeleteTopicsResponseMessage(BufferReader reader, ApiVersion version)
+    /// <summary>
+    /// Base constructor for deserializing message DeleteTopicsResponseMessage
+    /// </summary>
+    public DeleteTopicsResponseMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
-        Read(reader, version);
+        IncomingBufferLength = reader.Length;
+        Read(ref reader, version);
     }
 
-    public void Read(BufferReader reader, ApiVersion version)
+    /// <inheritdoc />
+    public void Read(ref BufferReader reader, ApiVersion version)
     {
         if (version >= ApiVersion.Version1)
         {
@@ -85,7 +101,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
                     var newCollection = new DeletableTopicResultCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeletableTopicResultMessage(reader, version));
+                        newCollection.Add(new DeletableTopicResultMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -103,7 +119,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
                     var newCollection = new DeletableTopicResultCollection(arrayLength);
                     for (var i = 0; i < arrayLength; i++)
                     {
-                        newCollection.Add(new DeletableTopicResultMessage(reader, version));
+                        newCollection.Add(new DeletableTopicResultMessage(ref reader, version));
                     }
                     Responses = newCollection;
                 }
@@ -127,6 +143,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
@@ -166,11 +183,13 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <inheritdoc />
     public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || obj is DeleteTopicsResponseMessage other && Equals(other);
     }
 
+    /// <inheritdoc />
     public bool Equals(DeleteTopicsResponseMessage? other)
     {
         if (other is null)
@@ -198,6 +217,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
+    /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = 0;
@@ -205,6 +225,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         return hashCode;
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return "DeleteTopicsResponseMessage("
@@ -213,9 +234,16 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             + ")";
     }
 
+    /// <summary>
+    /// Describes the contract for message DeletableTopicResultMessage
+    /// </summary>
     public sealed partial class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
     {
+        /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
         /// The topic name
@@ -240,17 +268,25 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         /// </summary>
         public string? ErrorMessage { get; set; } = null;
 
+        /// <summary>
+        /// The basic constructor of the message DeletableTopicResultMessage
+        /// </summary>
         public DeletableTopicResultMessage()
         {
         }
 
-        public DeletableTopicResultMessage(BufferReader reader, ApiVersion version)
+        /// <summary>
+        /// Base constructor for deserializing message DeletableTopicResultMessage
+        /// </summary>
+        public DeletableTopicResultMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
-            Read(reader, version);
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
         }
 
-        public void Read(BufferReader reader, ApiVersion version)
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
         {
             if (version > ApiVersion.Version6)
             {
@@ -334,6 +370,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public void Write(BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
@@ -394,11 +431,13 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             }
         }
 
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return ReferenceEquals(this, obj) || obj is DeletableTopicResultMessage other && Equals(other);
         }
 
+        /// <inheritdoc />
         public bool Equals(DeletableTopicResultMessage? other)
         {
             if (other is null)
@@ -444,6 +483,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = 0;
@@ -451,6 +491,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             return hashCode;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return "DeletableTopicResultMessage("
@@ -462,16 +503,26 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
         }
     }
 
+    /// <summary>
+    /// Describes the contract for message DeletableTopicResultCollection
+    /// </summary>
     public sealed partial class DeletableTopicResultCollection: HashSet<DeletableTopicResultMessage>
     {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
         public DeletableTopicResultCollection()
         {
         }
 
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
         public DeletableTopicResultCollection(int capacity)
             : base(capacity)
         {
         }
+        /// <inheritdoc />
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<DeletableTopicResultMessage>)obj);

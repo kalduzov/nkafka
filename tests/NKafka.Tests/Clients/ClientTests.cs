@@ -26,6 +26,7 @@ using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Messages;
+using NKafka.Protocol;
 using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients;
@@ -37,8 +38,17 @@ public abstract class ClientTests
         var clusterConfig = new ClusterConfig();
 
         var connectionPool = CreateKafkaConnectorPool();
+        var clusterMetadata = new ClusterMetadata
+        {
+            AggregationApiByVersion =
+            {
+                [ApiKeys.FindCoordinator] = (ApiVersion.Version0, ApiVersion.Version4),
+                [ApiKeys.OffsetFetch] = (ApiVersion.Version0, ApiVersion.Version8),
+                [ApiKeys.JoinGroup] = (ApiVersion.Version0, ApiVersion.Version9),
+            }
+        };
 
-        return new KafkaCluster(clusterConfig, NullLoggerFactory.Instance, connectionPool);
+        return new KafkaCluster(clusterConfig, NullLoggerFactory.Instance, connectionPool, clusterMetadata);
     }
 
     protected static IProducer<TKey, TValue> CreateProducerForTests<TKey, TValue>(ProducerConfig config)
@@ -81,8 +91,12 @@ public abstract class ClientTests
         SetupMetadataRequests(kafkaConnector1);
         SetupMetadataRequests(kafkaConnector2);
 
+        SetupApiRequests(kafkaConnector1);
+        SetupApiRequests(kafkaConnector2);
+
         SetupFindCoordinatorRequests(kafkaConnector1);
         SetupJointToGroupRequests(kafkaConnector1);
+        SetupOffsetFetchRequests(kafkaConnector1);
 
         connectionPool.GetConnector().Returns(kafkaConnector1);
         connectionPool.TryGetConnector(1, true, connector: out Arg.Any<IKafkaConnector>())
@@ -94,6 +108,54 @@ public abstract class ClientTests
             });
 
         return connectionPool;
+    }
+
+    private static void SetupOffsetFetchRequests(IKafkaConnector kafkaConnector)
+    {
+        kafkaConnector.SendAsync<OffsetFetchResponseMessage, OffsetFetchRequestMessage>(Arg.Any<OffsetFetchRequestMessage>(), false, Arg.Any<CancellationToken>())
+            .Returns(new OffsetFetchResponseMessage
+            {
+                Groups = new List<OffsetFetchResponseMessage.OffsetFetchResponseGroupMessage>
+                {
+                    new()
+                    {
+                        groupId = "good_test",
+                        Topics = new List<OffsetFetchResponseMessage.OffsetFetchResponseTopicsMessage>
+                        {
+                            new()
+                            {
+                                Name = "test",
+                                Partitions = new List<OffsetFetchResponseMessage.OffsetFetchResponsePartitionsMessage>
+                                {
+                                    new()
+                                    {
+                                        CommittedOffset = 0,
+                                        PartitionIndex = 0,
+                                        CommittedLeaderEpoch = -1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+    }
+
+    private static void SetupApiRequests(IKafkaConnector kafkaConnector)
+    {
+        kafkaConnector.SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(Arg.Any<ApiVersionsRequestMessage>(), false, Arg.Any<CancellationToken>())
+            .Returns(new ApiVersionsResponseMessage
+            {
+                ApiKeys = new ApiVersionsResponseMessage.ApiVersionCollection
+                {
+                    new()
+                    {
+                        ApiKey = (short)ApiKeys.FindCoordinator,
+                        MaxVersion = (short)ApiVersion.Version4,
+                        MinVersion = (short)ApiVersion.Version0,
+                    }
+                }
+            });
     }
 
     private static void SetupJointToGroupRequests(IKafkaConnector kafkaConnector)

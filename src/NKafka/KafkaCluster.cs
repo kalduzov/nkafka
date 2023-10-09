@@ -72,13 +72,13 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <summary>
     ///     Create a new kafka cluster
     /// </summary>
-    internal KafkaCluster(ClusterConfig config, ILoggerFactory loggerFactory, IKafkaConnectorPool? kafkaConnectorPool = null)
+    internal KafkaCluster(ClusterConfig config, ILoggerFactory loggerFactory, IKafkaConnectorPool? kafkaConnectorPool = null, ClusterMetadata? clusterMetadata = null)
     {
         Closed = true;
         Config = config;
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<KafkaCluster>();
-        _clusterMetadata = new ClusterMetadata();
+        _clusterMetadata = clusterMetadata ?? new ClusterMetadata();
         _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, _clusterMetadata, Timeout.Infinite, Timeout.Infinite);
         _topics = new ConcurrentDictionary<string, TopicMetadata>();
         _topicsById = new ConcurrentDictionary<Guid, string>();

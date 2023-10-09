@@ -46,8 +46,10 @@ public partial class CoordinatorTests
             {
                 new RoundRobinAssignor()
             });
-        await coordinator.NewSessionAsync(subscription, CancellationToken.None);
 
+        var result = await coordinator.NewSessionAsync(subscription, CancellationToken.None);
+
+        result.Should().BeTrue("Новая сессия должна быть создана успешно");
         coordinator.IsLeader.Should().Be(true);
     }
 }

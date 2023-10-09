@@ -78,13 +78,13 @@ await using var consumer = kafkaCluster.BuildConsumer<Null, int>(new ConsumerCon
     GroupId = "consumer-group"
 });
 
-var channel = consumer.Subscribe("test_topic");
+var channel = await consumer.SubscribeAsync("test_topic");
 
 while (await channel.WaitToReadAsync())
 {
     var message = await channel.ReadAsync();
     Console.WriteLine(message.Message.Value);
-    await consumer.CommitOffsetAsync(message.TopicPartition, CancellationToken.None);
+    await consumer.CommitOffsetAsync();
 } //Infinite reading of data from a channel
 consumer.Unsubscribe();
 

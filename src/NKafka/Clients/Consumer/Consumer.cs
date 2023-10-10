@@ -134,7 +134,8 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     }
 
     /// <inheritdoc />
-    public async ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics, CancellationToken token = default)
+    public async ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics,
+        CancellationToken token = default)
     {
         try
         {
@@ -153,7 +154,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
 
             if (!await _coordinator.NewSessionAsync(_currentSubscription, token))
             {
-                throw new KafkaException("Не удалось создать новую сессию");
+                throw new ConsumerException("Не удалось создать новую сессию");
             }
 
             var channel = BuildChannel();
@@ -233,7 +234,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     {
         if (_currentSubscription is null)
         {
-            throw new KafkaException("Консьюмер не подписан ни на один топик.");
+            throw new ConsumerException("Консьюмер не подписан ни на один топик.");
         }
 
         var logger = LoggerFactory.CreateLogger<ConsumerChannel<TKey, TValue>>();

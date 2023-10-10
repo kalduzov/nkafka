@@ -18,12 +18,14 @@
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
+
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// 
+/// Options for <see cref="IAdminClient.CreateTopicsAsync"/>
 /// </summary>
-/// <param name="TimeoutMs"></param>
-/// <param name="ValidateOnly"></param>
-/// <param name="RetryOnQuotaViolation"></param>
-public record CreateTopicsOptions(int TimeoutMs, bool ValidateOnly, bool RetryOnQuotaViolation): AdminOptions(TimeoutMs);
+/// <param name="TimeoutMs">Set the timeout in milliseconds for this operation or <c>-1</c> if the default api timeout for the
+/// AdminClient should be used.</param>
+/// <param name="ValidateOnly">Set to true if the request should be validated without creating the topic</param>
+/// <param name="RetryOnQuotaViolation">Set to true if quota violation should be automatically retried</param>
+public record CreateTopicsOptions(int TimeoutMs = -1, bool ValidateOnly = false, bool RetryOnQuotaViolation = true): AdminOptions(TimeoutMs);

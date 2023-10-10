@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!--
+      Integration tests should be framework independent. 
+      All specific dependencies should be covered by unit tests.
+      The largest version of the framework is always used.
+    -->
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\NKafka\NKafka.csproj"/>
+  </ItemGroup>
+</Project>

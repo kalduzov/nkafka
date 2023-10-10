@@ -94,7 +94,7 @@ internal sealed partial class KafkaConnector
             Mechanism = _saslSettings.MechanismAsString(saslMechanism)
         };
 
-        var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeResponseMessage, SaslHandshakeRequestMessage>(
+        var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeRequestMessage, SaslHandshakeResponseMessage>(
             saslHandshakeRequest,
             true,
             token);
@@ -109,7 +109,7 @@ internal sealed partial class KafkaConnector
         {
             AuthBytes = CreateSaslToken(Array.Empty<byte>(), true)
         };
-        var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateResponseMessage, SaslAuthenticateRequestMessage>(
+        var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateRequestMessage, SaslAuthenticateResponseMessage>(
             authenticateRequest,
             true,
             token);

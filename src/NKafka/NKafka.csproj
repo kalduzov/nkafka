@@ -13,7 +13,7 @@
     <PackageIcon>logo.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NKafka</AssemblyName>
-    <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+    <MinVerMinimumMajorMinor>0.2</MinVerMinimumMajorMinor>
     <Deterministic>false</Deterministic>
     <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

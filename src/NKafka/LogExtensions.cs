@@ -23,6 +23,8 @@ using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.Logging;
 
+using NKafka.Clients.Admin;
+
 namespace NKafka;
 
 /// <summary>
@@ -72,6 +74,6 @@ internal static partial class LogExtensions
     [LoggerMessage(
         EventId = 8,
         Level = LogLevel.Trace,
-        Message = LOGGER_PREFIX + "'{MemberName}' has been called")]
-    public static partial void CallMethodTrace(this ILogger logger, [CallerMemberName] string memberName = "");
+        Message = LOGGER_PREFIX + "Admin method '{MemberName}' has been called")]
+    public static partial void CallMethodTrace(this ILogger<AdminClient> logger, [CallerMemberName] string memberName = "");
 }

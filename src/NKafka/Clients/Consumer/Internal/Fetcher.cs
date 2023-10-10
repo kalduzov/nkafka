@@ -118,7 +118,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             };
 
             var leader = _kafkaCluster.LeaderFor(topicPartition);
-            var response = await _kafkaCluster.SendAsync<ListOffsetsResponseMessage, ListOffsetsRequestMessage>(request, leader.Id, ctsToken);
+            var response = await _kafkaCluster.SendAsync<ListOffsetsRequestMessage, ListOffsetsResponseMessage>(request, leader.Id, ctsToken);
 
             var offset = response.Topics.First().Partitions.First().Offset;
             subscription.OffsetManager.UpdateOffsetForTopicPartition(topicPartition, new Offset(offset));
@@ -192,7 +192,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
         //todo запрос fetch должен всегда считываться динамически - нельзя его парсить сразу
         var responseTasks = requests
-            .Select(r => _kafkaCluster.SendAsync<FetchResponseMessage, FetchRequestMessage>(r.Value, r.Key, token))
+            .Select(r => _kafkaCluster.SendAsync<FetchRequestMessage, FetchResponseMessage>(r.Value, r.Key, token))
             .ToArray();
 
         await Task.WhenAll(responseTasks);
@@ -233,14 +233,19 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             {
                 if (!CheckSubscriptionAssigned(subscription, topicName, partition))
                 {
-                    _logger.LogDebug("Извлеченные данные более не нужны. Текущая подписка лишилась привязки к {Topic} {Partiton}", topicName, partition.PartitionIndex);
+                    _logger.LogDebug("Извлеченные данные более не нужны. Текущая подписка лишилась привязки к {Topic} {Partiton}",
+                        topicName,
+                        partition.PartitionIndex);
 
                     continue;
                 }
 
                 if (partition.Code != ErrorCodes.None)
                 {
-                    _logger.LogError("В ответе для {Topic} {Partiton} код ошибки не совпадает с успешным {Code}", topicName, partition.PartitionIndex, partition.Code);
+                    _logger.LogError("В ответе для {Topic} {Partiton} код ошибки не совпадает с успешным {Code}",
+                        topicName,
+                        partition.PartitionIndex,
+                        partition.Code);
 
                     continue;
                 }
@@ -282,6 +287,11 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
         ConsumerRecord<TKey, TValue>[] response,
         ref int index)
     {
+        if (partitionDataMessage.Records is null)
+        {
+            return;
+        }
+
         foreach (var batch in partitionDataMessage.Records.Batches)
         {
             foreach (var record in batch.Records)
@@ -382,7 +392,8 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
         return request;
     }
 
-    private List<FetchRequestMessage.FetchPartitionMessage> BuildFetchPartitionMessage(Subscription subscription, IReadOnlyCollection<TopicPartition> partitions)
+    private List<FetchRequestMessage.FetchPartitionMessage> BuildFetchPartitionMessage(Subscription subscription,
+        IReadOnlyCollection<TopicPartition> partitions)
     {
         var result = new List<FetchRequestMessage.FetchPartitionMessage>(partitions.Count);
 

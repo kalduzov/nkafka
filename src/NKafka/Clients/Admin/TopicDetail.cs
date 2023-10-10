@@ -24,6 +24,12 @@ namespace NKafka.Clients.Admin;
 /// <summary>
 /// A new topic to be created via <see cref="IAdminClient.CreateTopicsAsync"/> 
 /// </summary>
+/// <param name="Name">The name of the topic to be created</param>
+/// <param name="Partitions">The number of partitions for the new topic or -1 if a replica assignment has been specified</param>
+/// <param name="ReplicationFactor">The replication factor for the new topic or -1 if a replica assignment has been specified</param>
+/// <param name="ReplicaAssignment">A map from partition id to replica ids (i.e. broker ids) or null if the number of partitions
+/// and replication factor have been specified instead</param>
+/// <param name="Configs">Set the configuration to use on the new topic</param>
 public record TopicDetail(string Name,
     int Partitions,
     short ReplicationFactor,

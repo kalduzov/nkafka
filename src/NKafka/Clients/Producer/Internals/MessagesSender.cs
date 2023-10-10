@@ -145,7 +145,7 @@ internal class MessagesSender: IMessagesSender
                 }
             };
 
-            var result = await _kafkaCluster.SendAsync<ProduceResponseMessage, ProduceRequestMessage>(produceRequestMessage, node.Id, token);
+            var result = await _kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
 
             foreach (var response in result.Responses)
             {

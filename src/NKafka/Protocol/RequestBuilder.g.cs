@@ -62,7 +62,6 @@ internal static partial class RequestBuilder
             ApiKeys.DescribeUserScramCredentials => new DescribeUserScramCredentialsRequestMessage(ref reader, apiVersion),
             ApiKeys.EndTxn => new EndTxnRequestMessage(ref reader, apiVersion),
             ApiKeys.Fetch => new FetchRequestMessage(ref reader, apiVersion),
-            ApiKeys.FetchSnapshot => new FetchSnapshotRequestMessage(ref reader, apiVersion),
             ApiKeys.FindCoordinator => new FindCoordinatorRequestMessage(ref reader, apiVersion),
             ApiKeys.Heartbeat => new HeartbeatRequestMessage(ref reader, apiVersion),
             ApiKeys.IncrementalAlterConfigs => new IncrementalAlterConfigsRequestMessage(ref reader, apiVersion),

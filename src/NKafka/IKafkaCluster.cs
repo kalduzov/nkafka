@@ -193,7 +193,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="message">Request to send to the broker</param>
     /// <param name="token"></param>
     /// <remarks>The broker for processing the request will be selected the least loaded. If the request requires a controller, it will be selected</remarks>
-    internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(
+    internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         CancellationToken token)
         where TResponseMessage : class, IResponseMessage
@@ -205,7 +205,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="message">Request to send to the broker</param>
     /// <param name="nodeId">Broker ID</param>
     /// <param name="token"></param>
-    internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(
+    internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         int nodeId,
         CancellationToken token)

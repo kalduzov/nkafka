@@ -25,4 +25,4 @@ namespace NKafka.Clients.Admin;
 /// 
 /// </summary>
 /// <param name="TimeoutMs"></param>
-public abstract record AdminOptions(int TimeoutMs);
+public abstract record AdminOptions(int TimeoutMs = -1);

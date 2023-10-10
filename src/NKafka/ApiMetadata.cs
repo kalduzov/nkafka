@@ -19,34 +19,29 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Exceptions;
 using NKafka.Protocol;
 
 namespace NKafka;
 
 /// <summary>
-/// Full current information about the cluster
+/// 
 /// </summary>
-internal sealed record ClusterMetadata
+internal readonly struct ApiMetadata
 {
     /// <summary>
-    /// Aggregated set of minimum and maximum API versions in a cluster
+    /// 
     /// </summary>
-    internal Dictionary<ApiKeys, ApiMetadata> AggregationApiByVersion { get; } = new(17); //Currently only 17 APIs are supported.
+    public ApiVersion MinVersion { get; init; }
 
     /// <summary>
-    /// Returns the current max aggregated version of the Api key
+    /// 
     /// </summary>
-    /// <param name="apiKey">API key for which you need to get information</param>
-    /// <exception cref="UnsupportedVersionException">If the passed API is not supported by the cluster</exception>
-    /// <returns>Maximum supported API version</returns>
-    internal ApiVersion GetMaxCurrentApiVersion(ApiKeys apiKey)
-    {
-        if (AggregationApiByVersion.TryGetValue(apiKey, out var version))
-        {
-            return version.MaxVersion;
-        }
+    public ApiVersion MaxVersion { get; init; }
 
-        throw new UnsupportedVersionException($"In this cluster configuration, the passed {apiKey} is not supported");
+    /// <summary>Returns the hash code for this instance.</summary>
+    /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(MinVersion, MaxVersion);
     }
 }

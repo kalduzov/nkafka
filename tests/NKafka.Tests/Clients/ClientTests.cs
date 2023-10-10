@@ -42,9 +42,21 @@ public abstract class ClientTests
         {
             AggregationApiByVersion =
             {
-                [ApiKeys.FindCoordinator] = (ApiVersion.Version0, ApiVersion.Version4),
-                [ApiKeys.OffsetFetch] = (ApiVersion.Version0, ApiVersion.Version8),
-                [ApiKeys.JoinGroup] = (ApiVersion.Version0, ApiVersion.Version9),
+                [ApiKeys.FindCoordinator] = new ApiMetadata
+                {
+                    MinVersion = ApiVersion.Version0,
+                    MaxVersion = ApiVersion.Version4
+                },
+                [ApiKeys.OffsetFetch] = new ApiMetadata
+                {
+                    MinVersion = ApiVersion.Version0,
+                    MaxVersion = ApiVersion.Version8
+                },
+                [ApiKeys.JoinGroup] = new ApiMetadata
+                {
+                    MinVersion = ApiVersion.Version0,
+                    MaxVersion = ApiVersion.Version9
+                }
             }
         };
 
@@ -62,7 +74,11 @@ public abstract class ClientTests
         var recordAccumulator = Substitute.For<IRecordAccumulator>();
 
         recordAccumulator
-            .Append(Arg.Is<TopicPartition>(tp => tp.Partition == 1 && tp.Topic == "test_topic"), Arg.Any<long>(), Arg.Any<byte[]>(), Arg.Any<byte[]>(), Arg.Any<Headers>())
+            .Append(Arg.Is<TopicPartition>(tp => tp.Partition == 1 && tp.Topic == "test_topic"),
+                Arg.Any<long>(),
+                Arg.Any<byte[]>(),
+                Arg.Any<byte[]>(),
+                Arg.Any<Headers>())
             .Returns(new RecordAppendResult(new SendResultTask(new TaskCompletionSource(), 1, 0, 0, 0), false, true, 10));
 
         var messagesSender = Substitute.For<IMessagesSender>();
@@ -112,7 +128,9 @@ public abstract class ClientTests
 
     private static void SetupOffsetFetchRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<OffsetFetchResponseMessage, OffsetFetchRequestMessage>(Arg.Any<OffsetFetchRequestMessage>(), false, Arg.Any<CancellationToken>())
+        kafkaConnector.SendAsync<OffsetFetchResponseMessage, OffsetFetchRequestMessage>(Arg.Any<OffsetFetchRequestMessage>(),
+                false,
+                Arg.Any<CancellationToken>())
             .Returns(new OffsetFetchResponseMessage
             {
                 Groups = new List<OffsetFetchResponseMessage.OffsetFetchResponseGroupMessage>
@@ -143,7 +161,9 @@ public abstract class ClientTests
 
     private static void SetupApiRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(Arg.Any<ApiVersionsRequestMessage>(), false, Arg.Any<CancellationToken>())
+        kafkaConnector.SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(Arg.Any<ApiVersionsRequestMessage>(),
+                false,
+                Arg.Any<CancellationToken>())
             .Returns(new ApiVersionsResponseMessage
             {
                 ApiKeys = new ApiVersionsResponseMessage.ApiVersionCollection

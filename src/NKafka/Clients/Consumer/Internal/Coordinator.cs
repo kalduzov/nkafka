@@ -147,7 +147,7 @@ internal class Coordinator: ICoordinator
     {
         var currentApiVersion = _kafkaCluster
             .GetClusterMetadata()
-            .GetCurrentApiVersion(ApiKeys.OffsetFetch);
+            .GetMaxCurrentApiVersion(ApiKeys.OffsetFetch);
 
         var request = OffsetFetchRequestMessage.Build(currentApiVersion, _groupId, true, subscription.AssignedPartitionsByTopic);
 
@@ -265,7 +265,8 @@ internal class Coordinator: ICoordinator
                 {
                     if (!response.ProtocolType?.Equals(_PROTOCOL_TYPE) ?? false)
                     {
-                        throw new KafkaException($"SyncGroup failed due to inconsistent Protocol Type, received {response.ProtocolType} but expected {_PROTOCOL_TYPE}");
+                        throw new KafkaException(
+                            $"SyncGroup failed due to inconsistent Protocol Type, received {response.ProtocolType} but expected {_PROTOCOL_TYPE}");
                     }
 
                     return GetConsumerProtocolAssignment(response);
@@ -304,7 +305,7 @@ internal class Coordinator: ICoordinator
         {
             var currentApiVersion = _kafkaCluster
                 .GetClusterMetadata()
-                .GetCurrentApiVersion(ApiKeys.JoinGroup);
+                .GetMaxCurrentApiVersion(ApiKeys.JoinGroup);
 
             var protocols = BuildSupportProtocols(subscription);
 
@@ -317,7 +318,8 @@ internal class Coordinator: ICoordinator
                 _sessionTimeoutMs,
                 MemberId);
 
-            var response = await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage, false, token);
+            var response =
+                await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage, false, token);
 
             // Ok. This is the correct error code for the first request. MemberId came to us - we repeat the same request with this value.
             if (response.Code == ErrorCodes.MemberIdRequired)
@@ -325,7 +327,9 @@ internal class Coordinator: ICoordinator
                 joinGroupRequestMessage.MemberId = response.MemberId;
                 joinGroupRequestMessage.Reason = "Send with memberId";
 
-                response = await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage, false, token);
+                response = await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage,
+                    false,
+                    token);
             }
 
             // Other errors - we consider that it was not possible to join the group
@@ -428,7 +432,8 @@ internal class Coordinator: ICoordinator
         return topicPartitions;
     }
 
-    private async Task<IReadOnlyCollection<TopicPartition>> LeaderElectedAsync(List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers,
+    private async Task<IReadOnlyCollection<TopicPartition>> LeaderElectedAsync(
+        List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers,
         CancellationToken token)
     {
 
@@ -486,7 +491,8 @@ internal class Coordinator: ICoordinator
         return topicPartitions;
     }
 
-    private async Task<IDictionary<string, List<TopicPartition>>> Balance(List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers, CancellationToken token)
+    private async Task<IDictionary<string, List<TopicPartition>>> Balance(List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers,
+        CancellationToken token)
     {
         if (_selectedPartitionAssignor is null)
         {
@@ -537,7 +543,7 @@ internal class Coordinator: ICoordinator
 
         var currentApiVersion = _kafkaCluster
             .GetClusterMetadata()
-            .GetCurrentApiVersion(ApiKeys.FindCoordinator);
+            .GetMaxCurrentApiVersion(ApiKeys.FindCoordinator);
 
         var groups = new[]
         {
@@ -548,7 +554,8 @@ internal class Coordinator: ICoordinator
 
         try
         {
-            var findCoordinatorResponseMessage = await _kafkaCluster.SendAsync<FindCoordinatorResponseMessage, FindCoordinatorRequestMessage>(findCoordinatorRequestMessage, token);
+            var findCoordinatorResponseMessage =
+                await _kafkaCluster.SendAsync<FindCoordinatorResponseMessage, FindCoordinatorRequestMessage>(findCoordinatorRequestMessage, token);
             var coordinator = findCoordinatorResponseMessage.GetCoordinator();
 
             if (coordinator.Code == ErrorCodes.None)

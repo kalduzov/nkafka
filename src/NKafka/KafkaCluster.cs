@@ -72,7 +72,10 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <summary>
     ///     Create a new kafka cluster
     /// </summary>
-    internal KafkaCluster(ClusterConfig config, ILoggerFactory loggerFactory, IKafkaConnectorPool? kafkaConnectorPool = null, ClusterMetadata? clusterMetadata = null)
+    internal KafkaCluster(ClusterConfig config,
+        ILoggerFactory loggerFactory,
+        IKafkaConnectorPool? kafkaConnectorPool = null,
+        ClusterMetadata? clusterMetadata = null)
     {
         Closed = true;
         Config = config;
@@ -160,7 +163,8 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public async ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitionsAsync(IReadOnlyCollection<string> topics, CancellationToken token = default)
+    public async ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitionsAsync(IReadOnlyCollection<string> topics,
+        CancellationToken token = default)
     {
         //Всегда забираем самые свежие данные из кластера
 
@@ -651,13 +655,21 @@ internal sealed class KafkaCluster: IKafkaCluster
                 {
                     var minVersion = Math.Max((short)curVersion.MinVersion, (short)supportVersion.Value.MinVersion);
                     var maxVersion = Math.Min((short)curVersion.MaxVersion, (short)supportVersion.Value.MaxVersion);
-                    _clusterMetadata.AggregationApiByVersion[supportVersion.Key] = ((ApiVersion)minVersion, (ApiVersion)maxVersion);
+                    _clusterMetadata.AggregationApiByVersion[supportVersion.Key] = new ApiMetadata
+                    {
+                        MinVersion = (ApiVersion)minVersion,
+                        MaxVersion = (ApiVersion)maxVersion
+                    };
                 }
                 else
                 {
                     if (isFirst)
                     {
-                        _clusterMetadata.AggregationApiByVersion[supportVersion.Key] = (supportVersion.Value.MinVersion, supportVersion.Value.MaxVersion);
+                        _clusterMetadata.AggregationApiByVersion[supportVersion.Key] = new ApiMetadata
+                        {
+                            MinVersion = supportVersion.Value.MinVersion,
+                            MaxVersion = supportVersion.Value.MaxVersion
+                        };
                     }
                 }
             }

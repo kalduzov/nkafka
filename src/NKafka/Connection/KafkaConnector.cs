@@ -171,7 +171,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         ConnectorState = State.Open;
     }
 
-    async Task<TResponseMessage> IKafkaConnector.SendAsync<TResponseMessage, TRequestMessage>(
+    async Task<TResponseMessage> IKafkaConnector.SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         bool isInternalRequest,
         CancellationToken token)
@@ -361,7 +361,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         }
 
         var request = new ApiVersionsRequestMessage();
-        var response = await ((IKafkaConnector)this).SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(
+        var response = await ((IKafkaConnector)this).SendAsync<ApiVersionsRequestMessage, ApiVersionsResponseMessage>(
             request,
             true,
             token);

@@ -37,7 +37,10 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
 {
     private readonly bool _apiVersionRequest;
     private readonly ConcurrentDictionary<int, Node> _brokers = new(); // The dictionary of all broker nodes by their id
-    private readonly ConcurrentDictionary<Node, List<IKafkaConnector>> _brokersConnectors = new(); // The dictionary of all connections with broker nodes
+
+    private readonly ConcurrentDictionary<Node, List<IKafkaConnector>>
+        _brokersConnectors = new(); // The dictionary of all connections with broker nodes
+
     private readonly string _clientId;
     private readonly int _closeConnectionTimeoutMs;
     private readonly int _connectionsMaxIdleMs;
@@ -137,7 +140,8 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         {
             if (_seedConnectors.TryAdd(connector.Endpoint, connector) is not true)
             {
-                throw new ArgumentException("Коллекция не может содержать элементы, которые относятся к одному и тому же адресу", nameof(seedConnectors));
+                throw new ArgumentException("Коллекция не может содержать элементы, которые относятся к одному и тому же адресу",
+                    nameof(seedConnectors));
             }
         }
 
@@ -153,7 +157,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         foreach (var groupByNodeId in connectorsByNodeId)
         {
             var first = groupByNodeId.First();
-            var (host, port) = Utils.GetHostAndPort(first.Endpoint.ToString());
+            var (host, port) = Utils.GetHostAndPort(first.Endpoint.ToString()!);
             var node = new Node(groupByNodeId.Key, host, port);
             _brokers.TryAdd(groupByNodeId.Key, node);
 

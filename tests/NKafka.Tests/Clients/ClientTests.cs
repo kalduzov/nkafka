@@ -128,7 +128,7 @@ public abstract class ClientTests
 
     private static void SetupOffsetFetchRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<OffsetFetchResponseMessage, OffsetFetchRequestMessage>(Arg.Any<OffsetFetchRequestMessage>(),
+        kafkaConnector.SendAsync<OffsetFetchRequestMessage, OffsetFetchResponseMessage>(Arg.Any<OffsetFetchRequestMessage>(),
                 false,
                 Arg.Any<CancellationToken>())
             .Returns(new OffsetFetchResponseMessage
@@ -161,7 +161,7 @@ public abstract class ClientTests
 
     private static void SetupApiRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<ApiVersionsResponseMessage, ApiVersionsRequestMessage>(Arg.Any<ApiVersionsRequestMessage>(),
+        kafkaConnector.SendAsync<ApiVersionsRequestMessage, ApiVersionsResponseMessage>(Arg.Any<ApiVersionsRequestMessage>(),
                 false,
                 Arg.Any<CancellationToken>())
             .Returns(new ApiVersionsResponseMessage
@@ -180,7 +180,7 @@ public abstract class ClientTests
 
     private static void SetupJointToGroupRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(
+        kafkaConnector.SendAsync<JoinGroupRequestMessage, JoinGroupResponseMessage>(
                 Arg.Is<JoinGroupRequestMessage>(
                     r => r.GroupId == "good_test"
                          && string.IsNullOrWhiteSpace(r.MemberId)
@@ -199,7 +199,7 @@ public abstract class ClientTests
 
     private static void SetupFindCoordinatorRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<FindCoordinatorResponseMessage, FindCoordinatorRequestMessage>(
+        kafkaConnector.SendAsync<FindCoordinatorRequestMessage, FindCoordinatorResponseMessage>(
                 Arg.Is<FindCoordinatorRequestMessage>(
                     r => r.KeyType == 0 && (r.CoordinatorKeys.Contains("good_test") || r.Key == "good_test")),
                 false,
@@ -224,7 +224,7 @@ public abstract class ClientTests
 
     private static void SetupMetadataRequests(IKafkaConnector kafkaConnector)
     {
-        kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
+        kafkaConnector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
                 Arg.Any<MetadataRequestMessage>(),
                 true,
                 Arg.Any<CancellationToken>())

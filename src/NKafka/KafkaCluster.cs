@@ -255,7 +255,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    async Task<TResponseMessage> IKafkaCluster.SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, CancellationToken token)
+    async Task<TResponseMessage> IKafkaCluster.SendAsync<TRequestMessage, TResponseMessage>(TRequestMessage message, CancellationToken token)
     {
         var retryAttempt = Config.MaxRetries;
 
@@ -285,16 +285,16 @@ internal sealed class KafkaCluster: IKafkaCluster
             var messageIsRequiredController = messageLocal.OnlyController;
             var connector = GetConnectorForServiceRequests(messageIsRequiredController);
 
-            return await connector.SendAsync<TResponseMessage, TRequestMessage>(messageLocal, false, tokenLocal);
+            return await connector.SendAsync<TRequestMessage, TResponseMessage>(messageLocal, false, tokenLocal);
         }
     }
 
     /// <inheritdoc />
-    Task<TResponseMessage> IKafkaCluster.SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, int nodeId, CancellationToken token)
+    Task<TResponseMessage> IKafkaCluster.SendAsync<TRequestMessage, TResponseMessage>(TRequestMessage message, int nodeId, CancellationToken token)
     {
         if (_connectorPool.TryGetConnector(nodeId, false, out var connector))
         {
-            return connector.SendAsync<TResponseMessage, TRequestMessage>(message, false, token);
+            return connector.SendAsync<TRequestMessage, TResponseMessage>(message, false, token);
         }
 
         throw new ConnectorNotFoundException($"Коннектор для брокера {nodeId} не найден");
@@ -312,7 +312,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             return connector;
         }
 
-        throw new KafkaException("Невозможно создать выделенное соединение");
+        throw new ClusterKafkaException("Невозможно создать выделенное соединение");
     }
 
     /// <summary>
@@ -406,7 +406,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метаданные из брокера, который является контроллером
         await kafkaConnector.OpenAsync(token);
         var request = MetadataRequestMessage.Build(Config.AllowAutoTopicCreation, topics);
-        var response = await kafkaConnector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(request, true, token);
+        var response = await kafkaConnector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(request, true, token);
         await ProcessMetadataResponse(response, token);
     }
 

@@ -151,7 +151,7 @@ internal class Coordinator: ICoordinator
 
         var request = OffsetFetchRequestMessage.Build(currentApiVersion, _groupId, true, subscription.AssignedPartitionsByTopic);
 
-        var response = await _coordinatorConnector.SendAsync<OffsetFetchResponseMessage, OffsetFetchRequestMessage>(request, false, token);
+        var response = await _coordinatorConnector.SendAsync<OffsetFetchRequestMessage, OffsetFetchResponseMessage>(request, false, token);
 
         if (response.Code == ErrorCodes.None)
         {
@@ -163,7 +163,7 @@ internal class Coordinator: ICoordinator
 
                 if (groupInfo.groupId != _groupId)
                 {
-                    throw new KafkaException("В ответе на запрос offsets пришла неизвестная группа");
+                    throw new ConsumerException("В ответе на запрос offsets пришла неизвестная группа");
                 }
 
                 foreach (var topicsMessage in groupInfo.Topics)
@@ -227,7 +227,7 @@ internal class Coordinator: ICoordinator
                 .ToList(),
         };
 
-        var result = await _coordinatorConnector.SendAsync<OffsetCommitResponseMessage, OffsetCommitRequestMessage>(request, false, token);
+        var result = await _coordinatorConnector.SendAsync<OffsetCommitRequestMessage, OffsetCommitResponseMessage>(request, false, token);
 
         if (result.Topics[0].Partitions[0].Code == ErrorCodes.None)
         {
@@ -257,7 +257,7 @@ internal class Coordinator: ICoordinator
 
     private async Task<ConsumerProtocolAssignment> SyncGroupAsync(SyncGroupRequestMessage request, CancellationToken token)
     {
-        var response = await _coordinatorConnector.SendAsync<SyncGroupResponseMessage, SyncGroupRequestMessage>(request, false, token);
+        var response = await _coordinatorConnector.SendAsync<SyncGroupRequestMessage, SyncGroupResponseMessage>(request, false, token);
 
         switch (response.Code)
         {
@@ -265,7 +265,7 @@ internal class Coordinator: ICoordinator
                 {
                     if (!response.ProtocolType?.Equals(_PROTOCOL_TYPE) ?? false)
                     {
-                        throw new KafkaException(
+                        throw new ConsumerException(
                             $"SyncGroup failed due to inconsistent Protocol Type, received {response.ProtocolType} but expected {_PROTOCOL_TYPE}");
                     }
 
@@ -319,7 +319,7 @@ internal class Coordinator: ICoordinator
                 MemberId);
 
             var response =
-                await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage, false, token);
+                await _coordinatorConnector.SendAsync<JoinGroupRequestMessage, JoinGroupResponseMessage>(joinGroupRequestMessage, false, token);
 
             // Ok. This is the correct error code for the first request. MemberId came to us - we repeat the same request with this value.
             if (response.Code == ErrorCodes.MemberIdRequired)
@@ -327,7 +327,7 @@ internal class Coordinator: ICoordinator
                 joinGroupRequestMessage.MemberId = response.MemberId;
                 joinGroupRequestMessage.Reason = "Send with memberId";
 
-                response = await _coordinatorConnector.SendAsync<JoinGroupResponseMessage, JoinGroupRequestMessage>(joinGroupRequestMessage,
+                response = await _coordinatorConnector.SendAsync<JoinGroupRequestMessage, JoinGroupResponseMessage>(joinGroupRequestMessage,
                     false,
                     token);
             }
@@ -436,9 +436,7 @@ internal class Coordinator: ICoordinator
         List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers,
         CancellationToken token)
     {
-
         // Срабатывает, когда данные консьюмер был выбран лидером группы
-
         _logger.LogTrace("Данный консьюмер назначен лидером, выполняем ребалансировку");
 
         // Раз мы были назначены лидером - проводим балансировку группы
@@ -468,6 +466,7 @@ internal class Coordinator: ICoordinator
             }
 
             using var ms = new MemoryStream();
+
             var writer = new BufferWriter(ms, 0);
             writer.WriteShort((short)ApiVersion.Version3);
             assignment.Write(writer, ApiVersion.Version3);
@@ -478,6 +477,7 @@ internal class Coordinator: ICoordinator
                 Assignment = writer.WrittenSpan.ToArray()
 
             });
+
         }
         var calculateAssignment = await SyncGroupAsync(request, token);
         var topicPartitions = new List<TopicPartition>(calculateAssignment.AssignedPartitions.Count);
@@ -498,7 +498,7 @@ internal class Coordinator: ICoordinator
         {
             _logger.LogCritical("Не выбран текущий алгоритм балансировки");
 
-            throw new KafkaException("Ошибка балансировки лидером");
+            throw new ConsumerException("Ошибка балансировки лидером");
         }
 
         var subscriptions = new Dictionary<string, Subscription>();
@@ -555,7 +555,7 @@ internal class Coordinator: ICoordinator
         try
         {
             var findCoordinatorResponseMessage =
-                await _kafkaCluster.SendAsync<FindCoordinatorResponseMessage, FindCoordinatorRequestMessage>(findCoordinatorRequestMessage, token);
+                await _kafkaCluster.SendAsync<FindCoordinatorRequestMessage, FindCoordinatorResponseMessage>(findCoordinatorRequestMessage, token);
             var coordinator = findCoordinatorResponseMessage.GetCoordinator();
 
             if (coordinator.Code == ErrorCodes.None)
@@ -566,7 +566,7 @@ internal class Coordinator: ICoordinator
             }
             else if (coordinator.Code == ErrorCodes.GroupAuthorizationFailed)
             {
-                throw new KafkaException($"Authorized fail for group {_groupId}");
+                throw new ConsumerException($"Authorized fail for group {_groupId}");
             }
             else
             {
@@ -618,7 +618,7 @@ internal class Coordinator: ICoordinator
             MemberId = MemberId,
             GroupInstanceId = _groupInstanceId
         };
-        var result = await _coordinatorConnector.SendAsync<HeartbeatResponseMessage, HeartbeatRequestMessage>(_heartbeatRequest, false, token);
+        var result = await _coordinatorConnector.SendAsync<HeartbeatRequestMessage, HeartbeatResponseMessage>(_heartbeatRequest, false, token);
 
         switch (result.Code)
         {
@@ -662,7 +662,7 @@ internal class Coordinator: ICoordinator
             GroupId = _groupId
         };
 
-        var result = await _coordinatorConnector.SendAsync<LeaveGroupResponseMessage, LeaveGroupRequestMessage>(request, false, token);
+        var result = await _coordinatorConnector.SendAsync<LeaveGroupRequestMessage, LeaveGroupResponseMessage>(request, false, token);
 
         if (result.Code.IsSuccessCode())
         {

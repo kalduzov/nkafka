@@ -32,7 +32,7 @@ internal sealed record ClusterMetadata
     /// <summary>
     /// Aggregated set of minimum and maximum API versions in a cluster
     /// </summary>
-    internal Dictionary<ApiKeys, ApiMetadata> AggregationApiByVersion { get; } = new(17); //Currently only 17 APIs are supported.
+    internal Dictionary<ApiKeys, ApiMetadata> AggregationApiByVersion { get; } = new(64);
 
     /// <summary>
     /// Returns the current max aggregated version of the Api key

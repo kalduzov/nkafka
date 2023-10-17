@@ -63,7 +63,7 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
     /// <summary>
     /// Отправляет запрос в брокер
     /// </summary>
-    internal Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(
+    internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         bool isInternalRequest,
         CancellationToken token)

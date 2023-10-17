@@ -26,6 +26,8 @@ namespace NKafka.Clients.Consumer.Internal;
 /// <summary>
 /// Messages fetcher interface
 /// </summary>
+/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TValue"></typeparam>
 internal interface IFetcher<TKey, TValue>
     where TKey : notnull
     where TValue : notnull
@@ -36,9 +38,11 @@ internal interface IFetcher<TKey, TValue>
     /// <param name="subscription"></param>
     /// <param name="channelWriter"></param>
     /// <param name="token"></param>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
     Task StartAsync(Subscription subscription, ChannelWriter<ConsumerRecord<TKey, TValue>> channelWriter, CancellationToken token);
 
+    /// <summary>
+    /// Полностью останавливает извлечение данных и отправку их в канал
+    /// </summary>
+    /// <param name="cancellationToken"></param>
     Task StopAsync(CancellationToken cancellationToken);
 }

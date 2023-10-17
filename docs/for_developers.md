@@ -17,3 +17,4 @@ The **infra** folder contains a set of tools for deploying **kafka** to **docker
 
 > At the moment, only `docker-compose.yml` and `docker-compose.big-cluster.yml` files are fully functional. The rest of the deployment options need to be improved.
 
+> To run **integration tests**, you will also need to deploy the `docker-compose.yml` file.

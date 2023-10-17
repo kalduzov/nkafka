@@ -129,9 +129,10 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
         catch (Exception exc)
         {
-            Close(TimeSpan.Zero, true); //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves. 
+            Close(TimeSpan.Zero,
+                true); //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves. 
 
-            throw new KafkaException(EM.Producer_CreateError, exc);
+            throw new ProducerException(EM.Producer_CreateError, exc);
         }
     }
 
@@ -292,7 +293,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     {
         if (_closed)
         {
-            throw new KafkaException(EM.Producer_WasClosed);
+            throw new ProducerException(EM.Producer_WasClosed);
         }
     }
 
@@ -395,7 +396,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         {
             var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.MaxRequestSize), _maxRequestSize);
 
-            throw new KafkaException(message);
+            throw new ProducerException(message);
         }
 
         // ReSharper disable once InvertIf
@@ -403,7 +404,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         {
             var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.BufferMemory), _totalMemorySize);
 
-            throw new KafkaException(message);
+            throw new ProducerException(message);
         }
     }
 

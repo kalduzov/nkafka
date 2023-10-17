@@ -138,7 +138,7 @@ public interface IRecordsBatch
             2 => CompressionType.Snappy,
             3 => CompressionType.Lz4,
             4 => CompressionType.ZStd,
-            _ => throw new KafkaException("Unsupported compression type")
+            _ => throw new InvalidCompressionTypeException("Unsupported compression type")
         };
     }
 

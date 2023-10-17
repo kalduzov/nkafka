@@ -24,16 +24,10 @@ using NKafka.Protocol;
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// 
+///  Результат создания топика
 /// </summary>
-/// <param name="Results"></param>
-public record CreateTopicsResult(Dictionary<string, TopicMetadataAndConfig> Results);
-
-/// <summary>
-/// 
-/// </summary>
-/// <param name="TopicId"></param>
-/// <param name="NumPartitions"></param>
+/// <param name="TopicId">Id топика</param>
+/// <param name="NumPartitions">Количество созданных партиций</param>
 /// <param name="ReplicationFactor"></param>
-/// <param name="ErrorCodes"></param>
-public record TopicMetadataAndConfig(Guid TopicId, int NumPartitions, int ReplicationFactor, ErrorCodes ErrorCodes);
+/// <param name="ErrorCode">Номер ошибки, если есть</param>
+public record CreateTopicResult(Guid TopicId, int NumPartitions, int ReplicationFactor, ErrorCodes ErrorCode);

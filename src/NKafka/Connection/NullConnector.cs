@@ -42,22 +42,24 @@ internal class NullConnector: IKafkaConnector
     /// <summary>
     /// Is it a dedicated connection or not
     /// </summary>
-    public bool IsDedicated { get; }
+    public bool IsDedicated => throw new NotImplementedException();
 
     public int NodeId { get; set; }
 
-    public KafkaConnector.State ConnectorState { get; }
+    public KafkaConnector.State ConnectorState => throw new NotImplementedException();
 
-    public int CurrentNumberInflightRequests { get; }
+    public int CurrentNumberInflightRequests => throw new NotImplementedException();
 
-    public EndPoint Endpoint { get; }
+    public EndPoint Endpoint => throw new NotImplementedException();
 
     /// <summary>
     ///  
     /// </summary>
-    public Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; }
+    public Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions => throw new NotImplementedException();
 
-    public Task<TResponseMessage> SendAsync<TResponseMessage, TRequestMessage>(TRequestMessage message, bool isInternalRequest, CancellationToken token)
+    public Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(TRequestMessage message,
+        bool isInternalRequest,
+        CancellationToken token)
         where TResponseMessage : class, IResponseMessage
         where TRequestMessage : class, IRequestMessage
     {

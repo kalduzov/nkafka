@@ -185,7 +185,7 @@ public partial class ClusterTests
     {
         var connector = Substitute.For<IKafkaConnector>();
         connector.NodeId.Returns(nodeId);
-        connector.SendAsync<MetadataResponseMessage, MetadataRequestMessage>(
+        connector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
                 Arg.Any<MetadataRequestMessage>(),
                 Arg.Any<bool>(),
                 Arg.Any<CancellationToken>())

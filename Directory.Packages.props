@@ -2,8 +2,8 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <OpenTelemtryVersion>1.6.0</OpenTelemtryVersion>
-    <BenchmarkDotNetVersion>0.13.8</BenchmarkDotNetVersion>
-    <Net8Version>8.0.0-rc.1.23419.4</Net8Version>
+    <BenchmarkDotNetVersion>0.13.9</BenchmarkDotNetVersion>
+    <Net8Version>8.0.0-rc.2.23479.6</Net8Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">

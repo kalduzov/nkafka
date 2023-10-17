@@ -190,9 +190,16 @@ internal class AdminClient: IAdminClient
     /// </summary>
     /// <param name="options">Describe the cluster information.</param>
     /// <param name="token"></param>
-    public Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token = default)
+    public async Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token = default)
     {
-        return Task.FromResult(new DescribeClusterResult());
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+        var timeout = GetTimeout(options.TimeoutMs);
+        cts.CancelAfter(timeout);
+        await _kafkaCluster.RefreshMetadataAsync(Array.Empty<string>(), cts.Token);
+        var result = new DescribeClusterResult(_kafkaCluster.Brokers, _kafkaCluster.Controller, _kafkaCluster.ClusterId);
+
+        return result;
     }
 
     /// <summary>

@@ -24,6 +24,4 @@ namespace NKafka.Clients.Admin;
 /// <summary>
 /// 
 /// </summary>
-public record DescribeClusterResult
-{
-}
+public record DescribeClusterResult(IReadOnlyCollection<Node> Nodes, Node Controller, string? ClusterId);

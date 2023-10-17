@@ -51,15 +51,15 @@ public interface IAdminClient: IClient
     /// </summary>
     /// <param name="options">The options to use when listing the topics</param>
     /// <param name="token"></param>
-    Task<ListTopicsResult> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default);
+    Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default);
 
     /// <summary>
-    /// 
+    /// Describe some topics in the cluster
     /// </summary>
-    /// <param name="topics"></param>
-    /// <param name="options"></param>
+    /// <param name="topics">The names of the topics to describe</param>
+    /// <param name="options"> The options to use when describing the topic</param>
     /// <param name="token"></param>
-    Task<DescribeTopicsResult> DescribeTopicsAsync(IReadOnlyCollection<string> topics,
+    Task<Dictionary<string, TopicDescription>> DescribeTopicsAsync(HashSet<string> topics,
         DescribeTopicsOptions options,
         CancellationToken token = default);
 

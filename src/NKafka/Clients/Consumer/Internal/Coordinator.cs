@@ -436,9 +436,7 @@ internal class Coordinator: ICoordinator
         List<JoinGroupResponseMessage.JoinGroupResponseMemberMessage> resultMembers,
         CancellationToken token)
     {
-
         // Срабатывает, когда данные консьюмер был выбран лидером группы
-
         _logger.LogTrace("Данный консьюмер назначен лидером, выполняем ребалансировку");
 
         // Раз мы были назначены лидером - проводим балансировку группы
@@ -468,6 +466,7 @@ internal class Coordinator: ICoordinator
             }
 
             using var ms = new MemoryStream();
+
             var writer = new BufferWriter(ms, 0);
             writer.WriteShort((short)ApiVersion.Version3);
             assignment.Write(writer, ApiVersion.Version3);
@@ -478,6 +477,7 @@ internal class Coordinator: ICoordinator
                 Assignment = writer.WrittenSpan.ToArray()
 
             });
+
         }
         var calculateAssignment = await SyncGroupAsync(request, token);
         var topicPartitions = new List<TopicPartition>(calculateAssignment.AssignedPartitions.Count);

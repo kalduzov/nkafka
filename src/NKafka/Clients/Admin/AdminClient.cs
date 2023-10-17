@@ -72,7 +72,7 @@ internal class AdminClient: IAdminClient
             {
                 if (string.IsNullOrWhiteSpace(topic.Name))
                 {
-                    throw new InvalidTopicException($"Имя топика '{topic.Name}' не корректно");
+                    throw new InvalidTopicException($"Некорректное имя топика '{topic.Name}'");
                 }
                 topicCollection.Add(
                     new CreateTopicsRequestMessage.CreatableTopicMessage
@@ -140,13 +140,21 @@ internal class AdminClient: IAdminClient
     }
 
     /// <summary>
-    /// List the topics available in the cluster
+    /// List  the topics available in the cluster
     /// </summary>
     /// <param name="options">The options to use when listing the topics</param>
     /// <param name="token"></param>
-    public Task<ListTopicsResult> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default)
+    public async Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default)
     {
-        return Task.FromResult(new ListTopicsResult());
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+        var timeout = GetTimeout(options.TimeoutMs);
+        cts.CancelAfter(timeout);
+        await _kafkaCluster.RefreshMetadataAsync(null!, cts.Token);
+
+        return _kafkaCluster.Topics.Values
+            .Where(t => t.IsInternal is false || t.IsInternal == options.IncludeInternal)
+            .ToArray();
     }
 
     /// <summary>
@@ -155,11 +163,26 @@ internal class AdminClient: IAdminClient
     /// <param name="topics"></param>
     /// <param name="options"></param>
     /// <param name="token"></param>
-    public Task<DescribeTopicsResult> DescribeTopicsAsync(IReadOnlyCollection<string> topics,
+    public async Task<Dictionary<string, TopicDescription>> DescribeTopicsAsync(HashSet<string> topics,
         DescribeTopicsOptions options,
         CancellationToken token = default)
     {
-        return Task.FromResult(new DescribeTopicsResult());
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+        var timeout = GetTimeout(options.TimeoutMs);
+        cts.CancelAfter(timeout);
+        await _kafkaCluster.RefreshMetadataAsync(topics, cts.Token);
+
+        var result = new Dictionary<string, TopicDescription>(topics.Count);
+
+        foreach (var topic in _kafkaCluster.Topics.Where(t => topics.Contains(t.Key)))
+        {
+            var topicPartitions = _kafkaCluster.PartitionsForTopic(topic.Key);
+            var topicDescription = new TopicDescription(topic.Key, topic.Value.TopicId, topic.Value.IsInternal, topicPartitions);
+            result.Add(topic.Key, topicDescription);
+        }
+
+        return result;
     }
 
     /// <summary>

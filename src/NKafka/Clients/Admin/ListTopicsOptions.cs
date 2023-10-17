@@ -22,8 +22,7 @@
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// 
+///  Options for <see cref="IAdminClient.ListTopicsAsync"/>>
 /// </summary>
-public record ListTopicsOptions
-{
-}
+/// <param name="IncludeInternal">Should list Kafka internal topics</param>
+public record ListTopicsOptions(bool IncludeInternal = false): AdminOptions;

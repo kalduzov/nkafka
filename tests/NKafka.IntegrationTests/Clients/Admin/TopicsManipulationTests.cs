@@ -27,6 +27,8 @@ using NKafka.Protocol;
 
 using TopicDetail = NKafka.Clients.Admin.TopicDetail;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace NKafka.IntegrationTests.Clients.Admin;
 
 public class TopicsManipulationTests
@@ -55,6 +57,101 @@ public class TopicsManipulationTests
             new DeleteTopicsOptions());
 
         deleteTopicsResult.First().Value.IsError.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData("topic_from_integration_tests_3", 5, 2)]
+    [InlineData("topic_from_integration_tests_4", 11, 3)]
+    public async Task ListInformationAboutTopics_WithInternalTopics_ShouldBe_Successful(string topicName, int partitions, short replicaFactor)
+    {
+        await using var kafkaCluster = await BuildKafkaCluster();
+
+        var topics = new List<TopicDetail>
+        {
+            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+        };
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+
+        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
+        {
+            IncludeInternal = true
+        });
+
+        listTopics.Count.Should().BeGreaterThan(1);
+        listTopics.Should().Contain(x => x.Name == topicName);
+        listTopics.Should().Contain(x => x.IsInternal);
+
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
+            {
+                topicName
+            },
+            new DeleteTopicsOptions());
+
+    }
+
+    [Theory]
+    [InlineData("topic_from_integration_tests_5", 5, 2)]
+    [InlineData("topic_from_integration_tests_6", 11, 3)]
+    public async Task ListInformationAboutTopics_WithoutInternalTopics_ShouldBe_Successful(string topicName, int partitions, short replicaFactor)
+    {
+        await using var kafkaCluster = await BuildKafkaCluster();
+
+        var topics = new List<TopicDetail>
+        {
+            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+        };
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+
+        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
+        {
+            IncludeInternal = false
+        });
+
+        listTopics.Count.Should().BeGreaterThan(1);
+        listTopics.Should().Contain(x => x.Name == topicName);
+        listTopics.Should().NotContain(x => x.IsInternal);
+
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
+            {
+                topicName
+            },
+            new DeleteTopicsOptions());
+
+    }
+
+    [Theory]
+    [InlineData("topic_from_integration_tests_7", 5, 2)]
+    [InlineData("topic_from_integration_tests_8", 11, 3)]
+    public async Task DescribeTopics_ShouldBe_Successful(string topicName, int partitions, short replicaFactor)
+    {
+        await using var kafkaCluster = await BuildKafkaCluster();
+
+        var topics = new List<TopicDetail>
+        {
+            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+        };
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+
+        var listTopics = await kafkaCluster.AdminClient.DescribeTopicsAsync(new HashSet<string>
+            {
+                topicName
+            },
+            new DescribeTopicsOptions());
+
+        listTopics.Count.Should().Be(1);
+        listTopics.First().Key.Should().Be(topicName);
+        var value = listTopics.First().Value;
+        value.IsInternal.Should().BeFalse();
+        value.Name.Should().Be(topicName);
+        value.Partitions.Count.Should().Be(partitions);
+        value.Partitions.First().Replicas.Count.Should().Be(replicaFactor);
+
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
+            {
+                topicName
+            },
+            new DeleteTopicsOptions());
+
     }
 
     private static async Task<IKafkaCluster> BuildKafkaCluster()

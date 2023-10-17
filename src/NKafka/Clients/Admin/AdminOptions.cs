@@ -22,7 +22,8 @@
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// 
+/// Implements basic options for all requests in the AdminClient.
 /// </summary>
-/// <param name="TimeoutMs"></param>
+/// <param name="TimeoutMs">Set the timeout in milliseconds for this operation or <c>-1</c> if the default api timeout for the
+/// AdminClient should be used.</param>
 public abstract record AdminOptions(int TimeoutMs = -1);

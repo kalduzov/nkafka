@@ -359,7 +359,8 @@ internal static partial class SupportVersionsExtensions
     /// <remarks>Эффективная версия - это максимальная версия Api, поддерживаемая всеми брокерами кластера.
     /// Каждый раз, когда меняется состав брокеров в кластере - происходит перерасчет эффективной версии.
     /// Через конфигурацию так же можно изменить общий набор версий для api указав необходимую версию</remarks>
-    public static ApiVersion GetEffectiveApiVersion(this ApiKeys apiKey, Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> supportVersions)
+    public static ApiVersion GetEffectiveApiVersion(this ApiKeys apiKey,
+        Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> supportVersions)
     {
         if (apiKey == ApiKeys.ApiVersions)
         {
@@ -394,8 +395,8 @@ internal static partial class SupportVersionsExtensions
             unchecked
             {
                 var hashCode = (int)ApiKey;
-                hashCode = (hashCode * 397) ^ (int)MinApiVersion;
-                hashCode = (hashCode * 397) ^ (int)MaxApiVersion;
+                hashCode = hashCode * 397 ^ (int)MinApiVersion;
+                hashCode = hashCode * 397 ^ (int)MaxApiVersion;
 
                 return hashCode;
             }

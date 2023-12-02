@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C4
 		Directory.Packages.props = Directory.Packages.props
 		logo.png = logo.png
 		NuGet.Config = NuGet.Config
+		qodana.yaml = qodana.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{01D4B64F-6FEB-4172-BC31-72B9A78BB506}"

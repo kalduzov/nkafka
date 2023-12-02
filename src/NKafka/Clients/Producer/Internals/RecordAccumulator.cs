@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,12 +47,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 {
     private class TopicBatches
     {
-        public ConcurrentDictionary<Partition, Deque<ProducerBatch>> Batches { get; }
-
-        public TopicBatches()
-        {
-            Batches = new ConcurrentDictionary<Partition, Deque<ProducerBatch>>();
-        }
+        public ConcurrentDictionary<Partition, Deque<ProducerBatch>> Batches { get; } = new();
     }
 
     private readonly ConcurrentDictionary<string, TopicBatches> _topicBatchesMap;
@@ -76,7 +71,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         int deliveryTimeoutMs,
         ILoggerFactory loggerFactory)
     {
-        _topicBatchesMap = new();
+        _topicBatchesMap = new ConcurrentDictionary<string, TopicBatches>();
         _metrics = config.Metrics;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
@@ -137,7 +132,14 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 lock (deque)
                 {
                     var bufferWriter = new BufferWriter(stream, ProducerBatch.BATCH_HEADER_LEN);
-                    var recordAppendResult = AppendIntoNewBatch(topicPartition.Topic, effectivePartition, deque, timestamp, key, value, headers, bufferWriter);
+                    var recordAppendResult = AppendIntoNewBatch(topicPartition.Topic,
+                        effectivePartition,
+                        deque,
+                        timestamp,
+                        key,
+                        value,
+                        headers,
+                        bufferWriter);
 
                     // It is possible that the batch was already created in another thread while we were preparing the buffer
                     if (recordAppendResult.NewBatchCreated)
@@ -235,6 +237,16 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     /// <inheritdoc/>
     public void FlushAll(TimeSpan timeSpan)
     {
+        foreach (var batches in _topicBatchesMap.Values)
+        {
+            foreach (var batchesValue in batches.Batches.Values)
+            {
+                // foreach (var batch in batchesValue)
+                // {
+                //     batch.IsReady = true;
+                // }
+            }
+        }
     }
 
     /// <inheritdoc/>

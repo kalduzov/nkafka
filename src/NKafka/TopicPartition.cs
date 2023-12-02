@@ -100,7 +100,7 @@ public class TopicPartition: IComparable<TopicPartition>
     {
         if (a is null)
         {
-            return (b is null);
+            return b is null;
         }
 
         return a.Equals(b);

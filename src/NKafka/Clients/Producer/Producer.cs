@@ -118,9 +118,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             _partitioner = InitPartitionerClass(config.PartitionerConfig);
             _keySerializer = InitializeSerializer(keySerializer);
             _valueSerializer = InitializeSerializer(valueSerializer);
-
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
-
             _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
             _accumulator = recordAccumulator ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, loggerFactory);
             _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, loggerFactory);
@@ -142,7 +140,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
         var tp = topicPartition;
-        var _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
+        _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
                 task =>
                 {
@@ -312,11 +310,9 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            var _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
+            _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
 
             var headers = message.Headers;
-            headers.SetReadOnly();
-
             var serializedKey = await SerializeKeyAsync(message.Key);
             var serializedValue = await SerializeValueAsync(message.Value);
 
@@ -336,7 +332,6 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                     token);
 
                 topicPartition.Partition = computedPartition;
-
             }
 
             var appendResult = _accumulator.Append(

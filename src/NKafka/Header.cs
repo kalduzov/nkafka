@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,23 +31,27 @@ namespace NKafka;
 /// <remarks>
 ///     Message headers are supported by v0.11 brokers and above.
 /// </remarks>
-public class Header: IHeader, IEquatable<Header>
+/// <remarks>
+///     Create a new Header instance.
+/// </remarks>
+/// <param name="key">
+///     The header key.
+/// </param>
+/// <param name="value">
+///     The header value (may be null).
+/// </param>
+/// <exception cref="ArgumentNullException"></exception>
+public sealed class Header(string key, byte[]? value): IEquatable<Header>
 {
     /// <summary>
-    ///     Create a new Header instance.
+    /// The header key.
     /// </summary>
-    /// <param name="key">
-    ///     The header key.
-    /// </param>
-    /// <param name="value">
-    ///     The header value (may be null).
-    /// </param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public Header(string key, byte[]? value)
-    {
-        Key = key ?? throw new ArgumentNullException(nameof(key), ExceptionMessages.Kafka_message_header_key_cannot_be_null);
-        Value = value;
-    }
+    public string Key { get; } = key ?? throw new ArgumentNullException(nameof(key), ExceptionMessages.Kafka_message_header_key_cannot_be_null);
+
+    /// <summary>
+    /// Get the serialized header value data.
+    /// </summary>
+    public byte[]? Value { get; } = value;
 
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
     /// <param name="other">An object to compare with this object.</param>
@@ -78,16 +82,6 @@ public class Header: IHeader, IEquatable<Header>
 
         return false;
     }
-
-    /// <summary>
-    ///     The header key.
-    /// </summary>
-    public string Key { get; }
-
-    /// <summary>
-    ///     Get the serialized header value data.
-    /// </summary>
-    public byte[]? Value { get; }
 
     /// <summary>Determines whether the specified object is equal to the current object.</summary>
     /// <param name="obj">The object to compare with the current object.</param>

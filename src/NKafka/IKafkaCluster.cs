@@ -54,14 +54,15 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     IDictionary<string, TopicMetadata> Topics { get; }
 
     /// <summary>
-    /// 
+    /// Gets a dictionary of topics indexed by their unique identifiers.
     /// </summary>
+    /// <remarks>
+    /// The dictionary contains the topics stored in the system, with each topic
+    /// mapped to its unique identifier.
+    /// </remarks>
     IDictionary<Guid, string> TopicsById { get; }
 
-    /// <summary>
-    /// Закрыт кластер или открыт
-    /// </summary>
-    /// <remarks>Из закрытого или уничтоженного кластера невозможно получить никакую информацию</remarks>
+    /// <summary
     bool Closed { get; }
 
     /// <summary>
@@ -75,15 +76,23 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     IReadOnlyCollection<Node> Brokers { get; }
 
     /// <summary>
-    /// 
+    /// Gets the admin client instance for managing administrative operations.
     /// </summary>
+    /// <remarks>
+    /// The <see cref="AdminClient"/> property provides access to the admin client instance
+    /// that allows the user to perform various administrative operations.
+    /// </remarks>
     IAdminClient AdminClient { get; }
 
     /// <summary>
-    /// Returns a list of partitions for a topic
+    /// Retrieves partitions of a given topic asynchronously.
     /// </summary>
-    /// <remarks>If the data is not in the internal cache, then a request is made to the broker for this information.</remarks>
-    /// <exception cref="ProtocolKafkaException">Throws if there is no such topic in kafka</exception>
+    /// <param name="topic">The topic whose partitions are to be retrieved.</param>
+    /// <param name="token">A CancellationToken to observe cancellation requests.</param>
+    /// <returns>
+    /// A <see cref="ValueTask{IReadOnlyCollection{Partition}}"/> representing the asynchronous operation.
+    /// The task result contains a read-only collection of <see cref="Partition"/> objects representing the partitions of the topic.
+    /// </returns>
     ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);
 
     /// <summary>
@@ -181,10 +190,10 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     IReadOnlyCollection<PartitionMetadata> PartitionsForTopic(string topic);
 
     /// <summary>
-    /// 
+    /// Retrieves metadata for a specific topic.
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <param name="name">The name of the topic.</param>
+    /// <returns>The metadata associated with the topic.</returns>
     TopicMetadata GetTopicMetadata(string name);
 
     /// <summary>
@@ -218,14 +227,18 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     internal void NotifyAboutDisposedConsumer(IConsumer consumer);
 
     /// <summary>
-    /// Предоставляет выделенный коннектор к конкретному брокеру
+    /// Provides a dedicated connector to the Kafka broker.
     /// </summary>
-    /// <returns>Выделенный коннектор - это отдельный физический канал к брокеру.
-    /// В основном используется для работы нескольких консьюмеров одного кластера в едином адресном пространстве процесса</returns>
+    /// <param name="nodeId">The identifier of the node.</param>
+    /// <returns>A dedicated connector is a separate physical channel to the broker.
+    /// It is mainly used for multiple consumers of the same cluster in a single process address space.</returns>
     internal IKafkaConnector ProvideDedicateConnector(int nodeId);
 
     /// <summary>
-    /// Возвращает метаданные кластера
+    /// Retrieve the metadata about a cluster.
     /// </summary>
+    /// <returns>
+    /// An instance of the ClusterMetadata class containing the metadata information.
+    /// </returns>
     internal ClusterMetadata GetClusterMetadata();
 }

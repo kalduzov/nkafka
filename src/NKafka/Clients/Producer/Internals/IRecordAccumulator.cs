@@ -26,16 +26,30 @@ namespace NKafka.Clients.Producer.Internals;
 /// </summary>
 internal interface IRecordAccumulator
 {
+    /// <summary>
+    /// Flushes all pending changes asynchronously.
+    /// </summary>
+    /// <param name="token">The cancellation token.</param>
+    /// <returns>
+    /// A task that represents the asynchronous flush operation.
+    /// </returns>
     Task FlushAllAsync(CancellationToken token);
 
+    /// <summary>
+    /// Flushes all data with a given timeout.
+    /// </summary>
+    /// <param name="timeout">The timeout for flushing all data.</param>
     void FlushAll(TimeSpan timeout);
 
     /// <summary>
-    /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size
+    /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size.
     /// </summary>
-    /// <param name="kafkaCluster"></param>
-    /// <param name="maxRequestSize">Maximum request size</param>
-    IEnumerable<ProducerBatch> PullBathes(IKafkaCluster kafkaCluster, int maxRequestSize);
+    /// <param name="kafkaCluster">The Kafka cluster from which to pull the batches.</param>
+    /// <param name="maxRequestSize">The maximum size allowed for a single request.</param>
+    /// <returns>
+    /// An enumerable collection of ProducerBatch objects that are ready to be sent.
+    /// </returns>
+    IEnumerable<ProducerBatch> PullReadyBatches(IKafkaCluster kafkaCluster, int maxRequestSize);
 
     /// <summary>
     /// Adds a new record to the accumulator

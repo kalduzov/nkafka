@@ -39,17 +39,17 @@ internal class ProducerBatch: RecordsBatch
     /// </summary>
     internal const int BATCH_HEADER_LEN = 54;
 
-    internal const int BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET = RECORD_BATCH_OVERHEAD - 4;
+    private const int _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET = RECORD_BATCH_OVERHEAD - 4;
 
-    internal const int ATTRIBUTES_OFFSET = 17;
+    private const int _ATTRIBUTES_OFFSET = 17;
 
     private readonly TaskCompletionSource _produceRequestResult;
     private readonly BufferWriter _bufferWriter;
     private int _maxRecordSize;
     private int _recordsCount;
-    private List<SendResultTask> _recordTasks = new();
+    private readonly List<SendResultTask> _recordTasks = [];
     private int _lastOffset;
-    private List<IRecord> _records = new(16);
+    private readonly List<IRecord> _records = new(16);
 
     /// <summary>
     /// How many bytes are left to add so that the batch is complete
@@ -62,17 +62,31 @@ internal class ProducerBatch: RecordsBatch
     public bool IsFull { get; set; }
 
     /// <summary>
-    /// 
+    /// Represents a specific partition of a topic in a Kafka cluster.
     /// </summary>
     public TopicPartition TopicPartition { get; }
 
     /// <summary>
-    /// 
+    /// Gets a value indicating whether the property is ready.
     /// </summary>
+    /// <value>
+    /// <c>true</c> if the property is ready; otherwise, <c>false</c>.
+    /// </value>
     public bool IsReady => true;
 
+    /// <summary>
+    /// Gets or sets the size of the object.
+    /// </summary>
+    /// <value>
+    /// The size of the object.
+    /// </value>
     public int Size { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProducerBatch"/> class with the specified <see cref="TopicPartition"/> and <see cref="BufferWriter"/>.
+    /// </summary>
+    /// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
+    /// <param name="bufferWriter">The <see cref="BufferWriter"/> used for writing the batch data.</param>
     public ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter)
     {
         _lastOffset = -1;
@@ -135,6 +149,10 @@ internal class ProducerBatch: RecordsBatch
         return true;
     }
 
+    /// <summary>
+    /// Closes the current batch by writing any pending records and the batch header.
+    /// Sets the IsFull flag to true indicating that the batch is no longer open for writing.
+    /// </summary>
     public void Close()
     {
         WriteRecords();
@@ -144,7 +162,7 @@ internal class ProducerBatch: RecordsBatch
 
     private void WriteRecords()
     {
-        _bufferWriter.Position = BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
+        _bufferWriter.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
 
         _bufferWriter.WriteInt(_records.Count);
 
@@ -174,21 +192,25 @@ internal class ProducerBatch: RecordsBatch
         _bufferWriter.WriteLong(ProducerId);
         _bufferWriter.WriteShort(ProducerEpoch);
         _bufferWriter.WriteInt(BaseSequence);
-        Crc = CrcUtils.Calculate(_bufferWriter.AsSpan(ATTRIBUTES_OFFSET + 4, Length));
-        _bufferWriter.PutUInt(ATTRIBUTES_OFFSET, Crc); //
+        Crc = CrcUtils.Calculate(_bufferWriter.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
+        _bufferWriter.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
         _bufferWriter.Position = 0;
     }
 
+    /// <summary>
+    /// Retrieves the data as a Records object.
+    /// </summary>
+    /// <returns>A new Records object containing the data.</returns>
     public Records GetAsRecords()
     {
         return new Records(Length);
     }
 
     /// <summary>
-    /// Successfully completes batch processing 
+    /// Successfully completes batch processing
     /// </summary>
-    /// <param name="baseOffset"></param>
-    /// <param name="appendTime"></param>
+    /// <param name="baseOffset">The base offset to be incremented for each record</param>
+    /// <param name="appendTime">The append time of the batch</param>
     public void Complete(long baseOffset, long appendTime)
     {
         foreach (var recordTask in _recordTasks)
@@ -202,6 +224,10 @@ internal class ProducerBatch: RecordsBatch
         _produceRequestResult.SetResult();
     }
 
+    /// <summary>
+    /// Method to handle failure by setting exception for all record tasks and produce request result.
+    /// </summary>
+    /// <param name="errorCode">The error code for the failure.</param>
     public void Fail(ErrorCodes errorCode)
     {
         var exception = new ProtocolKafkaException(errorCode);

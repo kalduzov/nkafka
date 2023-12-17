@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,10 +24,10 @@
 namespace NKafka.Clients.Producer;
 
 /// <summary>
-/// 
+/// Represents the result of delivering a Kafka message.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TKey">The type of the message key.</typeparam>
+/// <typeparam name="TValue">The type of the message value.</typeparam>
 public class DeliveryResult<TKey, TValue>
     where TKey : notnull
     where TValue : notnull
@@ -85,18 +85,24 @@ public class DeliveryResult<TKey, TValue>
     public Message<TKey, TValue> Message { get; private set; }
 
     /// <summary>
-    /// 
+    /// Gets the key associated with the property.
     /// </summary>
     public TKey Key => Message.Key;
 
     /// <summary>
-    /// 
+    /// Gets the value of the property.
     /// </summary>
+    /// <remarks>
+    /// This property returns the value of the property stored in the Message.Value property.
+    /// </remarks>
     public TValue Value => Message.Value;
 
     /// <summary>
-    /// 
+    /// Gets the timestamp of the message.
     /// </summary>
+    /// <remarks>
+    /// This property returns the timestamp of the message, indicating when the message was generated or received.
+    /// </remarks>
     public Timestamp Timestamp => Message.Timestamp;
 
     /// <summary>
@@ -105,11 +111,10 @@ public class DeliveryResult<TKey, TValue>
     public Headers Headers => Message.Headers;
 
     /// <summary>
-    /// 
+    /// Represents the result of delivering a message.
     /// </summary>
-    /// <param name="message"></param>
-    /// <param name="persisted"></param>
-    /// <param name="topicPartitionOffset"></param>
+    /// <typeparam name="TKey">The type of the message key.</typeparam>
+    /// <typeparam name="TValue">The type of the message value.</typeparam>
     public DeliveryResult(Message<TKey, TValue> message, PersistenceStatus persisted, TopicPartitionOffset topicPartitionOffset)
     {
         Message = message;

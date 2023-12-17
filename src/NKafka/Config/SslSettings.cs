@@ -25,10 +25,11 @@ using System.Security.Authentication;
 namespace NKafka.Config;
 
 /// <summary>
-/// 
+/// Represents the SSL settings for establishing a secure connection.
 /// </summary>
 public record SslSettings
 {
+    /// <summary
     internal static readonly SslSettings None = new(false);
 
     internal bool IsSet { get; }
@@ -45,13 +46,38 @@ public record SslSettings
     public bool CheckCertificateRevocation { get; set; } = true;
 
     /// <summary>
-    /// 
+    /// Gets or sets the callback used to validate the remote certificate in an SSL/TLS connection.
     /// </summary>
+    /// <remarks>
+    /// The RemoteCertificateValidationCallback is called during the SSL/TLS handshake process to
+    /// validate the remote server's certificate. It is responsible for determining whether the
+    /// certificate is trusted or not. The callback should return true if the certificate is trusted,
+    /// and false otherwise.
+    /// The signature of the RemoteCertificateValidationCallback delegate is as follows:
+    /// <code>
+    /// bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate,
+    /// X509Chain chain, SslPolicyErrors sslPolicyErrors)
+    /// </code>
+    /// The <paramref name="sender"/> parameter is the object that triggered the validation request,
+    /// typically a TcpClient or HttpClient object.
+    /// The <paramref name="certificate"/> parameter is the remote server's certificate.
+    /// The <paramref name="chain"/> parameter is the chain of certificate authorities that vouch for
+    /// the authenticity of the certificate.
+    /// The <paramref name="sslPolicyErrors"/> parameter indicates if any SSL/TLS policy errors
+    /// were encountered during the validation. This can include errors such as the certificate not
+    /// being trusted, or the common name not matching the host name.
+    /// </remarks>
     public RemoteCertificateValidationCallback? RemoteCertificateValidationCallback { get; set; } = null;
 
     /// <summary>
-    /// 
+    /// Gets or sets a value indicating whether the SSL/TLS certificate presented by the server should be trusted.
     /// </summary>
+    /// <remarks>
+    /// When set to <c>true</c>, the client will trust any SSL/TLS certificate presented by the server, regardless of its validity.
+    /// When set to <c>false</c> (the default), the client will validate the SSL/TLS certificate using the certificate chain and trust store of the operating system to ensure its validity
+    /// .
+    /// Trusting an invalid or self-signed certificate may introduce security risks as the server may not be the expected entity.
+    /// </remarks>
     public bool TrustServerCertificate { get; set; }
 
     /// <summary>
@@ -65,7 +91,7 @@ public record SslSettings
     }
 
     /// <summary>
-    /// 
+    /// Represents the SSL settings for a connection.
     /// </summary>
     public SslSettings()
         : this(true)

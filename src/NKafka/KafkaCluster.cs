@@ -300,11 +300,21 @@ internal sealed class KafkaCluster: IKafkaCluster
         throw new ConnectorNotFoundException($"Коннектор для брокера {nodeId} не найден");
     }
 
+    /// <summary>
+    /// Notifies when a consumer is disposed.
+    /// </summary>
+    /// <param name="consumer">The consumer instance to be disposed.</param>
     public void NotifyAboutDisposedConsumer(IConsumer consumer)
     {
         _consumers.TryRemove(consumer.ConsumerInstanceId, out _);
     }
 
+    /// <summary>
+    /// Provides a dedicated Kafka connector for the given node ID.
+    /// </summary>
+    /// <param name="nodeId">The ID of the Kafka node.</param>
+    /// <returns>The dedicated Kafka connector for the specified node ID.</returns>
+    /// <exception cref="ClusterKafkaException">Thrown when unable to create a dedicated connection.</exception>
     public IKafkaConnector ProvideDedicateConnector(int nodeId)
     {
         if (_connectorPool.TryGetConnector(nodeId, true, out var connector))
@@ -315,9 +325,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         throw new ClusterKafkaException("Невозможно создать выделенное соединение");
     }
 
-    /// <summary>
-    /// Возвращает метаданные кластера
-    /// </summary>
+    /// <inheritdoc />
     public ClusterMetadata GetClusterMetadata()
     {
         return _clusterMetadata;
@@ -330,17 +338,17 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    ///     Возвращает список доступных разделов для топика
-    ///     Доступные разделы - это те, к которым сейчас можно обратиться из клиента.
-    ///     Т.е. брокеры, на которых находятся данные разделы, в сети и к ним можно сделать запрос.
+    /// Returns a list of available partitions for a given topic.
+    /// Available partitions are those that can currently be accessed from the client.
+    /// This means that brokers hosting these partitions are online and can be queried.
     /// </summary>
-    /// <param name="topic">Имя топика</param>
+    /// <param name="topic">The name of the topic.</param>
     /// <remarks>
-    ///     Данный метод возвращает данные, который были получены при вызове методов GetPartitionsAsync, RefreshMetadataAsync
-    ///     или фоновым обновление данных по кластеру
+    /// This method returns the data that was obtained when calling the GetPartitionsAsync, RefreshMetadataAsync methods,
+    /// or through background updates of cluster data.
     /// </remarks>
     /// <returns>
-    ///     Список доступных разделов или пустую коллекцию, если такие разделы пока не доступны
+    /// A list of available partitions or an empty collection if no such partitions are currently available.
     /// </returns>
     public IReadOnlyList<Partition> GetAvailablePartitions(string topic)
     {
@@ -348,9 +356,7 @@ internal sealed class KafkaCluster: IKafkaCluster
 
     }
 
-    /// <summary>
-    /// Возвращает лидера для указнной партиции в топике
-    /// </summary>
+    /// <inheritdoc />
     public Node LeaderFor(TopicPartition topicPartition)
     {
         return !_partitionsMetadata.TryGetValue(topicPartition, out var partitionMetadata)
@@ -359,9 +365,7 @@ internal sealed class KafkaCluster: IKafkaCluster
 
     }
 
-    /// <summary>
-    /// Возвращает информацию о партициях для указанного топика
-    /// </summary>
+    /// <inheritdoc />
     public IReadOnlyCollection<PartitionMetadata> PartitionsForTopic(string topic)
     {
         if (_partitionsMetadatas.TryGetValue(topic, out var partitionMetadatas))
@@ -372,19 +376,14 @@ internal sealed class KafkaCluster: IKafkaCluster
         return Array.Empty<PartitionMetadata>();
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         _metadataUpdaterTimer.Dispose();
         _connectorPool.Dispose();
     }
 
-    /// <summary>
-    ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources
-    ///     asynchronously.
-    /// </summary>
-    /// <returns>
-    ///     A task that represents the asynchronous dispose operation.
-    /// </returns>
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         await _metadataUpdaterTimer.DisposeAsync();
@@ -427,8 +426,10 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    /// Формирует список посевных брокеров
+    /// Forms a list of seed brokers.
     /// </summary>
+    /// <param name="commonConfig">The common configuration.</param>
+    /// <returns>The list of broker nodes.</returns>
     private List<Node> SeedBrokers(CommonConfig commonConfig)
     {
         var brokers = new List<Node>(Config.BootstrapServers.Count);
@@ -496,7 +497,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         }
     }
 
-    private async ValueTask UpdateBrokersAsync(
+    private ValueTask UpdateBrokersAsync(
         IReadOnlyDictionary<int, Node> nodes,
         int? controllerId,
         CancellationToken token)
@@ -519,16 +520,18 @@ internal sealed class KafkaCluster: IKafkaCluster
             }
         }
 
-        await _connectorPool.AddOrUpdateConnectorsAsync(Brokers, token);
+        return _connectorPool.AddOrUpdateConnectorsAsync(Brokers, token);
     }
 
     /// <summary>
-    ///     Возвращает брокера для сервисных запросов
+    /// Returns a connector for service requests.
     /// </summary>
+    /// <param name="throwExceptionIfNoController">Specifies whether to throw an exception if no controller is available. Default value is false.</param>
+    /// <returns>The connector for service requests.</returns>
     /// <remarks>
-    ///     Сервисные запросы обычно делаются на контроллер, либо, если он отсутствует, на произвольный брокер кластера.
-    ///     Кроме того, часть запросов должна обязательно делаться на контроллере. В случае, если для запроса требуется контроллер,
-    ///     а был выбран отличный от него брокер, то такой запрос упадет с ошибкой
+    /// Service requests are usually made to a controller, or if it is not available, to an arbitrary broker in the cluster.
+    /// Additionally, some requests must be made to the controller. If a controller is required for a request, but a different
+    /// broker is chosen, the request will fail with an error.
     /// </remarks>
     private IKafkaConnector GetConnectorForServiceRequests(bool throwExceptionIfNoController = false)
     {
@@ -551,8 +554,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    /// Периодически обновляет метаданные по топикам, с которыми работаем в текущий момент
+    /// Periodically updates metadata for the topics that are currently being worked on.
     /// </summary>
+    /// <param name="state">The state passed to the method after the time interval has elapsed.</param>
     private async void UpdateMetadataCallback(object? state)
     {
         ThrowExceptionIfClusterClosed();
@@ -611,8 +615,10 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <summary>
-    ///     Инициализируем кластер
+    /// Initializes the cluster.
     /// </summary>
+    /// <param name="token">Cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     private async Task OpenInternalAsync(CancellationToken token)
     {
         token.ThrowIfCancellationRequested();

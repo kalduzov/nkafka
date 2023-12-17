@@ -32,14 +32,14 @@ namespace NKafka;
 /// <summary>
 ///     A collection of Kafka message headers.
 /// </summary>
-public class Headers: IEnumerable<IHeader>
+public class Headers: IEnumerable<Header>
 {
+    private readonly List<Header> _headers;
+
     /// <summary>
-    /// 
+    /// Represents an empty headers object.
     /// </summary>
     public static readonly Headers Empty = new EmptyHeaders();
-
-    private readonly List<IHeader> _headers;
 
     /// <summary>
     ///     Gets the header at the specified index
@@ -47,7 +47,7 @@ public class Headers: IEnumerable<IHeader>
     /// <param name="index">
     ///     The zero-based index of the element to get.
     /// </param>
-    public IHeader this[int index] => _headers[index];
+    public Header this[int index] => _headers[index];
 
     /// <summary>
     ///     The number of headers in the collection.
@@ -55,12 +55,12 @@ public class Headers: IEnumerable<IHeader>
     public int Count => _headers.Count;
 
     /// <summary>
-    /// 
+    /// Represents a collection of headers.
     /// </summary>
-    /// <param name="headers"></param>
+    /// <param name="headers">The initial collection of headers.</param>
     public Headers(IEnumerable<Header>? headers)
     {
-        _headers = headers is null ? new() : new List<IHeader>(headers);
+        _headers = headers is null ? new() : new List<Header>(headers);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public class Headers: IEnumerable<IHeader>
     /// <returns>
     ///     An enumerator object that can be used to iterate through the headers collection.
     /// </returns>
-    public IEnumerator<IHeader> GetEnumerator()
+    public IEnumerator<Header> GetEnumerator()
     {
         return new HeadersEnumerator(this);
     }
@@ -103,7 +103,8 @@ public class Headers: IEnumerable<IHeader>
             throw new ArgumentNullException(nameof(key), ExceptionMessages.Kafka_message_header_key_cannot_be_null);
         }
 
-        _headers.Add(new Header(key, val));
+        var header = new Header(key, val);
+        Add(header);
     }
 
     /// <summary>
@@ -123,62 +124,6 @@ public class Headers: IEnumerable<IHeader>
     }
 
     /// <summary>
-    ///     Get the value of the latest header with the specified key.
-    /// </summary>
-    /// <param name="key">
-    ///     The key to get the associated value of.
-    /// </param>
-    /// <returns>
-    ///     The value of the latest element in the collection with the specified key.
-    /// </returns>
-    /// <exception cref="KeyNotFoundException">
-    ///     The key <paramref name="key" /> was not present in the collection.
-    /// </exception>
-    public virtual byte[]? GetLastBytes(string key)
-    {
-        if (TryGetLastBytes(key, out var result))
-        {
-            return result;
-        }
-
-        throw new KeyNotFoundException($"The key {key} was not present in the headers collection.");
-    }
-
-    /// <summary>
-    ///     Try to get the value of the latest header with the specified key.
-    /// </summary>
-    /// <param name="key">
-    ///     The key to get the associated value of.
-    /// </param>
-    /// <param name="lastHeader">
-    ///     The value of the latest element in the collection with the
-    ///     specified key, if a header with that key was present in the
-    ///     collection.
-    /// </param>
-    /// <returns>
-    ///     true if the a value with the specified key was present in
-    ///     the collection, false otherwise.
-    /// </returns>
-    public virtual bool TryGetLastBytes(string key, out byte[]? lastHeader)
-    {
-        for (var i = _headers.Count - 1; i >= 0; --i)
-        {
-            if (_headers[i].Key != key)
-            {
-                continue;
-            }
-
-            lastHeader = _headers[i].Value;
-
-            return true;
-        }
-
-        lastHeader = default!;
-
-        return false;
-    }
-
-    /// <summary>
     ///     Removes all headers for the given key.
     /// </summary>
     /// <param name="key">
@@ -189,7 +134,7 @@ public class Headers: IEnumerable<IHeader>
         _headers.RemoveAll(a => a.Key == key);
     }
 
-    private class HeadersEnumerator: IEnumerator<IHeader>
+    private class HeadersEnumerator: IEnumerator<Header>
     {
         private readonly Headers _headers;
 
@@ -200,9 +145,9 @@ public class Headers: IEnumerable<IHeader>
             _headers = headers;
         }
 
-        public object Current => ((IEnumerator<IHeader>)this).Current;
+        public object Current => ((IEnumerator<Header>)this).Current;
 
-        IHeader IEnumerator<IHeader>.Current => _headers._headers[_location];
+        Header IEnumerator<Header>.Current => _headers._headers[_location];
 
         public void Dispose()
         {
@@ -226,13 +171,8 @@ public class Headers: IEnumerable<IHeader>
         }
     }
 
-    private class EmptyHeaders: Headers
+    private sealed class EmptyHeaders(): Headers(null)
     {
-        public EmptyHeaders()
-            : base(null)
-        {
-        }
-
         public override void Add(string key, byte[] val)
         {
             throw new NotImplemented();
@@ -244,16 +184,6 @@ public class Headers: IEnumerable<IHeader>
         }
 
         public override void Remove(string key)
-        {
-            throw new NotImplemented();
-        }
-
-        public override bool TryGetLastBytes(string key, out byte[] lastHeader)
-        {
-            throw new NotImplemented();
-        }
-
-        public override byte[] GetLastBytes(string key)
         {
             throw new NotImplemented();
         }

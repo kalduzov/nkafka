@@ -91,7 +91,7 @@ internal sealed partial class KafkaConnector
         // handshake step
         var saslHandshakeRequest = new SaslHandshakeRequestMessage
         {
-            Mechanism = _saslSettings.MechanismAsString(saslMechanism)
+            Mechanism = SaslSettings.MechanismAsString(saslMechanism)
         };
 
         var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeRequestMessage, SaslHandshakeResponseMessage>(

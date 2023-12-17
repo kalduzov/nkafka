@@ -27,7 +27,7 @@ using CEM = NKafka.Resources.ConfigExceptionMessages;
 namespace NKafka.Config;
 
 /// <summary>
-/// 
+/// Represents the configuration for message partitioning.
 /// </summary>
 public class PartitionerConfig
 {

@@ -25,16 +25,9 @@ using NKafka.Config;
 
 namespace NKafka.Clients.Producer.Internals;
 
-internal class TransactionManager: ITransactionManager
+internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFactory): ITransactionManager
 {
-    private readonly string _transactionalId;
-    private readonly int _transactionTimeoutMs;
-    private readonly ILogger<TransactionManager> _logger;
-
-    public TransactionManager(ProducerConfig config, ILoggerFactory loggerFactory)
-    {
-        _transactionalId = config.TransactionalId;
-        _transactionTimeoutMs = config.TransactionTimeoutMs;
-        _logger = loggerFactory.CreateLogger<TransactionManager>();
-    }
+    private readonly string _transactionalId = config.TransactionalId;
+    private readonly int _transactionTimeoutMs = config.TransactionTimeoutMs;
+    private readonly ILogger<TransactionManager> _logger = loggerFactory.CreateLogger<TransactionManager>();
 }

@@ -119,7 +119,7 @@ internal class MessagesSender: IMessagesSender
 
     private async Task SendProducerDataAsync(CancellationToken token)
     {
-        var batches = _recordAccumulator.PullBathes(_kafkaCluster, _config.MaxRequestSize);
+        var batches = _recordAccumulator.PullReadyBatches(_kafkaCluster, _config.MaxRequestSize);
 
         foreach (var batch in batches)
         {

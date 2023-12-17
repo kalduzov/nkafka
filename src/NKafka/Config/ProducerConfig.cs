@@ -26,12 +26,12 @@ using NKafka.Metrics;
 namespace NKafka.Config;
 
 /// <summary>
-/// 
+/// Represents the configuration for a producer.
 /// </summary>
 public record ProducerConfig: CommonConfig
 {
     /// <summary>
-    /// 
+    /// Represents an empty producer configuration.
     /// </summary>
     public static readonly ProducerConfig EmptyProducerConfig = new();
 
@@ -104,17 +104,20 @@ public record ProducerConfig: CommonConfig
     public IProducerMetrics Metrics { get; set; } = new NullProducerMetrics();
 
     /// <summary>
-    /// 
+    /// Gets or sets the unique identifier for a transaction.
     /// </summary>
+    /// <value>
+    /// The transactional identifier.
+    /// </value>
     public string TransactionalId { get; set; } = string.Empty;
 
     /// <summary>
-    /// 
+    /// Gets or sets the transaction timeout in milliseconds.
     /// </summary>
     public int TransactionTimeoutMs { get; set; } = 60000;
 
     /// <summary>
-    /// 
+    /// Gets or sets a value indicating whether idempotence is enabled.
     /// </summary>
     public bool EnableIdempotence { get; set; } = false;
 

@@ -50,9 +50,8 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         public ConcurrentDictionary<Partition, Deque<ProducerBatch>> Batches { get; } = new();
     }
 
-    private readonly ConcurrentDictionary<string, TopicBatches> _topicBatchesMap;
+    private readonly ConcurrentDictionary<string, TopicBatches> _batchesByTopics;
     private readonly int _batchSize;
-    private readonly ArrayPool<byte> _bufferPool;
     private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly bool _closed;
     private readonly CompressionType _compressionType;
@@ -71,7 +70,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         int deliveryTimeoutMs,
         ILoggerFactory loggerFactory)
     {
-        _topicBatchesMap = new ConcurrentDictionary<string, TopicBatches>();
+        _batchesByTopics = new ConcurrentDictionary<string, TopicBatches>();
         _metrics = config.Metrics;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
@@ -81,12 +80,20 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         _compressionType = config.CompressionType;
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
-        _bufferPool = ArrayPool<byte>.Create(config.BufferMemory, _batchSize);
+        ArrayPool<byte>.Create(config.BufferMemory, _batchSize);
         _memoryStreamManager = new RecyclableMemoryStreamManager(config.BufferMemory, _batchSize);
 
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Appends a record to the specified topic partition with the given timestamp, key, value, and headers.
+    /// </summary>
+    /// <param name="topicPartition">The topic partition to append the record to.</param>
+    /// <param name="timestamp">The timestamp of the record.</param>
+    /// <param name="key">The key of the record.</param>
+    /// <param name="value">The value of the record.</param>
+    /// <param name="headers">The headers of the record.</param>
+    /// <returns>A <see cref="RecordAppendResult"/> object representing the result of the append operation.</returns>
     public RecordAppendResult Append(
         TopicPartition topicPartition,
         long timestamp,
@@ -97,7 +104,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         Interlocked.Increment(ref _appendsInProgress);
 
         // list of batches for a specific topic divided by partitions
-        var topicBatches = _topicBatchesMap.GetOrAdd(topicPartition.Topic, new TopicBatches());
+        var topicBatches = _batchesByTopics.GetOrAdd(topicPartition.Topic, _ => new TopicBatches());
 
         var stream = Stream.Null;
 
@@ -237,7 +244,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     /// <inheritdoc/>
     public void FlushAll(TimeSpan timeSpan)
     {
-        foreach (var batches in _topicBatchesMap.Values)
+        foreach (var batches in _batchesByTopics.Values)
         {
             foreach (var batchesValue in batches.Batches.Values)
             {
@@ -256,33 +263,43 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     }
 
     /// <inheritdoc/>
-    public IEnumerable<ProducerBatch> PullBathes(IKafkaCluster kafkaCluster, int maxRequestSize)
+    public IEnumerable<ProducerBatch> PullReadyBatches(IKafkaCluster kafkaCluster, int maxRequestSize)
     {
         var size = 0;
 
-        foreach (var topicBatches in _topicBatchesMap.Values)
+        foreach (var batches in _batchesByTopics.Values) //Обрабатываем все данные по всем топикам за раз
         {
-            foreach (var topicBatch in topicBatches.Batches.Values)
+            foreach (var deque in batches.Batches.Values) // Ищем все собранные очереди в разрезе партиций
             {
                 ProducerBatch? batch;
 
-                lock (topicBatch)
+                lock (deque) // Блокируем очередную очередь
                 {
-                    batch = topicBatch.PeekFront();
+                    batch = deque.PeekFront(); // Проверяем первый пакет перед извлечением
 
-                    if (batch is null)
+                    if (batch is null) // Пакета нету - идем к следующей очереди
                     {
                         continue;
                     }
 
+                    // Пакет есть - проверяем, если мы добавим этот пакет в запрос, его размер превысит ограничение на запрос?
+                    // Если это первый пакет, то мы игнорируем процесс отбора. Первый пакет отправляется всегда!
                     if (size + batch.Size > maxRequestSize)
                     {
-                        break;
+                        if (size == 0) //первый пакет для отправки
+                        {
+                            _logger.LogWarning(
+                                "Пакет имеет размер больше чем требуется. Т.к. это первый пакет - он все равно будет отправлен. Пожалуйста повысьте значение MaxRequestSize");
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
 
                     if (batch.IsReady) //todo всегда true, надо что-то с этим сделать
                     {
-                        batch = topicBatch.PopFront();
+                        batch = deque.PopFront();
                     }
                     else
                     {

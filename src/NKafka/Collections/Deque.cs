@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,11 +45,18 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
 
     public bool IsFull => Count >= _array.Length;
 
+    /// <summary>Creates a new instance of Deque.</summary>
+    /// <typeparam name="T">The type of elements in the Deque.</typeparam>
     public Deque()
     {
         _array = new T[_DEFAULT_CAPACITY];
     }
 
+    /// <summary>
+    /// Initializes a new instance of the Deque class with the specified capacity.
+    /// </summary>
+    /// <param name="capacity">The capacity of the deque.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the capacity is less than zero.</exception>
     public Deque(int capacity)
     {
         if (capacity < 0)
@@ -61,6 +68,10 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         _array = new T[initialCapacity];
     }
 
+    /// <summary>
+    /// Constructs a new instance of the <see cref="Deque{T}"/> class with the elements copied from the specified collection.
+    /// </summary>
+    /// <param name="collection">The collection from which the elements are copied.</param>
     public Deque(ICollection<T> collection)
         : this(collection.Count)
     {
@@ -76,6 +87,16 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
 
     object ICollection.SyncRoot => this;
 
+    /// <summary>
+    /// Copies the elements of the <paramref name="array"/> to a specified index in the current queue.
+    /// </summary>
+    /// <param name="array">The one-dimensional array that is the destination of the elements copied from the queue. The array must have zero-based indexing.</param>
+    /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="array"/> is null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="array"/> is multidimensional, or it has a non-zero lower bound.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the length of <paramref name="array"/>.</exception>
+    /// <exception cref="ArgumentException">The number of elements in the queue is greater than the available space from the specified <paramref name="index"/> to the end of the destination array.</exception>
+    /// <exception cref="ArgumentException">The type of the source or destination array is not compatible with the type of the items in the queue.</exception>
     public void CopyTo(Array array, int index)
     {
         if (array == null)
@@ -85,12 +106,12 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
 
         if (array.Rank != 1)
         {
-            throw new ArgumentException(nameof(array));
+            throw new ArgumentException(null, nameof(array));
         }
 
         if (array.GetLowerBound(0) != 0)
         {
-            throw new ArgumentException(nameof(array));
+            throw new ArgumentException(null, nameof(array));
         }
 
         var arrayLen = array.Length;
@@ -148,6 +169,9 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         return new Enumerator(this);
     }
 
+    /// <summary>
+    /// Clears the contents of the collection.
+    /// </summary>
     public void Clear()
     {
         if (IsEmpty is not false)
@@ -174,6 +198,11 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         _version++;
     }
 
+    /// <summary>
+    /// Pushes an item to the back of the array.
+    /// </summary>
+    /// <typeparam name="T">The type of the item.</typeparam>
+    /// <param name="item">The item to be pushed to the back of the array.</param>
     public void PushBack(T item)
     {
         if (Count == _array.Length)
@@ -193,6 +222,10 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         Count++;
     }
 
+    /// <summary>
+    /// Inserts an item at the front of the collection.
+    /// </summary>
+    /// <param name="item">The item to be inserted.</param>
     public void PushFront(T item)
     {
         if (Count == _array.Length)
@@ -205,6 +238,17 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         Count++;
     }
 
+    /// <summary>
+    /// Removes and returns the element at the front of the array.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the array.</typeparam>
+    /// <returns>The element that was removed from the front of the array.</returns>
+    /// <remarks>
+    /// The method assumes that the array is not empty. It is the caller's responsibility to ensure that there are elements remaining in the array before calling this method.
+    /// The removed element is replaced with a default value of type T.
+    /// If the head index reaches the end of the array, it wraps around to 0.
+    /// The Count property is decremented by 1 after the element is removed.
+    /// </remarks>
     public T PopFront()
     {
         Debug.Assert(!IsEmpty); // caller's responsibility to make sure there are elements remaining
@@ -224,6 +268,16 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         return item;
     }
 
+    /// <summary>
+    /// Removes and returns the last element in the collection.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the collection.</typeparam>
+    /// <returns>The last element in the collection.</returns>
+    /// <remarks>
+    /// This method removes and returns the last element in the collection,
+    /// decrementing the tail index and updating the count accordingly.
+    /// If the tail index reaches -1, it wraps around to the end of the internal array.
+    /// </remarks>
     public T PopBack()
     {
         Debug.Assert(!IsEmpty);
@@ -243,11 +297,23 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
         return item;
     }
 
+    /// <summary>
+    /// Retrieves the front element of the underlying array without removing it.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the array.</typeparam>
+    /// <returns>
+    /// The front element of the array if it exists; otherwise, the default value of the type <typeparamref name="T"/>.
+    /// </returns>
     public T? PeekFront()
     {
         return IsEmpty ? default : _array[_head];
     }
 
+    /// <summary>
+    /// Returns the last element of the queue without removing it.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the queue.</typeparam>
+    /// <returns>The last element of the queue if the queue is not empty; otherwise, the default value of the type.</returns>
     public T? PeekBack()
     {
         return IsEmpty ? default : _array[_tail];

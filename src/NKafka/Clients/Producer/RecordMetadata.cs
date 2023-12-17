@@ -22,27 +22,33 @@
 namespace NKafka.Clients.Producer;
 
 /// <summary>
-/// 
+/// Represents metadata information for a record.
 /// </summary>
 public record RecordMetadata
 {
     /// <summary>
-    /// 
+    /// Gets or sets the topic and partition information.
     /// </summary>
     public TopicPartition? TopicPartition { get; set; }
 
-    /// <summary>
-    /// 
-    /// </summary>
+    /// Gets or sets the offset value.
+    /// /
     public Offset Offset { get; set; }
 
     /// <summary>
-    /// 
+    /// Gets or sets the size of the serialized key.
     /// </summary>
+    /// <value>
+    /// The size of the serialized key.
+    /// </value>
     public int SerializedKeySize { get; set; }
 
     /// <summary>
-    /// 
+    /// Gets or sets the size of the serialized value.
     /// </summary>
+    /// <remarks>
+    /// This property represents the size, in bytes, of the serialized value of an object.
+    /// It is used to determine the amount of space required to store the serialized value.
+    /// </remarks>
     public int SerializedValueSize { get; set; }
 }

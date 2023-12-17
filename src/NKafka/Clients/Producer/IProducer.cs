@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -61,55 +61,60 @@ public interface IProducer<TKey, TValue>: IProducer
     void Flush(TimeSpan timeout);
 
     /// <summary>
-    /// 
+    /// Retrieves the partitions metadata for a given topic.
     /// </summary>
-    /// <param name="topic"></param>
-    /// <returns></returns>
+    /// <param name="topic">The name of the topic.</param>
+    /// <returns>A read-only collection of PartitionMetadata objects representing the partitions for the topic.</returns>
     IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic);
 
     /// <summary>
-    /// 
+    /// Closes the application with the specified timeout.
     /// </summary>
-    /// <param name="timeout"></param>
+    /// <param name="timeout">The duration to wait before closing the application.</param>
     void Close(TimeSpan timeout);
 
     /// <summary>
-    /// 
+    /// Closes the asynchronous operation.
     /// </summary>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <param name="token">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     ValueTask CloseAsync(CancellationToken token);
 
     #region Produce
 
     /// <summary>
+    /// Produces a message asynchronously to the specified topic.
     /// </summary>
-    /// <param name="topicName"></param>
-    /// <param name="message"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <param name="topicName">The name of the topic to which the message will be produced.</param>
+    /// <param name="message">The message to be produced.</param>
+    /// <param name="token">A cancellation token that can be used to cancel the asynchronous operation.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the delivery result of the produced message.</returns>
     Task<DeliveryResult<TKey, TValue>> ProduceAsync(string topicName, Message<TKey, TValue> message, CancellationToken token = default)
     {
         return ProduceAsync(new TopicPartition(topicName, Partition.Any), message, token);
     }
 
     /// <summary>
+    /// Asynchronously produces a message to the specified topic and partition.
     /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <param name="topicPartition">The topic and partition to produce the message to.</param>
+    /// <param name="message">The message to produce.</param>
+    /// <param name="token">The cancellation token.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the delivery result.</returns>
     Task<DeliveryResult<TKey, TValue>> ProduceAsync(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
         CancellationToken token = default);
 
     /// <summary>
+    /// Produces a batch of messages to the specified topic asynchronously.
     /// </summary>
-    /// <param name="topicName"></param>
-    /// <param name="messages"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <typeparam name="TKey">The type of the message key.</typeparam>
+    /// <typeparam name="TValue">The type of the message value.</typeparam>
+    /// <param name="topicName">The name of the topic.</param>
+    /// <param name="messages">The messages to be produced.</param>
+    /// <param name="token">A cancellation token to cancel the operation.</param>
+    /// <returns>An asynchronous enumerable that represents the delivery results for each produced message.</returns>
     IAsyncEnumerable<DeliveryResult<TKey, TValue>> ProduceAsync(
         string topicName,
         IEnumerable<Message<TKey, TValue>> messages,
@@ -119,11 +124,12 @@ public interface IProducer<TKey, TValue>: IProducer
     }
 
     /// <summary>
+    /// Asynchronously produces a batch of messages to the specified topic and partition.
     /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="messages"></param>
-    /// <param name="token"></param>
-    /// <returns></returns>
+    /// <param name="topicPartition">The topic and partition to produce the messages to.</param>
+    /// <param name="messages">The messages to be produced.</param>
+    /// <param name="token">The cancellation token to cancel the operation.</param>
+    /// <returns>A sequence of delivery results for each produced message.</returns>
     async IAsyncEnumerable<DeliveryResult<TKey, TValue>> ProduceAsync(
         TopicPartition topicPartition,
         IEnumerable<Message<TKey, TValue>> messages,

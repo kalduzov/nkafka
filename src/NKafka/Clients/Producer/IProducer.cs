@@ -54,13 +54,6 @@ public interface IProducer<TKey, TValue>: IProducer
     Task FlushAsync(CancellationToken token);
 
     /// <summary>
-    /// Sends all pending accumulated messages and waits for a response to the result of the send
-    /// </summary>
-    /// <param name="timeout">Send timeout</param>
-    /// <remarks>The method blocks for the timeout</remarks>
-    void Flush(TimeSpan timeout);
-
-    /// <summary>
     /// Retrieves the partitions metadata for a given topic.
     /// </summary>
     /// <param name="topic">The name of the topic.</param>

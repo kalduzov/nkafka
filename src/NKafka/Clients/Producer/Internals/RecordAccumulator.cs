@@ -21,7 +21,6 @@
  * limitations under the License.
  */
 
-using System.Buffers;
 using System.Collections.Concurrent;
 
 using Microsoft.Extensions.Logging;
@@ -80,7 +79,6 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         _compressionType = config.CompressionType;
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
-        ArrayPool<byte>.Create(config.BufferMemory, _batchSize);
         _memoryStreamManager = new RecyclableMemoryStreamManager(config.BufferMemory, _batchSize);
 
     }
@@ -242,28 +240,34 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     }
 
     /// <inheritdoc/>
-    public void FlushAll(TimeSpan timeSpan)
+    public async Task FlushAllAsync(CancellationToken cancellationToken)
     {
-        foreach (var batches in _batchesByTopics.Values)
+        if (_flushesInProgress > 0)
         {
-            foreach (var batchesValue in batches.Batches.Values)
+            return;
+        }
+
+        Interlocked.Increment(ref _flushesInProgress);
+
+        try
+        {
+            foreach (var batches in _batchesByTopics.Values)
             {
-                // foreach (var batch in batchesValue)
-                // {
-                //     batch.IsReady = true;
-                // }
+                foreach (var batchesByPartitions in batches.Batches.Values)
+                {
+                    //batchesByPartitions.
+                }
             }
         }
+        finally
+        {
+            Interlocked.Decrement(ref _flushesInProgress);
+        }
+
     }
 
     /// <inheritdoc/>
-    public Task FlushAllAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public IEnumerable<ProducerBatch> PullReadyBatches(IKafkaCluster kafkaCluster, int maxRequestSize)
+    public IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize)
     {
         var size = 0;
 

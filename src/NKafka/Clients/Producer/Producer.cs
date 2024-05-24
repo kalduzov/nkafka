@@ -163,15 +163,21 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     }
 
     /// <inheritdoc/>
-    public Task FlushAsync(CancellationToken token)
+    public async Task FlushAsync(CancellationToken token)
     {
-        return _accumulator.FlushAllAsync(token);
-    }
+        _logger.FlushingRecordsTrace();
 
-    /// <inheritdoc/>
-    public void Flush(TimeSpan timeout)
-    {
-        _accumulator.FlushAll(timeout);
+        var timestamp = Stopwatch.StartNew();
+
+        try
+        {
+            await _accumulator.FlushAllAsync(token);
+        }
+        finally
+        {
+            timestamp.Stop();
+            _producerMetrics.Flush(timestamp.ElapsedMilliseconds);
+        }
     }
 
     /// <inheritdoc/>

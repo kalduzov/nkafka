@@ -31,7 +31,7 @@ namespace NKafka.Collections;
 /// The implementation of the double ended queue is based on the internal implementation of System.Collections.Generic.Deque&lt;T&gt;
 /// </summary>
 [DebuggerDisplay("Count = {Count}")]
-internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection<T>
+internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     where T : class
 {
     private const int _DEFAULT_CAPACITY = 8;
@@ -378,8 +378,7 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
     // Implements an enumerator for a Queue.  The enumerator uses the
     // internal version number of the list to ensure that no modifications are
     // made to the list while an enumeration is in progress.
-    internal struct Enumerator: IEnumerator<T>,
-        IEnumerator
+    private struct Enumerator: IEnumerator<T>
     {
         private readonly Deque<T> _q;
         private readonly int _version;
@@ -468,7 +467,7 @@ internal sealed class Deque<T>: IEnumerable<T>, ICollection, IReadOnlyCollection
             throw new InvalidOperationException();
         }
 
-        object? IEnumerator.Current => Current;
+        object IEnumerator.Current => Current;
 
         void IEnumerator.Reset()
         {

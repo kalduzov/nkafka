@@ -36,20 +36,13 @@ internal interface IRecordAccumulator
     Task FlushAllAsync(CancellationToken token);
 
     /// <summary>
-    /// Flushes all data with a given timeout.
-    /// </summary>
-    /// <param name="timeout">The timeout for flushing all data.</param>
-    void FlushAll(TimeSpan timeout);
-
-    /// <summary>
     /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size.
     /// </summary>
-    /// <param name="kafkaCluster">The Kafka cluster from which to pull the batches.</param>
     /// <param name="maxRequestSize">The maximum size allowed for a single request.</param>
     /// <returns>
     /// An enumerable collection of ProducerBatch objects that are ready to be sent.
     /// </returns>
-    IEnumerable<ProducerBatch> PullReadyBatches(IKafkaCluster kafkaCluster, int maxRequestSize);
+    IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize);
 
     /// <summary>
     /// Adds a new record to the accumulator

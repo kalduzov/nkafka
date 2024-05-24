@@ -54,4 +54,9 @@ internal static partial class ProducerLogExtensions
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Add new batch for {TopicPartition}")]
     public static partial void AddNewBatchTrace(this ILogger logger, TopicPartition topicPartition);
+
+    [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 5,
+        Level = LogLevel.Trace,
+        Message = LogExtensions.LOGGER_PREFIX + "Start flushing records")]
+    public static partial void FlushingRecordsTrace(this ILogger logger);
 }

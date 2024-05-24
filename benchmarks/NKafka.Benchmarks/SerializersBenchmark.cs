@@ -34,52 +34,61 @@ namespace NKafka.Benchmarks;
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net60)]
 [SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net80)]
 public class SerializersBenchmark
 {
-    [Benchmark(Baseline = true)]
-    public byte[] ConfluentDoubleSerializer()
-    {
-        var data = Double.MaxValue;
-
-        if (BitConverter.IsLittleEndian)
-        {
-            unsafe
-            {
-                var result = new byte[8];
-                var p = (byte*)(&data);
-                result[7] = *p++;
-                result[6] = *p++;
-                result[5] = *p++;
-                result[4] = *p++;
-                result[3] = *p++;
-                result[2] = *p++;
-                result[1] = *p++;
-                result[0] = *p++;
-
-                return result;
-            }
-        }
-        else
-        {
-            return BitConverter.GetBytes(data);
-        }
-    }
+    // [Benchmark(Baseline = true)]
+    // public byte[] ConfluentDoubleSerializer()
+    // {
+    //     var data = Double.MaxValue;
+    //
+    //     if (BitConverter.IsLittleEndian)
+    //     {
+    //         unsafe
+    //         {
+    //             var result = new byte[8];
+    //             var p = (byte*)&data;
+    //             result[7] = *p++;
+    //             result[6] = *p++;
+    //             result[5] = *p++;
+    //             result[4] = *p++;
+    //             result[3] = *p++;
+    //             result[2] = *p++;
+    //             result[1] = *p++;
+    //             result[0] = *p++;
+    //
+    //             return result;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         return BitConverter.GetBytes(data);
+    //     }
+    // }
+    //
+    // [Benchmark]
+    // public byte[] NKafkaDoubleSerializer()
+    // {
+    //     var result = new byte[8];
+    //     WriteDoubleBigEndian(result, double.MaxValue);
+    //
+    //     return result;
+    // }
+    //
+    // [Benchmark]
+    // public byte[] NKafkaDoubleSerializer2()
+    // {
+    //     var d = double.MaxValue;
+    //
+    //     return Unsafe.As<double, byte[]>(ref d);
+    // }
 
     [Benchmark]
-    public byte[] NKafkaDoubleSerializer()
+    public byte[] NKafkaLongSerializer()
     {
-        var result = new byte[8];
-        WriteDoubleBigEndian(result, double.MaxValue);
+        var d = long.MaxValue;
 
-        return result;
-    }
-
-    [Benchmark]
-    public byte[] NKafkaDoubleSerializer2()
-    {
-        var d = double.MaxValue;
-
-        return Unsafe.As<double, byte[]>(ref d);
+        return Unsafe.As<long, byte[]>(ref d);
     }
 
     // [Benchmark(Baseline = true)]

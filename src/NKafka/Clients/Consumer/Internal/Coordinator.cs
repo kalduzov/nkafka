@@ -19,11 +19,14 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics;
+
 using Microsoft.Extensions.Logging;
 
 using NKafka.Clients.Producer;
 using NKafka.Config;
 using NKafka.Connection;
+using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
@@ -108,6 +111,8 @@ internal class Coordinator: ICoordinator
     /// <inheritdoc />
     public async ValueTask<bool> NewSessionAsync(Subscription subscription, CancellationToken token)
     {
+        using var activity = KafkaDiagnosticsSource.CreateNewSession();
+
         _logger.LogInformation("Start consumer new session with session timeout {SessionTimeout} ms", _sessionTimeoutMs);
 
         try
@@ -125,8 +130,10 @@ internal class Coordinator: ICoordinator
         }
         catch (ProtocolKafkaException exc)
         {
+
             if (exc.InternalError == ErrorCodes.UnknownTopicOrPartition)
             {
+                activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
                 _logger.LogError(exc, "Не удалось создать новую сессию работы координатора группы");
 
                 throw;
@@ -134,6 +141,7 @@ internal class Coordinator: ICoordinator
         }
         catch (Exception exc)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
             _logger.LogError(exc, "Не удалось создать новую сессию работы координатора группы");
 
             return false;
@@ -301,6 +309,8 @@ internal class Coordinator: ICoordinator
 
     private async Task JoinToGroupAsync(Subscription subscription, CancellationToken token)
     {
+        using var activity = KafkaDiagnosticsSource.JoinGroup(_groupId);
+
         try
         {
             var currentApiVersion = _kafkaCluster
@@ -362,6 +372,7 @@ internal class Coordinator: ICoordinator
         }
         catch (ProtocolKafkaException exc)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
             _logger.LogError(exc, "Joining a group failed");
 
             _consumerMetrics.JoinToGroupFailed(_groupId);
@@ -370,11 +381,13 @@ internal class Coordinator: ICoordinator
         }
         catch (Exception exc) when (_activeSessionAwaiter.Task.IsFaulted)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
             _logger.LogError(exc, "Coordinator for group {Group} not found", _groupId);
             _consumerMetrics.JoinToGroupFailed(_groupId);
         }
         catch (Exception exc)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
             _logger.LogError(exc, "Unknown error");
             _consumerMetrics.JoinToGroupFailed(_groupId);
         }
@@ -532,6 +545,8 @@ internal class Coordinator: ICoordinator
     /// <exception cref="ProtocolKafkaException"></exception>
     internal async Task TryFindCoordinatorForGroupAsync(CancellationToken token)
     {
+        using var activity = KafkaDiagnosticsSource.FindCoordinator();
+
         //Т.к. у нас есть сохраненный коннектор с координатором, то мы уже ранее его находили и он не изменился
         if (_coordinatorConnector != KafkaConnector.Null)
         {
@@ -576,6 +591,7 @@ internal class Coordinator: ICoordinator
         }
         catch (Exception exc)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
             _logger.LogError(exc, "Не удалось получить данные по координатору");
 
             throw;

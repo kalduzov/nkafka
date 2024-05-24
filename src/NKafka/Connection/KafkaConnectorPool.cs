@@ -92,7 +92,13 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
         _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
         _socketFactory = new SocketFactory();
-        _memoryStreamManager = new RecyclableMemoryStreamManager(1024, messageMaxBytes / 16, messageMaxBytes);
+        var options = new RecyclableMemoryStreamManager.Options
+        {
+            BlockSize = 1024,
+            LargeBufferMultiple = messageMaxBytes / 16,
+            MaximumBufferSize = messageMaxBytes
+        };
+        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
         _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedBrokers.Count);
         _brokersNumberCounter = new RandomNumberCounter();
 
@@ -132,7 +138,13 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
         _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
         _socketFactory = new SocketFactory();
-        _memoryStreamManager = new RecyclableMemoryStreamManager(1024, messageMaxBytes / 16, messageMaxBytes);
+        var options = new RecyclableMemoryStreamManager.Options
+        {
+            BlockSize = 1024,
+            LargeBufferMultiple = messageMaxBytes / 16,
+            MaximumBufferSize = messageMaxBytes
+        };
+        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
         _brokersNumberCounter = new RandomNumberCounter();
         _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedConnectors.Count);
 

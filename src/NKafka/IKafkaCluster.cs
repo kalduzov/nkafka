@@ -154,7 +154,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="token"></param>
     /// <param name="topics">List of topics for which you need to get information from brokers</param>
     /// <remarks>If no topics are specified, information on all cluster topics will be returned</remarks>
-    Task RefreshMetadataAsync(IEnumerable<string> topics, CancellationToken token = default);
+    Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token = default);
 
     /// <summary>
     /// Opens a network connection to a kafka broker and initializes metadata for the entire kafka cluster

@@ -45,6 +45,7 @@ public record SslSettings
     /// </summary>
     public bool CheckCertificateRevocation { get; set; } = true;
 
+#pragma warning disable CS1574, CS1584, CS1581, CS1580
     /// <summary>
     /// Gets or sets the callback used to validate the remote certificate in an SSL/TLS connection.
     /// </summary>
@@ -67,6 +68,7 @@ public record SslSettings
     /// were encountered during the validation. This can include errors such as the certificate not
     /// being trusted, or the common name not matching the host name.
     /// </remarks>
+#pragma warning restore CS1574, CS1584, CS1581, CS1580
     public RemoteCertificateValidationCallback? RemoteCertificateValidationCallback { get; set; } = null;
 
     /// <summary>

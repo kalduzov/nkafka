@@ -84,7 +84,9 @@ public interface IProducer<TKey, TValue>: IProducer
     /// <returns>A task representing the asynchronous operation. The task result contains the delivery result of the produced message.</returns>
     Task<DeliveryResult<TKey, TValue>> ProduceAsync(string topicName, Message<TKey, TValue> message, CancellationToken token = default)
     {
-        return ProduceAsync(new TopicPartition(topicName, Partition.Any), message, token);
+        var topicPartition = new TopicPartition(topicName, Partition.Any);
+
+        return ProduceAsync(topicPartition, message, token);
     }
 
     /// <summary>

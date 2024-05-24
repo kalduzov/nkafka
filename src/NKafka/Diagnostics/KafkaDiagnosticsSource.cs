@@ -29,6 +29,7 @@ using System.Text;
 using FastEnumUtility;
 
 using NKafka.Clients.Admin;
+using NKafka.Clients.Consumer;
 using NKafka.Protocol;
 
 namespace NKafka.Diagnostics;
@@ -73,7 +74,7 @@ internal static class KafkaDiagnosticsSource
         EndPoint endPoint)
     {
         var activity = _internalActivitySource
-            .StartActivity()
+            .StartActivity($"InternalSendMessage - {key.FastToString()}")
             ?.AddTag("Key", key.FastToString())
             .AddTag("Version", version.FastToString())
             .AddTag("RequestId", requestId.ToString())
@@ -97,6 +98,103 @@ internal static class KafkaDiagnosticsSource
     {
         var activity = _activitySource.StartActivity()
             ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics.Count <= 0 || activity is null)
+        {
+            return activity;
+        }
+        var sb = new StringBuilder();
+
+        var first = true;
+
+        foreach (var topic in topics)
+        {
+            if (!first)
+            {
+                sb.Append(',');
+            }
+            sb.Append(topic);
+
+            if (first)
+            {
+                first = false;
+            }
+        }
+        activity.AddTag("topics", sb.ToString());
+
+        return activity;
+    }
+
+    public static Activity? SubscribeTopics(IReadOnlyCollection<string> topics)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics.Count <= 0 || activity is null)
+        {
+            return activity;
+        }
+        var sb = new StringBuilder();
+
+        var first = true;
+
+        foreach (var topic in topics)
+        {
+            if (!first)
+            {
+                sb.Append(',');
+            }
+            sb.Append(topic);
+
+            if (first)
+            {
+                first = false;
+            }
+        }
+        activity.AddTag("topics", sb.ToString());
+
+        return activity;
+    }
+
+    public static Activity? CreateNewSession()
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        return activity;
+    }
+
+    public static Activity? FindCoordinator()
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        return activity;
+    }
+
+    public static Activity? JoinGroup(string groupId)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        activity?.SetTag("group", groupId);
+
+        return activity;
+    }
+
+    public static Activity? RefreshMetadata(IReadOnlyCollection<string>? topics)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics is null)
+        {
+            activity?.SetTag("FullMetadata", "true");
+
+            return activity;
+        }
+
+        activity?.SetTag("FullMetadata", "false");
 
         if (topics.Count <= 0 || activity is null)
         {

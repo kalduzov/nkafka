@@ -65,19 +65,13 @@ var clusterConfig = new ClusterConfig
 //     .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
 //     .AddSource("NKafka.Internal")
 //     .AddSource("NKafka")
-//     .AddJaegerExporter(
-//         options =>
-//         {
-//             options.AgentHost = "localhost";
-//             options.AgentPort = 6831;
-//             options.Protocol = JaegerExportProtocol.UdpCompactThrift;
-//             options.ExportProcessorType = ExportProcessorType.Simple;
-//         })
-//     .AddConsoleExporter()
+//     .AddOtlpExporter()
+//     //.AddConsoleExporter()
 //     .Build();
-//
+
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}",
+        theme: AnsiConsoleTheme.Code)
     .MinimumLevel.Information()
     .CreateLogger();
 
@@ -160,7 +154,8 @@ while (await channel1.WaitToReadAsync())
 {
     var record = await channel1.ReadAsync();
     Console.WriteLine(record.Message.Value);
-    await consumer1.CommitOffsetAsync(); // Этот метод закоммитит все offsets, которые были считаны, (т.е. которые вернулись после ReadAsync) последними из канала выше
+    await consumer1
+        .CommitOffsetAsync(); // Этот метод закоммитит все offsets, которые были считаны, (т.е. которые вернулись после ReadAsync) последними из канала выше
 }
 
 await consumer1.UnsubscribeAsync();

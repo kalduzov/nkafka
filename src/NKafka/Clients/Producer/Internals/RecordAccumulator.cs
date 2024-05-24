@@ -79,7 +79,11 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         _compressionType = config.CompressionType;
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
-        _memoryStreamManager = new RecyclableMemoryStreamManager(config.BufferMemory, _batchSize);
+        var options = new RecyclableMemoryStreamManager.Options
+        {
+            BlockSize = config.BufferMemory,
+        };
+        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
 
     }
 

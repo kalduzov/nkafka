@@ -243,7 +243,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public Task RefreshMetadataAsync(IEnumerable<string> topics, CancellationToken token = default)
+    public Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token = default)
     {
         return InternalRefreshMetadataAsync(topics, token: token);
     }
@@ -395,18 +395,30 @@ internal sealed class KafkaCluster: IKafkaCluster
         bool skipException = false,
         CancellationToken token = default)
     {
-        if (!skipException)
+        var localTopics = topics?.ToArray();
+        using var activity = KafkaDiagnosticsSource.RefreshMetadata(localTopics);
+
+        try
         {
-            ThrowExceptionIfClusterClosed();
+            if (!skipException)
+            {
+                ThrowExceptionIfClusterClosed();
+            }
+
+            token.ThrowIfCancellationRequested();
+
+            var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метаданные из брокера, который является контроллером
+            await kafkaConnector.OpenAsync(token);
+            var request = MetadataRequestMessage.Build(Config.AllowAutoTopicCreation, localTopics);
+            var response = await kafkaConnector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(request, true, token);
+            await ProcessMetadataResponse(response, token);
         }
+        catch (Exception exc)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
 
-        token.ThrowIfCancellationRequested();
-
-        var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метаданные из брокера, который является контроллером
-        await kafkaConnector.OpenAsync(token);
-        var request = MetadataRequestMessage.Build(Config.AllowAutoTopicCreation, topics);
-        var response = await kafkaConnector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(request, true, token);
-        await ProcessMetadataResponse(response, token);
+            throw;
+        }
     }
 
     private async Task ProcessMetadataResponse(MetadataResponseMessage responseMessage, CancellationToken token)

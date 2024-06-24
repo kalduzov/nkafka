@@ -77,4 +77,14 @@ public sealed partial class EndTxnResponseMessageTests: ResponseMessageTests<End
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new EndTxnResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

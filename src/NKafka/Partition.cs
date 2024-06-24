@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,7 +31,13 @@ namespace NKafka;
 ///     its purpose is to add some syntactical sugar
 ///     related to special values.
 /// </remarks>
-public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
+/// <remarks>
+///     Initializes a new instance of the Partition structure.
+/// </remarks>
+/// <param name="partition">
+///     The partition value
+/// </param>
+public readonly struct Partition(int partition): IEquatable<Partition>, IComparable<Partition>
 {
     private const int _UNASSIGN_PARTITION_INDEX = -1;
 
@@ -41,24 +47,12 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     public static readonly Partition Any = new(_UNASSIGN_PARTITION_INDEX);
 
     /// <summary>
-    ///     Initializes a new instance of the Partition structure.
-    /// </summary>
-    /// <param name="partition">
-    ///     The partition value
-    /// </param>
-    public Partition(int partition)
-    {
-        Value = partition;
-    }
-
-    /// <summary>
     ///     Gets the int value corresponding to this partition.
     /// </summary>
-    public int Value { get; }
+    public int Value { get; } = partition;
 
     /// <summary>
-    ///     Gets whether or not this is one of the special
-    ///     partition values.
+    /// Gets whether this is one of the special partition values.
     /// </summary>
     public bool IsSpecial => Value == _UNASSIGN_PARTITION_INDEX;
 
@@ -69,7 +63,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The object to test.
     /// </param>
     /// <returns>
-    ///     true if obj is a Partition instance and has the same value. false otherwise.
+    ///     true if <paramref name="obj"/> is a Partition instance and has the same value. false otherwise.
     /// </returns>
     public override bool Equals(object? obj)
     {
@@ -88,7 +82,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The partition to test.
     /// </param>
     /// <returns>
-    ///     true if other has the same value. false otherwise.
+    ///     true if <paramref name="other"/> has the same value. false otherwise.
     /// </returns>
     public bool Equals(Partition other)
     {
@@ -96,7 +90,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is equal to Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is equal to Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -105,7 +99,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a and b are equal. false otherwise.
+    ///     true if Partition value <paramref name="a"/> and <paramref name="b"/> are equal. false otherwise.
     /// </returns>
     public static bool operator ==(Partition a, Partition b)
     {
@@ -113,7 +107,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is not equal to Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is not equal to Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -122,7 +116,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a and b are not equal. false otherwise.
+    ///     true if Partition value <paramref name="a"/> and <paramref name="b"/> are not equal. false otherwise.
     /// </returns>
     public static bool operator !=(Partition a, Partition b)
     {
@@ -130,7 +124,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is greater than Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is greater than Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -139,7 +133,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a is greater than Partition value b. false otherwise.
+    ///     true if Partition value <paramref name="a"/> is greater than Partition value <paramref name="b"/>. false otherwise.
     /// </returns>
     public static bool operator >(Partition a, Partition b)
     {
@@ -147,7 +141,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is less than Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is less than Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -156,7 +150,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a is less than Partition value b. false otherwise.
+    ///     true if Partition value <paramref name="a"/> is less than Partition value <paramref name="b"/>. false otherwise.
     /// </returns>
     public static bool operator <(Partition a, Partition b)
     {
@@ -164,7 +158,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is greater than or equal to Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is greater than or equal to Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -173,7 +167,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a is greater than or equal to Partition value b. false otherwise.
+    ///     true if Partition value <paramref name="a"/> is greater than or equal to Partition value <paramref name="b"/>. false otherwise.
     /// </returns>
     public static bool operator >=(Partition a, Partition b)
     {
@@ -181,7 +175,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Tests whether Partition value a is less than or equal to Partition value b.
+    ///     Tests whether Partition value <paramref name="a"/> is less than or equal to Partition value <paramref name="b"/>.
     /// </summary>
     /// <param name="a">
     ///     The first Partition value to compare.
@@ -190,7 +184,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     ///     The second Partition value to compare.
     /// </param>
     /// <returns>
-    ///     true if Partition value a is less than or equal to Partition value b. false otherwise.
+    ///     true if Partition value <paramref name="a"/> is less than or equal to Partition value <paramref name="b"/>. false otherwise.
     /// </returns>
     public static bool operator <=(Partition a, Partition b)
     {
@@ -205,7 +199,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     /// </returns>
     public override int GetHashCode()
     {
-        return Value.GetHashCode();
+        return Value;
     }
 
     /// <summary>
@@ -219,7 +213,7 @@ public readonly struct Partition: IEquatable<Partition>, IComparable<Partition>
     }
 
     /// <summary>
-    ///     Converts the specified int value to an Partition value.
+    ///     Converts the specified int value to a Partition value.
     /// </summary>
     /// <param name="value">
     ///     The int value to convert.

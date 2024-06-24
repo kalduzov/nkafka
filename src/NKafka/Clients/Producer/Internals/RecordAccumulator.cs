@@ -285,7 +285,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 {
                     batch = deque.PeekFront(); // Проверяем первый пакет перед извлечением
 
-                    if (batch is null) // Пакета нету - идем к следующей очереди
+                    if (batch is null) // Пакета нет - идем к следующей очереди
                     {
                         continue;
                     }

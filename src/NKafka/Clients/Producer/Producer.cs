@@ -190,12 +190,6 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     }
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
     public void Close(TimeSpan timeout)
     {
         _closed = true;
@@ -304,16 +298,18 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         bool isFireAndForget,
         CancellationToken token = default)
     {
-        _logger.ProduceMessageTrace(topicPartition);
+        var newTopicPartition = topicPartition;
+
+        _logger.ProduceMessageTrace(newTopicPartition);
 
         ThrowIfProducerClosed();
 
-        using var activity = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, isFireAndForget);
+        using var activity = KafkaDiagnosticsSource.ProduceMessage(newTopicPartition, message, isFireAndForget);
 
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
+            _ = await KafkaCluster.GetPartitionsAsync(newTopicPartition.Topic, token);
 
             var headers = message.Headers;
             var serializedKey = await SerializeAsync(_keySerializer, message.Key);
@@ -334,11 +330,14 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                     KafkaCluster,
                     token);
 
-                topicPartition.Partition = computedPartition;
+                newTopicPartition = newTopicPartition with
+                {
+                    Partition = computedPartition
+                };
             }
 
             var appendResult = _accumulator.Append(
-                topicPartition,
+                newTopicPartition,
                 message.Timestamp.UnixTimestampMs,
                 serializedKey,
                 serializedValue,
@@ -349,7 +348,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                 _messagesSender.Wakeup();
             }
 
-            _producerMetrics.AppendBytes(topicPartition, appendResult.AppendedBytes);
+            _producerMetrics.AppendBytes(newTopicPartition, appendResult.AppendedBytes);
 
             if (!isFireAndForget)
             {
@@ -357,13 +356,13 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                     .SendResult!
                     .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token);
 
-                var topicPartitionOffset = new TopicPartitionOffset(topicPartition, sendResult.Offset);
+                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, sendResult.Offset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.Persisted, topicPartitionOffset);
             }
             else
             {
-                var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
+                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, Offset.Unset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.PossiblyPersisted, topicPartitionOffset);
             }

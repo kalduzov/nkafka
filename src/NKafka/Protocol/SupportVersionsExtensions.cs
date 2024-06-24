@@ -375,20 +375,13 @@ internal static partial class SupportVersionsExtensions
         return versions.MaxVersion;
     }
 
-    internal readonly struct ApiKeysVersion: IEquatable<ApiKeysVersion>
+    internal readonly struct ApiKeysVersion(ApiKeys apiKey, ApiVersion minApiVersion, ApiVersion maxApiVersion): IEquatable<ApiKeysVersion>
     {
-        public ApiKeysVersion(ApiKeys apiKey, ApiVersion minApiVersion, ApiVersion maxApiVersion)
-        {
-            ApiKey = apiKey;
-            MinApiVersion = minApiVersion;
-            MaxApiVersion = maxApiVersion;
-        }
+        public ApiKeys ApiKey { get; } = apiKey;
 
-        public ApiKeys ApiKey { get; }
+        public ApiVersion MinApiVersion { get; } = minApiVersion;
 
-        public ApiVersion MinApiVersion { get; }
-
-        public ApiVersion MaxApiVersion { get; }
+        public ApiVersion MaxApiVersion { get; } = maxApiVersion;
 
         public override int GetHashCode()
         {

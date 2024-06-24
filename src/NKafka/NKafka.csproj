@@ -24,6 +24,7 @@
     <PackageReference Include="System.Diagnostics.DiagnosticSource" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
     <PackageReference Include="FastEnum" />
+    <!--    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"/>-->
     <PackageReference Include="MinVer">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

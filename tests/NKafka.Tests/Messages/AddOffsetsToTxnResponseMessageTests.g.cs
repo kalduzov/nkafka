@@ -77,4 +77,14 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new AddOffsetsToTxnResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

@@ -26,8 +26,10 @@ namespace NKafka;
 /// <summary>
 /// Information about kafka partition
 /// </summary>
-public class TopicPartition: IComparable<TopicPartition>
+public sealed record TopicPartition: IComparable<TopicPartition>
 {
+    private readonly int _hash;
+
     /// <summary>
     /// Topic name
     /// </summary>
@@ -39,9 +41,9 @@ public class TopicPartition: IComparable<TopicPartition>
     public Guid TopicId { get; }
 
     /// <summary>
-    /// Partition in topic
+    /// Partition in the topic
     /// </summary>
-    public Partition Partition { get; set; }
+    public Partition Partition { get; init; }
 
     /// <summary>
     /// Information about kafka partition
@@ -61,11 +63,15 @@ public class TopicPartition: IComparable<TopicPartition>
         Topic = topic;
         TopicId = topicId;
         Partition = partition;
+
+        _hash = 31 * (31 + partition) + topic.GetHashCode();
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
-        => Partition.GetHashCode() * 251 + Topic.GetHashCode();
+    {
+        return _hash;
+    }
 
     /// <inheritdoc />
     public int CompareTo(TopicPartition? other)
@@ -78,42 +84,6 @@ public class TopicPartition: IComparable<TopicPartition>
 
         return topicComparison != 0 ? topicComparison : Partition.CompareTo(other.Partition);
     }
-
-    /// <inheritdoc />
-    public override bool Equals(object? other)
-    {
-        if (other is not TopicPartition topicPartition)
-        {
-            return false;
-        }
-
-        return Topic.Equals(topicPartition.Topic) && Partition == topicPartition.Partition;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
-    public static bool operator ==(TopicPartition a, TopicPartition b)
-    {
-        if (a is null)
-        {
-            return b is null;
-        }
-
-        return a.Equals(b);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
-    public static bool operator !=(TopicPartition a, TopicPartition b)
-        => !(a == b);
 
     /// <inheritdoc />
     public override string ToString()

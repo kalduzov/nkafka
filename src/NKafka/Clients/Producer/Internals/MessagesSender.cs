@@ -38,6 +38,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
     private readonly ILogger<MessagesSender> _logger = loggerFactory.CreateLogger<MessagesSender>();
     private CancellationTokenSource _tokenSource = new();
     private readonly IProducerMetrics _metrics = config.Metrics;
+    private readonly ManualResetEventSlim _resetEvent = new(true);
 
     /// <inheritdoc/>
     public Task StartAsync(CancellationToken stoppingToken)
@@ -51,11 +52,13 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
     /// <inheritdoc/>
     public void Sleep()
     {
+        _resetEvent.Reset();
     }
 
     /// <inheritdoc/>
     public void Wakeup()
     {
+        _resetEvent.Set();
     }
 
     /// <inheritdoc/>
@@ -68,7 +71,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
         var oldThreadName = Thread.CurrentThread.Name;
         Thread.CurrentThread.Name = "Kafka producer I/O thread";
 
-        _logger.LogTrace("Starting producer I/O thread");
+        _logger.StartMessageSenderTrace();
 
         try
         {
@@ -80,12 +83,10 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
 
             while (!token.IsCancellationRequested)
             {
-                //todo вызов этого цикла без паузы постоянно нагружает SOH
+                _resetEvent.Wait(token);
                 await RunOnceAsync(token);
                 await Task.Delay(TimeSpan.FromMilliseconds(config.RetryBackoffMs), token);
             }
-
-            //todo, после основного цикла нужно подчистить все ресурсы
         }
         catch (OperationCanceledException)
         {
@@ -146,7 +147,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
                     }
                     else
                     {
-                        _logger.LogTrace("Error: {ErrorCode}", partitionResponse.Code);
+                        _logger.ErrorTrace(partitionResponse.Code);
                         batch.Fail(partitionResponse.Code);
                     }
                 }

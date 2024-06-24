@@ -51,7 +51,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     private readonly Timer _metadataUpdaterTimer;
     private readonly ClusterMetadata _clusterMetadata;
 
-    //Минимально поддерживаемая версия кафки 
+    // Минимально поддерживаемая версия кафки 
     private readonly Version _minSupportVersion = new(2, 0, 0, 0);
     private readonly ConcurrentDictionary<TopicPartition, PartitionMetadata> _partitionsMetadata = new();
     private readonly ConcurrentDictionary<string, SortedSet<PartitionMetadata>> _partitionsMetadatas = new();
@@ -65,9 +65,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     private volatile int _metadataUpdating;
     private volatile int _metadataUpdatingCounter;
 
-    //Самое большое количество парцитий на топик 
+    // Самое большое количество разделов на топик 
     private int _maxPartitionsByTopic = 1;
-    private ConcurrentDictionary<Guid, string> _topicsById;
+    private readonly ConcurrentDictionary<Guid, string> _topicsById;
 
     /// <summary>
     ///     Create a new kafka cluster
@@ -148,10 +148,9 @@ internal sealed class KafkaCluster: IKafkaCluster
         }
 
         await InternalRefreshMetadataAsync(
-            new[]
-            {
+            [
                 topic
-            },
+            ],
             token: token);
 
         if (_topicPartitions.TryGetValue(topic, out partitions) && partitions.Count != 0)
@@ -373,7 +372,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             return partitionMetadatas;
         }
 
-        return Array.Empty<PartitionMetadata>();
+        return [];
     }
 
     /// <inheritdoc />
@@ -649,7 +648,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             await InternalRefreshMetadataAsync(topics: _topics.Keys, skipException: true, token: token);
         }
 
-        //после этого запускаем цикл обновления данных на постоянку
+        // после этого периодическое обновление данных по брокерам 
         _metadataUpdaterTimer.Change(Config.MetadataUpdateTimeoutMs, Config.MetadataUpdateTimeoutMs);
 
         MergeAllVersions();

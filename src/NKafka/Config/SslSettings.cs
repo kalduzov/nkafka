@@ -29,7 +29,7 @@ namespace NKafka.Config;
 /// </summary>
 public record SslSettings
 {
-    /// <summary
+    /// <summary/>
     internal static readonly SslSettings None = new(false);
 
     internal bool IsSet { get; }

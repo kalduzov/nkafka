@@ -62,7 +62,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// </remarks>
     IDictionary<Guid, string> TopicsById { get; }
 
-    /// <summary
+    /// <summary/>
     bool Closed { get; }
 
     /// <summary>
@@ -90,7 +90,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="topic">The topic whose partitions are to be retrieved.</param>
     /// <param name="token">A CancellationToken to observe cancellation requests.</param>
     /// <returns>
-    /// A <see cref="ValueTask{IReadOnlyCollection{Partition}}"/> representing the asynchronous operation.
+    /// A <see cref="ValueTask{T}"/> where T is a <see cref="IReadOnlyCollection{Partition}"/> is  representing the asynchronous operation.
     /// The task result contains a read-only collection of <see cref="Partition"/> objects representing the partitions of the topic.
     /// </returns>
     ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);

@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,7 +30,7 @@ namespace NKafka.Protocol;
 /// </summary>
 public enum ApiVersion: short
 {
-    LastVersion = Version14,
+    LastVersion = Version16,
 
     Version0 = 0x0000,
     Version1 = 0x0001,
@@ -46,7 +46,9 @@ public enum ApiVersion: short
     Version11 = 0x000B,
     Version12 = 0x000C,
     Version13 = 0x000D,
+    Version14 = 0x000E,
+    Version15 = 0x000F,
 #pragma warning disable CA1069
-    Version14 = 0x000E
+    Version16 = 0x0010,
 #pragma warning restore CA1069
 }

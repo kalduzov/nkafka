@@ -13,27 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Version 1 adds Zk broker epoch to the request if the broker is migrating from Zk mode to KRaft mode.
-
-// Version 2 adds LogDirs for KIP-858
-
-// Version 3 adds the PreviousBrokerEpoch for the KIP-966
 {
-  "apiKey":62,
+  "apiKey": 70,
   "type": "request",
   "listeners": ["controller"],
-  "name": "BrokerRegistrationRequest",
-  "validVersions": "0-3",
+  "name": "ControllerRegistrationRequest",
+  "validVersions": "0",
   "flexibleVersions": "0+",
   "fields": [
-    { "name": "BrokerId", "type": "int32", "versions": "0+", "entityType": "brokerId",
-      "about": "The broker ID." },
-    { "name": "ClusterId", "type": "string", "versions": "0+",
-      "about": "The cluster id of the broker process." },
+    { "name": "ControllerId", "type": "int32", "versions": "0+",
+      "about": "The ID of the controller to register." },
     { "name": "IncarnationId", "type": "uuid", "versions": "0+",
-      "about": "The incarnation id of the broker process." },
+      "about": "The controller incarnation ID, which is unique to each process run." },
+    { "name": "ZkMigrationReady", "type": "bool", "versions": "0+",
+      "about": "Set if the required configurations for ZK migration are present." },
     { "name": "Listeners", "type": "[]Listener",
-      "about": "The listeners of this broker", "versions": "0+", "fields": [
+      "about": "The listeners of this controller", "versions": "0+", "fields": [
       { "name": "Name", "type": "string", "versions": "0+", "mapKey": true,
         "about": "The name of the endpoint." },
       { "name": "Host", "type": "string", "versions": "0+",
@@ -42,37 +37,15 @@
         "about": "The port." },
       { "name": "SecurityProtocol", "type": "int16", "versions": "0+",
         "about": "The security protocol." }
-    ]
-    },
+    ]},
     { "name": "Features", "type": "[]Feature",
-      "about": "The features on this broker", "versions": "0+", "fields": [
+      "about": "The features on this controller", "versions": "0+", "fields": [
       { "name": "Name", "type": "string", "versions": "0+", "mapKey": true,
         "about": "The feature name." },
       { "name": "MinSupportedVersion", "type": "int16", "versions": "0+",
         "about": "The minimum supported feature level." },
       { "name": "MaxSupportedVersion", "type": "int16", "versions": "0+",
         "about": "The maximum supported feature level." }
-    ]
-    },
-    { "name": "Rack", "type": "string", "versions": "0+", "nullableVersions": "0+",
-      "about": "The rack which this broker is in." },
-    { "name": "IsMigratingZkBroker", "type": "bool", "versions": "1+", "default": "false",
-      "about": "If the required configurations for ZK migration are present, this value is set to true"
-    },
-    {
-      "name": "LogDirs",
-      "type": "[]uuid",
-      "versions": "2+",
-      "about": "Log directories configured in this broker which are available.",
-      "ignorable": true
-    },
-    {
-      "name": "PreviousBrokerEpoch",
-      "type": "int64",
-      "versions": "3+",
-      "default": "-1",
-      "ignorable": true,
-      "about": "The epoch before a clean shutdown."
-    }
+    ]}
   ]
 }

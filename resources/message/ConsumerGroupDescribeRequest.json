@@ -14,22 +14,16 @@
 // limitations under the License.
 
 {
-  "apiKey": 26,
-  "type": "response",
-  "name": "EndTxnResponse",
-  // Starting in version 1, on quota violation, brokers send out responses before throttling.
-  //
-  // Version 2 adds the support for new error code PRODUCER_FENCED.
-  //
-  // Version 3 enables flexible versions.
-  //
-  // Version 4 adds support for new error code TRANSACTION_ABORTABLE (KIP-890).
-  "validVersions": "0-4",
-  "flexibleVersions": "3+",
+  "apiKey": 69,
+  "type": "request",
+  "listeners": ["zkBroker", "broker"],
+  "name": "ConsumerGroupDescribeRequest",
+  "validVersions": "0",
+  "flexibleVersions": "0+",
   "fields": [
-    { "name": "ThrottleTimeMs", "type": "int32", "versions": "0+",
-      "about": "The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota." },
-    { "name": "ErrorCode", "type": "int16", "versions": "0+",
-      "about": "The error code, or 0 if there was no error." }
+    { "name": "GroupIds", "type": "[]string", "versions": "0+", "entityType": "groupId",
+      "about": "The ids of the groups to describe" },
+    { "name": "IncludeAuthorizedOperations", "type": "bool", "versions": "0+",
+      "about": "Whether to include authorized operations." }
   ]
 }

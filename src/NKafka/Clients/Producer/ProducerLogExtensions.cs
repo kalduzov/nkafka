@@ -23,6 +23,9 @@
 
 using Microsoft.Extensions.Logging;
 
+using NKafka.Clients.Producer.Internals;
+using NKafka.Protocol;
+
 namespace NKafka.Clients.Producer;
 
 /// <summary>
@@ -59,4 +62,14 @@ internal static partial class ProducerLogExtensions
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Start flushing records")]
     public static partial void FlushingRecordsTrace(this ILogger logger);
+
+    [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 6,
+        Level = LogLevel.Trace,
+        Message = LogExtensions.LOGGER_PREFIX + "Error: {ErrorCode}")]
+    public static partial void ErrorTrace(this ILogger<MessagesSender> logger, ErrorCodes errorCode);
+
+    [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 7,
+        Level = LogLevel.Trace,
+        Message = LogExtensions.LOGGER_PREFIX + "Starting producer I/O thread")]
+    public static partial void StartMessageSenderTrace(this ILogger<MessagesSender> logger);
 }

@@ -252,4 +252,61 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version13);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version14")]
+    public void SerializeAndDeserializeMessage_ApiVersion14_Success()
+    {
+        var message = new FetchRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaId = -420004200,
+            MaxWaitMs = -420004200,
+            MinBytes = -420004200,
+            MaxBytes = -420004200,
+            IsolationLevel = 42,
+            SessionId = -420004200,
+            SessionEpoch = -420004200,
+            Topics = new (),
+            ForgottenTopicsData = new (),
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version14);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version15")]
+    public void SerializeAndDeserializeMessage_ApiVersion15_Success()
+    {
+        var message = new FetchRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaState = new (),
+            MaxWaitMs = -420004200,
+            MinBytes = -420004200,
+            MaxBytes = -420004200,
+            IsolationLevel = 42,
+            SessionId = -420004200,
+            SessionEpoch = -420004200,
+            Topics = new (),
+            ForgottenTopicsData = new (),
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version15);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version16")]
+    public void SerializeAndDeserializeMessage_ApiVersion16_Success()
+    {
+        var message = new FetchRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaState = new (),
+            MaxWaitMs = -420004200,
+            MinBytes = -420004200,
+            MaxBytes = -420004200,
+            IsolationLevel = 42,
+            SessionId = -420004200,
+            SessionEpoch = -420004200,
+            Topics = new (),
+            ForgottenTopicsData = new (),
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version16);
+    }
 }

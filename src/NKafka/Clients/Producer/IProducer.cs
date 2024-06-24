@@ -54,13 +54,6 @@ public interface IProducer<TKey, TValue>: IProducer
     Task FlushAsync(CancellationToken token);
 
     /// <summary>
-    /// Retrieves the partitions metadata for a given topic.
-    /// </summary>
-    /// <param name="topic">The name of the topic.</param>
-    /// <returns>A read-only collection of PartitionMetadata objects representing the partitions for the topic.</returns>
-    IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic);
-
-    /// <summary>
     /// Closes the application with the specified timeout.
     /// </summary>
     /// <param name="timeout">The duration to wait before closing the application.</param>
@@ -115,7 +108,9 @@ public interface IProducer<TKey, TValue>: IProducer
         IEnumerable<Message<TKey, TValue>> messages,
         CancellationToken token = default)
     {
-        return ProduceAsync(new TopicPartition(topicName, Partition.Any), messages, token);
+        var topicPartition = new TopicPartition(topicName, Partition.Any);
+
+        return ProduceAsync(topicPartition, messages, token);
     }
 
     /// <summary>

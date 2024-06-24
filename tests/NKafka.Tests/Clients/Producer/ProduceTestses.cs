@@ -26,7 +26,7 @@ using NKafka.Resources;
 
 namespace NKafka.Tests.Clients.Producer;
 
-public sealed class ProduceTestses: ClientTests
+public sealed class ProduceTests: ClientTests
 {
     private readonly ProducerConfig _producer;
 
@@ -52,7 +52,7 @@ public sealed class ProduceTestses: ClientTests
         }
     }
 
-    public ProduceTestses()
+    public ProduceTests()
     {
         _producer = new ProducerConfig
         {

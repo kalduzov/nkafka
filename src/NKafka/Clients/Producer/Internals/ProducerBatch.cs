@@ -210,7 +210,7 @@ internal class ProducerBatch: RecordsBatch
     /// Successfully completes batch processing
     /// </summary>
     /// <param name="baseOffset">The base offset to be incremented for each record</param>
-    /// <param name="appendTime">The append time of the batch</param>
+    /// <param name="appendTime">The appended time of the batch</param>
     public void Complete(long baseOffset, long appendTime)
     {
         foreach (var recordTask in _recordTasks)

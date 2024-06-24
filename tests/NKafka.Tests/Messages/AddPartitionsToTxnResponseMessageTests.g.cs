@@ -43,7 +43,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
         var message = new AddPartitionsToTxnResponseMessage
         {
             ThrottleTimeMs = -420004200,
-            Results = new (),
+            ResultsByTopicV3AndBelow = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version0);
     }
@@ -53,7 +53,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
         var message = new AddPartitionsToTxnResponseMessage
         {
             ThrottleTimeMs = -420004200,
-            Results = new (),
+            ResultsByTopicV3AndBelow = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version1);
     }
@@ -63,7 +63,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
         var message = new AddPartitionsToTxnResponseMessage
         {
             ThrottleTimeMs = -420004200,
-            Results = new (),
+            ResultsByTopicV3AndBelow = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version2);
     }
@@ -73,8 +73,30 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
         var message = new AddPartitionsToTxnResponseMessage
         {
             ThrottleTimeMs = -420004200,
-            Results = new (),
+            ResultsByTopicV3AndBelow = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new AddPartitionsToTxnResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            ResultsByTransaction = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new AddPartitionsToTxnResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            ResultsByTransaction = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
     }
 }

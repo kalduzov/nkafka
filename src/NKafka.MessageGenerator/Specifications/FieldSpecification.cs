@@ -393,7 +393,14 @@ public class FieldSpecification
 
         if (Type.IsStruct)
         {
-            if (Default.Length > 0)
+            if (Default.Equals("null"))
+            {
+                ValidateNullDefault();
+
+                return "null";
+            }
+
+            if (!string.IsNullOrEmpty(Default))
             {
                 throw new ArgumentException($"Invalid default for struct field {Name}: custom defaults are not supported for struct fields.");
             }

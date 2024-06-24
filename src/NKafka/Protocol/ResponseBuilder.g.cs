@@ -49,6 +49,7 @@ internal static partial class ResponseBuilder
             ApiKeys.AlterConfigs => new AlterConfigsResponseMessage(ref reader, apiVersion),
             ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsResponseMessage(ref reader, apiVersion),
             ApiKeys.ApiVersions => new ApiVersionsResponseMessage(ref reader, apiVersion),
+            ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatResponseMessage(ref reader, apiVersion),
             ApiKeys.CreateAcls => new CreateAclsResponseMessage(ref reader, apiVersion),
             ApiKeys.CreatePartitions => new CreatePartitionsResponseMessage(ref reader, apiVersion),
             ApiKeys.CreateTopics => new CreateTopicsResponseMessage(ref reader, apiVersion),

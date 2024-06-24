@@ -54,4 +54,11 @@ public class VersionsTests
 
         result.Should().Be(Versions.Parse(resultString, null!));
     }
+
+    [Fact]
+    public void ParseTests()
+    {
+        var version = Versions.Parse("0+", Versions.None);
+        version.Lowest.Should().Be(0);
+    }
 }

@@ -49,6 +49,7 @@ internal static partial class RequestBuilder
             ApiKeys.AlterConfigs => new AlterConfigsRequestMessage(ref reader, apiVersion),
             ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsRequestMessage(ref reader, apiVersion),
             ApiKeys.ApiVersions => new ApiVersionsRequestMessage(ref reader, apiVersion),
+            ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatRequestMessage(ref reader, apiVersion),
             ApiKeys.CreateAcls => new CreateAclsRequestMessage(ref reader, apiVersion),
             ApiKeys.CreatePartitions => new CreatePartitionsRequestMessage(ref reader, apiVersion),
             ApiKeys.CreateTopics => new CreateTopicsRequestMessage(ref reader, apiVersion),

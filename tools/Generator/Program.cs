@@ -29,7 +29,7 @@ using NKafka.MessageGenerator.Specifications;
 // Генерируем только запросы, необходимые для клиентской работы.
 // Если какой-то запрос отсутствует - нужно добавить его в этот массив
 string[] clientMessagesPattern =
-{
+[
     "AddOffsetsToTxn",
     "AddPartitionsToTxn",
     "ApiVersions",
@@ -69,8 +69,9 @@ string[] clientMessagesPattern =
     "IncrementalAlterConfigs",
     "OffsetDelete",
     "DescribeUserScramCredentials",
-    "AlterUserScramCredentials"
-};
+    "AlterUserScramCredentials",
+    "ConsumerGroupHeartbeat"
+];
 
 Console.WriteLine("Kafka classes generator");
 Console.WriteLine();

@@ -120,7 +120,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
         writer.WriteVarUInt(Results.Count + 1);
         foreach (var element in Results)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

@@ -156,7 +156,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +164,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             writer.WriteInt(Groups.Count);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -522,7 +522,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                 writer.WriteVarUInt(Members.Count + 1);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -530,7 +530,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                 writer.WriteInt(Members.Count);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version3)

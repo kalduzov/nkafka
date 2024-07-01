@@ -25,20 +25,13 @@ using NKafka.MessageGenerator.Specifications;
 
 namespace NKafka.MessageGenerator;
 
-public abstract class ClassGenerator: IClassGenerator
+public abstract class ClassGenerator(string @namespace): IClassGenerator
 {
-    protected IHeaderGenerator HeaderGenerator { get; }
+    protected IHeaderGenerator HeaderGenerator { get; } = new HeaderGenerator(@namespace);
 
-    protected ICodeGenerator CodeGenerator { get; }
+    protected ICodeGenerator CodeGenerator { get; } = new CodeGenerator();
 
-    protected StructRegistry StructRegistry { get; }
-
-    protected ClassGenerator(string ns)
-    {
-        HeaderGenerator = new HeaderGenerator(ns);
-        CodeGenerator = new CodeGenerator();
-        StructRegistry = new StructRegistry();
-    }
+    protected StructRegistry StructRegistry { get; } = new();
 
     public StringBuilder Generate(MessageSpecification message)
     {

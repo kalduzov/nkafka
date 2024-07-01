@@ -161,7 +161,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
         writer.WriteVarUInt(Results.Count + 1);
         foreach (var element in Results)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -386,7 +386,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
             writer.WriteVarUInt(CredentialInfos.Count + 1);
             foreach (var element in CredentialInfos)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

@@ -382,7 +382,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             writer.WriteVarUInt(Assignments.Count + 1);
             foreach (var element in Assignments)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -390,7 +390,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
             writer.WriteInt(Assignments.Count);
             foreach (var element in Assignments)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

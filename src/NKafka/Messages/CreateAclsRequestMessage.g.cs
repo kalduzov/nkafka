@@ -150,7 +150,7 @@ public sealed partial class CreateAclsRequestMessage: IRequestMessage, IEquatabl
             writer.WriteVarUInt(Creations.Count + 1);
             foreach (var element in Creations)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -158,7 +158,7 @@ public sealed partial class CreateAclsRequestMessage: IRequestMessage, IEquatabl
             writer.WriteInt(Creations.Count);
             foreach (var element in Creations)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

@@ -374,7 +374,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             writer.WriteVarUInt(Members.Count + 1);
             foreach (var element in Members)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -382,7 +382,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
             writer.WriteInt(Members.Count);
             foreach (var element in Members)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

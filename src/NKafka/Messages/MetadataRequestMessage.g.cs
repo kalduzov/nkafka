@@ -202,7 +202,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -223,7 +223,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                 writer.WriteInt(Topics.Count);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }

@@ -298,11 +298,11 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         bool isFireAndForget,
         CancellationToken token = default)
     {
+        ThrowIfProducerClosed();
+
         var newTopicPartition = topicPartition;
 
         _logger.ProduceMessageTrace(newTopicPartition);
-
-        ThrowIfProducerClosed();
 
         using var activity = KafkaDiagnosticsSource.ProduceMessage(newTopicPartition, message, isFireAndForget);
 

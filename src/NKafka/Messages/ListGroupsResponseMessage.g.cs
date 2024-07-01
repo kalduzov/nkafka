@@ -166,7 +166,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -174,7 +174,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             writer.WriteInt(Groups.Count);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

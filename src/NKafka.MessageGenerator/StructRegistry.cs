@@ -25,19 +25,13 @@ namespace NKafka.MessageGenerator;
 
 public sealed class StructRegistry
 {
-    private readonly Dictionary<string, StructInfo> _struct;
+    private readonly Dictionary<string, StructInfo> _struct = [];
 
     public IEnumerable<StructSpecification> CommonStructs => _struct
         .Where(s => CommonStructNames.Contains(s.Key))
         .Select(x => x.Value.Specification);
 
-    public HashSet<string> CommonStructNames { get; }
-
-    public StructRegistry()
-    {
-        _struct = new Dictionary<string, StructInfo>();
-        CommonStructNames = new HashSet<string>();
-    }
+    public HashSet<string> CommonStructNames { get; } = [];
 
     public void Register(MessageSpecification message)
     {
@@ -89,7 +83,7 @@ public sealed class StructRegistry
             }
             else
             {
-                var spec = new StructSpecification(typeName, field.Versions.ToString(), field.Fields);
+                var spec = new StructSpecification(typeName, field.Versions.ToString(), Versions.NONE_STRING, field.Fields);
                 _struct.Add(typeName, new StructInfo(spec, parentVersions));
             }
 
@@ -111,7 +105,7 @@ public sealed class StructRegistry
         }
         else
         {
-            throw new ArgumentException();
+            throw new ArgumentException(null, nameof(field));
         }
 
         if (!_struct.TryGetValue(structFieldName, out var structInfo))

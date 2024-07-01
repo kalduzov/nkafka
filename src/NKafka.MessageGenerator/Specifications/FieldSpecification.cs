@@ -29,8 +29,14 @@ namespace NKafka.MessageGenerator.Specifications;
 
 public class FieldSpecification
 {
+    /// <summary>
+    /// Field name
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Field type
+    /// </summary>
     public IFieldType Type { get; }
 
     public Versions Versions { get; }

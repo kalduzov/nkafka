@@ -258,7 +258,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteVarUInt(Brokers.Count + 1);
             foreach (var element in Brokers)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -266,7 +266,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteInt(Brokers.Count);
             foreach (var element in Brokers)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version2)
@@ -305,7 +305,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -313,7 +313,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
@@ -939,7 +939,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -947,7 +947,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version8)

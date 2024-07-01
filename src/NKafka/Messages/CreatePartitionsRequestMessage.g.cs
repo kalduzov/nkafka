@@ -162,7 +162,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -170,7 +170,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         writer.WriteInt(TimeoutMs);
@@ -405,7 +405,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     writer.WriteVarUInt(Assignments.Count + 1);
                     foreach (var element in Assignments)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -420,7 +420,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     writer.WriteInt(Assignments.Count);
                     foreach (var element in Assignments)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

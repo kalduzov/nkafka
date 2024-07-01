@@ -214,7 +214,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else

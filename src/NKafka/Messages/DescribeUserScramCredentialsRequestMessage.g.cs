@@ -130,7 +130,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             writer.WriteVarUInt(Users.Count + 1);
             foreach (var element in Users)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

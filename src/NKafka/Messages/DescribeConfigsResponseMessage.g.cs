@@ -146,7 +146,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +154,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
             writer.WriteInt(Results.Count);
             foreach (var element in Results)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -438,7 +438,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -446,7 +446,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                 writer.WriteInt(Configs.Count);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -857,7 +857,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                     writer.WriteVarUInt(Synonyms.Count + 1);
                     foreach (var element in Synonyms)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
                 else
@@ -865,7 +865,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
                     writer.WriteInt(Synonyms.Count);
                     foreach (var element in Synonyms)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

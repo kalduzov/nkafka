@@ -176,7 +176,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             writer.WriteVarUInt(Resources.Count + 1);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -184,7 +184,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
             writer.WriteInt(Resources.Count);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version1)

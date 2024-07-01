@@ -238,7 +238,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
                 writer.WriteVarUInt(Members.Count + 1);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -246,7 +246,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
                 writer.WriteInt(Members.Count);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }

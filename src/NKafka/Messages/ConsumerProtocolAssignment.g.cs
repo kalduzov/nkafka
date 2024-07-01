@@ -118,7 +118,7 @@ public sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<Con
         writer.WriteInt(AssignedPartitions.Count);
         foreach (var element in AssignedPartitions)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         if (UserData is null)
         {

@@ -146,7 +146,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: IResponseMes
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +154,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: IResponseMes
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

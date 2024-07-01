@@ -234,7 +234,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -242,7 +242,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version16)
@@ -271,7 +271,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                     writer.WriteVarUInt(NodeEndpoints.Count + 1);
                     foreach (var element in NodeEndpoints)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -532,7 +532,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -540,7 +540,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -920,7 +920,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                         writer.WriteVarUInt(AbortedTransactions.Count + 1);
                         foreach (var element in AbortedTransactions)
                         {
-                            element.Write(writer, version);
+                            element?.Write(writer, version);
                         }
                     }
                 }
@@ -935,7 +935,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                         writer.WriteInt(AbortedTransactions.Count);
                         foreach (var element in AbortedTransactions)
                         {
-                            element.Write(writer, version);
+                            element?.Write(writer, version);
                         }
                     }
                 }
@@ -966,11 +966,11 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
             {
                 if (version >= ApiVersion.Version12)
                 {
-                    writer.WriteVarUInt(Records.SizeInBytes + 1);
+                    writer.WriteVarUInt((Records?.SizeInBytes ?? 0) + 1);
                 }
                 else
                 {
-                    writer.WriteInt(Records.SizeInBytes);
+                    writer.WriteInt((Records?.SizeInBytes ?? 0));
                 }
                 writer.WriteRecords(Records);
             }
@@ -983,21 +983,21 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
                     if (!DivergingEpoch.Equals(new ()))
                     {
                         writer.WriteVarUInt(0);
-                        DivergingEpoch.Write(writer, version);
+                        DivergingEpoch?.Write(writer, version);
                     }
                 }
                 {
                     if (!CurrentLeader.Equals(new ()))
                     {
                         writer.WriteVarUInt(1);
-                        CurrentLeader.Write(writer, version);
+                        CurrentLeader?.Write(writer, version);
                     }
                 }
                 {
                     if (!SnapshotId.Equals(new ()))
                     {
                         writer.WriteVarUInt(2);
-                        SnapshotId.Write(writer, version);
+                        SnapshotId?.Write(writer, version);
                     }
                 }
                 rawWriter.WriteRawTags(writer, int.MaxValue);

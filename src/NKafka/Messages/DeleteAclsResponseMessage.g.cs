@@ -146,7 +146,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             writer.WriteVarUInt(FilterResults.Count + 1);
             foreach (var element in FilterResults)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +154,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             writer.WriteInt(FilterResults.Count);
             foreach (var element in FilterResults)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -391,7 +391,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                 writer.WriteVarUInt(MatchingAcls.Count + 1);
                 foreach (var element in MatchingAcls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -399,7 +399,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                 writer.WriteInt(MatchingAcls.Count);
                 foreach (var element in MatchingAcls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

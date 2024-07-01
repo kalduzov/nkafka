@@ -138,7 +138,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
         writer.WriteInt(Topics.Count);
         foreach (var element in Topics)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -302,7 +302,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

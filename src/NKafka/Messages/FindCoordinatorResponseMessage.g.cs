@@ -330,7 +330,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             writer.WriteVarUInt(Coordinators.Count + 1);
             foreach (var element in Coordinators)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else

@@ -29,7 +29,7 @@ namespace NKafka.Clients.Producer;
 public enum PersistenceStatus
 {
     /// <summary>
-    ///     Message was never transmitted to the broker, or failed with
+    ///     The Message was never transmitted to the broker, or failed with
     ///     an error indicating it was not written to the log.
     ///     Application retry risks ordering, but not duplication.
     /// </summary>
@@ -42,7 +42,7 @@ public enum PersistenceStatus
     PossiblyPersisted = 1,
 
     /// <summary>
-    ///     Message was written to the log and acknowledged by the broker.
+    ///     The Message was written to the log and acknowledged by the broker.
     ///     Note: acks='all' should be used for this to be fully trusted
     ///     in case of a broker failover.
     /// </summary>

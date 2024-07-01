@@ -208,7 +208,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
             writer.WriteVarUInt(Resources.Count + 1);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -216,7 +216,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
             writer.WriteInt(Resources.Count);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -482,7 +482,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
                 writer.WriteVarUInt(Acls.Count + 1);
                 foreach (var element in Acls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -490,7 +490,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
                 writer.WriteInt(Acls.Count);
                 foreach (var element in Acls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

@@ -52,6 +52,7 @@ var consumerBuilder = new ConsumerBuilder<byte[], string>(new ConsumerConfig
 });
 
 using var consumer1 = consumerBuilder.Build();
+
 //using var consumer2 = consumerBuilder.Build();
 
 consumer1.Subscribe("avail_service_stock_queue_stocks");

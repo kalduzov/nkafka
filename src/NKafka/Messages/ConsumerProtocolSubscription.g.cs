@@ -217,7 +217,7 @@ public sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable<C
             writer.WriteInt(OwnedPartitions.Count);
             foreach (var element in OwnedPartitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version2)

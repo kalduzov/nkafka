@@ -340,7 +340,7 @@ public sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMessag
             writer.WriteVarUInt(TopicPartitions.Count + 1);
             foreach (var element in TopicPartitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

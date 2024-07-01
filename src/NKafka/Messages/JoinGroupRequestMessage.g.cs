@@ -387,7 +387,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             writer.WriteVarUInt(Protocols.Count + 1);
             foreach (var element in Protocols)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -395,7 +395,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
             writer.WriteInt(Protocols.Count);
             foreach (var element in Protocols)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version8)

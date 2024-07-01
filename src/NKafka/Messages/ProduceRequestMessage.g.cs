@@ -231,7 +231,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             writer.WriteVarUInt(TopicData.Count + 1);
             foreach (var element in TopicData)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -239,7 +239,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             writer.WriteInt(TopicData.Count);
             foreach (var element in TopicData)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -474,7 +474,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
                 writer.WriteVarUInt(PartitionData.Count + 1);
                 foreach (var element in PartitionData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -482,7 +482,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
                 writer.WriteInt(PartitionData.Count);
                 foreach (var element in PartitionData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -666,11 +666,11 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             {
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt(Records.SizeInBytes + 1);
+                    writer.WriteVarUInt((Records?.SizeInBytes ?? 0) + 1);
                 }
                 else
                 {
-                    writer.WriteInt(Records.SizeInBytes);
+                    writer.WriteInt((Records?.SizeInBytes ?? 0));
                 }
                 writer.WriteRecords(Records);
             }

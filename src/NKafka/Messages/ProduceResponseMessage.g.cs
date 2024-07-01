@@ -152,7 +152,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -160,7 +160,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version1)
@@ -379,7 +379,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                 writer.WriteVarUInt(PartitionResponses.Count + 1);
                 foreach (var element in PartitionResponses)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -387,7 +387,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                 writer.WriteInt(PartitionResponses.Count);
                 foreach (var element in PartitionResponses)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -671,7 +671,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                     writer.WriteVarUInt(RecordErrors.Count + 1);
                     foreach (var element in RecordErrors)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
                 else
@@ -679,7 +679,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
                     writer.WriteInt(RecordErrors.Count);
                     foreach (var element in RecordErrors)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

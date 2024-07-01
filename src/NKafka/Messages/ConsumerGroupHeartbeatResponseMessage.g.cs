@@ -189,7 +189,7 @@ public sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMess
         }
         writer.WriteInt(MemberEpoch);
         writer.WriteInt(HeartbeatIntervalMs);
-        Assignment.Write(writer, version);
+        Assignment?.Write(writer, version);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt(numTaggedFields);
@@ -371,7 +371,7 @@ public sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMess
             writer.WriteVarUInt(TopicPartitions.Count + 1);
             foreach (var element in TopicPartitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

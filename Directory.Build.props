@@ -9,7 +9,7 @@
     <!--    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>-->
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
-    <AnalysisLevel>8</AnalysisLevel>
+    <!--    <AnalysisLevel>8</AnalysisLevel>-->
     <AnalysisLevelPerformance>latest</AnalysisLevelPerformance>
   </PropertyGroup>
 

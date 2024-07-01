@@ -36,12 +36,13 @@ public record MessageSpecification
     public static readonly MessageSpecification Empty = new(
         apiKey: -1,
         type: MessageType.None,
-        listeners: Array.Empty<RequestListenerType>(),
+        listeners: [],
         name: string.Empty,
         validVersions: string.Empty,
+        deprecatedVersions: Versions.NONE_STRING,
         flexibleVersions: "0+",
-        fields: Array.Empty<FieldSpecification>(),
-        commonStructs: Array.Empty<StructSpecification>());
+        fields: [],
+        commonStructs: []);
 
     /// <summary>
     /// Message api key 
@@ -92,10 +93,11 @@ public record MessageSpecification
         [JsonProperty("name")] string name,
         [JsonProperty("validVersions")] string validVersions,
         [JsonProperty("flexibleVersions")] string flexibleVersions,
+        [JsonProperty("deprecatedVersions")] string deprecatedVersions,
         [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification> fields,
         [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs)
     {
-        Struct = new StructSpecification(name, validVersions, fields);
+        Struct = new StructSpecification(name, validVersions, deprecatedVersions, fields);
         ApiKey = apiKey ?? -1;
         Type = type;
         CommonStructs = (commonStructs ?? Array.Empty<StructSpecification>()).ToImmutableArray();

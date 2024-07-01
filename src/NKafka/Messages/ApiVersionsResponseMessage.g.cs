@@ -238,7 +238,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             writer.WriteVarUInt(ApiKeys.Count + 1);
             foreach (var element in ApiKeys)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -246,7 +246,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             writer.WriteInt(ApiKeys.Count);
             foreach (var element in ApiKeys)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version1)
@@ -293,7 +293,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     writer.WriteVarUInt(SupportedFeatures.Count + 1);
                     foreach (var element in SupportedFeatures)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -312,7 +312,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     writer.WriteVarUInt(FinalizedFeatures.Count + 1);
                     foreach (var element in FinalizedFeatures)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

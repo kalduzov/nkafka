@@ -404,7 +404,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -412,7 +412,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version7)
@@ -422,7 +422,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteVarUInt(ForgottenTopicsData.Count + 1);
                 foreach (var element in ForgottenTopicsData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -430,7 +430,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteInt(ForgottenTopicsData.Count);
                 foreach (var element in ForgottenTopicsData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -473,7 +473,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 if (!ReplicaState.Equals(new ()))
                 {
                     writer.WriteVarUInt(1);
-                    ReplicaState.Write(writer, version);
+                    ReplicaState?.Write(writer, version);
                 }
             }
             rawWriter.WriteRawTags(writer, int.MaxValue);
@@ -919,7 +919,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -927,7 +927,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

@@ -130,7 +130,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
         writer.WriteVarUInt(Topics.Count + 1);
         foreach (var element in Topics)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -299,7 +299,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
             writer.WriteVarUInt(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -490,14 +490,14 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             writer.WriteInt(Index);
             writer.WriteShort((short)ErrorCode);
-            SnapshotId.Write(writer, version);
+            SnapshotId?.Write(writer, version);
             if (!CurrentLeader.Equals(new ()))
             {
                 numTaggedFields++;
             }
             writer.WriteLong(Size);
             writer.WriteLong(Position);
-            writer.WriteVarUInt(UnalignedRecords.SizeInBytes + 1);
+            writer.WriteVarUInt((UnalignedRecords?.SizeInBytes ?? 0) + 1);
             writer.WriteRecords(UnalignedRecords);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -506,7 +506,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
                 if (!CurrentLeader.Equals(new ()))
                 {
                     writer.WriteVarUInt(0);
-                    CurrentLeader.Write(writer, version);
+                    CurrentLeader?.Write(writer, version);
                 }
             }
             rawWriter.WriteRawTags(writer, int.MaxValue);

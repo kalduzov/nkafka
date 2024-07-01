@@ -181,7 +181,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -189,7 +189,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -409,7 +409,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -417,7 +417,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

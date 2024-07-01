@@ -19,6 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Web;
 
 using NKafka.MessageGenerator.Specifications;
@@ -29,14 +30,15 @@ namespace NKafka.MessageGenerator;
 /// <summary>
 /// Генератор классов для requests и responses из папки resources
 /// </summary>
+[SuppressMessage("Performance", "CA1859:Use concrete types when possible for improved performance")]
 public class MessageGenerator: ClassGenerator, IMessageGenerator
 {
     private readonly IMethodGenerator _readMethodGenerator;
     private readonly IMethodGenerator _writeMethodGenerator;
     private Versions _messageFlexibleVersions = Versions.None;
 
-    public MessageGenerator(string ns)
-        : base(ns)
+    public MessageGenerator(string @namespace)
+        : base(@namespace)
     {
         _readMethodGenerator = new ReadMethodGenerator(StructRegistry, CodeGenerator);
         _writeMethodGenerator = new WriteMethodGenerator(StructRegistry, CodeGenerator);
@@ -328,14 +330,10 @@ public class MessageGenerator: ClassGenerator, IMessageGenerator
                     CodeGenerator.AppendLeftBrace();
                     CodeGenerator.IncrementIndent();
 
-                    if (field.Type is IFieldType.ArrayType)
-                    {
-                        CodeGenerator.AppendLine($"if (!{field.Name}.SequenceEqual(other.{field.Name}))");
-                    }
-                    else
-                    {
-                        CodeGenerator.AppendLine($"if (!{field.Name}.Equals(other.{field.Name}))");
-                    }
+                    CodeGenerator.AppendLine(field.Type is IFieldType.ArrayType
+                        ? $"if (!{field.Name}.SequenceEqual(other.{field.Name}))"
+                        : $"if (!{field.Name}.Equals(other.{field.Name}))");
+
                     CodeGenerator.AppendLeftBrace();
                     CodeGenerator.IncrementIndent();
 

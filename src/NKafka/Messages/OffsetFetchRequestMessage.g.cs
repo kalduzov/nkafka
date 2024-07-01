@@ -265,7 +265,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
                     writer.WriteVarUInt(Topics.Count + 1);
                     foreach (var element in Topics)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -286,7 +286,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
                     writer.WriteInt(Topics.Count);
                     foreach (var element in Topics)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -303,7 +303,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -752,7 +752,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

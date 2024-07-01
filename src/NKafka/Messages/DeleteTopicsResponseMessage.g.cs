@@ -156,7 +156,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +164,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

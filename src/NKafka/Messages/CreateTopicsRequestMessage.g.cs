@@ -169,7 +169,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -177,7 +177,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         writer.WriteInt(timeoutMs);
@@ -466,7 +466,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Assignments.Count + 1);
                 foreach (var element in Assignments)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -474,7 +474,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Assignments.Count);
                 foreach (var element in Assignments)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version5)
@@ -482,7 +482,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -490,7 +490,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Configs.Count);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

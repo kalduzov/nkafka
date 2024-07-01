@@ -118,7 +118,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
         writer.WriteInt(Topics.Count);
         foreach (var element in Topics)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -277,7 +277,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

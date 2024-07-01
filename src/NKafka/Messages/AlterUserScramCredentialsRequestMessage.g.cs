@@ -146,12 +146,12 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: IRequestMes
         writer.WriteVarUInt(Deletions.Count + 1);
         foreach (var element in Deletions)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         writer.WriteVarUInt(Upsertions.Count + 1);
         foreach (var element in Upsertions)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

@@ -150,7 +150,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             writer.WriteVarUInt(Filters.Count + 1);
             foreach (var element in Filters)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -158,7 +158,7 @@ public sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquatabl
             writer.WriteInt(Filters.Count);
             foreach (var element in Filters)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

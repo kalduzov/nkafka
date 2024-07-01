@@ -156,7 +156,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             writer.WriteVarUInt(Resources.Count + 1);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +164,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
             writer.WriteInt(Resources.Count);
             foreach (var element in Resources)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         writer.WriteBool(ValidateOnly);
@@ -387,7 +387,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -395,7 +395,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Configs.Count);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

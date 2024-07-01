@@ -198,7 +198,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
             writer.WriteVarUInt(ResultsByTransaction.Count + 1);
             foreach (var element in ResultsByTransaction)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -215,7 +215,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 writer.WriteVarUInt(ResultsByTopicV3AndBelow.Count + 1);
                 foreach (var element in ResultsByTopicV3AndBelow)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -223,7 +223,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 writer.WriteInt(ResultsByTopicV3AndBelow.Count);
                 foreach (var element in ResultsByTopicV3AndBelow)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -430,7 +430,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
             writer.WriteVarUInt(TopicResults.Count + 1);
             foreach (var element in TopicResults)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -671,7 +671,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 writer.WriteVarUInt(ResultsByPartition.Count + 1);
                 foreach (var element in ResultsByPartition)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -679,7 +679,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 writer.WriteInt(ResultsByPartition.Count);
                 foreach (var element in ResultsByPartition)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

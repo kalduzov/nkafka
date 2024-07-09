@@ -275,7 +275,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponseTopicMessage");
             }
@@ -512,7 +512,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponsePartitionMessage");
             }

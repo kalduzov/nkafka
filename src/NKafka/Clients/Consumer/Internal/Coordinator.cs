@@ -169,7 +169,7 @@ internal class Coordinator: ICoordinator
             {
                 var groupInfo = response.Groups[0];
 
-                if (groupInfo.groupId != _groupId)
+                if (groupInfo.GroupId != _groupId)
                 {
                     throw new ConsumerException("В ответе на запрос offsets пришла неизвестная группа");
                 }
@@ -219,7 +219,7 @@ internal class Coordinator: ICoordinator
         {
             GroupId = _groupId,
             MemberId = MemberId,
-            GenerationId = GenerationId,
+            GenerationIdOrMemberEpoch = GenerationId,
             Topics = offsetManager.GetAllTopicPartitionOffset()
                 .GroupBy(t => t.Topic)
                 .Select(x => new OffsetCommitRequestMessage.OffsetCommitRequestTopicMessage

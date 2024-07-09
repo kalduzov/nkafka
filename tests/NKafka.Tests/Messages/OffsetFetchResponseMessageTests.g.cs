@@ -130,4 +130,14 @@ public sealed partial class OffsetFetchResponseMessageTests: ResponseMessageTest
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version8);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchResponseMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new OffsetFetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Groups = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+    }
 }

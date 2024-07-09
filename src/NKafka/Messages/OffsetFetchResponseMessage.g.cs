@@ -808,7 +808,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = string.Empty;
+        public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses per topic.
@@ -843,7 +843,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseGroupMessage");
             }
@@ -852,15 +852,15 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 length = reader.ReadVarUInt() - 1;
                 if (length < 0)
                 {
-                    throw new Exception("non-nullable field groupId was serialized as null");
+                    throw new Exception("non-nullable field GroupId was serialized as null");
                 }
                 else if (length > 0x7fff)
                 {
-                    throw new Exception($"string field groupId had invalid length {length}");
+                    throw new Exception($"string field GroupId had invalid length {length}");
                 }
                 else
                 {
-                    groupId = reader.ReadString(length);
+                    GroupId = reader.ReadString(length);
                 }
             }
             {
@@ -905,7 +905,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(groupId);
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
@@ -934,16 +934,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             {
                 return false;
             }
-            if (groupId is null)
+            if (GroupId is null)
             {
-                if (other.groupId is not null)
+                if (other.GroupId is not null)
                 {
                     return false;
                 }
             }
             else
             {
-                if (!groupId.Equals(other.groupId))
+                if (!GroupId.Equals(other.GroupId))
                 {
                     return false;
                 }
@@ -973,7 +973,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, groupId, Topics, ErrorCode);
+            hashCode = HashCode.Combine(hashCode, GroupId, Topics, ErrorCode);
             return hashCode;
         }
 
@@ -981,7 +981,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         public override string ToString()
         {
             return "OffsetFetchResponseGroupMessage("
-                + "groupId=" + (string.IsNullOrWhiteSpace(groupId) ? "null" : groupId)
+                + "GroupId=" + (string.IsNullOrWhiteSpace(GroupId) ? "null" : GroupId)
                 + ", Topics=" + Topics.DeepToString()
                 + ", ErrorCode=" + ErrorCode
                 + ")";
@@ -1029,7 +1029,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseTopicsMessage");
             }
@@ -1222,7 +1222,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponsePartitionsMessage");
             }

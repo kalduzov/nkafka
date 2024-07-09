@@ -360,7 +360,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             return;
         }
 
-        var request = new ApiVersionsRequestMessage();
+        var request = ApiVersionsRequestMessage.Build();
         var response = await ((IKafkaConnector)this).SendAsync<ApiVersionsRequestMessage, ApiVersionsResponseMessage>(
             request,
             true,

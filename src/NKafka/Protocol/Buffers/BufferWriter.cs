@@ -39,7 +39,7 @@
 // public ref partial struct BufferWriter<TBufferWriter>
 //     where TBufferWriter : IBufferWriter<byte>
 // {
-//     private readonly bool _useCompact;
+//     privateonly bool _useCompact;
 // #if NET7_0_OR_GREATER
 //     private ref TBufferWriter _bufferWriter;
 //     private ref byte _bufferReference;
@@ -252,3 +252,4 @@
 //         Advance(size);
 //     }
 // }
+

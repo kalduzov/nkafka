@@ -92,4 +92,20 @@ public sealed partial class TxnOffsetCommitRequestMessageTests: RequestMessageTe
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitRequestMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new TxnOffsetCommitRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+            GenerationId = -420004200,
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

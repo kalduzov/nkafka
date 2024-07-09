@@ -136,4 +136,26 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version9);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new ProduceResponseMessage
+        {
+            Responses = new (),
+            ThrottleTimeMs = -420004200,
+            NodeEndpoints = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version11")]
+    public void SerializeAndDeserializeMessage_ApiVersion11_Success()
+    {
+        var message = new ProduceResponseMessage
+        {
+            Responses = new (),
+            ThrottleTimeMs = -420004200,
+            NodeEndpoints = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+    }
 }

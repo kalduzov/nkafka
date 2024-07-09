@@ -275,7 +275,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicResponseMessage");
             }
@@ -532,7 +532,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionResponseMessage");
             }

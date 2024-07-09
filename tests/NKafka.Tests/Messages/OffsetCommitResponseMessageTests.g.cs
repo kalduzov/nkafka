@@ -124,4 +124,14 @@ public sealed partial class OffsetCommitResponseMessageTests: ResponseMessageTes
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version8);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitResponseMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new OffsetCommitResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+    }
 }

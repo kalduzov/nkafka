@@ -61,7 +61,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The broker ID of the requestor, or -1 if this request is being made by a normal consumer.
+    /// The broker ID of the requester, or -1 if this request is being made by a normal consumer.
     /// </summary>
     public int ReplicaId { get; set; } = 0;
 
@@ -305,7 +305,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicMessage");
             }
@@ -549,7 +549,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionMessage");
             }

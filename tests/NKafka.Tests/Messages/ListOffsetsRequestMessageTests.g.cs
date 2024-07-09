@@ -123,4 +123,15 @@ public sealed partial class ListOffsetsRequestMessageTests: RequestMessageTests<
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version7);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version8")]
+    public void SerializeAndDeserializeMessage_ApiVersion8_Success()
+    {
+        var message = new ListOffsetsRequestMessage
+        {
+            ReplicaId = -420004200,
+            IsolationLevel = 42,
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+    }
 }

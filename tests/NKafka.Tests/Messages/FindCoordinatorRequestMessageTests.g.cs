@@ -86,4 +86,14 @@ public sealed partial class FindCoordinatorRequestMessageTests: RequestMessageTe
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version4);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'FindCoordinatorRequestMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new FindCoordinatorRequestMessage
+        {
+            KeyType = 42,
+            CoordinatorKeys = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+    }
 }

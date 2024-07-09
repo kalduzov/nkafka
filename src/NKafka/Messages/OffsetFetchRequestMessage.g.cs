@@ -651,7 +651,17 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = string.Empty;
+        public string GroupId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The member ID assigned by the group coordinator if using the new consumer protocol (KIP-848).
+        /// </summary>
+        public string? MemberId { get; set; } = null;
+
+        /// <summary>
+        /// The member epoch if using the new consumer protocol (KIP-848).
+        /// </summary>
+        public int MemberEpoch { get; set; } = -1;
 
         /// <summary>
         /// Each topic we would like to fetch offsets for, or null to fetch offsets for all topics.
@@ -678,7 +688,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestGroupMessage");
             }
@@ -687,16 +697,45 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
                 length = reader.ReadVarUInt() - 1;
                 if (length < 0)
                 {
-                    throw new Exception("non-nullable field groupId was serialized as null");
+                    throw new Exception("non-nullable field GroupId was serialized as null");
                 }
                 else if (length > 0x7fff)
                 {
-                    throw new Exception($"string field groupId had invalid length {length}");
+                    throw new Exception($"string field GroupId had invalid length {length}");
                 }
                 else
                 {
-                    groupId = reader.ReadString(length);
+                    GroupId = reader.ReadString(length);
                 }
+            }
+            if (version >= ApiVersion.Version9)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    MemberId = null;
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field MemberId had invalid length {length}");
+                }
+                else
+                {
+                    MemberId = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                MemberId = null;
+            }
+            if (version >= ApiVersion.Version9)
+            {
+                MemberEpoch = reader.ReadInt();
+            }
+            else
+            {
+                MemberEpoch = -1;
             }
             {
                 int arrayLength;
@@ -739,9 +778,26 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(groupId);
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersion.Version9)
+            {
+                if (MemberId is null)
+                {
+                    writer.WriteVarUInt(0);
+                }
+                else
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersion.Version9)
+            {
+                writer.WriteInt(MemberEpoch);
             }
             if (Topics is null)
             {
@@ -774,19 +830,37 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
             {
                 return false;
             }
-            if (groupId is null)
+            if (GroupId is null)
             {
-                if (other.groupId is not null)
+                if (other.GroupId is not null)
                 {
                     return false;
                 }
             }
             else
             {
-                if (!groupId.Equals(other.groupId))
+                if (!GroupId.Equals(other.GroupId))
                 {
                     return false;
                 }
+            }
+            if (MemberId is null)
+            {
+                if (other.MemberId is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!MemberId.Equals(other.MemberId))
+                {
+                    return false;
+                }
+            }
+            if (MemberEpoch != other.MemberEpoch)
+            {
+                return false;
             }
             if (Topics is null)
             {
@@ -809,7 +883,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, groupId, Topics);
+            hashCode = HashCode.Combine(hashCode, GroupId, MemberId, MemberEpoch, Topics);
             return hashCode;
         }
 
@@ -817,7 +891,9 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
         public override string ToString()
         {
             return "OffsetFetchRequestGroupMessage("
-                + "groupId=" + (string.IsNullOrWhiteSpace(groupId) ? "null" : groupId)
+                + "GroupId=" + (string.IsNullOrWhiteSpace(GroupId) ? "null" : GroupId)
+                + ", MemberId=" + (string.IsNullOrWhiteSpace(MemberId) ? "null" : MemberId)
+                + ", MemberEpoch=" + MemberEpoch
                 + ", Topics=" + (Topics is null ? "null" : Topics.DeepToString())
                 + ")";
         }
@@ -864,7 +940,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestTopicsMessage");
             }

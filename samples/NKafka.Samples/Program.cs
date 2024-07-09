@@ -72,14 +72,14 @@ var clusterConfig = new ClusterConfig
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}",
         theme: AnsiConsoleTheme.Code)
-    .MinimumLevel.Information()
+    .MinimumLevel.Debug()
     .CreateLogger();
 
 var loggerFactory = LoggerFactory.Create(
     builder =>
     {
         builder.AddSerilog();
-        builder.SetMinimumLevel(LogLevel.Information);
+        builder.SetMinimumLevel(LogLevel.Debug);
     });
 
 var logger = loggerFactory.CreateLogger<Program>();

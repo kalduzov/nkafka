@@ -521,7 +521,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The partitions inside the topic that we want to committ offsets for.
+        /// The partitions inside the topic that we want to commit offsets for.
         /// </summary>
         public List<TxnOffsetCommitRequestPartitionMessage> Partitions { get; set; } = new ();
 
@@ -545,7 +545,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestTopicMessage");
             }
@@ -789,7 +789,7 @@ public sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestPartitionMessage");
             }

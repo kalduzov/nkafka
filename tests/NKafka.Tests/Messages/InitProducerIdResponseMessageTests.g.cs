@@ -97,4 +97,16 @@ public sealed partial class InitProducerIdResponseMessageTests: ResponseMessageT
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version4);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdResponseMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new InitProducerIdResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+    }
 }

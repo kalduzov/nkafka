@@ -516,7 +516,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CoordinatorMessage");
             }

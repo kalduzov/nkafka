@@ -91,4 +91,16 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version4);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new InitProducerIdRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            TransactionTimeoutMs = -420004200,
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+    }
 }

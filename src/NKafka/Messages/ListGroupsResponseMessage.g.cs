@@ -276,6 +276,11 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         public string GroupState { get; set; } = string.Empty;
 
         /// <summary>
+        /// The group type name.
+        /// </summary>
+        public string GroupType { get; set; } = string.Empty;
+
+        /// <summary>
         /// The basic constructor of the message ListedGroupMessage
         /// </summary>
         public ListedGroupMessage()
@@ -295,7 +300,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListedGroupMessage");
             }
@@ -366,6 +371,27 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             {
                 GroupState = string.Empty;
             }
+            if (version >= ApiVersion.Version5)
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field GroupType was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field GroupType had invalid length {length}");
+                }
+                else
+                {
+                    GroupType = reader.ReadString(length);
+                }
+            }
+            else
+            {
+                GroupType = string.Empty;
+            }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version3)
             {
@@ -416,6 +442,14 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupState);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersion.Version5)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(GroupType);
                     writer.WriteVarUInt(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
@@ -491,6 +525,20 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
                     return false;
                 }
             }
+            if (GroupType is null)
+            {
+                if (other.GroupType is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!GroupType.Equals(other.GroupType))
+                {
+                    return false;
+                }
+            }
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
@@ -498,7 +546,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, GroupId, ProtocolType, GroupState);
+            hashCode = HashCode.Combine(hashCode, GroupId, ProtocolType, GroupState, GroupType);
             return hashCode;
         }
 
@@ -509,6 +557,7 @@ public sealed partial class ListGroupsResponseMessage: IResponseMessage, IEquata
                 + "GroupId=" + (string.IsNullOrWhiteSpace(GroupId) ? "null" : GroupId)
                 + ", ProtocolType=" + (string.IsNullOrWhiteSpace(ProtocolType) ? "null" : ProtocolType)
                 + ", GroupState=" + (string.IsNullOrWhiteSpace(GroupState) ? "null" : GroupState)
+                + ", GroupType=" + (string.IsNullOrWhiteSpace(GroupType) ? "null" : GroupType)
                 + ")";
         }
     }

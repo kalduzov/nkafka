@@ -265,7 +265,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitResponseTopicMessage");
             }
@@ -502,7 +502,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitResponsePartitionMessage");
             }

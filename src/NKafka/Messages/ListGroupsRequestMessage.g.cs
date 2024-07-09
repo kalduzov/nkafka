@@ -61,9 +61,14 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The states of the groups we want to list. If empty all groups are returned with their state.
+    /// The states of the groups we want to list. If empty, all groups are returned with their state.
     /// </summary>
     public List<string> StatesFilter { get; set; } = new ();
+
+    /// <summary>
+    /// The types of the groups we want to list. If empty, all groups are returned with their type.
+    /// </summary>
+    public List<string> TypesFilter { get; set; } = new ();
 
     /// <summary>
     /// The basic constructor of the message ListGroupsRequestMessage
@@ -120,6 +125,41 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
         {
             StatesFilter = new ();
         }
+        if (version >= ApiVersion.Version5)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field TypesFilter was serialized as null");
+            }
+            else
+            {
+                var newCollection = new List<string>(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
+                {
+                    int length;
+                    length = reader.ReadVarUInt() - 1;
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field TypesFilter element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field TypesFilter element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
+                }
+                TypesFilter = newCollection;
+            }
+        }
+        else
+        {
+            TypesFilter = new ();
+        }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
@@ -159,6 +199,25 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
             if (StatesFilter.Count != 0)
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default StatesFilter at version {version}");
+            }
+        }
+        if (version >= ApiVersion.Version5)
+        {
+            writer.WriteVarUInt(TypesFilter.Count + 1);
+            foreach (var element in TypesFilter)
+            {
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(element);
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+        }
+        else
+        {
+            if (TypesFilter.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default TypesFilter at version {version}");
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -204,6 +263,20 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
                 return false;
             }
         }
+        if (TypesFilter is null)
+        {
+            if (other.TypesFilter is not null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!TypesFilter.SequenceEqual(other.TypesFilter))
+            {
+                return false;
+            }
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -211,7 +284,7 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, StatesFilter);
+        hashCode = HashCode.Combine(hashCode, StatesFilter, TypesFilter);
         return hashCode;
     }
 
@@ -220,6 +293,7 @@ public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatabl
     {
         return "ListGroupsRequestMessage("
             + "StatesFilter=" + StatesFilter.DeepToString()
+            + ", TypesFilter=" + TypesFilter.DeepToString()
             + ")";
     }
 }

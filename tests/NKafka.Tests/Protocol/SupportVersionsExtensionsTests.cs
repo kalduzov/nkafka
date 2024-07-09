@@ -33,6 +33,13 @@ public sealed class SupportVersionsExtensionsTests
         result.Should().BeTrue();
     }
 
+    // [Fact]
+    // public void ()
+    // {
+    //     var result = version.IsSupportKafkaVersion(out _);
+    //     result.Should().BeTrue();
+    // }
+
     public static IEnumerable<object[]> Data =>
     [
         [SupportVersionsExtensions.Version20],

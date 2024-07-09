@@ -175,37 +175,37 @@ public abstract record CommonConfig
     public int ReceiveBufferBytes { get; set; } = 32768;
 
     /// <summary>
-    /// Создавать ли топики автоматически
+    /// Should topics be created automatically?
     /// </summary>
-    /// <remarks>Если установлена данная опция, то запрос на получение метаданных, при наличии имени топика в обработке,
-    /// и отсутствии его в кластере, будет создавать его, если настройки кластера это допускают</remarks>
+    /// <remarks>If this option is enabled, a request for metadata will create the topic if its name is in processing but absent from the cluster,
+    /// provided that the cluster settings allow this.</remarks>
     public bool AllowAutoTopicCreation { get; set; } = false;
 
     /// <summary>
-    /// Версия брокеров кафки в кластере по умолчанию, если вдруг по какойто-то причине не удалось получить список поддерживаемых версий API с самого брокера
+    /// Версия брокеров кафки в кластере по умолчанию, если вдруг по какой-то причине не удалось получить список поддерживаемых версий API с самого брокера
     /// </summary>
-    /// <remarks>Клиент поддерживает минимально версию 2.0. Максимальная версия 3.4.
+    /// <remarks>Клиент поддерживает минимально версию 2.0. Максимальная версия 3.8.
     /// Если свойство `ApiVersionRequest` is true, то клиент не обращается к серверу за списком версий,
     /// а использует предустановленный набор для конкретной версии. Это помогает уменьшить время инициализации соединения
-    /// с брокером за счет отстуствия одного запроса за списком поддерживаемого брокером API</remarks>
-    /// <remarks>По умолчанию версия значение версии не установлено и всегде делается запрос за поддерживаемой версией брокера</remarks>
+    /// с брокером за счет отсутствия одного запроса за списком поддерживаемого брокером API</remarks>
+    /// <remarks>По умолчанию версия значение версии не установлено и всегда делается запрос за поддерживаемой версией брокера</remarks>
     public Version FallbackBrokerVersion { get; set; } = SupportVersionsExtensions.Version20;
 
     /// <summary>
-    /// Если данный флаг устновлен в true, то при инициализации кластера будет выбираться минимально поддерживаемая версия для всех брокеров.
+    /// Если данный флаг установлен в true, то при инициализации кластера будет выбираться минимально поддерживаемая версия для всех брокеров.
     /// Если false, то для каждого брокера будет выбираться самая высокая поддерживаемая версия
     /// </summary>
     /// <br/>
     /// <br/>
     /// <p>
-    /// Это свойство завязано на два других параметра конфигурации `BrokerVesion`
+    /// Это свойство завязано на два других параметра конфигурации `BrokerVersion`
     /// </p>
     public bool UseMinimalSupportVersion { get; set; } = true;
 
     /// <summary>
     /// Конкретные значения конфигурации для каждого брокера
     /// </summary>
-    /// <remarks>В кластере брокеры не всегда сконфигурированные одинаково.
+    /// <remarks>В кластере брокеры не всегда бывают сконфигурированные одинаково.
     /// Для указания различий в конфигурации для брокеров используется данное свойство.
     /// Для этого требуется знать id каждого брокера, который отличается от общей конфигурации.
     /// Если конкретные настройки для брокера отсутствуют в данном словаре, то используются общие настройки</remarks>
@@ -237,7 +237,7 @@ public abstract record CommonConfig
             throw new KafkaConfigException(nameof(ReceiveBufferBytes), ReceiveBufferBytes, "Размер буфера не может быть меньше -1");
         }
 
-        // валидируем зависимые конфигурации
+        //validate dependent configs
         foreach (var brokerConfig in PerBrokerConfigs)
         {
             brokerConfig.Value.Validate();
@@ -262,7 +262,7 @@ public abstract record CommonConfig
             return;
         }
 
-        if (!SupportVersionsExtensions.IsSupportKafkaVersion(FallbackBrokerVersion, out var minMaxVersions))
+        if (!FallbackBrokerVersion.IsSupportKafkaVersion(out var minMaxVersions))
         {
             throw new KafkaConfigException(
                 nameof(FallbackBrokerVersion),

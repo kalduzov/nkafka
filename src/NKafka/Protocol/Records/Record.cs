@@ -100,7 +100,7 @@ public class Record: IRecord
     {
         Length = reader.ReadVarInt();
         Attributes = reader.ReadSByte();
-        TimestampDelta = reader.ReadVarLong();
+        TimestampDelta = reader.ReadVarIntInt64();
         OffsetDelta = reader.ReadVarInt();
 
         var keyLen = reader.ReadVarInt();

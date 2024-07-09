@@ -55,7 +55,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
-    /// Each broker in the response.
+    /// A list of brokers present in the cluster.
     /// </summary>
     public MetadataResponseBrokerCollection Brokers { get; set; } = new ();
 
@@ -739,12 +739,12 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
-        /// The topic name.
+        /// The topic name. Null for non-existing topics queried by ID. This is never null when ErrorCode is zero. One of Name and TopicId is always populated.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The topic id.
+        /// The topic id. Zero for non-existing topics queried by name. This is never zero when ErrorCode is zero. One of Name and TopicId is always populated.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 

@@ -53,7 +53,7 @@ public sealed partial class FindCoordinatorRequestMessage
         }
         else
         {
-            findCoordinatorRequestMessage.CoordinatorKeys = groupIds.ToList();
+            findCoordinatorRequestMessage.CoordinatorKeys = [.. groupIds];
         }
 
         return findCoordinatorRequestMessage;

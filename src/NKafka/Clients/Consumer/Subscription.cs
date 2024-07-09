@@ -72,12 +72,12 @@ public class Subscription
     internal IOffsetManager OffsetManager { get; }
 
     /// <summary>
-    /// Текущие партции по топикам, которые связаны с данной подпиской 
+    /// Текущие разделы по топикам, которые связаны с данной подпиской 
     /// </summary>
     public IReadOnlyDictionary<string, Partition[]> AssignedPartitionsByTopic { get; private set; }
 
     /// <summary>
-    ///  Список топиков-партиций связыннах с данной подпиской после ребалансировки 
+    ///  Список топиков-партиций связанных с данной подпиской после ребалансировки 
     /// </summary>
     public IReadOnlyCollection<TopicPartition> AssignedTopicPartitions => _assignedTopicPartitions;
 
@@ -88,7 +88,7 @@ public class Subscription
     /// <param name="autoOffsetReset">С какого offsets считывать данные из партиции</param>
     /// <param name="supportPartitionAssignors">Какие протоколы ребалансировки могут использоваться в данной подписке</param>
     /// <param name="generationId">Исходное поколение группы</param>
-    /// <param name="apiVersion">Версия апи для сериализации метаданных</param>
+    /// <param name="apiVersion">Версия API для сериализации метаданных</param>
     internal Subscription(IReadOnlyCollection<string> topics,
         AutoOffsetReset autoOffsetReset,
         IReadOnlyCollection<IPartitionAssignor> supportPartitionAssignors,
@@ -121,16 +121,18 @@ public class Subscription
     }
 
     /// <summary>
-    /// Связывает с данной подпиской список TopicPartitions, которые она должна обрабатывтаь после ребалансировки
+    /// Связывает с данной подпиской список TopicPartitions, которые она должна обрабатывать после ребалансировки
     /// </summary>
     public void Assign(IReadOnlyCollection<TopicPartition> topicPartitions)
     {
-        _assignedTopicPartitions = topicPartitions.ToHashSet();
-        AssignedPartitionsByTopic = topicPartitions.GroupBy(g => g.Topic).ToDictionary(x => x.Key, x => x.Select(y => y.Partition).ToArray());
+        _assignedTopicPartitions = [.. topicPartitions];
+        AssignedPartitionsByTopic = topicPartitions
+            .GroupBy(g => g.Topic)
+            .ToDictionary(x => x.Key, x => x.Select(y => y.Partition).ToArray());
     }
 
     /// <summary>
-    /// Проверяет что в данной подписке сейчас еще есть свзянный раздел с топиком
+    /// Проверяет что в данной подписке сейчас еще есть связанный раздел с топиком
     /// </summary>
     public bool IsAssignedTopicPartitions(string topic, Partition partition)
     {
@@ -139,16 +141,8 @@ public class Subscription
         return _assignedTopicPartitions.Contains(topicPartitions);
     }
 
-    private class SubscriptionSerializer: IAsyncSerializer<Subscription>
+    private class SubscriptionSerializer(ApiVersion apiVersion): IAsyncSerializer<Subscription>
     {
-        private readonly ApiVersion _apiVersion;
-
-        public SubscriptionSerializer(ApiVersion apiVersion)
-        {
-            _apiVersion = apiVersion;
-
-        }
-
         public bool PreferAsync => false;
 
         /// <inheritdoc />
@@ -162,14 +156,14 @@ public class Subscription
         {
             var cps = new ConsumerProtocolSubscription
             {
-                Topics = new List<string>(data.Topics),
+                Topics = [..data.Topics],
                 GenerationId = data.GenerationId,
             };
 
             using var ms = new MemoryStream();
             var writer = new BufferWriter(ms, 0);
-            writer.WriteShort((short)_apiVersion);
-            cps.Write(writer, _apiVersion);
+            writer.WriteShort((short)apiVersion);
+            cps.Write(writer, apiVersion);
             var result = writer.WrittenSpan.ToArray();
 
             return result;
@@ -191,7 +185,7 @@ public class Subscription
             var version = bufferReader.ReadShort();
             var cps = new ConsumerProtocolSubscription(ref bufferReader, (ApiVersion)version);
 
-            return new Subscription(cps.Topics, AutoOffsetReset.None, Array.Empty<IPartitionAssignor>());
+            return new Subscription(cps.Topics, AutoOffsetReset.None, []);
         }
     }
 }

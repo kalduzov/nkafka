@@ -115,4 +115,14 @@ public sealed partial class ListOffsetsResponseMessageTests: ResponseMessageTest
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version7);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsResponseMessage' message by Version8")]
+    public void SerializeAndDeserializeMessage_ApiVersion8_Success()
+    {
+        var message = new ListOffsetsResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+    }
 }

@@ -370,7 +370,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceDataMessage");
             }
@@ -604,7 +604,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceDataMessage");
             }

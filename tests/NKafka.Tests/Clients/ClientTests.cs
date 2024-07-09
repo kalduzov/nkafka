@@ -137,7 +137,7 @@ public abstract class ClientTests
                 {
                     new()
                     {
-                        groupId = "good_test",
+                        GroupId = "good_test",
                         Topics = new List<OffsetFetchResponseMessage.OffsetFetchResponseTopicsMessage>
                         {
                             new()

@@ -71,7 +71,7 @@ public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, I
     public byte[] AuthBytes { get; set; } = Array.Empty<byte>();
 
     /// <summary>
-    /// The SASL authentication bytes from the server, as defined by the SASL mechanism.
+    /// Number of milliseconds after which only re-authentication over the existing connection to create a new session can occur.
     /// </summary>
     public long SessionLifetimeMs { get; set; } = 0;
 

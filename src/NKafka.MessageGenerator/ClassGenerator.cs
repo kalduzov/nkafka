@@ -40,6 +40,7 @@ public abstract class ClassGenerator(string @namespace): IClassGenerator
         HeaderGenerator.Generate();
 
         var result = new StringBuilder();
+        result.AppendLine($"//{message.Hash}");
         result.Append(HeaderGenerator);
         result.Append(CodeGenerator);
 

@@ -42,7 +42,8 @@ public record MessageSpecification
         deprecatedVersions: Versions.NONE_STRING,
         flexibleVersions: "0+",
         fields: [],
-        commonStructs: []);
+        commonStructs: [],
+        hash: string.Empty);
 
     /// <summary>
     /// Message api key 
@@ -85,6 +86,11 @@ public record MessageSpecification
     [JsonIgnore]
     public StructSpecification Struct { get; }
 
+    /// <summary>
+    /// Содержит хеш файла из которого сгенерилсась спецификация
+    /// </summary>
+    public string Hash { get; }
+
     [JsonConstructor]
     public MessageSpecification(
         [JsonProperty("apiKey")] short? apiKey,
@@ -95,7 +101,8 @@ public record MessageSpecification
         [JsonProperty("flexibleVersions")] string flexibleVersions,
         [JsonProperty("deprecatedVersions")] string deprecatedVersions,
         [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification> fields,
-        [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs)
+        [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs,
+        [JsonProperty("hash")] string hash)
     {
         Struct = new StructSpecification(name, validVersions, deprecatedVersions, fields);
         ApiKey = apiKey ?? -1;
@@ -121,6 +128,7 @@ public record MessageSpecification
             throw new ArgumentException("The `requestScope` property is only valid for messages with type `request`");
         }
         Listeners = listeners;
+        Hash = hash;
 
     }
 }

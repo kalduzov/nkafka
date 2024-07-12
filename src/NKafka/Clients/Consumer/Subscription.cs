@@ -39,7 +39,7 @@ public class Subscription
     private readonly object _lockObject = new();
     private volatile int _generationId;
 
-    private HashSet<TopicPartition> _assignedTopicPartitions = new();
+    private HashSet<TopicPartition> _assignedTopicPartitions = [];
 
     /// <summary>
     /// Номер поколения подписки 

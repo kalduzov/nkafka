@@ -65,24 +65,24 @@ public class ReaderBenchmarks
     [Benchmark(OperationsPerInvoke = 16)]
     public int FastBufferReaderReadVarIntInt32()
     {
-        var br = new FastBufferReader(_buffer);
+        var br = new BufferReader(_buffer);
 
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        _ = br.ReadVarIntInt32();
-        var value = br.ReadVarIntInt32();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        _ = br.ReadVarInt();
+        var value = br.ReadVarInt();
 
         return value;
 

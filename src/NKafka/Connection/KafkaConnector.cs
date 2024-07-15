@@ -166,7 +166,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     public async ValueTask OpenAsync(CancellationToken token)
     {
         await ReEstablishConnectionAsync(token);
-        await TryRequestApiSupportVersionsAsync(token);
 
         ConnectorState = State.Open;
     }
@@ -324,6 +323,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 }
 
                 _globalTimeWaiting.Start();
+
+                await TryRequestApiSupportVersionsAsync(token);
 
                 if (_securityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
                 {

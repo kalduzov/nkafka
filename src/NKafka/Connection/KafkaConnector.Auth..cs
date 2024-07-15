@@ -19,6 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Text;
+
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Messages;
@@ -54,7 +56,55 @@ internal sealed partial class KafkaConnector
 
     private Task AuthenticateProcessV1Async(CancellationToken token)
     {
-        return Task.CompletedTask;
+        return _saslSettings.Mechanism switch
+        {
+            SaslMechanism.Plain => AuthenticateSaslPlainV1Async(token),
+
+            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
+        };
+    }
+
+    private async Task AuthenticateSaslPlainV1Async(CancellationToken token)
+    {
+        // handshake step
+        var saslHandshakeRequest = new SaslHandshakeRequestMessage
+        {
+            Mechanism = SaslSettings.MechanismAsString(SaslMechanism.Plain)
+        };
+
+        var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeRequestMessage, SaslHandshakeResponseMessage>(
+            saslHandshakeRequest,
+            true,
+            token);
+
+        if (handshakeResponse.Code != ErrorCodes.None)
+        {
+            throw new ProtocolKafkaException(handshakeResponse.Code);
+        }
+
+        // initial step
+        var authenticateRequest = new SaslAuthenticateRequestMessage
+        {
+            AuthBytes = CreatePlainToken()
+        };
+
+        var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateRequestMessage, SaslAuthenticateResponseMessage>(
+            authenticateRequest,
+            true,
+            token);
+
+        if (authenticateResponse.Code != ErrorCodes.None)
+        {
+            throw new ProtocolKafkaException(handshakeResponse.Code);
+        }
+
+    }
+
+    private byte[] CreatePlainToken()
+    {
+        var str = $"\x00{_saslSettings.UserName}\x00{_saslSettings.Password}";
+
+        return Encoding.UTF8.GetBytes(str);
     }
 
     private Task AuthenticateProcessV0Async(CancellationToken token)

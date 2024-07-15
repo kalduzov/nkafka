@@ -56,6 +56,13 @@ var clusterConfig = new ClusterConfig
     // },
     ClusterInitTimeoutMs = 160000, // 160сек для отладки
     MetadataUpdateTimeoutMs = 60000, // 60 секунд на обновление данных по кластеру
+    Sasl = new SaslSettings
+    {
+        Mechanism = SaslMechanism.Plain,
+        UserName = "test",
+        Password = "test"
+    },
+    SecurityProtocol = SecurityProtocols.SaslPlaintext
 
     //MessageMaxBytes = 400000
     //MessageMaxBytes = 20,

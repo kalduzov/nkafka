@@ -207,6 +207,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infra", "infra", "{04B6002E
 		infra\readme.md = infra\readme.md
 		infra\docker-compose.big-cluster.yml = infra\docker-compose.big-cluster.yml
 		infra\docker-compose.simple.yml = infra\docker-compose.simple.yml
+		infra\docker-compose.kraft.sasl.yml = infra\docker-compose.kraft.sasl.yml
+		infra\kafka_server_jaas.conf = infra\kafka_server_jaas.conf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "choco", "choco", "{0BCF7CE3-517C-4AE5-9D39-8B2C353CF89C}"

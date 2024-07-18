@@ -85,6 +85,20 @@ public sealed record TopicPartition: IComparable<TopicPartition>
         return topicComparison != 0 ? topicComparison : Partition.CompareTo(other.Partition);
     }
 
+    /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
+    /// <param name="other">An object to compare with this object.</param>
+    /// <returns>
+    /// <see langword="true" /> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <see langword="false" />.</returns>
+    public bool Equals(TopicPartition? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        return _hash == other._hash;
+    }
+
     /// <inheritdoc />
     public override string ToString()
     {

@@ -127,8 +127,8 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
         catch (Exception exc)
         {
-            Close(TimeSpan.Zero,
-                true); //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves. 
+            //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves.
+            Close(TimeSpan.Zero, true);
 
             throw new ProducerException(EM.Producer_CreateError, exc);
         }
@@ -207,7 +207,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     {
         _tokenSource.Cancel(!swallowException);
 
-        if (_senderTask.IsCompleted || _senderTask.IsFaulted || _senderTask.IsCanceled)
+        if (_senderTask.IsCompleted)
         {
             _senderTask.Dispose();
         }

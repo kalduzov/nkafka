@@ -52,7 +52,7 @@ internal class ProducerBatch: RecordsBatch
     private readonly List<IRecord> _records = new(16);
 
     /// <summary>
-    /// How many bytes are left to add so that the batch is complete
+    /// How many bytes are left to add so that the batch is complete?
     /// </summary>
     public int EstimatedSizeInBytes { get; set; }
 
@@ -72,7 +72,7 @@ internal class ProducerBatch: RecordsBatch
     /// <value>
     /// <c>true</c> if the property is ready; otherwise, <c>false</c>.
     /// </value>
-    public bool IsReady => true;
+    public bool IsReady { get; private set; }
 
     /// <summary>
     /// Gets or sets the size of the object.
@@ -81,6 +81,16 @@ internal class ProducerBatch: RecordsBatch
     /// The size of the object.
     /// </value>
     public int Size { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Task CompletionTask => _produceRequestResult.Task;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public long CreateTimestamp { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProducerBatch"/> class with the specified <see cref="TopicPartition"/> and <see cref="BufferWriter"/>.
@@ -94,6 +104,7 @@ internal class ProducerBatch: RecordsBatch
         _bufferWriter = bufferWriter;
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         BaseTimestamp = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
+        CreateTimestamp = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
     }
 
     internal ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter, long timestamp)
@@ -104,6 +115,7 @@ internal class ProducerBatch: RecordsBatch
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         BaseTimestamp = timestamp;
         MaxTimestamp = timestamp;
+        CreateTimestamp = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
     }
 
     /// <summary>
@@ -203,7 +215,12 @@ internal class ProducerBatch: RecordsBatch
     /// <returns>A new Records object containing the data.</returns>
     public Records GetAsRecords()
     {
-        return new Records(Length);
+        var list = new[]
+        {
+            this
+        };
+
+        return new Records(Length, list);
     }
 
     /// <summary>
@@ -237,5 +254,10 @@ internal class ProducerBatch: RecordsBatch
             recordTask.SetException(exception);
         }
         _produceRequestResult.SetException(exception);
+    }
+
+    public void SetReady()
+    {
+        IsReady = true;
     }
 }

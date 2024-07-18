@@ -69,7 +69,7 @@ public record SaslSettings
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
-    /// Whether or not to send the Kafka SASL handshake first if enabled
+    /// Whether to send the Kafka SASL handshake first if enabled
     /// (defaults to true). You should only set this to false if you're using
     /// a non-Kafka SASL proxy.
     /// </summary>
@@ -107,6 +107,14 @@ public record SaslSettings
             SaslMechanism.Kerberos => SaslMechanism.Kerberos,
             _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
         };
+
+        if (Mechanism == SaslMechanism.Plain)
+        {
+            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
+            {
+                throw new ArgumentException("Invalid credentials for sasl plaintext");
+            }
+        }
     }
 
     /// <summary>

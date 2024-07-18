@@ -88,58 +88,6 @@ internal static class VarIntExtensions
         return WriteVarUInt64(stream, value);
     }
 
-    private static int ReadVarInt(BinaryReader reader)
-    {
-        var i = 0;
-        var value = 0;
-        var shift = 0;
-
-        while (true)
-        {
-            var b = reader.ReadByte();
-
-            if (b < 0x80)
-            {
-                if (i >= 5 || i == 4 && b > 1)
-                {
-                    return -(i + 1);
-                }
-
-                return i + 1;
-            }
-
-            value |= (b & 0x7F) << shift;
-            shift += 7;
-            i++;
-        }
-    }
-
-    private static int ReadVarUInt64(BinaryReader reader)
-    {
-        var i = 0;
-        ulong value = 0U;
-        var shift = 0;
-
-        while (true)
-        {
-            var b = reader.ReadByte();
-
-            if (b < 0x80)
-            {
-                if (i == 4 && b > 1 || i >= 5)
-                {
-                    return -(i + 1);
-                }
-
-                return i + 1;
-            }
-
-            value |= (ulong)(b & 0x7F) << shift;
-            shift += 7;
-            i++;
-        }
-    }
-
     internal static int SizeOfVarInt(this int value)
     {
         return SizeOfVarUInt(value << 1 ^ value >> 31);

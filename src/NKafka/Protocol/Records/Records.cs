@@ -56,8 +56,10 @@ public sealed class Records
     /// 
     /// </summary>
     /// <param name="sizeInBytes"></param>
-    public Records(int sizeInBytes)
+    /// <param name="batches"></param>
+    public Records(int sizeInBytes, IReadOnlyList<IRecordsBatch> batches)
     {
+        Batches = batches;
         SizeInBytes = sizeInBytes;
     }
 

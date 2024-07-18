@@ -31,8 +31,9 @@ public record RecordMetadata
     /// </summary>
     public TopicPartition? TopicPartition { get; set; }
 
+    /// <summary>
     /// Gets or sets the offset value.
-    /// /
+    /// </summary>
     public Offset Offset { get; set; }
 
     /// <summary>

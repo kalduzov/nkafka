@@ -31,7 +31,7 @@ namespace NKafka.Collections;
 /// The implementation of the double ended queue is based on the internal implementation of System.Collections.Generic.Deque&lt;T&gt;
 /// </summary>
 [DebuggerDisplay("Count = {Count}")]
-internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
+internal class Deque<T>: ICollection, IReadOnlyCollection<T>
     where T : class
 {
     private const int _DEFAULT_CAPACITY = 8;
@@ -77,7 +77,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     {
         foreach (var element in collection)
         {
-            PushFront(element);
+            AddFirst(element);
         }
     }
 
@@ -203,7 +203,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// </summary>
     /// <typeparam name="T">The type of the item.</typeparam>
     /// <param name="item">The item to be pushed to the back of the array.</param>
-    public void PushBack(T item)
+    public void AddLast(T item)
     {
         if (Count == _array.Length)
         {
@@ -226,7 +226,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// Inserts an item at the front of the collection.
     /// </summary>
     /// <param name="item">The item to be inserted.</param>
-    public void PushFront(T item)
+    public void AddFirst(T item)
     {
         if (Count == _array.Length)
         {
@@ -249,7 +249,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// If the head index reaches the end of the array, it wraps around to 0.
     /// The Count property is decremented by 1 after the element is removed.
     /// </remarks>
-    public T PopFront()
+    public T RemoveFirst1()
     {
         Debug.Assert(!IsEmpty); // caller's responsibility to make sure there are elements remaining
 
@@ -278,7 +278,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// decrementing the tail index and updating the count accordingly.
     /// If the tail index reaches -1, it wraps around to the end of the internal array.
     /// </remarks>
-    public T PopBack()
+    public T RemoveFirst()
     {
         Debug.Assert(!IsEmpty);
 
@@ -304,7 +304,7 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// <returns>
     /// The front element of the array if it exists; otherwise, the default value of the type <typeparamref name="T"/>.
     /// </returns>
-    public T? PeekFront()
+    public T? PeekFirst()
     {
         return IsEmpty ? default : _array[_head];
     }
@@ -314,9 +314,11 @@ internal sealed class Deque<T>: ICollection, IReadOnlyCollection<T>
     /// </summary>
     /// <typeparam name="T">The type of elements in the queue.</typeparam>
     /// <returns>The last element of the queue if the queue is not empty; otherwise, the default value of the type.</returns>
-    public T? PeekBack()
+    public bool TryPeekLast(out T element)
     {
-        return IsEmpty ? default : _array[_tail];
+        element = IsEmpty ? default! : _array[_tail];
+
+        return !IsEmpty;
     }
 
     private void Grow()

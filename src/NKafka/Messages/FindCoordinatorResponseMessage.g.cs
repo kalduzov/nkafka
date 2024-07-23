@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//A7-1F-3B-0A-75-C3-8A-60-7B-87-0A-AD-B5-0C-B1-E4-1A-1F-4D-2C-91-C9-6E-24-CE-6F-47-12-A4-F5-FC-B3
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -330,7 +331,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
             writer.WriteVarUInt(Coordinators.Count + 1);
             foreach (var element in Coordinators)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -516,7 +517,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CoordinatorMessage");
             }

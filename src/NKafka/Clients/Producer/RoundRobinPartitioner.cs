@@ -24,7 +24,7 @@ using System.Collections.Concurrent;
 namespace NKafka.Clients.Producer;
 
 /// <summary>
-/// The "Round-Robin" partitioner
+/// The "Round-Robin" partitioner.
 /// </summary>
 internal class RoundRobinPartitioner: IPartitioner
 {

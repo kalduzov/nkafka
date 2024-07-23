@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//FE-67-E0-E0-C2-BE-F4-02-24-07-07-45-F1-3F-95-52-84-AA-2D-06-D2-23-23-93-88-61-B7-D0-C3-DF-4D-B2
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -61,24 +62,29 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
+    /// List of transactions to add partitions to.
+    /// </summary>
+    public AddPartitionsToTxnTransactionCollection Transactions { get; set; } = new ();
+
+    /// <summary>
     /// The transactional id corresponding to the transaction.
     /// </summary>
-    public string TransactionalId { get; set; } = string.Empty;
+    public string V3AndBelowTransactionalId { get; set; } = string.Empty;
 
     /// <summary>
     /// Current producer id in use by the transactional id.
     /// </summary>
-    public long ProducerId { get; set; } = 0;
+    public long V3AndBelowProducerId { get; set; } = 0;
 
     /// <summary>
     /// Current epoch associated with the producer id.
     /// </summary>
-    public short ProducerEpoch { get; set; } = 0;
+    public short V3AndBelowProducerEpoch { get; set; } = 0;
 
     /// <summary>
     /// The partitions to add to the transaction.
     /// </summary>
-    public AddPartitionsToTxnTopicCollection Topics { get; set; } = new ();
+    public AddPartitionsToTxnTopicCollection V3AndBelowTopics { get; set; } = new ();
 
     /// <summary>
     /// The basic constructor of the message AddPartitionsToTxnRequestMessage
@@ -100,6 +106,29 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
+        if (version >= ApiVersion.Version4)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field Transactions was serialized as null");
+            }
+            else
+            {
+                var newCollection = new AddPartitionsToTxnTransactionCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
+                {
+                    newCollection.Add(new AddPartitionsToTxnTransactionMessage(ref reader, version));
+                }
+                Transactions = newCollection;
+            }
+        }
+        else
+        {
+            Transactions = new ();
+        }
+        if (version <= ApiVersion.Version3)
         {
             int length;
             if (version >= ApiVersion.Version3)
@@ -112,19 +141,38 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
             }
             if (length < 0)
             {
-                throw new Exception("non-nullable field TransactionalId was serialized as null");
+                throw new Exception("non-nullable field V3AndBelowTransactionalId was serialized as null");
             }
             else if (length > 0x7fff)
             {
-                throw new Exception($"string field TransactionalId had invalid length {length}");
+                throw new Exception($"string field V3AndBelowTransactionalId had invalid length {length}");
             }
             else
             {
-                TransactionalId = reader.ReadString(length);
+                V3AndBelowTransactionalId = reader.ReadString(length);
             }
         }
-        ProducerId = reader.ReadLong();
-        ProducerEpoch = reader.ReadShort();
+        else
+        {
+            V3AndBelowTransactionalId = string.Empty;
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            V3AndBelowProducerId = reader.ReadLong();
+        }
+        else
+        {
+            V3AndBelowProducerId = 0;
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            V3AndBelowProducerEpoch = reader.ReadShort();
+        }
+        else
+        {
+            V3AndBelowProducerEpoch = 0;
+        }
+        if (version <= ApiVersion.Version3)
         {
             if (version >= ApiVersion.Version3)
             {
@@ -132,7 +180,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
                 arrayLength = reader.ReadVarUInt() - 1;
                 if (arrayLength < 0)
                 {
-                    throw new Exception("non-nullable field Topics was serialized as null");
+                    throw new Exception("non-nullable field V3AndBelowTopics was serialized as null");
                 }
                 else
                 {
@@ -141,7 +189,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicMessage(ref reader, version));
                     }
-                    Topics = newCollection;
+                    V3AndBelowTopics = newCollection;
                 }
             }
             else
@@ -150,7 +198,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
                 arrayLength = reader.ReadInt();
                 if (arrayLength < 0)
                 {
-                    throw new Exception("non-nullable field Topics was serialized as null");
+                    throw new Exception("non-nullable field V3AndBelowTopics was serialized as null");
                 }
                 else
                 {
@@ -159,9 +207,13 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicMessage(ref reader, version));
                     }
-                    Topics = newCollection;
+                    V3AndBelowTopics = newCollection;
                 }
             }
+        }
+        else
+        {
+            V3AndBelowTopics = new ();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
@@ -185,34 +237,89 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
     public void Write(BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
+        if (version >= ApiVersion.Version4)
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-            if (version >= ApiVersion.Version3)
+            writer.WriteVarUInt(Transactions.Count + 1);
+            foreach (var element in Transactions)
             {
-                writer.WriteVarUInt(stringBytes.Length + 1);
-            }
-            else
-            {
-                writer.WriteShort((short)stringBytes.Length);
-            }
-            writer.WriteBytes(stringBytes);
-        }
-        writer.WriteLong(ProducerId);
-        writer.WriteShort(ProducerEpoch);
-        if (version >= ApiVersion.Version3)
-        {
-            writer.WriteVarUInt(Topics.Count + 1);
-            foreach (var element in Topics)
-            {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
         {
-            writer.WriteInt(Topics.Count);
-            foreach (var element in Topics)
+            if (Transactions.Count != 0)
             {
-                element.Write(writer, version);
+                throw new UnsupportedVersionException($"Attempted to write a non-default Transactions at version {version}");
+            }
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(V3AndBelowTransactionalId);
+                if (version >= ApiVersion.Version3)
+                {
+                    writer.WriteVarUInt(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
+            }
+        }
+        else
+        {
+            if (!V3AndBelowTransactionalId.Equals(string.Empty))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default V3AndBelowTransactionalId at version {version}");
+            }
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            writer.WriteLong(V3AndBelowProducerId);
+        }
+        else
+        {
+            if (V3AndBelowProducerId != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default V3AndBelowProducerId at version {version}");
+            }
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            writer.WriteShort(V3AndBelowProducerEpoch);
+        }
+        else
+        {
+            if (V3AndBelowProducerEpoch != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default V3AndBelowProducerEpoch at version {version}");
+            }
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            if (version >= ApiVersion.Version3)
+            {
+                writer.WriteVarUInt(V3AndBelowTopics.Count + 1);
+                foreach (var element in V3AndBelowTopics)
+                {
+                    element?.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(V3AndBelowTopics.Count);
+                foreach (var element in V3AndBelowTopics)
+                {
+                    element?.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (V3AndBelowTopics.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default V3AndBelowTopics at version {version}");
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -244,38 +351,52 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
         {
             return false;
         }
-        if (TransactionalId is null)
+        if (Transactions is null)
         {
-            if (other.TransactionalId is not null)
+            if (other.Transactions is not null)
             {
                 return false;
             }
         }
         else
         {
-            if (!TransactionalId.Equals(other.TransactionalId))
+            if (!Transactions.SequenceEqual(other.Transactions))
             {
                 return false;
             }
         }
-        if (ProducerId != other.ProducerId)
+        if (V3AndBelowTransactionalId is null)
         {
-            return false;
-        }
-        if (ProducerEpoch != other.ProducerEpoch)
-        {
-            return false;
-        }
-        if (Topics is null)
-        {
-            if (other.Topics is not null)
+            if (other.V3AndBelowTransactionalId is not null)
             {
                 return false;
             }
         }
         else
         {
-            if (!Topics.SequenceEqual(other.Topics))
+            if (!V3AndBelowTransactionalId.Equals(other.V3AndBelowTransactionalId))
+            {
+                return false;
+            }
+        }
+        if (V3AndBelowProducerId != other.V3AndBelowProducerId)
+        {
+            return false;
+        }
+        if (V3AndBelowProducerEpoch != other.V3AndBelowProducerEpoch)
+        {
+            return false;
+        }
+        if (V3AndBelowTopics is null)
+        {
+            if (other.V3AndBelowTopics is not null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!V3AndBelowTopics.SequenceEqual(other.V3AndBelowTopics))
             {
                 return false;
             }
@@ -287,7 +408,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, TransactionalId, ProducerId, ProducerEpoch, Topics);
+        hashCode = HashCode.Combine(hashCode, Transactions, V3AndBelowTransactionalId, V3AndBelowProducerId, V3AndBelowProducerEpoch, V3AndBelowTopics);
         return hashCode;
     }
 
@@ -295,11 +416,253 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
     public override string ToString()
     {
         return "AddPartitionsToTxnRequestMessage("
-            + "TransactionalId=" + (string.IsNullOrWhiteSpace(TransactionalId) ? "null" : TransactionalId)
-            + ", ProducerId=" + ProducerId
-            + ", ProducerEpoch=" + ProducerEpoch
-            + ", Topics=" + Topics.DeepToString()
+            + "Transactions=" + Transactions.DeepToString()
+            + ", V3AndBelowTransactionalId=" + (string.IsNullOrWhiteSpace(V3AndBelowTransactionalId) ? "null" : V3AndBelowTransactionalId)
+            + ", V3AndBelowProducerId=" + V3AndBelowProducerId
+            + ", V3AndBelowProducerEpoch=" + V3AndBelowProducerEpoch
+            + ", V3AndBelowTopics=" + V3AndBelowTopics.DeepToString()
             + ")";
+    }
+
+    /// <summary>
+    /// Describes the contract for message AddPartitionsToTxnTransactionMessage
+    /// </summary>
+    public sealed partial class AddPartitionsToTxnTransactionMessage: IMessage, IEquatable<AddPartitionsToTxnTransactionMessage>
+    {
+        /// <inheritdoc />
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
+
+        /// <summary>
+        /// The transactional id corresponding to the transaction.
+        /// </summary>
+        public string TransactionalId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Current producer id in use by the transactional id.
+        /// </summary>
+        public long ProducerId { get; set; } = 0;
+
+        /// <summary>
+        /// Current epoch associated with the producer id.
+        /// </summary>
+        public short ProducerEpoch { get; set; } = 0;
+
+        /// <summary>
+        /// Boolean to signify if we want to check if the partition is in the transaction rather than add it.
+        /// </summary>
+        public bool VerifyOnly { get; set; } = false;
+
+        /// <summary>
+        /// The partitions to add to the transaction.
+        /// </summary>
+        public AddPartitionsToTxnTopicCollection Topics { get; set; } = new ();
+
+        /// <summary>
+        /// The basic constructor of the message AddPartitionsToTxnTransactionMessage
+        /// </summary>
+        public AddPartitionsToTxnTransactionMessage()
+        {
+        }
+
+        /// <summary>
+        /// Base constructor for deserializing message AddPartitionsToTxnTransactionMessage
+        /// </summary>
+        public AddPartitionsToTxnTransactionMessage(ref BufferReader reader, ApiVersion version)
+            : this()
+        {
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
+        }
+
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
+        {
+            if (version > ApiVersion.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnTransactionMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TransactionalId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TransactionalId had invalid length {length}");
+                }
+                else
+                {
+                    TransactionalId = reader.ReadString(length);
+                }
+            }
+            ProducerId = reader.ReadLong();
+            ProducerEpoch = reader.ReadShort();
+            VerifyOnly = reader.ReadByte() != 0;
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field Topics was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new AddPartitionsToTxnTopicCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
+                    {
+                        newCollection.Add(new AddPartitionsToTxnTopicMessage(ref reader, version));
+                    }
+                    Topics = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public void Write(BufferWriter writer, ApiVersion version)
+        {
+            if (version < ApiVersion.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of AddPartitionsToTxnTransactionMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteLong(ProducerId);
+            writer.WriteShort(ProducerEpoch);
+            writer.WriteBool(VerifyOnly);
+            writer.WriteVarUInt(Topics.Count + 1);
+            foreach (var element in Topics)
+            {
+                element?.Write(writer, version);
+            }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnTransactionMessage other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(AddPartitionsToTxnTransactionMessage? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (TransactionalId is null)
+            {
+                if (other.TransactionalId is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!TransactionalId.Equals(other.TransactionalId))
+                {
+                    return false;
+                }
+            }
+            if (ProducerId != other.ProducerId)
+            {
+                return false;
+            }
+            if (ProducerEpoch != other.ProducerEpoch)
+            {
+                return false;
+            }
+            if (VerifyOnly != other.VerifyOnly)
+            {
+                return false;
+            }
+            if (Topics is null)
+            {
+                if (other.Topics is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!Topics.SequenceEqual(other.Topics))
+                {
+                    return false;
+                }
+            }
+            return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TransactionalId);
+            return hashCode;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "AddPartitionsToTxnTransactionMessage("
+                + "TransactionalId=" + (string.IsNullOrWhiteSpace(TransactionalId) ? "null" : TransactionalId)
+                + ", ProducerId=" + ProducerId
+                + ", ProducerEpoch=" + ProducerEpoch
+                + ", VerifyOnly=" + (VerifyOnly ? "true" : "false")
+                + ", Topics=" + Topics.DeepToString()
+                + ")";
+        }
+    }
+
+    /// <summary>
+    /// Describes the contract for message AddPartitionsToTxnTransactionCollection
+    /// </summary>
+    public sealed partial class AddPartitionsToTxnTransactionCollection: HashSet<AddPartitionsToTxnTransactionMessage>
+    {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
+        public AddPartitionsToTxnTransactionCollection()
+        {
+        }
+
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
+        public AddPartitionsToTxnTransactionCollection(int capacity)
+            : base(capacity)
+        {
+        }
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return SetEquals((IEnumerable<AddPartitionsToTxnTransactionMessage>)obj);
+        }
     }
 
     /// <summary>
@@ -343,7 +706,7 @@ public sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage, I
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnTopicMessage");
             }

@@ -85,4 +85,16 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new AddOffsetsToTxnRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

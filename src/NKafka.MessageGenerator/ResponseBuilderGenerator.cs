@@ -58,12 +58,12 @@ public class ResponseBuilderGenerator
         _codeGenerator.IncrementIndent();
 
         var responses = responseInformation as (string ApiKeyName, short ApiKey, string ClassName)[]
-                                  ?? responseInformation.ToArray();
+                        ?? responseInformation.ToArray();
 
-        _codeGenerator.AppendLine("public static IResponseMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span)");
+        _codeGenerator.AppendLine("public static IResponseMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span, int bodyLen)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
-        _codeGenerator.AppendLine("var reader = new BufferReader(span);");
+        _codeGenerator.AppendLine("var reader = new BufferReader(span, bodyLen);");
         _codeGenerator.AppendLine("var headerVersion = apiKey.GetResponseHeaderVersion(apiVersion);");
         _codeGenerator.AppendLine("ProcessHeader(ref reader, headerVersion);");
         _codeGenerator.AppendLine("return apiKey switch");

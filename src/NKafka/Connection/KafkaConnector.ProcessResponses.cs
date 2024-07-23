@@ -68,14 +68,14 @@ internal sealed partial class KafkaConnector
                 // Перевод на полное чтение например в pipe позволит вычитывать ответы с меньшим оверхедом.
                 // Проблема в том, что нужно знать размер данных, которые нужно считать, а это можно узнать только чтением первых 4 байт из сети.
                 // А потом еще надо прочитать это количество байт.
-                // В идельном случае можно вообще не вычитывать весь буфер, а последовательным чтением сразу формировать нужный класс ответа 
+                // В идеальном случае можно вообще не вычитывать весь буфер, а последовательным чтением сразу формировать нужный класс ответа 
                 // Pipelines требуют свободного "потока", который будет сливать данные из сокета - его можно сделать один на весь пулл подключений aka NIO из java 
                 var countReadBytes = await _stream.ReadAsync(intBuffer);
                 _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, countReadBytes);
 
                 var responseLen = ReadInt32BigEndian(intBuffer.Span);
 
-                if (responseLen == 0) //Данных нет идем дальше ждать
+                if (responseLen == 0) //Данных нет, идем дальше ждать
                 {
                     if (countReadBytes == 4)
                     {
@@ -135,7 +135,8 @@ internal sealed partial class KafkaConnector
         {
             if (_inFlightRequests.TryRemove(requestId, out var responseInfo))
             {
-                Debug.WriteLine($"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen + 4}");
+                Debug.WriteLine(
+                    $"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen + 4}");
 
                 if (token.IsCancellationRequested)
                 {

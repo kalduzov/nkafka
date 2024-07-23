@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,6 +29,7 @@ using System.Text;
 using FastEnumUtility;
 
 using NKafka.Clients.Admin;
+using NKafka.Clients.Consumer;
 using NKafka.Protocol;
 
 namespace NKafka.Diagnostics;
@@ -60,7 +61,7 @@ internal static class KafkaDiagnosticsSource
             .AddTag("ValueType", typeof(TValue))
             .SetStatus(ActivityStatusCode.Ok);
 
-        activity?.AddTag("Key", message.Key.ToString());
+        activity?.AddTag("Key", message.Key);
 
         return activity;
     }
@@ -73,7 +74,7 @@ internal static class KafkaDiagnosticsSource
         EndPoint endPoint)
     {
         var activity = _internalActivitySource
-            .StartActivity()
+            .StartActivity($"InternalSendMessage - {key.FastToString()}")
             ?.AddTag("Key", key.FastToString())
             .AddTag("Version", version.FastToString())
             .AddTag("RequestId", requestId.ToString())
@@ -119,7 +120,104 @@ internal static class KafkaDiagnosticsSource
                 first = false;
             }
         }
-        activity?.AddTag("topics", sb.ToString());
+        activity.AddTag("topics", sb.ToString());
+
+        return activity;
+    }
+
+    public static Activity? SubscribeTopics(IReadOnlyCollection<string> topics)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics.Count <= 0 || activity is null)
+        {
+            return activity;
+        }
+        var sb = new StringBuilder();
+
+        var first = true;
+
+        foreach (var topic in topics)
+        {
+            if (!first)
+            {
+                sb.Append(',');
+            }
+            sb.Append(topic);
+
+            if (first)
+            {
+                first = false;
+            }
+        }
+        activity.AddTag("topics", sb.ToString());
+
+        return activity;
+    }
+
+    public static Activity? CreateNewSession()
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        return activity;
+    }
+
+    public static Activity? FindCoordinator()
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        return activity;
+    }
+
+    public static Activity? JoinGroup(string groupId)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        activity?.SetTag("group", groupId);
+
+        return activity;
+    }
+
+    public static Activity? RefreshMetadata(IReadOnlyCollection<string>? topics)
+    {
+        var activity = _activitySource.StartActivity()
+            ?.SetStatus(ActivityStatusCode.Ok);
+
+        if (topics is null)
+        {
+            activity?.SetTag("FullMetadata", "true");
+
+            return activity;
+        }
+
+        activity?.SetTag("FullMetadata", "false");
+
+        if (topics.Count <= 0 || activity is null)
+        {
+            return activity;
+        }
+        var sb = new StringBuilder();
+
+        var first = true;
+
+        foreach (var topic in topics)
+        {
+            if (!first)
+            {
+                sb.Append(',');
+            }
+            sb.Append(topic);
+
+            if (first)
+            {
+                first = false;
+            }
+        }
+        activity.AddTag("topics", sb.ToString());
 
         return activity;
     }

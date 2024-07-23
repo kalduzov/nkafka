@@ -54,6 +54,7 @@ NKafka.Messages.AddOffsetsToTxnResponseMessage.AddOffsetsToTxnResponseMessage() 
 NKafka.Messages.AddOffsetsToTxnResponseMessage.AddOffsetsToTxnResponseMessage(NKafka.Protocol.BufferReader reader, NKafka.Protocol.ApiVersion version) -> void
 NKafka.Messages.AddOffsetsToTxnResponseMessage.HighestSupportedVersion.get -> NKafka.Protocol.ApiVersion
 NKafka.Messages.AddOffsetsToTxnResponseMessage.LowestSupportedVersion.get -> NKafka.Protocol.ApiVersion
+NKafka.Messages.FindCoordinatorResponseMessage.ShouldClientThrottle(NKafka.Protocol.ApiVersion version) -> bool
 NKafka.Null
 NKafka.Null.Null() -> void
 NKafka.Protocol.BufferReader

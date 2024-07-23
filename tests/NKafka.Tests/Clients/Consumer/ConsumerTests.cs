@@ -45,8 +45,8 @@ public partial class ConsumerTests: IDisposable
             _ = new Consumer<Null, Null>(
                 kafkaCluster: _kafkaCluster,
                 config: config,
-                keyDeserializer: null,
-                valueDeserializer: null,
+                keyDeserializer: NoneDeserializer<Null>.Instance,
+                valueDeserializer: NoneDeserializer<Null>.Instance,
                 fetcher: null,
                 coordinator: null,
                 loggerFactory: NullLoggerFactory.Instance);
@@ -60,9 +60,13 @@ public partial class ConsumerTests: IDisposable
 
         var stringDeserializer = new StringDeserializer();
 
+        FluentActions.Invoking(Ctor).Should().NotThrow();
+
+        return;
+
         void Ctor()
         {
-            var _ = new Consumer<string, string>(
+            _ = new Consumer<string, string>(
                 _kafkaCluster,
                 config,
                 stringDeserializer,
@@ -71,8 +75,6 @@ public partial class ConsumerTests: IDisposable
                 null!,
                 NullLoggerFactory.Instance);
         }
-
-        FluentActions.Invoking(Ctor).Should().NotThrow();
     }
 
     private static IKafkaCluster BuildMockForKafkaCluster()

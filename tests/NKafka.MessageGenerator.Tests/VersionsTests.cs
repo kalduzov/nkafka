@@ -46,12 +46,19 @@ public class VersionsTests
     [InlineData("3+", "4+", "3")]
     [InlineData("4+", "3+", "none")]
     [InlineData("1-5", "2-4", null)]
-    public void SubtractTests(string oneString, string twoString, string resultString)
+    public void SubtractTests(string oneString, string twoString, string? resultString)
     {
         var one = Versions.Parse(oneString, null!);
         var two = Versions.Parse(twoString, null!);
         var result = one! - two!;
 
         result.Should().Be(Versions.Parse(resultString, null!));
+    }
+
+    [Fact]
+    public void ParseTests()
+    {
+        var version = Versions.Parse("0+", Versions.None);
+        version.Lowest.Should().Be(0);
     }
 }

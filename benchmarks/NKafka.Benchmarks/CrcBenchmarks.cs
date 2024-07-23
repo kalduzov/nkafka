@@ -330,11 +330,11 @@ public class CrcBenchmarks
         return crc ^ 0xFFFFFFFF;
     }
 
-    [Benchmark]
-    public uint CalculateSystemIoHashing()
-    {
-        var res = System.IO.Hashing.Crc32.Hash(_buffer!);
-
-        return res[0];
-    }
+    // [Benchmark]
+    // public uint CalculateSystemIoHashing()
+    // {
+    //     var res = System.IO.Hashing.Crc32.Hash(_buffer!);
+    //
+    //     return res[0];
+    // }
 }

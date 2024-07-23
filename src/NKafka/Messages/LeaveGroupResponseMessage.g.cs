@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//AA-5C-A4-AB-8D-AC-F9-D3-69-59-EF-91-60-F2-35-E9-E4-43-7A-41-09-EC-01-88-0D-F0-58-6C-54-0B-7D-BC
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -173,7 +174,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
                 writer.WriteVarUInt(Members.Count + 1);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -181,7 +182,7 @@ public sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEquata
                 writer.WriteInt(Members.Count);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }

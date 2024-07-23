@@ -261,7 +261,7 @@ internal class WriteMethodGenerator: IMethodGenerator
             IFieldType.Int64FieldType => $"writer.WriteLong({name})",
             IFieldType.UuidFieldType => $"writer.WriteGuid({name})",
             IFieldType.Float64FieldType => $"writer.WriteDouble({name})",
-            IFieldType.StructType => $"{name}.Write(writer, version)",
+            IFieldType.StructType => $"{name}{(type.CanBeNullable ? "?" : "")}.Write(writer, version)",
             _ => throw new Exception($"Unsupported field type {type}")
         };
     }
@@ -309,7 +309,7 @@ internal class WriteMethodGenerator: IMethodGenerator
                     }
                     else if (type.IsRecords)
                     {
-                        lengthExpression = $"{name}.SizeInBytes";
+                        lengthExpression = type.CanBeNullable ? $"({name}?.SizeInBytes ?? 0)" : $"{name}.SizeInBytes";
                     }
                     else if (type.IsArray)
                     {

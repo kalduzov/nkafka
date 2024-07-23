@@ -47,7 +47,7 @@ public sealed partial class OffsetFetchRequestMessage
         {
             var groupMessage = new OffsetFetchRequestGroupMessage
             {
-                groupId = groupId,
+                GroupId = groupId,
             };
 
             foreach (var topicPartition in topicPartitions)

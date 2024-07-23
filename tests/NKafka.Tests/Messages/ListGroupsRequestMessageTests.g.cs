@@ -78,4 +78,14 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version4);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new ListGroupsRequestMessage
+        {
+            StatesFilter = new (),
+            TypesFilter = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+    }
 }

@@ -19,6 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Security.Cryptography;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -29,7 +30,7 @@ using NKafka.MessageGenerator.Specifications;
 // Генерируем только запросы, необходимые для клиентской работы.
 // Если какой-то запрос отсутствует - нужно добавить его в этот массив
 string[] clientMessagesPattern =
-{
+[
     "AddOffsetsToTxn",
     "AddPartitionsToTxn",
     "ApiVersions",
@@ -69,16 +70,15 @@ string[] clientMessagesPattern =
     "IncrementalAlterConfigs",
     "OffsetDelete",
     "DescribeUserScramCredentials",
-    "AlterUserScramCredentials"
-};
+    "AlterUserScramCredentials",
+    "ConsumerGroupHeartbeat"
+];
 
 Console.WriteLine("Kafka classes generator");
 Console.WriteLine();
 
 var solutionDirectory = GetRootDirectory(args[0]);
 var outputDirectory = GetOutPutDirectory(args[1]);
-
-//private readonly string messagesDirectory = 
 
 var command = args.Length == 3 ? args[2].ToLowerInvariant() : "messages";
 
@@ -114,6 +114,28 @@ switch (command)
 
 return;
 
+bool DoesFileHaveSameHash(string fileName, MessageSpecification specification)
+{
+    var fullFileName = GetFileWithPath(outputDirectory, fileName);
+
+    if (!File.Exists(fullFileName))
+    {
+        return false;
+    }
+
+    var hash = ReadHashFile(fullFileName);
+
+    return hash == specification.Hash;
+
+    string ReadHashFile(string fn)
+    {
+        using var reader = new StreamReader(File.OpenRead(fn), Encoding.UTF8, leaveOpen: false);
+
+        return reader.ReadLine()!.TrimStart('/');
+
+    }
+}
+
 void GenerateMessages()
 {
     Console.WriteLine("Start messages generator");
@@ -130,9 +152,16 @@ void GenerateMessages()
             {
                 case MessageType.Request or MessageType.Response or MessageType.Header or MessageType.Data:
                     {
+
                         IMessageGenerator messageGenerator = new MessageGenerator("NKafka.Messages");
-                        var result = messageGenerator.Generate(messageSpecification);
                         var classFileName = $"{messageGenerator.ClassName(messageSpecification)}.g.cs";
+
+                        if (DoesFileHaveSameHash(classFileName, messageSpecification))
+                        {
+                            continue;
+                        }
+                        var result = messageGenerator.Generate(messageSpecification);
+
                         WriteMessageToFile(classFileName, result);
 
                         break;
@@ -247,8 +276,7 @@ List<MessageSpecification> GetMessageSpecifications(IEnumerable<string> enumerab
 
 void WriteMessageToFile(string fileName, StringBuilder result)
 {
-    var path = Path.Combine(outputDirectory, "Messages", fileName);
-    Directory.CreateDirectory(outputDirectory);
+    var path = GetFileWithPath(outputDirectory, fileName);
     File.WriteAllText(path, result.ToString(), Encoding.UTF8);
 }
 
@@ -313,6 +341,11 @@ static MessageSpecification GetApiDescriptor(string fileName)
         }
     }
 
+    var hash = BitConverter.ToString(SHA256.HashData(Encoding.UTF8.GetBytes(str)));
+    var index = str.LastIndexOf('}');
+    str = str.Remove(index);
+    str += $",\"hash\":\"{hash}\"}}";
+
     try
     {
         return JsonConvert.DeserializeObject<MessageSpecification>(str)!;
@@ -330,5 +363,13 @@ string GetRootDirectory(string path)
 
 string GetOutPutDirectory(string path)
 {
+    return path;
+}
+
+string GetFileWithPath(string directory, string fileName)
+{
+    var path = Path.Combine(directory, "Messages", fileName);
+    Directory.CreateDirectory(directory);
+
     return path;
 }

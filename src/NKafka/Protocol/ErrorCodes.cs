@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -198,5 +198,16 @@ public enum ErrorCodes: short
     TransactionalIdNotFound = 105,
     FetchSessionTopicIdError = 106,
     IneligibleReplica = 107,
-    NewLeaderElected = 108
+    NewLeaderElected = 108,
+    OffsetMovedToTieredStorage = 109,
+    FencedMemberEpoch = 110,
+    UnreleasedInstanceId = 111,
+    UnsupportedAssignor = 112,
+    StaleMemberEpoch = 113,
+    MismatchedEndpointType = 114,
+    UnsupportedEndpointType = 115,
+    UnknownControllerId = 116,
+    UnknownSubscriptionId = 117,
+    TelemetryTooLarge = 118,
+    InvalidRegistration = 119
 }

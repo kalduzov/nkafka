@@ -322,6 +322,8 @@ public interface IFieldType
 
         public string TypeName => _type;
 
+        public bool CanBeNullable => true;
+
         public StructType(string type)
         {
             _type = type;

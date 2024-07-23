@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//65-69-27-BD-39-33-2E-9A-67-4B-2B-46-27-A2-69-D1-F7-C4-6D-A3-20-4E-7B-AF-C1-63-6D-33-38-6B-4A-F1
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -167,7 +168,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessage,
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -175,7 +176,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessage,
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -390,7 +391,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessage,
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -398,7 +399,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessage,
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

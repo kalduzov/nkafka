@@ -190,4 +190,41 @@ public sealed partial class FetchResponseMessageTests: ResponseMessageTests<Fetc
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version13);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchResponseMessage' message by Version14")]
+    public void SerializeAndDeserializeMessage_ApiVersion14_Success()
+    {
+        var message = new FetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            SessionId = -420004200,
+            Responses = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version14);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchResponseMessage' message by Version15")]
+    public void SerializeAndDeserializeMessage_ApiVersion15_Success()
+    {
+        var message = new FetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            SessionId = -420004200,
+            Responses = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version15);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchResponseMessage' message by Version16")]
+    public void SerializeAndDeserializeMessage_ApiVersion16_Success()
+    {
+        var message = new FetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            SessionId = -420004200,
+            Responses = new (),
+            NodeEndpoints = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version16);
+    }
 }

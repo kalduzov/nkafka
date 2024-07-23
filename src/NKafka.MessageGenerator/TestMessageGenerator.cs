@@ -25,8 +25,8 @@ namespace NKafka.MessageGenerator;
 
 public class TestMessageGenerator: ClassGenerator, ITestsMessageGenerator
 {
-    public TestMessageGenerator(string ns)
-        : base(ns)
+    public TestMessageGenerator(string @namespace)
+        : base(@namespace)
     {
     }
 

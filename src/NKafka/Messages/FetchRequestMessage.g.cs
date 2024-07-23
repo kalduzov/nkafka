@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//A2-0C-22-F3-23-21-59-3F-52-47-54-2A-E7-06-7E-4B-B5-74-8C-4A-E0-74-DD-04-31-00-41-36-0F-F6-DD-13
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -68,7 +69,12 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// <summary>
     /// The broker ID of the follower, of -1 if this request is from a consumer.
     /// </summary>
-    public int ReplicaId { get; set; } = 0;
+    public int ReplicaId { get; set; } = -1;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public ReplicaStateMessage ReplicaState { get; set; } = new ();
 
     /// <summary>
     /// The maximum time in milliseconds to wait for the response.
@@ -138,7 +144,17 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         {
             ClusterId = null;
         }
-        ReplicaId = reader.ReadInt();
+        if (version <= ApiVersion.Version14)
+        {
+            ReplicaId = reader.ReadInt();
+        }
+        else
+        {
+            ReplicaId = -1;
+        }
+        {
+            ReplicaState = new ();
+        }
         MaxWaitMs = reader.ReadInt();
         MinBytes = reader.ReadInt();
         if (version >= ApiVersion.Version3)
@@ -310,6 +326,18 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                         }
                         break;
                     }
+                    case 1:
+                    {
+                        if (version >= ApiVersion.Version15)
+                        {
+                            ReplicaState = new ReplicaStateMessage(ref reader, version);
+                            break;
+                        }
+                        else
+                        {
+                            throw new Exception($"Tag 1 is not valid for version {version}");
+                        }
+                    }
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                         break;
@@ -329,7 +357,31 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 numTaggedFields++;
             }
         }
-        writer.WriteInt(ReplicaId);
+        if (version <= ApiVersion.Version14)
+        {
+            writer.WriteInt(ReplicaId);
+        }
+        else
+        {
+            if (ReplicaId != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ReplicaId at version {version}");
+            }
+        }
+        if (version >= ApiVersion.Version15)
+        {
+            if (!ReplicaState.Equals(new ()))
+            {
+                numTaggedFields++;
+            }
+        }
+        else
+        {
+            if (!ReplicaState.Equals(new ()))
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ReplicaState at version {version}");
+            }
+        }
         writer.WriteInt(MaxWaitMs);
         writer.WriteInt(MinBytes);
         if (version >= ApiVersion.Version3)
@@ -353,7 +405,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -361,7 +413,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version7)
@@ -371,7 +423,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteVarUInt(ForgottenTopicsData.Count + 1);
                 foreach (var element in ForgottenTopicsData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -379,7 +431,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteInt(ForgottenTopicsData.Count);
                 foreach (var element in ForgottenTopicsData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -417,6 +469,13 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
+            }
+            {
+                if (!ReplicaState.Equals(new ()))
+                {
+                    writer.WriteVarUInt(1);
+                    ReplicaState?.Write(writer, version);
+                }
             }
             rawWriter.WriteRawTags(writer, int.MaxValue);
         }
@@ -459,6 +518,20 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         if (ReplicaId != other.ReplicaId)
         {
             return false;
+        }
+        if (ReplicaState is null)
+        {
+            if (other.ReplicaState is not null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!ReplicaState.Equals(other.ReplicaState))
+            {
+                return false;
+            }
         }
         if (MaxWaitMs != other.MaxWaitMs)
         {
@@ -533,8 +606,8 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ClusterId, ReplicaId, MaxWaitMs, MinBytes, MaxBytes, IsolationLevel, SessionId);
-        hashCode = HashCode.Combine(hashCode, SessionEpoch, Topics, ForgottenTopicsData, RackId);
+        hashCode = HashCode.Combine(hashCode, ClusterId, ReplicaId, ReplicaState, MaxWaitMs, MinBytes, MaxBytes, IsolationLevel);
+        hashCode = HashCode.Combine(hashCode, SessionId, SessionEpoch, Topics, ForgottenTopicsData, RackId);
         return hashCode;
     }
 
@@ -544,6 +617,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         return "FetchRequestMessage("
             + "ClusterId=" + (string.IsNullOrWhiteSpace(ClusterId) ? "null" : ClusterId)
             + ", ReplicaId=" + ReplicaId
+            + ", ReplicaState=" + ReplicaState.ToString()
             + ", MaxWaitMs=" + MaxWaitMs
             + ", MinBytes=" + MinBytes
             + ", MaxBytes=" + MaxBytes
@@ -554,6 +628,126 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
             + ", ForgottenTopicsData=" + ForgottenTopicsData.DeepToString()
             + ", RackId=" + (string.IsNullOrWhiteSpace(RackId) ? "null" : RackId)
             + ")";
+    }
+
+    /// <summary>
+    /// Describes the contract for message ReplicaStateMessage
+    /// </summary>
+    public sealed partial class ReplicaStateMessage: IMessage, IEquatable<ReplicaStateMessage>
+    {
+        /// <inheritdoc />
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
+
+        /// <summary>
+        /// The replica ID of the follower, or -1 if this request is from a consumer.
+        /// </summary>
+        public int ReplicaId { get; set; } = -1;
+
+        /// <summary>
+        /// The epoch of this follower, or -1 if not available.
+        /// </summary>
+        public long ReplicaEpoch { get; set; } = -1;
+
+        /// <summary>
+        /// The basic constructor of the message ReplicaStateMessage
+        /// </summary>
+        public ReplicaStateMessage()
+        {
+        }
+
+        /// <summary>
+        /// Base constructor for deserializing message ReplicaStateMessage
+        /// </summary>
+        public ReplicaStateMessage(ref BufferReader reader, ApiVersion version)
+            : this()
+        {
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
+        }
+
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
+        {
+            if (version > ApiVersion.Version16)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of ReplicaStateMessage");
+            }
+            ReplicaId = reader.ReadInt();
+            ReplicaEpoch = reader.ReadLong();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public void Write(BufferWriter writer, ApiVersion version)
+        {
+            if (version < ApiVersion.Version15)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of ReplicaStateMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(ReplicaId);
+            writer.WriteLong(ReplicaEpoch);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is ReplicaStateMessage other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(ReplicaStateMessage? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (ReplicaId != other.ReplicaId)
+            {
+                return false;
+            }
+            if (ReplicaEpoch != other.ReplicaEpoch)
+            {
+                return false;
+            }
+            return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, ReplicaId, ReplicaEpoch);
+            return hashCode;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "ReplicaStateMessage("
+                + "ReplicaId=" + ReplicaId
+                + ", ReplicaEpoch=" + ReplicaEpoch
+                + ")";
+        }
     }
 
     /// <summary>
@@ -602,7 +796,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version13)
+            if (version > ApiVersion.Version16)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchTopicMessage");
             }
@@ -726,7 +920,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -734,7 +928,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -881,7 +1075,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version13)
+            if (version > ApiVersion.Version16)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchPartitionMessage");
             }
@@ -1080,7 +1274,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version13)
+            if (version > ApiVersion.Version16)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ForgottenTopicMessage");
             }

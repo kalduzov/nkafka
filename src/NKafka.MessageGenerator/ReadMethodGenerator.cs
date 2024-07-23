@@ -167,7 +167,7 @@ internal class ReadMethodGenerator: IMethodGenerator
                                     _ =>
                                     {
                                         _codeGenerator.AppendLine(
-                                            $"throw new RuntimeException($\"Tag {field.Tag} is not valid for version {{version}});");
+                                            $"throw new Exception($\"Tag {field.Tag} is not valid for version {{version}}\");");
                                     })
                                 .Generate(_codeGenerator);
                             _codeGenerator.DecrementIndent();
@@ -292,7 +292,8 @@ internal class ReadMethodGenerator: IMethodGenerator
         {
             if (isStructArrayWithKeys)
             {
-                _codeGenerator.AppendLine($"var newCollection = new {FieldSpecification.CollectionType(arrayType.ElementType.ToString())}({lengthVar});");
+                _codeGenerator.AppendLine(
+                    $"var newCollection = new {FieldSpecification.CollectionType(arrayType.ElementType.ToString())}({lengthVar});");
             }
             else
             {

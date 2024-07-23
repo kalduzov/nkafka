@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//6F-3B-63-D1-57-37-45-5B-66-37-65-1D-92-2B-2C-6C-B8-93-96-61-00-BF-E7-7C-19-B7-7A-B7-BC-0A-28-55
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -146,7 +147,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: IResponseMes
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +155,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessage: IResponseMes
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

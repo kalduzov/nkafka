@@ -53,7 +53,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
@@ -65,7 +65,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
@@ -78,7 +78,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
@@ -91,7 +91,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
@@ -104,7 +104,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
@@ -116,7 +116,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
@@ -128,7 +128,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
@@ -141,11 +141,24 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
         var message = new OffsetCommitRequestMessage
         {
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationId = -420004200,
+            GenerationIdOrMemberEpoch = -420004200,
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new OffsetCommitRequestMessage
+        {
+            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GenerationIdOrMemberEpoch = -420004200,
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
     }
 }

@@ -20,12 +20,14 @@
 //  limitations under the License.
 
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Threading.Channels;
 
 using Microsoft.Extensions.Logging;
 
 using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
+using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Protocol;
@@ -137,6 +139,8 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     public async ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics,
         CancellationToken token = default)
     {
+        using var activity = KafkaDiagnosticsSource.SubscribeTopics(topics);
+
         try
         {
             if (_subscribeSyncBlock.CurrentCount == 0)
@@ -167,6 +171,12 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
 
             return _currentChannel.Reader;
 
+        }
+        catch (Exception exc)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
+
+            throw;
         }
         finally
         {

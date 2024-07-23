@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//D2-7B-90-96-02-76-F5-1B-2A-14-2D-F4-94-9A-41-8F-12-6E-E5-03-6C-82-61-41-9F-98-4F-AD-A3-53-65-C9
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -156,7 +157,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +165,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -275,7 +276,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicResponseMessage");
             }
@@ -379,7 +380,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -387,7 +388,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -532,7 +533,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionResponseMessage");
             }

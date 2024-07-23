@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//6B-08-76-B8-4C-C5-E3-49-D4-F2-96-9B-D7-77-0D-97-DE-5E-79-E1-95-7D-35-59-73-BA-34-79-06-B1-31-5A
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -66,9 +67,9 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     public string GroupId { get; set; } = string.Empty;
 
     /// <summary>
-    /// The generation of the group.
+    /// The generation of the group if using the classic group protocol or the member epoch if using the consumer protocol.
     /// </summary>
-    public int GenerationId { get; set; } = -1;
+    public int GenerationIdOrMemberEpoch { get; set; } = -1;
 
     /// <summary>
     /// The member ID assigned by the group coordinator.
@@ -135,11 +136,11 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         }
         if (version >= ApiVersion.Version1)
         {
-            GenerationId = reader.ReadInt();
+            GenerationIdOrMemberEpoch = reader.ReadInt();
         }
         else
         {
-            GenerationId = -1;
+            GenerationIdOrMemberEpoch = -1;
         }
         if (version >= ApiVersion.Version1)
         {
@@ -279,7 +280,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         }
         if (version >= ApiVersion.Version1)
         {
-            writer.WriteInt(GenerationId);
+            writer.WriteInt(GenerationIdOrMemberEpoch);
         }
         if (version >= ApiVersion.Version1)
         {
@@ -339,7 +340,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -347,7 +348,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -393,7 +394,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                 return false;
             }
         }
-        if (GenerationId != other.GenerationId)
+        if (GenerationIdOrMemberEpoch != other.GenerationIdOrMemberEpoch)
         {
             return false;
         }
@@ -450,7 +451,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, GroupId, GenerationId, MemberId, GroupInstanceId, RetentionTimeMs, Topics);
+        hashCode = HashCode.Combine(hashCode, GroupId, GenerationIdOrMemberEpoch, MemberId, GroupInstanceId, RetentionTimeMs, Topics);
         return hashCode;
     }
 
@@ -459,7 +460,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     {
         return "OffsetCommitRequestMessage("
             + "GroupId=" + (string.IsNullOrWhiteSpace(GroupId) ? "null" : GroupId)
-            + ", GenerationId=" + GenerationId
+            + ", GenerationIdOrMemberEpoch=" + GenerationIdOrMemberEpoch
             + ", MemberId=" + (string.IsNullOrWhiteSpace(MemberId) ? "null" : MemberId)
             + ", GroupInstanceId=" + (string.IsNullOrWhiteSpace(GroupInstanceId) ? "null" : GroupInstanceId)
             + ", RetentionTimeMs=" + RetentionTimeMs
@@ -508,7 +509,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestTopicMessage");
             }
@@ -612,7 +613,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -620,7 +621,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -757,7 +758,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestPartitionMessage");
             }

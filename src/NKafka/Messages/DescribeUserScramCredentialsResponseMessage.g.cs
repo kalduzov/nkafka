@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//1D-90-7C-A3-0B-D7-89-CB-5B-E5-39-96-0B-E3-29-96-DD-C6-AF-A4-82-D4-72-6A-5A-52-19-82-29-91-A5-77
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -161,7 +162,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
         writer.WriteVarUInt(Results.Count + 1);
         foreach (var element in Results)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -386,7 +387,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
             writer.WriteVarUInt(CredentialInfos.Count + 1);
             foreach (var element in CredentialInfos)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

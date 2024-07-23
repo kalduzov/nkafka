@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//82-5E-7C-A1-95-48-38-1D-4C-67-52-37-6B-68-87-FE-53-7C-C7-AD-66-37-DF-D8-AA-00-BA-16-FB-F3-BF-ED
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -202,7 +203,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -223,7 +224,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
                 writer.WriteInt(Topics.Count);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }

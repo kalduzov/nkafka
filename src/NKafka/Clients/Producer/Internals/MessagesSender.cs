@@ -26,47 +26,40 @@ using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
 using NKafka.Protocol;
+using NKafka.Resources;
 
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
 /// Implementation of a manager interface for sending messages in a kafka cluster
 /// </summary>
-internal class MessagesSender: IMessagesSender
+internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAccumulator, IKafkaCluster kafkaCluster, ILoggerFactory loggerFactory)
+    : IMessagesSender
 {
-    private readonly ProducerConfig _config;
-    private readonly IRecordAccumulator _recordAccumulator;
-    private readonly IKafkaCluster _kafkaCluster;
-    private readonly ILogger<MessagesSender> _logger;
+    private readonly ILogger<MessagesSender> _logger = loggerFactory.CreateLogger<MessagesSender>();
     private CancellationTokenSource _tokenSource = new();
-    private readonly IProducerMetrics _metrics;
-
-    public MessagesSender(ProducerConfig config, IRecordAccumulator recordAccumulator, IKafkaCluster kafkaCluster, ILoggerFactory loggerFactory)
-    {
-        _config = config;
-        _metrics = config.Metrics;
-        _recordAccumulator = recordAccumulator;
-        _kafkaCluster = kafkaCluster;
-        _logger = loggerFactory.CreateLogger<MessagesSender>();
-
-    }
+    private readonly IProducerMetrics _metrics = config.Metrics;
+    private readonly ManualResetEventSlim _resetEvent = new(true);
 
     /// <inheritdoc/>
     public Task StartAsync(CancellationToken stoppingToken)
     {
         _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
+        //run in a dedicated thread
         return Task.Factory.StartNew(RunAsync, this, TaskCreationOptions.LongRunning | TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
     /// <inheritdoc/>
     public void Sleep()
     {
+        _resetEvent.Reset();
     }
 
     /// <inheritdoc/>
     public void Wakeup()
     {
+        _resetEvent.Set();
     }
 
     /// <inheritdoc/>
@@ -79,24 +72,22 @@ internal class MessagesSender: IMessagesSender
         var oldThreadName = Thread.CurrentThread.Name;
         Thread.CurrentThread.Name = "Kafka producer I/O thread";
 
-        _logger.LogTrace("Starting producer I/O thread");
+        _logger.StartMessageSenderTrace();
 
         try
         {
             if (messageSender is not MessagesSender sender)
             {
-                throw new ArgumentException("На вход метода ожидался тип 'MessagesSender'", nameof(messageSender));
+                throw new ArgumentException(ExceptionMessages.MessagesSenderInvalidType, nameof(messageSender));
             }
             var token = sender._tokenSource.Token;
 
             while (!token.IsCancellationRequested)
             {
-                //todo вызов этого цикла без паузы постоянно нагружает SOH
+                _resetEvent.Wait(token);
                 await RunOnceAsync(token);
-                await Task.Delay(TimeSpan.FromMilliseconds(_config.RetryBackoffMs), token);
+                await Task.Delay(TimeSpan.FromMilliseconds(config.RetryBackoffMs), token);
             }
-
-            //todo, после основного цикла нужно подчистить все ресурсы
         }
         catch (OperationCanceledException)
         {
@@ -119,7 +110,7 @@ internal class MessagesSender: IMessagesSender
 
     private async Task SendProducerDataAsync(CancellationToken token)
     {
-        var batches = _recordAccumulator.PullBathes(_kafkaCluster, _config.MaxRequestSize);
+        var batches = recordAccumulator.PullReadyBatches(config.MaxRequestSize);
 
         foreach (var batch in batches)
         {
@@ -127,25 +118,26 @@ internal class MessagesSender: IMessagesSender
 
             var produceRequestMessage = new ProduceRequestMessage
             {
-                Acks = (short)_config.Acks,
-                TopicData = new ProduceRequestMessage.TopicProduceDataCollection
-                {
-                    new()
+                TimeoutMs = config.RequestTimeoutMs,
+                Acks = (short)config.Acks,
+                TopicData =
+                [
+                    new ProduceRequestMessage.TopicProduceDataMessage
                     {
                         Name = batch.TopicPartition.Topic,
-                        PartitionData = new List<ProduceRequestMessage.PartitionProduceDataMessage>
-                        {
-                            new()
+                        PartitionData =
+                        [
+                            new ProduceRequestMessage.PartitionProduceDataMessage
                             {
                                 Index = batch.TopicPartition.Partition,
                                 Records = batch.GetAsRecords()
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             };
 
-            var result = await _kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
+            var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
 
             foreach (var response in result.Responses)
             {
@@ -157,7 +149,7 @@ internal class MessagesSender: IMessagesSender
                     }
                     else
                     {
-                        _logger.LogTrace("Error: {ErrorCode}", partitionResponse.Code);
+                        _logger.ErrorTrace(partitionResponse.Code);
                         batch.Fail(partitionResponse.Code);
                     }
                 }
@@ -171,21 +163,21 @@ internal class MessagesSender: IMessagesSender
         // Пробуем получить лидера для парцитии.
         // Если вернулась пустая нода, считаем что данных по лидеру нет в метаданных.
         // Просим кластер обновить метаданные для указанного топика, если по прежнему не удалось получить лидера - кидаем исключение
-        var node = _kafkaCluster.LeaderFor(topicPartition);
+        var node = kafkaCluster.LeaderFor(topicPartition);
 
         if (node != Node.NoNode)
         {
             return node;
         }
 
-        await _kafkaCluster.RefreshMetadataAsync(
-            new[]
-            {
-                topicPartition.Topic
-            },
-            token);
+        var topics = new[]
+        {
+            topicPartition.Topic
+        };
 
-        node = _kafkaCluster.LeaderFor(topicPartition);
+        await kafkaCluster.RefreshMetadataAsync(topics, token);
+
+        node = kafkaCluster.LeaderFor(topicPartition);
 
         if (node == Node.NoNode)
         {

@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//4C-58-38-94-7A-35-5C-BD-76-A8-EC-D0-A8-43-8D-C4-BA-26-12-BB-9F-3A-D1-DF-4A-59-99-87-E7-CA-6A-FC
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -55,7 +56,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
-    /// Each broker in the response.
+    /// A list of brokers present in the cluster.
     /// </summary>
     public MetadataResponseBrokerCollection Brokers { get; set; } = new ();
 
@@ -258,7 +259,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteVarUInt(Brokers.Count + 1);
             foreach (var element in Brokers)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -266,7 +267,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteInt(Brokers.Count);
             foreach (var element in Brokers)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version2)
@@ -305,7 +306,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -313,7 +314,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
@@ -739,12 +740,12 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
-        /// The topic name.
+        /// The topic name. Null for non-existing topics queried by ID. This is never null when ErrorCode is zero. One of Name and TopicId is always populated.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The topic id.
+        /// The topic id. Zero for non-existing topics queried by name. This is never zero when ErrorCode is zero. One of Name and TopicId is always populated.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -939,7 +940,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -947,7 +948,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version8)

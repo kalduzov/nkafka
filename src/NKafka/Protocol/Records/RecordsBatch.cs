@@ -28,6 +28,8 @@ namespace NKafka.Protocol.Records;
 /// </summary>
 public class RecordsBatch: IRecordsBatch
 {
+    private readonly BufferWriter _bufferWriter = new(Stream.Null);
+
     /// <summary>
     /// Batch header length
     /// </summary>
@@ -48,7 +50,7 @@ public class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    public BufferWriter Buffer { get; set; } = new(Stream.Null);
+    public BufferWriter Buffer => _bufferWriter;
 
     /// <inheritdoc />
     public int CountRecords { get; set; }
@@ -90,17 +92,24 @@ public class RecordsBatch: IRecordsBatch
     public long BaseOffset { get; set; }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<Record> Records { get; private set; } = new List<Record>();
+    public IReadOnlyCollection<Record> Records { get; private set; } = [];
 
-    /// <summary>
-    /// 
-    /// </summary>
-    protected RecordsBatch()
+    private RecordsBatch()
     {
         Length = RECORD_BATCH_OVERHEAD;
         ProducerEpoch = _NO_PRODUCER_EPOCH;
         ProducerId = _NO_PRODUCER_ID;
         BaseSequence = _NO_SEQUENCE;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    protected RecordsBatch(BufferWriter bufferWriter)
+        : this()
+    {
+        _bufferWriter = bufferWriter;
+
     }
 
     /// <summary>
@@ -115,7 +124,7 @@ public class RecordsBatch: IRecordsBatch
 
     private void Read(ref BufferReader reader)
     {
-        // не хватает данных для считываения заголовка батча, значит выходим из цикла
+        // не хватает данных для считывания заголовка батча, значит выходим из цикла
         if (reader.Remaining < RECORD_BATCH_OVERHEAD)
         {
             return;
@@ -141,7 +150,7 @@ public class RecordsBatch: IRecordsBatch
         {
             if (reader.Remaining < _MAX_RECORD_OVERHEAD)
             {
-                //Нет места для считывание даже записи с минимальным размером
+                //No space left to read even for a record with the minimum size
                 break;
             }
             var record = new Record(ref reader);
@@ -167,10 +176,7 @@ public class RecordsBatch: IRecordsBatch
         return _MAX_RECORD_OVERHEAD + RecordExtensions.SizeOf(keySize, valueSize, headers);
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
+    /// <inheritdoc />
     public override string ToString()
     {
         return "Records";

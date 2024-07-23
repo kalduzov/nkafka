@@ -33,21 +33,27 @@ public record SaslSettings
     internal bool IsSet { get; }
 
     /// <summary>
-    /// 
+    /// Gets or sets the SASL mechanism used for authentication.
     /// </summary>
+    /// <value>
+    /// The SASL mechanism used for authentication.
+    /// </value>
     public SaslMechanism Mechanism { get; set; }
 
     /// <summary>
-    /// Version is the SASL Protocol Version to use 
+    /// Gets or sets the version of the SASL protocol.
     /// </summary>
-    /// <remarks>
-    /// Kafka > 1.x should use V1, except on Azure EventHub which use V0
-    /// </remarks>
+    /// <value>
+    /// The version of the SASL protocol.
+    /// </value>
     public SaslVersion Version { get; set; } = SaslVersion.SaslHandshakeV1;
 
     /// <summary>
-    /// 
+    /// Gets or sets the OAuth bearer method.
     /// </summary>
+    /// <value>
+    /// The OAuth bearer method.
+    /// </value>
     public OAuthBearerMethod OAuthBearerMethod { get; set; } = OAuthBearerMethod.Default;
 
     /// <summary>
@@ -63,7 +69,7 @@ public record SaslSettings
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
-    /// Whether or not to send the Kafka SASL handshake first if enabled
+    /// Whether to send the Kafka SASL handshake first if enabled
     /// (defaults to true). You should only set this to false if you're using
     /// a non-Kafka SASL proxy.
     /// </summary>
@@ -75,7 +81,7 @@ public record SaslSettings
     }
 
     /// <summary>
-    /// 
+    /// Represents the SASL settings.
     /// </summary>
     public SaslSettings()
         : this(true)
@@ -92,7 +98,7 @@ public record SaslSettings
             return;
         }
 
-        var _ = Mechanism switch
+        _ = Mechanism switch
         {
             SaslMechanism.Plain => SaslMechanism.Plain,
             SaslMechanism.ScramSha256 => SaslMechanism.ScramSha256,
@@ -101,15 +107,23 @@ public record SaslSettings
             SaslMechanism.Kerberos => SaslMechanism.Kerberos,
             _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
         };
+
+        if (Mechanism == SaslMechanism.Plain)
+        {
+            if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
+            {
+                throw new ArgumentException("Invalid credentials for sasl plaintext");
+            }
+        }
     }
 
     /// <summary>
-    /// 
+    /// Returns the specified SaslMechanism as its string representation.
     /// </summary>
-    /// <param name="mechanism"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public string MechanismAsString(SaslMechanism mechanism)
+    /// <param name="mechanism">The SaslMechanism to convert to string.</param>
+    /// <returns>The string representation of the specified SaslMechanism.</returns>
+    /// <exception cref="ArgumentException">Thrown if the specified SaslMechanism is not a valid value.</exception>
+    public static string MechanismAsString(SaslMechanism mechanism)
     {
         return mechanism switch
         {

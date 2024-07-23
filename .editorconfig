@@ -1,6 +1,15 @@
-﻿[*]
+[*]
 indent_style = space
 max_line_length = 150
+
+# Microsoft .NET properties
+dotnet_style_predefined_type_for_locals_parameters_members = true:warning
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+
+# ReSharper properties
+resharper_indent_nested_foreach_stmt = true
+resharper_indent_nested_for_stmt = true
+resharper_indent_nested_while_stmt = true
 
 [*.cs]
 
@@ -26,7 +35,7 @@ resharper_blank_lines_before_single_line_comment = 0
 resharper_csharp_case_block_braces = next_line_shifted_2
 resharper_csharp_remove_blank_lines_near_braces_in_code = false
 resharper_csharp_wrap_extends_list_style = chop_if_long
-resharper_instance_members_qualify_declared_in =
+resharper_instance_members_qualify_declared_in = 
 resharper_keep_existing_attribute_arrangement = true
 resharper_keep_existing_declaration_parens_arrangement = true
 resharper_keep_existing_invocation_parens_arrangement = true
@@ -41,11 +50,14 @@ tab_width = 4
 insert_final_newline = false
 end_of_line = crlf
 
+dotnet_public_api_analyzer.require_api_files = true
 
-dotnet_diagnostic.CS1806.severity = error
-dotnet_diagnostic.CS1820.severity = error
-dotnet_diagnostic.CS1825.severity = error
-dotnet_diagnostic.CA1826.severity = error
+
+dotnet_diagnostic.cs1806.severity = error
+dotnet_diagnostic.cs1820.severity = error
+dotnet_diagnostic.cs1825.severity = error
+dotnet_diagnostic.ca1826.severity = error
+dotnet_diagnostic.ide0070.severity = none
 
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
 indent_size = 2
@@ -59,7 +71,7 @@ indent_size = 2
 [*.g.cs]
 dotnet_analyzer_diagnostic.severity = none
 generated_code = true
-dotnet_diagnostic.CS0659.severity = suggestion
-dotnet_diagnostic.CS8604.severity = suggestion
-dotnet_diagnostic.CS8625.severity = suggestion
-dotnet_diagnostic.CS8600.severity = suggestion
+dotnet_diagnostic.cs0659.severity = suggestion
+dotnet_diagnostic.cs8604.severity = suggestion
+dotnet_diagnostic.cs8625.severity = suggestion
+dotnet_diagnostic.cs8600.severity = suggestion

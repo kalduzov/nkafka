@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//E6-CD-5F-07-2E-28-E5-D2-CB-0C-DA-EF-C7-30-1C-55-EA-A6-E0-41-BA-F4-84-ED-E4-2B-56-8C-C4-15-38-13
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -146,7 +147,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             writer.WriteVarUInt(Results.Count + 1);
             foreach (var element in Results)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +155,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
             writer.WriteInt(Results.Count);
             foreach (var element in Results)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

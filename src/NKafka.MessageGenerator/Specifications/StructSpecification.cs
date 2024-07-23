@@ -29,6 +29,8 @@ public class StructSpecification
 {
     public string Name { get; }
 
+    public Versions DeprecatedVersions { get; }
+
     public Versions Versions { get; }
 
     public IReadOnlyCollection<FieldSpecification> Fields { get; }
@@ -38,10 +40,12 @@ public class StructSpecification
     public StructSpecification(
         [JsonProperty("name")] string name,
         [JsonProperty("versions")] string versions,
+        [JsonProperty("deprecatedVersions")] string deprecatedVersions,
         [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification>? fields)
     {
         Name = name;
         Versions = Versions.Parse(versions, null!);
+        DeprecatedVersions = Versions.Parse(deprecatedVersions, Versions.None);
 
         var newFields = new List<FieldSpecification>();
 

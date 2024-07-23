@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -108,15 +108,17 @@ internal static class Utils
     {
         var map = new Dictionary<string, string>(0);
 
-        if (!string.IsNullOrWhiteSpace(extensions))
+        if (string.IsNullOrWhiteSpace(extensions))
         {
-            var attributeValues = extensions.Split(elementSeparator);
+            return map;
+        }
 
-            foreach (var value in attributeValues)
-            {
-                var array = value.Split(keyValueSeparator, 2);
-                map.Add(array[0], array[1]);
-            }
+        var attributeValues = extensions.Split(elementSeparator);
+
+        foreach (var value in attributeValues)
+        {
+            var array = value.Split(keyValueSeparator, 2);
+            map.Add(array[0], array[1]);
         }
 
         return map;

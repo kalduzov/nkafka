@@ -26,7 +26,7 @@ namespace NKafka.MessageGenerator;
 public class CodeGenerator: ICodeGenerator
 {
     private readonly StringBuilder _builder = new();
-    private readonly Dictionary<int, string> _indents = new();
+    private readonly Dictionary<int, string> _indents = [];
 
     private int _indentValue;
 

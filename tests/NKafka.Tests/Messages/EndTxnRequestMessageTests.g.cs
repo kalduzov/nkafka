@@ -85,4 +85,16 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new EndTxnRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+            Committed = true,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

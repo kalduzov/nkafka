@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//ED-F5-A5-DF-75-EA-AE-B2-9A-A5-47-9D-31-34-DE-57-ED-61-57-3E-E1-86-F4-1A-F7-A2-97-3B-01-E2-C8-D2
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -162,7 +163,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -170,7 +171,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         writer.WriteInt(TimeoutMs);
@@ -405,7 +406,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     writer.WriteVarUInt(Assignments.Count + 1);
                     foreach (var element in Assignments)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -420,7 +421,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
                     writer.WriteInt(Assignments.Count);
                     foreach (var element in Assignments)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

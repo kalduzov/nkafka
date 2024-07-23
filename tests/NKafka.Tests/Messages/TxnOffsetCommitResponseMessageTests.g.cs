@@ -77,4 +77,14 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new TxnOffsetCommitResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Topics = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
 }

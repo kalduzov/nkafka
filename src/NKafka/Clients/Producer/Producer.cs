@@ -118,9 +118,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             _partitioner = InitPartitionerClass(config.PartitionerConfig);
             _keySerializer = InitializeSerializer(keySerializer);
             _valueSerializer = InitializeSerializer(valueSerializer);
-
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
-
             _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
             _accumulator = recordAccumulator ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, loggerFactory);
             _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, loggerFactory);
@@ -129,8 +127,8 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
         catch (Exception exc)
         {
-            Close(TimeSpan.Zero,
-                true); //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves. 
+            //perhaps something has already managed to be created, so we are trying to clean everything up after ourselves.
+            Close(TimeSpan.Zero, true);
 
             throw new ProducerException(EM.Producer_CreateError, exc);
         }
@@ -142,7 +140,8 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
         var tp = topicPartition;
-        var _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
+
+        _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
                 task =>
                 {
@@ -164,15 +163,21 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     }
 
     /// <inheritdoc/>
-    public Task FlushAsync(CancellationToken token)
+    public async Task FlushAsync(CancellationToken token)
     {
-        return _accumulator.FlushAllAsync(token);
-    }
+        _logger.FlushingRecordsTrace();
 
-    /// <inheritdoc/>
-    public void Flush(TimeSpan timeout)
-    {
-        _accumulator.FlushAll(timeout);
+        var timestamp = Stopwatch.StartNew();
+
+        try
+        {
+            await _accumulator.FlushAllAsync(token);
+        }
+        finally
+        {
+            timestamp.Stop();
+            _producerMetrics.Flush(timestamp.ElapsedMilliseconds);
+        }
     }
 
     /// <inheritdoc/>
@@ -182,12 +187,6 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         CancellationToken token = default)
     {
         return InternalProduceAsync(topicPartition, message, false, token);
-    }
-
-    /// <inheritdoc/>
-    public IReadOnlyCollection<PartitionMetadata> PartitionsFor(string topic)
-    {
-        throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
@@ -204,17 +203,11 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         return ValueTask.CompletedTask;
     }
 
-    /// <inheritdoc/>
-    public override ValueTask DisposeAsync()
-    {
-        return base.DisposeAsync();
-    }
-
     private void Close(TimeSpan timeSpan, bool swallowException)
     {
         _tokenSource.Cancel(!swallowException);
 
-        if (_senderTask.IsCompleted || _senderTask.IsFaulted || _senderTask.IsCanceled)
+        if (_senderTask.IsCompleted)
         {
             _senderTask.Dispose();
         }
@@ -246,21 +239,23 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         {
             case Partitioner.Custom:
                 {
+                    object? partitionerClass;
+
                     try
                     {
-                        var partitionerClass = Activator.CreateInstance(partitionerConfig.CustomPartitionerClass);
-
-                        if (partitionerClass is null)
-                        {
-                            throw new ArgumentException(EM.PartitionerCreateError);
-                        }
-
-                        return (IPartitioner)partitionerClass;
+                        partitionerClass = Activator.CreateInstance(partitionerConfig.CustomPartitionerClass);
                     }
                     catch (Exception exc)
                     {
                         throw new ArgumentException(EM.PartitionerCreateError, exc);
                     }
+
+                    if (partitionerClass is not IPartitioner partitioner)
+                    {
+                        throw new ArgumentException(EM.PartitionerCreateError);
+                    }
+
+                    return partitioner;
                 }
             case Partitioner.Default:
                 return new DefaultPartitioner();
@@ -303,22 +298,22 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         bool isFireAndForget,
         CancellationToken token = default)
     {
-        _logger.ProduceMessageTrace(topicPartition);
-
         ThrowIfProducerClosed();
 
-        using var activity = KafkaDiagnosticsSource.ProduceMessage(topicPartition, message, isFireAndForget);
+        var newTopicPartition = topicPartition;
+
+        _logger.ProduceMessageTrace(newTopicPartition);
+
+        using var activity = KafkaDiagnosticsSource.ProduceMessage(newTopicPartition, message, isFireAndForget);
 
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            var _ = await KafkaCluster.GetPartitionsAsync(topicPartition.Topic, token);
+            _ = await KafkaCluster.GetPartitionsAsync(newTopicPartition.Topic, token);
 
             var headers = message.Headers;
-            headers.SetReadOnly();
-
-            var serializedKey = await SerializeKeyAsync(message.Key);
-            var serializedValue = await SerializeValueAsync(message.Value);
+            var serializedKey = await SerializeAsync(_keySerializer, message.Key);
+            var serializedValue = await SerializeAsync(_valueSerializer, message.Value);
 
             var serializedSize = RecordsBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
@@ -335,12 +330,14 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                     KafkaCluster,
                     token);
 
-                topicPartition.Partition = computedPartition;
-
+                newTopicPartition = newTopicPartition with
+                {
+                    Partition = computedPartition
+                };
             }
 
             var appendResult = _accumulator.Append(
-                topicPartition,
+                newTopicPartition,
                 message.Timestamp.UnixTimestampMs,
                 serializedKey,
                 serializedValue,
@@ -351,7 +348,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                 _messagesSender.Wakeup();
             }
 
-            _producerMetrics.AppendBytes(topicPartition, appendResult.AppendedBytes);
+            _producerMetrics.AppendBytes(newTopicPartition, appendResult.AppendedBytes);
 
             if (!isFireAndForget)
             {
@@ -359,13 +356,13 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
                     .SendResult!
                     .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token);
 
-                var topicPartitionOffset = new TopicPartitionOffset(topicPartition, sendResult.Offset);
+                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, sendResult.Offset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.Persisted, topicPartitionOffset);
             }
             else
             {
-                var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
+                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, Offset.Unset);
 
                 return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.PossiblyPersisted, topicPartitionOffset);
             }
@@ -408,27 +405,13 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
     }
 
-    private Task<byte[]> SerializeKeyAsync(TKey key)
+    private static Task<byte[]> SerializeAsync<T>(IAsyncSerializer<T> serializer, T value)
     {
         try
         {
-            return _keySerializer.PreferAsync
-                ? _keySerializer.SerializeAsync(key)
-                : Task.FromResult(_keySerializer.Serialize(key));
-        }
-        catch (Exception exc)
-        {
-            throw new ProduceException(exc);
-        }
-    }
-
-    private Task<byte[]> SerializeValueAsync(TValue value)
-    {
-        try
-        {
-            return _valueSerializer.PreferAsync
-                ? _valueSerializer.SerializeAsync(value)
-                : Task.FromResult(_valueSerializer.Serialize(value));
+            return serializer.PreferAsync
+                ? serializer.SerializeAsync(value)
+                : Task.FromResult(serializer.Serialize(value));
         }
         catch (Exception exc)
         {

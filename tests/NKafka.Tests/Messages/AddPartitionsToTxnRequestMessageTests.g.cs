@@ -42,10 +42,10 @@ public sealed partial class AddPartitionsToTxnRequestMessageTests: RequestMessag
     {
         var message = new AddPartitionsToTxnRequestMessage
         {
-            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProducerId = -9223372036854775808,
-            ProducerEpoch = -4242,
-            Topics = new (),
+            V3AndBelowTransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            V3AndBelowProducerId = -9223372036854775808,
+            V3AndBelowProducerEpoch = -4242,
+            V3AndBelowTopics = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version0);
     }
@@ -54,10 +54,10 @@ public sealed partial class AddPartitionsToTxnRequestMessageTests: RequestMessag
     {
         var message = new AddPartitionsToTxnRequestMessage
         {
-            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProducerId = -9223372036854775808,
-            ProducerEpoch = -4242,
-            Topics = new (),
+            V3AndBelowTransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            V3AndBelowProducerId = -9223372036854775808,
+            V3AndBelowProducerEpoch = -4242,
+            V3AndBelowTopics = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version1);
     }
@@ -66,10 +66,10 @@ public sealed partial class AddPartitionsToTxnRequestMessageTests: RequestMessag
     {
         var message = new AddPartitionsToTxnRequestMessage
         {
-            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProducerId = -9223372036854775808,
-            ProducerEpoch = -4242,
-            Topics = new (),
+            V3AndBelowTransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            V3AndBelowProducerId = -9223372036854775808,
+            V3AndBelowProducerEpoch = -4242,
+            V3AndBelowTopics = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version2);
     }
@@ -78,11 +78,29 @@ public sealed partial class AddPartitionsToTxnRequestMessageTests: RequestMessag
     {
         var message = new AddPartitionsToTxnRequestMessage
         {
-            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProducerId = -9223372036854775808,
-            ProducerEpoch = -4242,
-            Topics = new (),
+            V3AndBelowTransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            V3AndBelowProducerId = -9223372036854775808,
+            V3AndBelowProducerEpoch = -4242,
+            V3AndBelowTopics = new (),
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnRequestMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new AddPartitionsToTxnRequestMessage
+        {
+            Transactions = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnRequestMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new AddPartitionsToTxnRequestMessage
+        {
+            Transactions = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
     }
 }

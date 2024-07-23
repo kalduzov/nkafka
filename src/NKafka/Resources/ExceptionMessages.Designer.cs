@@ -87,7 +87,16 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Список идентификаторов групп должен содержать только один элемент. Фича с несколькими группами доступна начиная с 4 версии API.
+        ///   Looks up a localized string similar to Expected type &apos;MessagesSender&apos; as the input to the method.
+        /// </summary>
+        internal static string MessagesSenderInvalidType {
+            get {
+                return ResourceManager.GetString("MessagesSenderInvalidType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The list of group IDs must contain only one element. The feature with multiple groups is available starting from API version 4..
         /// </summary>
         internal static string NoBatchedFindCoordinatorsExceptionMessage {
             get {

@@ -39,7 +39,7 @@ public class TopicPartitionTests
     [Theory]
     [InlineData(null)]
     [InlineData("")]
-    public void TopicPartitionCreate_TopicInvalid_Successful(string topicName)
+    public void TopicPartitionCreate_TopicInvalid_Successful(string? topicName)
     {
         TopicPartition BuildTopicPartition()
         {

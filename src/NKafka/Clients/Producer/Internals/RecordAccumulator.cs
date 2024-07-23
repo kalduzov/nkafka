@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@
  * limitations under the License.
  */
 
-using System.Buffers;
 using System.Collections.Concurrent;
 
 using Microsoft.Extensions.Logging;
@@ -45,19 +44,20 @@ namespace NKafka.Clients.Producer.Internals;
 /// </remarks>
 internal sealed class RecordAccumulator: IRecordAccumulator
 {
-    private class TopicBatches
-    {
-        public ConcurrentDictionary<Partition, Deque<ProducerBatch>> Batches { get; }
+    /// <summary>
+    /// Коллекция пакетов в виде двухсторонней очереди
+    /// </summary>
+    private class BatchDeque: Deque<ProducerBatch>;
 
-        public TopicBatches()
-        {
-            Batches = new ConcurrentDictionary<Partition, Deque<ProducerBatch>>();
-        }
-    }
+    /// <summary>
+    /// Коллекция пакетов распределенных по партициям
+    /// </summary>
+    private class PartitionedBatchCollection: ConcurrentDictionary<Partition, BatchDeque>;
 
-    private readonly ConcurrentDictionary<string, TopicBatches> _topicBatchesMap;
+    //Пачки распределенные по топикам
+    private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics;
+
     private readonly int _batchSize;
-    private readonly ArrayPool<byte> _bufferPool;
     private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly bool _closed;
     private readonly CompressionType _compressionType;
@@ -76,7 +76,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         int deliveryTimeoutMs,
         ILoggerFactory loggerFactory)
     {
-        _topicBatchesMap = new();
+        _batchesByTopics = new ConcurrentDictionary<string, PartitionedBatchCollection>();
         _metrics = config.Metrics;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
@@ -86,12 +86,23 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         _compressionType = config.CompressionType;
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
-        _bufferPool = ArrayPool<byte>.Create(config.BufferMemory, _batchSize);
-        _memoryStreamManager = new RecyclableMemoryStreamManager(config.BufferMemory, _batchSize);
+        var options = new RecyclableMemoryStreamManager.Options
+        {
+            BlockSize = config.BufferMemory
+        };
+        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
 
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Appends a record to the specified topic partition with the given timestamp, key, value, and headers.
+    /// </summary>
+    /// <param name="topicPartition">The topic partition to append the record to.</param>
+    /// <param name="timestamp">The timestamp of the record.</param>
+    /// <param name="key">The key of the record.</param>
+    /// <param name="value">The value of the record.</param>
+    /// <param name="headers">The headers of the record.</param>
+    /// <returns>A <see cref="RecordAppendResult"/> object representing the result of the append operation.</returns>
     public RecordAppendResult Append(
         TopicPartition topicPartition,
         long timestamp,
@@ -102,7 +113,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         Interlocked.Increment(ref _appendsInProgress);
 
         // list of batches for a specific topic divided by partitions
-        var topicBatches = _topicBatchesMap.GetOrAdd(topicPartition.Topic, new TopicBatches());
+        var topicBatches = _batchesByTopics.GetOrAdd(topicPartition.Topic, _ => new PartitionedBatchCollection());
 
         var stream = Stream.Null;
 
@@ -113,7 +124,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 var effectivePartition = topicPartition.Partition.Value;
 
                 // get a queue containing batches for adding records
-                var deque = topicBatches.Batches.GetOrAdd(effectivePartition, _ => new Deque<ProducerBatch>());
+                var deque = topicBatches.GetOrAdd(effectivePartition, _ => new BatchDeque());
 
                 lock (deque) // only one thread can add data to the queue
                 {
@@ -137,7 +148,14 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 lock (deque)
                 {
                     var bufferWriter = new BufferWriter(stream, ProducerBatch.BATCH_HEADER_LEN);
-                    var recordAppendResult = AppendIntoNewBatch(topicPartition.Topic, effectivePartition, deque, timestamp, key, value, headers, bufferWriter);
+                    var recordAppendResult = AppendIntoNewBatch(topicPartition.Topic,
+                        effectivePartition,
+                        deque,
+                        timestamp,
+                        key,
+                        value,
+                        headers,
+                        bufferWriter);
 
                     // It is possible that the batch was already created in another thread while we were preparing the buffer
                     if (recordAppendResult.NewBatchCreated)
@@ -184,7 +202,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
             throw new ArgumentNullException(nameof(sendResultTask));
         }
 
-        deque.PushBack(batch);
+        deque.AddLast(batch);
 
         var batchIsFull = deque.Count > 1 || batch.IsFull;
 
@@ -210,77 +228,122 @@ internal sealed class RecordAccumulator: IRecordAccumulator
             throw new ProduceException(ExceptionMessages.Producer_WasClosed);
         }
 
-        var lastProducerBatch = deque.PeekFront(); //get the last batch from the queue
-
-        if (lastProducerBatch is null)
+        if (!deque.TryPeekLast(out var lastBatch)) //get the last batch from the queue
         {
             return false;
         }
 
-        var initialBytes = lastProducerBatch.EstimatedSizeInBytes;
+        var initialBytes = lastBatch.EstimatedSizeInBytes;
 
-        if (!lastProducerBatch.TryAppend(timestamp, key, value, headers, out var sendResultTask))
+        if (!lastBatch.TryAppend(timestamp, key, value, headers, out var sendResultTask))
         {
-            lastProducerBatch.Close();
+            lastBatch.Close();
+            lastBatch.SetReady();
 
             return false;
         }
-        var appendedBytes = lastProducerBatch.EstimatedSizeInBytes - initialBytes;
+        var appendedBytes = lastBatch.EstimatedSizeInBytes - initialBytes;
 
-        recordAppendResult = new RecordAppendResult(sendResultTask, deque.Count > 1 || lastProducerBatch.IsFull, false, appendedBytes);
+        recordAppendResult = new RecordAppendResult(sendResultTask, deque.Count > 1 || lastBatch.IsFull, false, appendedBytes);
 
         return true;
     }
 
     /// <inheritdoc/>
-    public void FlushAll(TimeSpan timeSpan)
+    public async Task FlushAllAsync(CancellationToken cancellationToken)
     {
+        if (_flushesInProgress > 0)
+        {
+            return;
+        }
+
+        Interlocked.Increment(ref _flushesInProgress);
+
+        try
+        {
+            // 1. Выбираем все батчи
+            // 2. Помечаем их как готовые к отправке, вне зависимости от размера, времени и т.п.
+            // 3. Ждем когда sender их отправит или выставит в ошибку
+
+            var waitingTasks = new List<Task>();
+
+            foreach (var batches in _batchesByTopics.Values)
+            {
+                foreach (var batchesByPartition in batches.Values)
+                {
+                    foreach (var batch in batchesByPartition)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        batch.Close();
+                        batch.SetReady();
+                        var completion = batch.CompletionTask;
+                        waitingTasks.Add(completion);
+                    }
+                }
+            }
+            await Task.WhenAll(waitingTasks);
+        }
+        finally
+        {
+            Interlocked.Decrement(ref _flushesInProgress);
+        }
+
     }
 
     /// <inheritdoc/>
-    public Task FlushAllAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
-    }
-
-    /// <inheritdoc/>
-    public IEnumerable<ProducerBatch> PullBathes(IKafkaCluster kafkaCluster, int maxRequestSize)
+    public IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize)
     {
         var size = 0;
 
-        foreach (var topicBatches in _topicBatchesMap.Values)
+        foreach (var batches in _batchesByTopics.Values) //Обрабатываем все данные по всем топикам за раз
         {
-            foreach (var topicBatch in topicBatches.Batches.Values)
+            foreach (var deque in batches.Values) // Ищем все собранные очереди в разрезе партиций
             {
-                ProducerBatch? batch;
+                ProducerBatch? firstBatch;
 
-                lock (topicBatch)
+                lock (deque) // Блокируем очередную очередь
                 {
-                    batch = topicBatch.PeekFront();
+                    firstBatch = deque.PeekFirst(); // Проверяем первый пакет перед извлечением
 
-                    if (batch is null)
+                    if (firstBatch is null) // Пакета нет - идем к следующей очереди
                     {
                         continue;
                     }
 
-                    if (size + batch.Size > maxRequestSize)
+                    if (Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow) - firstBatch.CreateTimestamp > _lingerMs)
                     {
-                        break;
+                        firstBatch.SetReady();
                     }
 
-                    if (batch.IsReady) //todo всегда true, надо что-то с этим сделать
+                    // Пакет есть - проверяем, если мы добавим этот пакет в запрос, его размер превысит ограничение на запрос?
+                    // Если это первый пакет, то мы игнорируем процесс отбора. Первый пакет отправляется всегда!
+                    if (size + firstBatch.Size > maxRequestSize)
                     {
-                        batch = topicBatch.PopFront();
+                        if (size == 0) //первый пакет для отправки
+                        {
+                            _logger.LogWarning(
+                                "Пакет имеет размер больше чем требуется. Т.к. это первый пакет - он все равно будет отправлен. Пожалуйста повысьте значение MaxRequestSize");
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
+                    if (firstBatch.IsReady)
+                    {
+                        firstBatch = deque.RemoveLast();
                     }
                     else
                     {
                         continue;
                     }
                 }
-                batch.Close();
-                size += batch.Size;
+                firstBatch.Close();
+                size += firstBatch.Size;
 
-                yield return batch;
+                yield return firstBatch;
             }
         }
     }

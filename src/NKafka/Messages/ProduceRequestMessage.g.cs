@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//08-D3-BB-A6-8F-62-94-0E-F1-76-F7-48-F8-12-75-B6-69-43-2A-44-6D-5C-1B-7D-F0-90-F1-89-D9-30-FD-34
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -231,7 +232,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             writer.WriteVarUInt(TopicData.Count + 1);
             foreach (var element in TopicData)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -239,7 +240,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             writer.WriteInt(TopicData.Count);
             foreach (var element in TopicData)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -370,7 +371,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceDataMessage");
             }
@@ -474,7 +475,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
                 writer.WriteVarUInt(PartitionData.Count + 1);
                 foreach (var element in PartitionData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -482,7 +483,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
                 writer.WriteInt(PartitionData.Count);
                 foreach (var element in PartitionData)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -604,7 +605,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceDataMessage");
             }
@@ -666,11 +667,11 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
             {
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt(Records.SizeInBytes + 1);
+                    writer.WriteVarUInt((Records?.SizeInBytes ?? 0) + 1);
                 }
                 else
                 {
-                    writer.WriteInt(Records.SizeInBytes);
+                    writer.WriteInt((Records?.SizeInBytes ?? 0));
                 }
                 writer.WriteRecords(Records);
             }

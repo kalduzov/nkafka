@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//5F-44-E2-56-D7-71-4C-5F-88-07-45-46-76-CF-ED-BF-C1-86-05-EA-79-62-A7-79-DC-C4-C9-DF-25-25-74-4E
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -169,7 +170,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -177,7 +178,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         writer.WriteInt(timeoutMs);
@@ -466,7 +467,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Assignments.Count + 1);
                 foreach (var element in Assignments)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -474,7 +475,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Assignments.Count);
                 foreach (var element in Assignments)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version5)
@@ -482,7 +483,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -490,7 +491,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
                 writer.WriteInt(Configs.Count);
                 foreach (var element in Configs)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

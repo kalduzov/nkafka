@@ -101,4 +101,14 @@ public sealed partial class FindCoordinatorResponseMessageTests: ResponseMessage
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version4);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'FindCoordinatorResponseMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new FindCoordinatorResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Coordinators = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+    }
 }

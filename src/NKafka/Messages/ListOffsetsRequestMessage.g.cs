@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//AD-73-38-86-14-D0-38-10-53-85-BE-AC-F5-66-39-F7-B9-87-F4-65-D2-75-8D-E5-FA-B2-56-0D-4A-62-E9-EA
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -61,7 +62,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The broker ID of the requestor, or -1 if this request is being made by a normal consumer.
+    /// The broker ID of the requester, or -1 if this request is being made by a normal consumer.
     /// </summary>
     public int ReplicaId { get; set; } = 0;
 
@@ -181,7 +182,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -189,7 +190,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -305,7 +306,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicMessage");
             }
@@ -409,7 +410,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -417,7 +418,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -549,7 +550,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version > ApiVersion.Version8)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionMessage");
             }

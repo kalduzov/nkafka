@@ -21,17 +21,38 @@
 
 namespace NKafka.Clients.Producer;
 
+/// <summary>
+/// Represents a thread-safe counter that allows for getting and incrementing the value.
+/// </summary>
 internal class ThreadSafeCounter
 {
     private volatile uint _value;
 
+    /// <summary>
+    /// Gets the value of the property.
+    /// </summary>
+    /// <remarks>
+    /// This property represents the underlying value stored in the class.
+    /// </remarks>
+    /// <returns>
+    /// The value of the property.
+    /// </returns>
     public uint Value => _value;
 
+    /// <summary>
+    /// Represents a thread-safe counter.
+    /// </summary>
     public ThreadSafeCounter(uint initValue = 0)
     {
         _value = initValue;
     }
 
+    /// <summary>
+    /// Retrieves the current value from a specified location, and increments it by one.
+    /// </summary>
+    /// <returns>
+    /// The original value stored in the specified variable, incremented by one.
+    /// </returns>
     public uint GetAndIncrement()
     {
         return Interlocked.Increment(ref _value) - 1; // всегда получаем предыдущее значение

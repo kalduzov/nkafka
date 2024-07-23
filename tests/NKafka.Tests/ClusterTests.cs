@@ -157,7 +157,7 @@ public partial class ClusterTests
             CancellationToken.None);
         await using var producer = kafkaCluster.BuildProducer<int, string>();
 
-        producer.Name.Should().Be("__DefaultProducer<Int32,String>");
+        producer.Name.Should().Be("__Producer<Int32,String>");
     }
 
     [Fact(DisplayName = "Build producer with custom name successful")]

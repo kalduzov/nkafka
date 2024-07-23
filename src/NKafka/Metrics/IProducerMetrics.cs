@@ -43,4 +43,12 @@ public interface IProducerMetrics
     void SentBytes(TopicPartition topicPartition, int sentBytes)
     {
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="duration"></param>
+    void Flush(long duration)
+    {
+    }
 }

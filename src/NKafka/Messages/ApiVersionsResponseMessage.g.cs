@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//BA-69-43-10-99-33-CC-C8-60-A7-0C-15-67-A8-F7-66-75-4F-D4-4E-F0-43-97-A9-B8-27-97-8C-45-F3-95-C2
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -238,7 +239,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             writer.WriteVarUInt(ApiKeys.Count + 1);
             foreach (var element in ApiKeys)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -246,7 +247,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
             writer.WriteInt(ApiKeys.Count);
             foreach (var element in ApiKeys)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         if (version >= ApiVersion.Version1)
@@ -293,7 +294,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     writer.WriteVarUInt(SupportedFeatures.Count + 1);
                     foreach (var element in SupportedFeatures)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }
@@ -312,7 +313,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
                     writer.WriteVarUInt(FinalizedFeatures.Count + 1);
                     foreach (var element in FinalizedFeatures)
                     {
-                        element.Write(writer, version);
+                        element?.Write(writer, version);
                     }
                 }
             }

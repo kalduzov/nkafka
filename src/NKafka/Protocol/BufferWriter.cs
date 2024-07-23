@@ -36,7 +36,7 @@ public sealed class BufferWriter: IBufferWriter<byte>
 
     private readonly Stream _stream;
     private readonly int _lenReserved;
-    private int _writtenCount = 0;
+    private int _writtenCount;
 
     /// <summary>
     /// 
@@ -53,7 +53,7 @@ public sealed class BufferWriter: IBufferWriter<byte>
     public long Length => _stream.Length;
 
     /// <summary>
-    /// How much space is left in the stream
+    /// How much space is left in the stream?
     /// </summary>
     public long Remaining => _stream.Length - _stream.Position;
 
@@ -288,8 +288,13 @@ public sealed class BufferWriter: IBufferWriter<byte>
     /// 
     /// </summary>
     /// <param name="records"></param>
-    public void WriteRecords(Records.Records records)
+    public void WriteRecords(Records.Records? records)
     {
+        if (records is null)
+        {
+            return;
+        }
+
         foreach (var batch in records.Batches)
         {
             _stream.Write(batch.Buffer.AsSpan(0, records.SizeInBytes));
@@ -298,7 +303,7 @@ public sealed class BufferWriter: IBufferWriter<byte>
     }
 
     /// <summary>
-    /// Записывает в начало длинну всего, что было записано ранее
+    /// Записывает в начало длину всего, что было записано ранее
     /// </summary>
     public void WriteSizeToStart()
     {

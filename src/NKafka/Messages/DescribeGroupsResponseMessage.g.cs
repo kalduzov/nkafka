@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//76-60-C4-EF-09-2B-B7-A5-E7-44-0A-8B-93-FD-EC-3D-D6-29-3E-E4-74-8B-7F-35-4E-A6-38-85-94-FE-56-5F
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -156,7 +157,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +165,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
             writer.WriteInt(Groups.Count);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -522,7 +523,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                 writer.WriteVarUInt(Members.Count + 1);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -530,7 +531,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
                 writer.WriteInt(Members.Count);
                 foreach (var element in Members)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             if (version >= ApiVersion.Version3)

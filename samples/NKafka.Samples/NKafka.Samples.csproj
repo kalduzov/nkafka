@@ -15,7 +15,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
         <PackageReference Include="OpenTelemetry"/>
         <PackageReference Include="OpenTelemetry.Exporter.Console"/>
-        <PackageReference Include="OpenTelemetry.Exporter.Jaeger"/>
+      <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
         <PackageReference Include="Serilog"/>
         <PackageReference Include="Serilog.Extensions.Logging"/>
         <PackageReference Include="Serilog.Sinks.Console"/>

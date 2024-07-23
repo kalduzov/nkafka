@@ -25,8 +25,8 @@ namespace NKafka.Protocol;
 
 internal static class ErrorCodesExtensions
 {
-    private static readonly HashSet<ErrorCodes> _retriableCodes = new()
-    {
+    private static readonly HashSet<ErrorCodes> _retriableCodes =
+    [
         ErrorCodes.CorruptMessage,
         ErrorCodes.UnknownTopicOrPartition,
         ErrorCodes.LeaderNotAvailable,
@@ -56,12 +56,12 @@ internal static class ErrorCodesExtensions
         ErrorCodes.UnknownTopicId,
         ErrorCodes.InconsistentTopicId,
         ErrorCodes.FetchSessionTopicIdError
-    };
+    ];
 
-    private static readonly HashSet<ErrorCodes> _processingRequiredClientCodes = new()
-    {
-        ErrorCodes.MemberIdRequired,
-    };
+    private static readonly HashSet<ErrorCodes> _processingRequiredClientCodes =
+    [
+        ErrorCodes.MemberIdRequired
+    ];
 
     /// <summary>
     /// A retriable error is a transient error that if retried may succeed.
@@ -79,7 +79,7 @@ internal static class ErrorCodesExtensions
     }
 
     /// <summary>
-    /// Обработка данной ошибки возложена на клиенские механизмы библиотеки  
+    /// Обработка данной ошибки возложена на клиентские механизмы библиотеки  
     /// </summary>
     /// Если при получении ответа от брокера данный код ошибки требует переотправки запроса в измененном виде,
     /// то такая ошибка должна обрабатываться кодом логики библиотеки 

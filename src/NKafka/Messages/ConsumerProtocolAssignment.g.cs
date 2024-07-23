@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//F8-35-3A-94-82-49-30-0E-42-00-E8-F7-8B-3E-42-0B-FE-0D-D9-DA-B8-63-1C-BB-34-25-4F-0F-D7-A6-8B-E8
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -118,7 +119,7 @@ public sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<Con
         writer.WriteInt(AssignedPartitions.Count);
         foreach (var element in AssignedPartitions)
         {
-            element.Write(writer, version);
+            element?.Write(writer, version);
         }
         if (UserData is null)
         {

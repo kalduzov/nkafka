@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//D9-E7-FB-EA-A1-B1-63-E0-80-D7-A0-A4-6D-0A-67-6D-14-15-08-98-E7-D1-E8-CD-4C-A0-B1-FA-37-32-2D-E0
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -146,7 +147,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +155,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -265,7 +266,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitResponseTopicMessage");
             }
@@ -369,7 +370,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -377,7 +378,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -502,7 +503,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitResponsePartitionMessage");
             }

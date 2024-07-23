@@ -166,7 +166,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     public async ValueTask OpenAsync(CancellationToken token)
     {
         await ReEstablishConnectionAsync(token);
-        await TryRequestApiSupportVersionsAsync(token);
 
         ConnectorState = State.Open;
     }
@@ -245,6 +244,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             if (CanWrite)
             {
                 var bytesSent = request.Write(_stream, true, _messageMaxBytes);
+                Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
                 _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
             }
             else
@@ -325,6 +325,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
                 _globalTimeWaiting.Start();
 
+                await TryRequestApiSupportVersionsAsync(token);
+
                 if (_securityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
                 {
                     await AuthenticateProcessAsync(token);
@@ -360,7 +362,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             return;
         }
 
-        var request = new ApiVersionsRequestMessage();
+        var request = ApiVersionsRequestMessage.Build();
         var response = await ((IKafkaConnector)this).SendAsync<ApiVersionsRequestMessage, ApiVersionsResponseMessage>(
             request,
             true,

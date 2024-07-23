@@ -154,4 +154,28 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version9);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new ProduceRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Acks = -4242,
+            TimeoutMs = -420004200,
+            TopicData = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+    }
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version11")]
+    public void SerializeAndDeserializeMessage_ApiVersion11_Success()
+    {
+        var message = new ProduceRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Acks = -4242,
+            TimeoutMs = -420004200,
+            TopicData = new (),
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+    }
 }

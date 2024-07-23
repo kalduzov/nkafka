@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//4E-41-93-28-7B-9D-34-97-83-3A-02-48-6A-5E-8C-08-DB-06-79-8E-6F-DD-50-89-98-B0-08-DD-17-53-EB-85
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -146,7 +147,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             writer.WriteVarUInt(FilterResults.Count + 1);
             foreach (var element in FilterResults)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -154,7 +155,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
             writer.WriteInt(FilterResults.Count);
             foreach (var element in FilterResults)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -391,7 +392,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                 writer.WriteVarUInt(MatchingAcls.Count + 1);
                 foreach (var element in MatchingAcls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -399,7 +400,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
                 writer.WriteInt(MatchingAcls.Count);
                 foreach (var element in MatchingAcls)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

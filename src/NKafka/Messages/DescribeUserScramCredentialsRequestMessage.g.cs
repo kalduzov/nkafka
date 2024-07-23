@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//DA-B3-0B-16-FE-73-94-9B-5E-4B-22-23-32-4F-D9-F3-2E-E2-17-B3-35-6A-18-F9-1F-88-F6-FB-DD-C9-6E-12
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -130,7 +131,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
             writer.WriteVarUInt(Users.Count + 1);
             foreach (var element in Users)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

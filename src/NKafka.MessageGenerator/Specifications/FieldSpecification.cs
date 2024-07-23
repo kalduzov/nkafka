@@ -29,8 +29,14 @@ namespace NKafka.MessageGenerator.Specifications;
 
 public class FieldSpecification
 {
+    /// <summary>
+    /// Field name
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Field type
+    /// </summary>
     public IFieldType Type { get; }
 
     public Versions Versions { get; }
@@ -393,7 +399,14 @@ public class FieldSpecification
 
         if (Type.IsStruct)
         {
-            if (Default.Length > 0)
+            if (Default.Equals("null"))
+            {
+                ValidateNullDefault();
+
+                return "null";
+            }
+
+            if (!string.IsNullOrEmpty(Default))
             {
                 throw new ArgumentException($"Invalid default for struct field {Name}: custom defaults are not supported for struct fields.");
             }

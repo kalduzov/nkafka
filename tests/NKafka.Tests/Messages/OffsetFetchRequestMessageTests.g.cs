@@ -128,4 +128,14 @@ public sealed partial class OffsetFetchRequestMessageTests: RequestMessageTests<
         };
         SerializeAndDeserializeMessage(message, ApiVersion.Version8);
     }
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new OffsetFetchRequestMessage
+        {
+            Groups = new (),
+            RequireStable = true,
+        };
+        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+    }
 }

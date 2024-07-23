@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//24-65-B0-40-D3-18-13-EE-A4-42-B8-81-B4-1B-DC-09-8D-7D-B2-1C-F9-C1-C4-6C-49-39-D7-A1-C2-65-47-B5
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -55,9 +56,22 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
+    /// The response top level error code.
+    /// </summary>
+    public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
+    /// <summary>
+    /// Results categorized by transactional ID.
+    /// </summary>
+    public AddPartitionsToTxnResultCollection ResultsByTransaction { get; set; } = new ();
+
+    /// <summary>
     /// The results for each topic.
     /// </summary>
-    public AddPartitionsToTxnTopicResultCollection Results { get; set; } = new ();
+    public AddPartitionsToTxnTopicResultCollection ResultsByTopicV3AndBelow { get; set; } = new ();
 
     /// <summary>
     /// The basic constructor of the message AddPartitionsToTxnResponseMessage
@@ -80,6 +94,37 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     public void Read(ref BufferReader reader, ApiVersion version)
     {
         ThrottleTimeMs = reader.ReadInt();
+        if (version >= ApiVersion.Version4)
+        {
+            ErrorCode = reader.ReadShort();
+        }
+        else
+        {
+            ErrorCode = 0;
+        }
+        if (version >= ApiVersion.Version4)
+        {
+            int arrayLength;
+            arrayLength = reader.ReadVarUInt() - 1;
+            if (arrayLength < 0)
+            {
+                throw new Exception("non-nullable field ResultsByTransaction was serialized as null");
+            }
+            else
+            {
+                var newCollection = new AddPartitionsToTxnResultCollection(arrayLength);
+                for (var i = 0; i < arrayLength; i++)
+                {
+                    newCollection.Add(new AddPartitionsToTxnResultMessage(ref reader, version));
+                }
+                ResultsByTransaction = newCollection;
+            }
+        }
+        else
+        {
+            ResultsByTransaction = new ();
+        }
+        if (version <= ApiVersion.Version3)
         {
             if (version >= ApiVersion.Version3)
             {
@@ -87,7 +132,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 arrayLength = reader.ReadVarUInt() - 1;
                 if (arrayLength < 0)
                 {
-                    throw new Exception("non-nullable field Results was serialized as null");
+                    throw new Exception("non-nullable field ResultsByTopicV3AndBelow was serialized as null");
                 }
                 else
                 {
@@ -96,7 +141,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicResultMessage(ref reader, version));
                     }
-                    Results = newCollection;
+                    ResultsByTopicV3AndBelow = newCollection;
                 }
             }
             else
@@ -105,7 +150,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                 arrayLength = reader.ReadInt();
                 if (arrayLength < 0)
                 {
-                    throw new Exception("non-nullable field Results was serialized as null");
+                    throw new Exception("non-nullable field ResultsByTopicV3AndBelow was serialized as null");
                 }
                 else
                 {
@@ -114,9 +159,13 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                     {
                         newCollection.Add(new AddPartitionsToTxnTopicResultMessage(ref reader, version));
                     }
-                    Results = newCollection;
+                    ResultsByTopicV3AndBelow = newCollection;
                 }
             }
+        }
+        else
+        {
+            ResultsByTopicV3AndBelow = new ();
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
@@ -141,20 +190,49 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        if (version >= ApiVersion.Version3)
+        if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarUInt(Results.Count + 1);
-            foreach (var element in Results)
+            writer.WriteShort((short)ErrorCode);
+        }
+        if (version >= ApiVersion.Version4)
+        {
+            writer.WriteVarUInt(ResultsByTransaction.Count + 1);
+            foreach (var element in ResultsByTransaction)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
         {
-            writer.WriteInt(Results.Count);
-            foreach (var element in Results)
+            if (ResultsByTransaction.Count != 0)
             {
-                element.Write(writer, version);
+                throw new UnsupportedVersionException($"Attempted to write a non-default ResultsByTransaction at version {version}");
+            }
+        }
+        if (version <= ApiVersion.Version3)
+        {
+            if (version >= ApiVersion.Version3)
+            {
+                writer.WriteVarUInt(ResultsByTopicV3AndBelow.Count + 1);
+                foreach (var element in ResultsByTopicV3AndBelow)
+                {
+                    element?.Write(writer, version);
+                }
+            }
+            else
+            {
+                writer.WriteInt(ResultsByTopicV3AndBelow.Count);
+                foreach (var element in ResultsByTopicV3AndBelow)
+                {
+                    element?.Write(writer, version);
+                }
+            }
+        }
+        else
+        {
+            if (ResultsByTopicV3AndBelow.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default ResultsByTopicV3AndBelow at version {version}");
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -190,16 +268,34 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         {
             return false;
         }
-        if (Results is null)
+        if (ErrorCode != other.ErrorCode)
         {
-            if (other.Results is not null)
+            return false;
+        }
+        if (ResultsByTransaction is null)
+        {
+            if (other.ResultsByTransaction is not null)
             {
                 return false;
             }
         }
         else
         {
-            if (!Results.SequenceEqual(other.Results))
+            if (!ResultsByTransaction.SequenceEqual(other.ResultsByTransaction))
+            {
+                return false;
+            }
+        }
+        if (ResultsByTopicV3AndBelow is null)
+        {
+            if (other.ResultsByTopicV3AndBelow is not null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!ResultsByTopicV3AndBelow.SequenceEqual(other.ResultsByTopicV3AndBelow))
             {
                 return false;
             }
@@ -211,7 +307,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Results);
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ResultsByTransaction, ResultsByTopicV3AndBelow);
         return hashCode;
     }
 
@@ -220,8 +316,215 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     {
         return "AddPartitionsToTxnResponseMessage("
             + "ThrottleTimeMs=" + ThrottleTimeMs
-            + ", Results=" + Results.DeepToString()
+            + ", ErrorCode=" + ErrorCode
+            + ", ResultsByTransaction=" + ResultsByTransaction.DeepToString()
+            + ", ResultsByTopicV3AndBelow=" + ResultsByTopicV3AndBelow.DeepToString()
             + ")";
+    }
+
+    /// <summary>
+    /// Describes the contract for message AddPartitionsToTxnResultMessage
+    /// </summary>
+    public sealed partial class AddPartitionsToTxnResultMessage: IMessage, IEquatable<AddPartitionsToTxnResultMessage>
+    {
+        /// <inheritdoc />
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
+
+        /// <summary>
+        /// The transactional id corresponding to the transaction.
+        /// </summary>
+        public string TransactionalId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The results for each topic.
+        /// </summary>
+        public AddPartitionsToTxnTopicResultCollection TopicResults { get; set; } = new ();
+
+        /// <summary>
+        /// The basic constructor of the message AddPartitionsToTxnResultMessage
+        /// </summary>
+        public AddPartitionsToTxnResultMessage()
+        {
+        }
+
+        /// <summary>
+        /// Base constructor for deserializing message AddPartitionsToTxnResultMessage
+        /// </summary>
+        public AddPartitionsToTxnResultMessage(ref BufferReader reader, ApiVersion version)
+            : this()
+        {
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
+        }
+
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
+        {
+            if (version > ApiVersion.Version5)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnResultMessage");
+            }
+            {
+                int length;
+                length = reader.ReadVarUInt() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field TransactionalId was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field TransactionalId had invalid length {length}");
+                }
+                else
+                {
+                    TransactionalId = reader.ReadString(length);
+                }
+            }
+            {
+                int arrayLength;
+                arrayLength = reader.ReadVarUInt() - 1;
+                if (arrayLength < 0)
+                {
+                    throw new Exception("non-nullable field TopicResults was serialized as null");
+                }
+                else
+                {
+                    var newCollection = new AddPartitionsToTxnTopicResultCollection(arrayLength);
+                    for (var i = 0; i < arrayLength; i++)
+                    {
+                        newCollection.Add(new AddPartitionsToTxnTopicResultMessage(ref reader, version));
+                    }
+                    TopicResults = newCollection;
+                }
+            }
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarUInt();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarUInt();
+                var size = reader.ReadVarUInt();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public void Write(BufferWriter writer, ApiVersion version)
+        {
+            if (version < ApiVersion.Version4)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of AddPartitionsToTxnResultMessage");
+            }
+            var numTaggedFields = 0;
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteVarUInt(TopicResults.Count + 1);
+            foreach (var element in TopicResults)
+            {
+                element?.Write(writer, version);
+            }
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarUInt(numTaggedFields);
+            rawWriter.WriteRawTags(writer, int.MaxValue);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is AddPartitionsToTxnResultMessage other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(AddPartitionsToTxnResultMessage? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (TransactionalId is null)
+            {
+                if (other.TransactionalId is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!TransactionalId.Equals(other.TransactionalId))
+                {
+                    return false;
+                }
+            }
+            if (TopicResults is null)
+            {
+                if (other.TopicResults is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!TopicResults.SequenceEqual(other.TopicResults))
+                {
+                    return false;
+                }
+            }
+            return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, TransactionalId);
+            return hashCode;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "AddPartitionsToTxnResultMessage("
+                + "TransactionalId=" + (string.IsNullOrWhiteSpace(TransactionalId) ? "null" : TransactionalId)
+                + ", TopicResults=" + TopicResults.DeepToString()
+                + ")";
+        }
+    }
+
+    /// <summary>
+    /// Describes the contract for message AddPartitionsToTxnResultCollection
+    /// </summary>
+    public sealed partial class AddPartitionsToTxnResultCollection: HashSet<AddPartitionsToTxnResultMessage>
+    {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
+        public AddPartitionsToTxnResultCollection()
+        {
+        }
+
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
+        public AddPartitionsToTxnResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return SetEquals((IEnumerable<AddPartitionsToTxnResultMessage>)obj);
+        }
     }
 
     /// <summary>
@@ -243,7 +546,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         /// <summary>
         /// The results for each partition
         /// </summary>
-        public AddPartitionsToTxnPartitionResultCollection Results { get; set; } = new ();
+        public AddPartitionsToTxnPartitionResultCollection ResultsByPartition { get; set; } = new ();
 
         /// <summary>
         /// The basic constructor of the message AddPartitionsToTxnTopicResultMessage
@@ -265,7 +568,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnTopicResultMessage");
             }
@@ -299,7 +602,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                     arrayLength = reader.ReadVarUInt() - 1;
                     if (arrayLength < 0)
                     {
-                        throw new Exception("non-nullable field Results was serialized as null");
+                        throw new Exception("non-nullable field ResultsByPartition was serialized as null");
                     }
                     else
                     {
@@ -308,7 +611,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                         {
                             newCollection.Add(new AddPartitionsToTxnPartitionResultMessage(ref reader, version));
                         }
-                        Results = newCollection;
+                        ResultsByPartition = newCollection;
                     }
                 }
                 else
@@ -317,7 +620,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                     arrayLength = reader.ReadInt();
                     if (arrayLength < 0)
                     {
-                        throw new Exception("non-nullable field Results was serialized as null");
+                        throw new Exception("non-nullable field ResultsByPartition was serialized as null");
                     }
                     else
                     {
@@ -326,7 +629,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                         {
                             newCollection.Add(new AddPartitionsToTxnPartitionResultMessage(ref reader, version));
                         }
-                        Results = newCollection;
+                        ResultsByPartition = newCollection;
                     }
                 }
             }
@@ -366,18 +669,18 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
             }
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt(Results.Count + 1);
-                foreach (var element in Results)
+                writer.WriteVarUInt(ResultsByPartition.Count + 1);
+                foreach (var element in ResultsByPartition)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
             {
-                writer.WriteInt(Results.Count);
-                foreach (var element in Results)
+                writer.WriteInt(ResultsByPartition.Count);
+                foreach (var element in ResultsByPartition)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -423,16 +726,16 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
                     return false;
                 }
             }
-            if (Results is null)
+            if (ResultsByPartition is null)
             {
-                if (other.Results is not null)
+                if (other.ResultsByPartition is not null)
                 {
                     return false;
                 }
             }
             else
             {
-                if (!Results.SequenceEqual(other.Results))
+                if (!ResultsByPartition.SequenceEqual(other.ResultsByPartition))
                 {
                     return false;
                 }
@@ -453,8 +756,34 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         {
             return "AddPartitionsToTxnTopicResultMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
-                + ", Results=" + Results.DeepToString()
+                + ", ResultsByPartition=" + ResultsByPartition.DeepToString()
                 + ")";
+        }
+    }
+
+    /// <summary>
+    /// Describes the contract for message AddPartitionsToTxnTopicResultCollection
+    /// </summary>
+    public sealed partial class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
+    {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
+        public AddPartitionsToTxnTopicResultCollection()
+        {
+        }
+
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
+        public AddPartitionsToTxnTopicResultCollection(int capacity)
+            : base(capacity)
+        {
+        }
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return SetEquals((IEnumerable<AddPartitionsToTxnTopicResultMessage>)obj);
         }
     }
 
@@ -477,10 +806,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         /// <summary>
         /// The response error code.
         /// </summary>
-        public short ErrorCode { get; set; } = 0;
-
-        /// <inheritdoc />
-        public ErrorCodes Code => (ErrorCodes)ErrorCode;
+        public short PartitionErrorCode { get; set; } = 0;
 
         /// <summary>
         /// The basic constructor of the message AddPartitionsToTxnPartitionResultMessage
@@ -502,12 +828,12 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AddPartitionsToTxnPartitionResultMessage");
             }
             PartitionIndex = reader.ReadInt();
-            ErrorCode = reader.ReadShort();
+            PartitionErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version3)
             {
@@ -531,7 +857,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
-            writer.WriteShort((short)ErrorCode);
+            writer.WriteShort(PartitionErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
@@ -565,7 +891,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
             {
                 return false;
             }
-            if (ErrorCode != other.ErrorCode)
+            if (PartitionErrorCode != other.PartitionErrorCode)
             {
                 return false;
             }
@@ -585,7 +911,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         {
             return "AddPartitionsToTxnPartitionResultMessage("
                 + "PartitionIndex=" + PartitionIndex
-                + ", ErrorCode=" + ErrorCode
+                + ", PartitionErrorCode=" + PartitionErrorCode
                 + ")";
         }
     }
@@ -613,32 +939,6 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
         public override bool Equals(object? obj)
         {
             return SetEquals((IEnumerable<AddPartitionsToTxnPartitionResultMessage>)obj);
-        }
-    }
-
-    /// <summary>
-    /// Describes the contract for message AddPartitionsToTxnTopicResultCollection
-    /// </summary>
-    public sealed partial class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
-    {
-        /// <summary>
-        /// Basic collection constructor
-        /// </summary>
-        public AddPartitionsToTxnTopicResultCollection()
-        {
-        }
-
-        /// <summary>
-        /// Basic collection constructor with the ability to set capacity
-        /// </summary>
-        public AddPartitionsToTxnTopicResultCollection(int capacity)
-            : base(capacity)
-        {
-        }
-        /// <inheritdoc />
-        public override bool Equals(object? obj)
-        {
-            return SetEquals((IEnumerable<AddPartitionsToTxnTopicResultMessage>)obj);
         }
     }
 }

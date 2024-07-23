@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//7F-9A-F6-42-AF-2D-4A-89-D5-F3-FC-17-C6-7F-04-B8-F3-9D-40-4F-B4-1D-63-16-16-79-BE-FA-B4-C4-39-8C
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -156,7 +157,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -164,7 +165,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -275,7 +276,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponseTopicMessage");
             }
@@ -379,7 +380,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -387,7 +388,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -512,7 +513,7 @@ public sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponsePartitionMessage");
             }

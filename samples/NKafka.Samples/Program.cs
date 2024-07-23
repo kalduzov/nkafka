@@ -29,6 +29,7 @@ using Microsoft.Extensions.Logging;
 
 using NKafka;
 using NKafka.Clients.Consumer;
+using NKafka.Clients.Producer;
 using NKafka.Config;
 
 using OpenTelemetry;
@@ -56,6 +57,13 @@ var clusterConfig = new ClusterConfig
     // },
     ClusterInitTimeoutMs = 160000, // 160сек для отладки
     MetadataUpdateTimeoutMs = 60000, // 60 секунд на обновление данных по кластеру
+    Sasl = new SaslSettings
+    {
+        Mechanism = SaslMechanism.Plain,
+        UserName = "test",
+        Password = "test"
+    },
+    SecurityProtocol = SecurityProtocols.SaslPlaintext
 
     //MessageMaxBytes = 400000
     //MessageMaxBytes = 20,
@@ -65,27 +73,21 @@ var clusterConfig = new ClusterConfig
 //     .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
 //     .AddSource("NKafka.Internal")
 //     .AddSource("NKafka")
-//     .AddJaegerExporter(
-//         options =>
-//         {
-//             options.AgentHost = "localhost";
-//             options.AgentPort = 6831;
-//             options.Protocol = JaegerExportProtocol.UdpCompactThrift;
-//             options.ExportProcessorType = ExportProcessorType.Simple;
-//         })
-//     .AddConsoleExporter()
+//     .AddOtlpExporter()
+//     //.AddConsoleExporter()
 //     .Build();
-//
+
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}", theme: AnsiConsoleTheme.Code)
-    .MinimumLevel.Information()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}",
+        theme: AnsiConsoleTheme.Code)
+    .MinimumLevel.Debug()
     .CreateLogger();
 
 var loggerFactory = LoggerFactory.Create(
     builder =>
     {
         builder.AddSerilog();
-        builder.SetMinimumLevel(LogLevel.Information);
+        builder.SetMinimumLevel(LogLevel.Debug);
     });
 
 var logger = loggerFactory.CreateLogger<Program>();
@@ -96,7 +98,7 @@ await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFact
 //     new[]
 //     {
 //         new Topic("test-protocol", 10, 2)
-//     });
+//      });
 
 // for (var i = 1000; i < 1500; i++)
 // {
@@ -111,59 +113,65 @@ await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFact
 
 //await kafkaCluster.RefreshMetadataAsync(default, "test");
 
-// await using var producer = kafkaCluster.BuildProducer<Null, string>(new ProducerConfig
-// {
-//     PartitionerConfig = new PartitionerConfig
-//     {
-//         Partitioner = Partitioner.RoundRobinPartitioner
-//     },
-//     BatchSize = 1000
-// });
-//
-// foreach (var val in Enumerable.Range(0, 1000))
-// {
-//     var test = new Message<Null, string>(Null.Instance, "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test" + val);
-//     var result = await producer.ProduceAsync("test", test);
-// }
-
-var group = Guid.NewGuid().ToString();
-
-await using var consumer1 = kafkaCluster.BuildConsumer<string, string>(new ConsumerConfig
+await using var producer = kafkaCluster.BuildProducer<Null, string>(new ProducerConfig
 {
-    GroupId = "test_nkafka",
-    PartitionAssignors = new IPartitionAssignor[]
+    PartitionerConfig = new PartitionerConfig
     {
-        new RoundRobinAssignor(),
-        new RangeAssignor()
+        Partitioner = Partitioner.RoundRobinPartitioner
     },
-    AutoOffsetReset = AutoOffsetReset.Earliest,
-    FetchMaxBytes = 10000
+    BatchSize = 1000,
+    LingerMs = 5
 });
 
-// await using var consumer2 = kafkaCluster.BuildConsumer<Null, int>(new ConsumerConfig
-// {
-//     GroupId = group,
-//     PartitionAssignors = new IPartitionAssignor[] { new RoundRobinAssignor() }
-// });
-//
-// var tasks = new List<ValueTask<ChannelReader<ConsumerRecord<Null, int>>>> { consumer1.SubscribeAsync("test"), consumer2.SubscribeAsync("test") };
+const int count = 10000;
 
-// var tasks = new List<ValueTask<ChannelReader<ConsumerRecord<Null, int>>>> { consumer1.SubscribeAsync("test") };
-// await Task.Delay(5000);
-// tasks.Add(consumer2.SubscribeAsync("test"));
-
-var channel1 = await consumer1.SubscribeAsync("test");
-
-// //var channel2 = await tasks[1];
-//
-while (await channel1.WaitToReadAsync())
+foreach (var val in Enumerable.Range(0, count))
 {
-    var record = await channel1.ReadAsync();
-    Console.WriteLine(record.Message.Value);
-    await consumer1.CommitOffsetAsync(); // Этот метод закоммитит все offsets, которые были считаны, (т.е. которые вернулись после ReadAsync) последними из канала выше
+    var message = new Message<Null, string>(Null.Instance,
+        "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test"
+        + val);
+    producer.Produce("test", message);
 }
 
-await consumer1.UnsubscribeAsync();
+// var group = Guid.NewGuid().ToString();
+//
+// await using var consumer1 = kafkaCluster.BuildConsumer<string, string>(new ConsumerConfig
+// {
+//     GroupId = "test_nkafka",
+//     PartitionAssignors = new IPartitionAssignor[]
+//     {
+//         new RoundRobinAssignor(),
+//         new RangeAssignor()
+//     },
+//     AutoOffsetReset = AutoOffsetReset.Earliest,
+//     FetchMaxBytes = 10000
+// });
+//
+// // await using var consumer2 = kafkaCluster.BuildConsumer<Null, int>(new ConsumerConfig
+// // {
+// //     GroupId = group,
+// //     PartitionAssignors = new IPartitionAssignor[] { new RoundRobinAssignor() }
+// // });
+// //
+// // var tasks = new List<ValueTask<ChannelReader<ConsumerRecord<Null, int>>>> { consumer1.SubscribeAsync("test"), consumer2.SubscribeAsync("test") };
+//
+// // var tasks = new List<ValueTask<ChannelReader<ConsumerRecord<Null, int>>>> { consumer1.SubscribeAsync("test") };
+// // await Task.Delay(5000);
+// // tasks.Add(consumer2.SubscribeAsync("test"));
+//
+// var channel1 = await consumer1.SubscribeAsync("test");
+//
+// // //var channel2 = await tasks[1];
+// //
+// while (await channel1.WaitToReadAsync())
+// {
+//     var record = await channel1.ReadAsync();
+//     Console.WriteLine(record.Message.Value);
+//     await consumer1
+//         .CommitOffsetAsync(); // Этот метод закоммитит все offsets, которые были считаны, (т.е. которые вернулись после ReadAsync) последними из канала выше
+// }
+//
+// await consumer1.UnsubscribeAsync();
 // //consumer2.UnsubscribeAsync();
 
 //await channel2.Completion;

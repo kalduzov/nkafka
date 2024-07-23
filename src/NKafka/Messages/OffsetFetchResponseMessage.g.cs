@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//E3-86-AF-85-3A-CE-DA-C4-59-7E-97-FA-BF-FF-CC-16-B2-61-99-F9-E1-AA-4F-0C-01-ED-37-3B-11-47-5D-44
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -206,7 +207,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -214,7 +215,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 writer.WriteInt(Topics.Count);
                 foreach (var element in Topics)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
         }
@@ -234,7 +235,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
         }
         else
@@ -476,7 +477,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             else
@@ -484,7 +485,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element.Write(writer, version);
+                    element?.Write(writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -808,7 +809,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <summary>
         /// The group ID.
         /// </summary>
-        public string groupId { get; set; } = string.Empty;
+        public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
         /// The responses per topic.
@@ -843,7 +844,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseGroupMessage");
             }
@@ -852,15 +853,15 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
                 length = reader.ReadVarUInt() - 1;
                 if (length < 0)
                 {
-                    throw new Exception("non-nullable field groupId was serialized as null");
+                    throw new Exception("non-nullable field GroupId was serialized as null");
                 }
                 else if (length > 0x7fff)
                 {
-                    throw new Exception($"string field groupId had invalid length {length}");
+                    throw new Exception($"string field GroupId had invalid length {length}");
                 }
                 else
                 {
-                    groupId = reader.ReadString(length);
+                    GroupId = reader.ReadString(length);
                 }
             }
             {
@@ -905,14 +906,14 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(groupId);
+                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 writer.WriteVarUInt(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -934,16 +935,16 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             {
                 return false;
             }
-            if (groupId is null)
+            if (GroupId is null)
             {
-                if (other.groupId is not null)
+                if (other.GroupId is not null)
                 {
                     return false;
                 }
             }
             else
             {
-                if (!groupId.Equals(other.groupId))
+                if (!GroupId.Equals(other.GroupId))
                 {
                     return false;
                 }
@@ -973,7 +974,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, groupId, Topics, ErrorCode);
+            hashCode = HashCode.Combine(hashCode, GroupId, Topics, ErrorCode);
             return hashCode;
         }
 
@@ -981,7 +982,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         public override string ToString()
         {
             return "OffsetFetchResponseGroupMessage("
-                + "groupId=" + (string.IsNullOrWhiteSpace(groupId) ? "null" : groupId)
+                + "GroupId=" + (string.IsNullOrWhiteSpace(GroupId) ? "null" : GroupId)
                 + ", Topics=" + Topics.DeepToString()
                 + ", ErrorCode=" + ErrorCode
                 + ")";
@@ -1029,7 +1030,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseTopicsMessage");
             }
@@ -1093,7 +1094,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
             writer.WriteVarUInt(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
-                element.Write(writer, version);
+                element?.Write(writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -1222,7 +1223,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponsePartitionsMessage");
             }

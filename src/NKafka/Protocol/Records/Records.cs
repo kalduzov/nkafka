@@ -35,7 +35,7 @@ public sealed class Records
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyList<IRecordsBatch> Batches { get; private set; } = new List<IRecordsBatch>(0);
+    public IReadOnlyList<IRecordsBatch> Batches { get; private set; } = [];
 
     /// <summary>
     /// The size of these records in bytes.
@@ -56,8 +56,10 @@ public sealed class Records
     /// 
     /// </summary>
     /// <param name="sizeInBytes"></param>
-    public Records(int sizeInBytes)
+    /// <param name="batches"></param>
+    public Records(int sizeInBytes, IReadOnlyList<IRecordsBatch> batches)
     {
+        Batches = batches;
         SizeInBytes = sizeInBytes;
     }
 

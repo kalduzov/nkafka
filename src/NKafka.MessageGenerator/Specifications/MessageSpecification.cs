@@ -36,12 +36,14 @@ public record MessageSpecification
     public static readonly MessageSpecification Empty = new(
         apiKey: -1,
         type: MessageType.None,
-        listeners: Array.Empty<RequestListenerType>(),
+        listeners: [],
         name: string.Empty,
         validVersions: string.Empty,
+        deprecatedVersions: Versions.NONE_STRING,
         flexibleVersions: "0+",
-        fields: Array.Empty<FieldSpecification>(),
-        commonStructs: Array.Empty<StructSpecification>());
+        fields: [],
+        commonStructs: [],
+        hash: string.Empty);
 
     /// <summary>
     /// Message api key 
@@ -84,6 +86,11 @@ public record MessageSpecification
     [JsonIgnore]
     public StructSpecification Struct { get; }
 
+    /// <summary>
+    /// Содержит хеш файла из которого сгенерилсась спецификация
+    /// </summary>
+    public string Hash { get; }
+
     [JsonConstructor]
     public MessageSpecification(
         [JsonProperty("apiKey")] short? apiKey,
@@ -92,10 +99,12 @@ public record MessageSpecification
         [JsonProperty("name")] string name,
         [JsonProperty("validVersions")] string validVersions,
         [JsonProperty("flexibleVersions")] string flexibleVersions,
+        [JsonProperty("deprecatedVersions")] string deprecatedVersions,
         [JsonProperty("fields")] IReadOnlyCollection<FieldSpecification> fields,
-        [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs)
+        [JsonProperty("commonStructs")] IReadOnlyCollection<StructSpecification>? commonStructs,
+        [JsonProperty("hash")] string hash)
     {
-        Struct = new StructSpecification(name, validVersions, fields);
+        Struct = new StructSpecification(name, validVersions, deprecatedVersions, fields);
         ApiKey = apiKey ?? -1;
         Type = type;
         CommonStructs = (commonStructs ?? Array.Empty<StructSpecification>()).ToImmutableArray();
@@ -119,6 +128,7 @@ public record MessageSpecification
             throw new ArgumentException("The `requestScope` property is only valid for messages with type `request`");
         }
         Listeners = listeners;
+        Hash = hash;
 
     }
 }

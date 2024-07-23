@@ -29,6 +29,7 @@ using Microsoft.Extensions.Logging;
 
 using NKafka;
 using NKafka.Clients.Consumer;
+using NKafka.Clients.Producer;
 using NKafka.Config;
 
 using OpenTelemetry;
@@ -119,14 +120,17 @@ await using var producer = kafkaCluster.BuildProducer<Null, string>(new Producer
         Partitioner = Partitioner.RoundRobinPartitioner
     },
     BatchSize = 1000,
+    LingerMs = 5
 });
 
-foreach (var val in Enumerable.Range(0, 1000))
+const int count = 10000;
+
+foreach (var val in Enumerable.Range(0, count))
 {
-    var test = new Message<Null, string>(Null.Instance,
+    var message = new Message<Null, string>(Null.Instance,
         "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test"
         + val);
-    var result = await producer.ProduceAsync("test", test);
+    producer.Produce("test", message);
 }
 
 // var group = Guid.NewGuid().ToString();

@@ -28,6 +28,8 @@ namespace NKafka.Protocol.Records;
 /// </summary>
 public class RecordsBatch: IRecordsBatch
 {
+    private readonly BufferWriter _bufferWriter = new(Stream.Null);
+
     /// <summary>
     /// Batch header length
     /// </summary>
@@ -48,7 +50,7 @@ public class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    public BufferWriter Buffer { get; set; } = new(Stream.Null);
+    public BufferWriter Buffer => _bufferWriter;
 
     /// <inheritdoc />
     public int CountRecords { get; set; }
@@ -92,15 +94,22 @@ public class RecordsBatch: IRecordsBatch
     /// <inheritdoc />
     public IReadOnlyCollection<Record> Records { get; private set; } = [];
 
-    /// <summary>
-    /// 
-    /// </summary>
-    protected RecordsBatch()
+    private RecordsBatch()
     {
         Length = RECORD_BATCH_OVERHEAD;
         ProducerEpoch = _NO_PRODUCER_EPOCH;
         ProducerId = _NO_PRODUCER_ID;
         BaseSequence = _NO_SEQUENCE;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    protected RecordsBatch(BufferWriter bufferWriter)
+        : this()
+    {
+        _bufferWriter = bufferWriter;
+
     }
 
     /// <summary>

@@ -39,7 +39,7 @@ public interface IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    BufferWriter Buffer { get; set; }
+    BufferWriter Buffer { get; }
 
     /// <summary>
     /// 

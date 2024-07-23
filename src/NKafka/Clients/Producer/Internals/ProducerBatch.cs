@@ -44,7 +44,6 @@ internal class ProducerBatch: RecordsBatch
     private const int _ATTRIBUTES_OFFSET = 17;
 
     private readonly TaskCompletionSource _produceRequestResult;
-    private readonly BufferWriter _bufferWriter;
     private int _maxRecordSize;
     private int _recordsCount;
     private readonly List<SendResultTask> _recordTasks = [];
@@ -98,20 +97,20 @@ internal class ProducerBatch: RecordsBatch
     /// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
     /// <param name="bufferWriter">The <see cref="BufferWriter"/> used for writing the batch data.</param>
     public ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter)
+        : base(bufferWriter)
     {
         _lastOffset = -1;
         TopicPartition = topicPartition;
-        _bufferWriter = bufferWriter;
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         BaseTimestamp = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
         CreateTimestamp = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
     }
 
     internal ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter, long timestamp)
+        : base(bufferWriter)
     {
         _lastOffset = -1;
         TopicPartition = topicPartition;
-        _bufferWriter = bufferWriter;
         _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         BaseTimestamp = timestamp;
         MaxTimestamp = timestamp;
@@ -131,7 +130,7 @@ internal class ProducerBatch: RecordsBatch
     {
         var estimateSizeInBytesUpperBound = EstimateSizeInBytesUpperBound(key, value, headers);
 
-        if (_bufferWriter.Remaining - estimateSizeInBytesUpperBound < 0)
+        if (Buffer.Remaining - estimateSizeInBytesUpperBound < 0)
         {
             sendResultTask = null;
 
@@ -174,39 +173,39 @@ internal class ProducerBatch: RecordsBatch
 
     private void WriteRecords()
     {
-        _bufferWriter.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
+        Buffer.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
 
-        _bufferWriter.WriteInt(_records.Count);
+        Buffer.WriteInt(_records.Count);
 
         var size = 0;
 
         foreach (var record in _records)
         {
-            size += record.WriteTo(_bufferWriter);
+            size += record.WriteTo(Buffer);
         }
         Length += size;
-        _bufferWriter.Position = 0;
+        Buffer.Position = 0;
     }
 
     private void WriteHeader()
     {
-        _bufferWriter.Position = 0;
+        Buffer.Position = 0;
         // https://kafka.apache.org/documentation/#recordbatch
-        _bufferWriter.WriteLong(BaseOffset);
-        _bufferWriter.WriteInt(Length - 12);
-        _bufferWriter.WriteInt(PartitionLeaderEpoch);
-        _bufferWriter.WriteByte(Magic);
-        _bufferWriter.WriteUInt(Crc); //reserve
-        _bufferWriter.WriteShort(Attributes);
-        _bufferWriter.WriteInt(LastOffsetDelta);
-        _bufferWriter.WriteLong(BaseTimestamp);
-        _bufferWriter.WriteLong(MaxTimestamp);
-        _bufferWriter.WriteLong(ProducerId);
-        _bufferWriter.WriteShort(ProducerEpoch);
-        _bufferWriter.WriteInt(BaseSequence);
-        Crc = CrcUtils.Calculate(_bufferWriter.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
-        _bufferWriter.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
-        _bufferWriter.Position = 0;
+        Buffer.WriteLong(BaseOffset);
+        Buffer.WriteInt(Length - 12);
+        Buffer.WriteInt(PartitionLeaderEpoch);
+        Buffer.WriteByte(Magic);
+        Buffer.WriteUInt(Crc); //reserve
+        Buffer.WriteShort(Attributes);
+        Buffer.WriteInt(_lastOffset);
+        Buffer.WriteLong(BaseTimestamp);
+        Buffer.WriteLong(MaxTimestamp);
+        Buffer.WriteLong(ProducerId);
+        Buffer.WriteShort(ProducerEpoch);
+        Buffer.WriteInt(BaseSequence);
+        Crc = CrcUtils.Calculate(Buffer.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
+        Buffer.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
+        Buffer.Position = 0;
     }
 
     /// <summary>

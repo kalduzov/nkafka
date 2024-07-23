@@ -333,7 +333,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
                     if (firstBatch.IsReady)
                     {
-                        firstBatch = deque.RemoveFirst();
+                        firstBatch = deque.RemoveLast();
                     }
                     else
                     {

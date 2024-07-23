@@ -29,35 +29,22 @@ namespace NKafka.Protocol;
 /// <summary>
 /// 
 /// </summary>
-internal readonly struct SendMessage
+internal readonly struct SendMessage(
+    RequestHeader header,
+    IRequestMessage requestMessage,
+    ApiVersion messageVersion,
+    ApiVersion headerVersion,
+    RecyclableMemoryStreamManager streamManager)
 {
-    private readonly ApiVersion _messageVersion;
-    private readonly ApiVersion _headerVersion;
-    private readonly RecyclableMemoryStreamManager _streamManager;
+    /// <summary>
+    /// 
+    /// </summary>
+    public RequestHeader Header { get; } = header;
 
     /// <summary>
     /// 
     /// </summary>
-    public RequestHeader Header { get; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public IRequestMessage RequestMessage { get; }
-
-    public SendMessage(
-        RequestHeader header,
-        IRequestMessage requestMessage,
-        ApiVersion messageVersion,
-        ApiVersion headerVersion,
-        RecyclableMemoryStreamManager streamManager)
-    {
-        _messageVersion = messageVersion;
-        _headerVersion = headerVersion;
-        _streamManager = streamManager;
-        Header = header;
-        RequestMessage = requestMessage;
-    }
+    public IRequestMessage RequestMessage { get; } = requestMessage;
 
     /// <summary>
     /// 
@@ -69,11 +56,11 @@ internal readonly struct SendMessage
     /// <exception cref="ProtocolKafkaException"></exception>
     public long Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
     {
-        using var stream = _streamManager.GetStream();
+        using var stream = streamManager.GetStream();
         var writer = new BufferWriter(stream);
 
-        Header.Write(writer, _headerVersion);
-        RequestMessage.Write(writer, _messageVersion);
+        Header.Write(writer, headerVersion);
+        RequestMessage.Write(writer, messageVersion);
 
         writer.WriteSizeToStart();
 

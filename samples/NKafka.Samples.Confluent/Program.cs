@@ -24,43 +24,49 @@ using System.Diagnostics;
 using Confluent.Kafka;
 
 var stopwatch = Stopwatch.StartNew();
-// var producerBuilder = new ProducerBuilder<Null, string>(
-//     new AdminClientConfig
-//     {
-//         BootstrapServers = "localhost:29091",
-//     });
-//
-// using var producer = producerBuilder.Build();
-//
-// for (var i = 0; i < 10; i++)
-// {
-//     producer.Produce("test",
-//         new Message<Null, string>
-//         {
-//             Value = "test"
-//         });
-//}
+var producerBuilder = new ProducerBuilder<Null, string>(
+    new ProducerConfig
+    {
+        BootstrapServers = "localhost:29091",
+        LingerMs = 5,
+        SaslMechanism = SaslMechanism.Plain,
+        SaslPassword = "test",
+        SaslUsername = "test",
+        SecurityProtocol = SecurityProtocol.SaslPlaintext,
+        BatchSize = 1000
+    });
 
-var consumerBuilder = new ConsumerBuilder<byte[], string>(new ConsumerConfig
+using var producer = producerBuilder.Build();
+
+for (var i = 0; i < 1000; i++)
 {
-    BootstrapServers = "devkafkabroker1.s.o3.ru:9092",
-    //BootstrapServers = "localhost:29091",
-    GroupId = "test-k",
-    AutoOffsetReset = AutoOffsetReset.Earliest,
-    FetchMaxBytes = 60000,
-    MessageMaxBytes = 50000
-});
+    producer.Produce("test",
+        new Message<Null, string>
+        {
+            Value = "test"
+        });
+}
 
-using var consumer1 = consumerBuilder.Build();
+// var consumerBuilder = new ConsumerBuilder<byte[], string>(new ConsumerConfig
+// {
+//     BootstrapServers = "localhost:29091",
+//     //BootstrapServers = "localhost:29091",
+//     GroupId = "test-k",
+//     AutoOffsetReset = AutoOffsetReset.Earliest,
+//     FetchMaxBytes = 60000,
+//     MessageMaxBytes = 50000
+// });
+//
+//using var consumer1 = consumerBuilder.Build();
 
 //using var consumer2 = consumerBuilder.Build();
 
-consumer1.Subscribe("avail_service_stock_queue_stocks");
+//consumer1.Subscribe("avail_service_stock_queue_stocks");
 //consumer2.Subscribe("test");
 
-var record = consumer1.Consume();
+//var record = consumer1.Consume();
 
-Console.WriteLine(record.Message.Value);
+//Console.WriteLine(record.Message.Value);
 
 Console.WriteLine($"All OK. {stopwatch.Elapsed}");
 Console.ReadKey();

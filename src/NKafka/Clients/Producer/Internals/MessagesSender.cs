@@ -26,6 +26,7 @@ using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
 using NKafka.Protocol;
+using NKafka.Resources;
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -77,7 +78,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
         {
             if (messageSender is not MessagesSender sender)
             {
-                throw new ArgumentException("На вход метода ожидался тип 'MessagesSender'", nameof(messageSender));
+                throw new ArgumentException(ExceptionMessages.MessagesSenderInvalidType, nameof(messageSender));
             }
             var token = sender._tokenSource.Token;
 
@@ -117,6 +118,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
 
             var produceRequestMessage = new ProduceRequestMessage
             {
+                TimeoutMs = config.RequestTimeoutMs,
                 Acks = (short)config.Acks,
                 TopicData =
                 [

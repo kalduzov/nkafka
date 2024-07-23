@@ -66,6 +66,9 @@
         <value>The pool does not contain any available connections</value>
     </data>
     <data name="NoBatchedFindCoordinatorsExceptionMessage" xml:space="preserve">
-        <value>Список идентификаторов групп должен содержать только один элемент. Фича с несколькими группами доступна начиная с 4 версии API</value>
+        <value>The list of group IDs must contain only one element. The feature with multiple groups is available starting from API version 4.</value>
     </data>
+  <data name="MessagesSenderInvalidType" xml:space="preserve">
+    <value>Expected type 'MessagesSender' as the input to the method</value>
+  </data>
 </root>

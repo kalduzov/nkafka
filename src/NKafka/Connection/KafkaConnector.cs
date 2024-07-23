@@ -244,6 +244,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             if (CanWrite)
             {
                 var bytesSent = request.Write(_stream, true, _messageMaxBytes);
+                Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
                 _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
             }
             else

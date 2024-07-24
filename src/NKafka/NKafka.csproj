@@ -13,7 +13,7 @@
     <PackageIcon>logo.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NKafka</AssemblyName>
-    <MinVerMinimumMajorMinor>0.2</MinVerMinimumMajorMinor>
+    <MinVerMinimumMajorMinor>0.3</MinVerMinimumMajorMinor>
     <Deterministic>false</Deterministic>
     <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -24,7 +24,7 @@
     <PackageReference Include="System.Diagnostics.DiagnosticSource"/>
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream"/>
     <PackageReference Include="FastEnum"/>
-    <!--    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"/>-->
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers"/>
     <PackageReference Include="MinVer">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

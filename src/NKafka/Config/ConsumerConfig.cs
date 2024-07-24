@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,7 +43,10 @@ public record ConsumerConfig: CommonConfig
     /// <remarks>Порядок укзаания важен, т.к. выбирается по умолчанию первый указанный протокол, если консьюмер единственный в группе.
     /// В остальных случаях будет выбран протокол, который поддерживается всеми констюмерами в группе.
     /// Однако, если ведомый консьюмер не поддерживает ни один протокол лидера - он не сможет присоединиться к группе</remarks>
-    public IReadOnlyCollection<IPartitionAssignor> PartitionAssignors { get; set; } = new[] { new RoundRobinAssignor() };
+    public IReadOnlyCollection<IPartitionAssignor> PartitionAssignors { get; set; } = new[]
+    {
+        new RoundRobinAssignor()
+    };
 
     /// <summary>
     ///     group.id
@@ -126,7 +129,12 @@ public record ConsumerConfig: CommonConfig
     /// <summary>
     /// 
     /// </summary>
-    public int RebalanceTimeoutMs { get; set; } = 300000;
+    public int RebalanceTimeoutMs { get; set; } = 300_000;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public int MaxPollIntervalMs { get; set; } = 300_000;
 
     /// <summary>
     /// Gives the consumer access to the implementation of the metrics provider
@@ -170,22 +178,22 @@ public record ConsumerConfig: CommonConfig
 
         if (ChannelSize <= 0)
         {
-            throw new KafkaConfigException(nameof(ChannelSize), ChannelSize, "Размер канал для приема сообщения не может быть меньше 1");
+            ChannelSize.ThrowConfigException("Размер канал для приема сообщения не может быть меньше 1");
         }
 
         if (string.IsNullOrWhiteSpace(GroupId))
         {
-            throw new KafkaConfigException(nameof(GroupId), GroupId, "Группа для консьюмера обязательно должна быть задана");
+            GroupId.ThrowConfigException("Группа для консьюмера обязательно должна быть задана");
         }
 
         if (EnableAutoCommit && AutoCommitIntervalMs <= 0)
         {
-            throw new KafkaConfigException(nameof(AutoCommitIntervalMs), AutoCommitIntervalMs, "В настройках включен автокомит, но настроенный интервал меньше 1 мс");
+            AutoCommitIntervalMs.ThrowConfigException("В настройках включен автокомит, но настроенный интервал меньше 1 мс");
         }
 
         if (PartitionAssignors.Count == 0)
         {
-            throw new KafkaConfigException(nameof(PartitionAssignors), string.Empty, "Не задан ни один тип балансировки. Укажите хотя бы один тип");
+            PartitionAssignors.ThrowConfigException("Не задан ни один тип балансировки. Укажите хотя бы один тип", string.Empty);
         }
 
         var uniqueName = new HashSet<string>(PartitionAssignors.Count);
@@ -194,14 +202,18 @@ public record ConsumerConfig: CommonConfig
         {
             if (uniqueName.Add(assignor.Name) is false)
             {
-                throw new KafkaConfigException(nameof(PartitionAssignors), string.Empty, "В коллекции типов балансировки содержатся не уникальные значения");
+                PartitionAssignors.ThrowConfigException("В коллекции типов балансировки содержатся не уникальные значения", string.Empty);
             }
         }
 
         if (Heartbeat.IntervalMs >= SessionTimeoutMs)
         {
-            throw new KafkaConfigException(nameof(Heartbeat.IntervalMs), Heartbeat.IntervalMs, "Нельзя установить Heartbeat интервал больше, чем таймут сессии");
+            Heartbeat.ThrowConfigException("Нельзя установить Heartbeat интервал больше, чем таймаут сессии");
+        }
 
+        if (MaxPollIntervalMs <= 0)
+        {
+            MaxPollIntervalMs.ThrowConfigException("Величина интервала обработки сообщений не может быть меньше 1мс");
         }
     }
 }

@@ -22,6 +22,14 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(Net8Version)"/>
     <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0"/>
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net9.0' ">
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0"/>
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="9.0.0"/>
+    <PackageVersion Include="System.IO.Pipelines" Version="9.0.0"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0"/>
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0"/>
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0.0.0"/>
+  </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1"/>
     <PackageVersion Include="FastEnum" Version="1.8.0"/>

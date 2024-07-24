@@ -28,13 +28,17 @@ internal class DefaultProducerMetrics: IProducerMetrics
     private Histogram<long> _flushDuration;
     private readonly Meter _producerMetrics = new("NKafka.Metrics.Producer");
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     internal DefaultProducerMetrics()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         RegisterMetrics();
     }
 
 #if NET8_0_OR_GREATER
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     internal DefaultProducerMetrics(IMeterFactory meterFactory)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
         _producerMetrics = meterFactory.Create("NKafka.Metrics.Producer");
 

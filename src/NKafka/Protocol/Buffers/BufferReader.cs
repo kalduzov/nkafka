@@ -58,6 +58,7 @@ public ref partial struct BufferReader
     /// 
     /// </summary>
     /// <param name="buffer"></param>
+    /// <param name="bodyLen"></param>
     public BufferReader(ReadOnlySpan<byte> buffer, int bodyLen = 0)
     {
         _bufferSource = ReadOnlySequence<byte>.Empty;
@@ -215,6 +216,9 @@ public ref partial struct BufferReader
         return value1;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {

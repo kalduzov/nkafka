@@ -24,14 +24,8 @@ namespace NKafka.Exceptions;
 /// <summary>
 /// 
 /// </summary>
-public class ConnectorNotFoundException: Exception
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="message"></param>
-    public ConnectorNotFoundException(string message)
-        : base(message)
-    {
-    }
-}
+/// <remarks>
+/// 
+/// </remarks>
+/// <param name="message"></param>
+public class ConnectorNotFoundException(string message): Exception(message);

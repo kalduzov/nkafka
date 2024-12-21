@@ -27,7 +27,7 @@ namespace NKafka.Protocol.Records;
 /// Record type implementation
 /// https://kafka.apache.org/documentation/#record
 /// </summary>
-public class Record: IRecord
+internal class Record: IRecord
 {
     /// <summary>
     /// 

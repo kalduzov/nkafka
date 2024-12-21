@@ -199,7 +199,7 @@ public readonly struct Partition(int partition): IEquatable<Partition>, ICompara
     /// </returns>
     public override int GetHashCode()
     {
-        return Value;
+        return Value.GetHashCode();
     }
 
     /// <summary>

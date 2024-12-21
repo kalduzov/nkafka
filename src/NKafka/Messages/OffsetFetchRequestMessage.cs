@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetFetchRequestMessage
+internal sealed partial class OffsetFetchRequestMessage
 {
     /// <summary>
     /// 

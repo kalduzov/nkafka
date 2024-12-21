@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//65-69-27-BD-39-33-2E-9A-67-4B-2B-46-27-A2-69-D1-F7-C4-6D-A3-20-4E-7B-AF-C1-63-6D-33-38-6B-4A-F1
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMessageTests<OffsetForLeaderEpochRequestMessage>
+public sealed partial class OffsetForLeaderEpochRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMess
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -53,7 +54,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMess
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -62,7 +63,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMess
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -72,7 +73,7 @@ public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMess
             ReplicaId = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -82,6 +83,6 @@ public sealed partial class OffsetForLeaderEpochRequestMessageTests: RequestMess
             ReplicaId = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

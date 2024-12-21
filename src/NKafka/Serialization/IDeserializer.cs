@@ -24,26 +24,8 @@ namespace NKafka.Serialization;
 /// <summary>
 /// Defines a deserializer for use with <see cref="NKafka.Clients.Consumer.IConsumer{TKey,TValue}"/>
 /// </summary>
-public interface IAsyncDeserializer<T>
+public interface IDeserializer<out T>
 {
-    /// <summary>
-    /// Prefer async method for deserialization
-    /// </summary>
-    /// <remarks>
-    /// If this property is set then the client will call the <see cref="DeserializeAsync"/> method to serialize, otherwise <see cref="Deserialize"/>
-    /// </remarks>>
-    bool PreferAsync => false;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    Task<T> DeserializeAsync(ReadOnlySpan<byte> data)
-    {
-        return Task.FromResult(Deserialize(data));
-    }
-
     /// <summary>
     /// 
     /// </summary>

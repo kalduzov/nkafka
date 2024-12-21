@@ -28,39 +28,13 @@ public class ByteArraySerializerDeserializerTests
     [Theory]
     [InlineData("3ff0000000000000", "3ff0000000000000")]
     [InlineData("00", "00")]
-    public async Task SerializeAsync_Successful(string value, string serializeValueAsByteString)
-    {
-        var serializeValue = Convert.FromHexString(serializeValueAsByteString);
-        IAsyncSerializer<byte[]> serializer = new ByteArraySerializer();
-        var result = await serializer.SerializeAsync(Convert.FromHexString(value));
-
-        result.Should().BeEquivalentTo(serializeValue);
-    }
-
-    [Theory]
-    [InlineData("3ff0000000000000", "3ff0000000000000")]
-    [InlineData("00", "00")]
     public void Serialize_Successful(string value, string serializeValueAsByteString)
     {
         var serializeValue = Convert.FromHexString(serializeValueAsByteString);
-        IAsyncSerializer<byte[]> serializer = new ByteArraySerializer();
+        var serializer = new ByteArraySerializer();
         var result = serializer.Serialize(Convert.FromHexString(value));
 
-        serializer.PreferAsync.Should().BeFalse();
         result.Should().BeEquivalentTo(serializeValue);
-    }
-
-    [Theory]
-    [InlineData("3ff0000000000000", "3ff0000000000000")]
-    [InlineData("00", "00")]
-    public async Task DeserializeAsync_Successful(string value, string deserializeValueAsByteString)
-    {
-        var deserializeValue = Convert.FromHexString(deserializeValueAsByteString);
-        IAsyncDeserializer<byte[]> deserializer = new ByteArrayDeserializer();
-        var result = await deserializer.DeserializeAsync(Convert.FromHexString(value));
-
-        deserializer.PreferAsync.Should().BeFalse();
-        result.Should().BeEquivalentTo(deserializeValue);
     }
 
     [Theory]
@@ -69,10 +43,9 @@ public class ByteArraySerializerDeserializerTests
     public void Deserialize_Successful(string value, string deserializeValueAsByteString)
     {
         var deserializeValue = Convert.FromHexString(deserializeValueAsByteString);
-        IAsyncDeserializer<byte[]> deserializer = new ByteArrayDeserializer();
+        var deserializer = new ByteArrayDeserializer();
         var result = deserializer.Deserialize(Convert.FromHexString(value));
 
-        deserializer.PreferAsync.Should().BeFalse();
         result.Should().BeEquivalentTo(deserializeValue);
     }
 
@@ -81,10 +54,10 @@ public class ByteArraySerializerDeserializerTests
     [InlineData("00")]
     public void SerializeDeserialize_Successful(string value)
     {
-        IAsyncSerializer<byte[]> serializer = new ByteArraySerializer();
+        var serializer = new ByteArraySerializer();
         var serializeValue = serializer.Serialize(Convert.FromHexString(value));
 
-        IAsyncDeserializer<byte[]> deserializer = new ByteArrayDeserializer();
+        var deserializer = new ByteArrayDeserializer();
         var deserializeValue = deserializer.Deserialize(serializeValue);
 
         serializeValue.Should().BeEquivalentTo(deserializeValue);

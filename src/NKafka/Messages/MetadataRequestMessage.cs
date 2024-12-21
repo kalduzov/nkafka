@@ -21,7 +21,7 @@
 
 namespace NKafka.Messages;
 
-public sealed partial class MetadataRequestMessage
+internal sealed partial class MetadataRequestMessage
 {
     /// <summary>
     /// 

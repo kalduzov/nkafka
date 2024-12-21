@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//44-F6-E8-64-37-23-8E-E0-95-A3-4B-5A-1B-CA-96-14-A5-B0-52-EE-05-B4-8D-59-C1-06-C8-AD-53-C2-6E-DA
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessageTests<AddOffsetsToTxnResponseMessage>
+public sealed partial class AddOffsetsToTxnResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,7 +66,7 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -85,6 +86,6 @@ public sealed partial class AddOffsetsToTxnResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

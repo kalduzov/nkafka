@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeUserScramCredentialsResponseMessage
 /// </summary>
-public sealed partial class DescribeUserScramCredentialsResponseMessage: IResponseMessage, IEquatable<DescribeUserScramCredentialsResponseMessage>
+internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResponseMessage, IEquatable<DescribeUserScramCredentialsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -244,7 +244,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
     /// <summary>
     /// Describes the contract for message DescribeUserScramCredentialsResultMessage
     /// </summary>
-    public sealed partial class DescribeUserScramCredentialsResultMessage: IMessage, IEquatable<DescribeUserScramCredentialsResultMessage>
+    internal sealed partial class DescribeUserScramCredentialsResultMessage: IMessage, IEquatable<DescribeUserScramCredentialsResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -480,7 +480,7 @@ public sealed partial class DescribeUserScramCredentialsResponseMessage: IRespon
     /// <summary>
     /// Describes the contract for message CredentialInfoMessage
     /// </summary>
-    public sealed partial class CredentialInfoMessage: IMessage, IEquatable<CredentialInfoMessage>
+    internal sealed partial class CredentialInfoMessage: IMessage, IEquatable<CredentialInfoMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

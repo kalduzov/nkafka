@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,27 +24,27 @@
 namespace NKafka.Config;
 
 /// <summary>
-///     Acks enum values
+/// Acks enum values
 /// </summary>
 public enum Acks: short
 {
     /// <summary>
-    ///     no set
+    /// no set
     /// </summary>
     NoSet = -2,
 
     /// <summary>
-    ///     None
+    /// None
     /// </summary>
     None = 0,
 
     /// <summary>
-    ///     Leader
+    /// Leader
     /// </summary>
     Leader = 1,
 
     /// <summary>
-    ///     All
+    /// All
     /// </summary>
     All = -1
 }

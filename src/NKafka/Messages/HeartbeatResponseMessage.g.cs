@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message HeartbeatResponseMessage
 /// </summary>
-public sealed partial class HeartbeatResponseMessage: IResponseMessage, IEquatable<HeartbeatResponseMessage>
+internal sealed partial class HeartbeatResponseMessage: IResponseMessage, IEquatable<HeartbeatResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class ApiVersionsResponseMessage
+internal sealed partial class ApiVersionsResponseMessage
 {
     /// <inheritdoc/>
     public bool ShouldClientThrottle(ApiVersion version)

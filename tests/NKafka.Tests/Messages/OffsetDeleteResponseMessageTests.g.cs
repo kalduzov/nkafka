@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//7E-79-4A-AC-56-E5-A3-F6-CC-DF-54-FA-2E-36-0A-97-9B-EB-D0-27-66-3C-97-21-03-5B-19-B3-74-54-2A-E5
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class OffsetDeleteResponseMessageTests: ResponseMessageTests<OffsetDeleteResponseMessage>
+public sealed partial class OffsetDeleteResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetDeleteResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -46,6 +47,6 @@ public sealed partial class OffsetDeleteResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
 }

@@ -99,11 +99,6 @@ public record ProducerConfig: CommonConfig
     public int BufferMemory { get; set; } = 32 * 1024 * 1024;
 
     /// <summary>
-    /// Gives the producer access to the implementation of the metrics provider
-    /// </summary>
-    public IProducerMetrics Metrics { get; set; } = new NullProducerMetrics();
-
-    /// <summary>
     /// Gets or sets the unique identifier for a transaction.
     /// </summary>
     /// <value>

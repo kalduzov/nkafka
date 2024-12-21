@@ -61,7 +61,7 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
     Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; }
 
     /// <summary>
-    /// Отправляет запрос в брокер
+    /// Sends a request to the broker
     /// </summary>
     internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
@@ -71,7 +71,7 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
         where TRequestMessage : class, IRequestMessage;
 
     /// <summary>
-    /// Открывает соединение с брокером по указанному адресу и порту
+    /// Opens a connection to the broker at the specified address and port
     /// </summary>
     ValueTask OpenAsync(CancellationToken token);
 }

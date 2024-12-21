@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message JoinGroupResponseMessage
 /// </summary>
-public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinGroupResponseMessage>
+internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatable<JoinGroupResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -532,7 +532,7 @@ public sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquatab
     /// <summary>
     /// Describes the contract for message JoinGroupResponseMemberMessage
     /// </summary>
-    public sealed partial class JoinGroupResponseMemberMessage: IMessage, IEquatable<JoinGroupResponseMemberMessage>
+    internal sealed partial class JoinGroupResponseMemberMessage: IMessage, IEquatable<JoinGroupResponseMemberMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

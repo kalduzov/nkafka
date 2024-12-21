@@ -21,10 +21,10 @@
 
 namespace NKafka.Crc;
 
-internal class NativeCrc32C: ICrc32C
+internal sealed class NativeCrc32C: ICrc32C
 {
     private static readonly uint[] _lookupTable =
-    {
+    [
         0x00000000,
         0xf26b8303,
         0xe13b70f7,
@@ -281,7 +281,7 @@ internal class NativeCrc32C: ICrc32C
         0x4c4623a6,
         0x5f16d052,
         0xad7d5351
-    };
+    ];
 
     public uint Calculate(ReadOnlySpan<byte> span)
     {

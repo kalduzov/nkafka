@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetFetchResponseMessage
 /// </summary>
-public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquatable<OffsetFetchResponseMessage>
+internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquatable<OffsetFetchResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -335,7 +335,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message OffsetFetchResponseTopicMessage
     /// </summary>
-    public sealed partial class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
+    internal sealed partial class OffsetFetchResponseTopicMessage: IMessage, IEquatable<OffsetFetchResponseTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -569,7 +569,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message OffsetFetchResponsePartitionMessage
     /// </summary>
-    public sealed partial class OffsetFetchResponsePartitionMessage: IMessage, IEquatable<OffsetFetchResponsePartitionMessage>
+    internal sealed partial class OffsetFetchResponsePartitionMessage: IMessage, IEquatable<OffsetFetchResponsePartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -798,7 +798,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message OffsetFetchResponseGroupMessage
     /// </summary>
-    public sealed partial class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
+    internal sealed partial class OffsetFetchResponseGroupMessage: IMessage, IEquatable<OffsetFetchResponseGroupMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -992,7 +992,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message OffsetFetchResponseTopicsMessage
     /// </summary>
-    public sealed partial class OffsetFetchResponseTopicsMessage: IMessage, IEquatable<OffsetFetchResponseTopicsMessage>
+    internal sealed partial class OffsetFetchResponseTopicsMessage: IMessage, IEquatable<OffsetFetchResponseTopicsMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1167,7 +1167,7 @@ public sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message OffsetFetchResponsePartitionsMessage
     /// </summary>
-    public sealed partial class OffsetFetchResponsePartitionsMessage: IMessage, IEquatable<OffsetFetchResponsePartitionsMessage>
+    internal sealed partial class OffsetFetchResponsePartitionsMessage: IMessage, IEquatable<OffsetFetchResponsePartitionsMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

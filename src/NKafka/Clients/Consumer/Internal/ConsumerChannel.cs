@@ -100,7 +100,7 @@ internal sealed class ConsumerChannel<TKey, TValue>: Channel<ConsumerRecord<TKey
             return wasMessageWritten;
         }
 
-        public override ValueTask<bool> WaitToWriteAsync(CancellationToken token = default)
+        public override ValueTask<bool> WaitToWriteAsync(CancellationToken token)
         {
             return _innerChannelWriter.WaitToWriteAsync(token);
         }
@@ -128,7 +128,7 @@ internal sealed class ConsumerChannel<TKey, TValue>: Channel<ConsumerRecord<TKey
             return true;
         }
 
-        public override ValueTask<bool> WaitToReadAsync(CancellationToken token = default)
+        public override ValueTask<bool> WaitToReadAsync(CancellationToken token)
         {
             return _innerChannelReader.WaitToReadAsync(token);
         }

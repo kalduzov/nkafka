@@ -24,7 +24,7 @@ namespace NKafka.Crc;
 /// <summary>
 /// 
 /// </summary>
-public interface ICrc32C
+internal interface ICrc32C
 {
     /// <summary>
     /// Calculate crc32c

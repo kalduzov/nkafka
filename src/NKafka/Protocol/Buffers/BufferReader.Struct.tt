@@ -27,7 +27,7 @@ using System.Runtime.CompilerServices;
 namespace NKafka.Protocol.Buffers;
 using static System.Buffers.Binary.BinaryPrimitives;
 
-public ref partial struct BufferReader
+internal ref partial struct BufferReader
 {
 <#
     foreach (var type in new[]

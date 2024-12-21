@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message JoinGroupRequestMessage
 /// </summary>
-public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGroupRequestMessage>
+internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable<JoinGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.JoinGroup;
@@ -563,7 +563,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
     /// <summary>
     /// Describes the contract for message JoinGroupRequestProtocolMessage
     /// </summary>
-    public sealed partial class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
+    internal sealed partial class JoinGroupRequestProtocolMessage: IMessage, IEquatable<JoinGroupRequestProtocolMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -761,7 +761,7 @@ public sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatable
     /// <summary>
     /// Describes the contract for message JoinGroupRequestProtocolCollection
     /// </summary>
-    public sealed partial class JoinGroupRequestProtocolCollection: HashSet<JoinGroupRequestProtocolMessage>
+    internal sealed partial class JoinGroupRequestProtocolCollection: HashSet<JoinGroupRequestProtocolMessage>
     {
         /// <summary>
         /// Basic collection constructor

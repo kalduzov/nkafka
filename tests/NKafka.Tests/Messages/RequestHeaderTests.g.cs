@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//2F-9C-30-60-CB-D2-DF-13-B9-36-49-E6-F1-54-FB-6E-F1-0A-AF-32-0E-AE-ED-59-3B-FC-25-38-EE-84-1D-E1
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class RequestHeaderTests: RequestMessageTests<RequestHeader>
+public sealed partial class RequestHeaderTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -46,7 +47,7 @@ public sealed partial class RequestHeaderTests: RequestMessageTests<RequestHeade
             RequestApiVersion = -4242,
             CorrelationId = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -58,7 +59,7 @@ public sealed partial class RequestHeaderTests: RequestMessageTests<RequestHeade
             CorrelationId = -420004200,
             ClientId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -70,6 +71,6 @@ public sealed partial class RequestHeaderTests: RequestMessageTests<RequestHeade
             CorrelationId = -420004200,
             ClientId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
 }

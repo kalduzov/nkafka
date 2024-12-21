@@ -30,6 +30,7 @@ using NKafka.Config;
 using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
+using NKafka.Metrics;
 using NKafka.Protocol;
 using NKafka.Serialization;
 
@@ -64,6 +65,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     private readonly ILogger _logger;
     private Subscription? _currentSubscription;
     private readonly SemaphoreSlim _subscribeSyncBlock;
+    private readonly IConsumerMetrics _metrics;
 
     public string GroupId { get; }
 
@@ -74,21 +76,22 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
 
     internal Consumer(IKafkaCluster kafkaCluster,
         ConsumerConfig config,
-        IAsyncDeserializer<TKey> keyDeserializer,
-        IAsyncDeserializer<TValue> valuedDeserializer,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valuedDeserializer,
         ILoggerFactory loggerFactory)
         :
-        this(kafkaCluster, config, keyDeserializer, valuedDeserializer, null, null, loggerFactory)
+        this(kafkaCluster, config, keyDeserializer, valuedDeserializer, null, null, null, loggerFactory)
     {
     }
 
     internal Consumer(
         IKafkaCluster kafkaCluster,
         ConsumerConfig config,
-        IAsyncDeserializer<TKey> keyDeserializer,
-        IAsyncDeserializer<TValue> valueDeserializer,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer,
         IFetcher<TKey, TValue>? fetcher,
         ICoordinator? coordinator,
+        IConsumerMetrics? metrics,
         ILoggerFactory loggerFactory)
         : base(kafkaCluster, config, loggerFactory)
     {
@@ -97,6 +100,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         GroupId = config.GroupId;
         config.EventListeners.ToImmutableList();
         _logger = LoggerFactory.CreateLogger(GetType());
+        _metrics = metrics ?? new DefaultConsumerMetrics();
 
         _coordinator = coordinator
                        ?? new Coordinator(kafkaCluster,
@@ -109,7 +113,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
                            config.SessionTimeoutMs,
                            config.MaxRetries,
                            config.RetryBackoffMs,
-                           config.Metrics,
+                           _metrics,
                            LoggerFactory);
 
         _fetcher = fetcher
@@ -126,7 +130,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     }
 
     /// <inheritdoc/>
-    public ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(string topicName, CancellationToken token = default)
+    public ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(string topicName, CancellationToken token)
     {
         return SubscribeAsync(new[]
             {
@@ -137,7 +141,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
 
     /// <inheritdoc />
     public async ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         using var activity = KafkaDiagnosticsSource.SubscribeTopics(topics);
 
@@ -184,7 +188,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         }
     }
 
-    private static IAsyncDeserializer<T> InitializeDeserializer<T>(IAsyncDeserializer<T> deserializer)
+    private static IDeserializer<T> InitializeDeserializer<T>(IDeserializer<T> deserializer)
     {
         if (deserializer != NoneDeserializer<T>.Instance)
         {
@@ -193,7 +197,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
 
         if (_defaultDeserializers.TryGetValue(typeof(T), out var ser))
         {
-            return (IAsyncDeserializer<T>)ser;
+            return (IDeserializer<T>)ser;
         }
 
         var errorMessage = string.Format(EM.Producer_SerializerError, typeof(T).Name);
@@ -210,7 +214,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         await _coordinator.StopSessionAsync(token);
     }
 
-    public async Task CommitOffsetAsync(CancellationToken token = default)
+    public async Task CommitOffsetAsync(CancellationToken token)
     {
         if (_currentSubscription is null)
         {

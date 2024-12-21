@@ -33,12 +33,17 @@ namespace NKafka.Clients.Producer.Internals;
 /// <summary>
 /// Implementation of a manager interface for sending messages in a kafka cluster
 /// </summary>
-internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAccumulator, IKafkaCluster kafkaCluster, ILoggerFactory loggerFactory)
+internal class MessagesSender(
+    ProducerConfig config,
+    IRecordAccumulator recordAccumulator,
+    IKafkaCluster kafkaCluster,
+    IProducerMetrics metrics,
+    ILoggerFactory loggerFactory)
     : IMessagesSender
 {
     private readonly ILogger<MessagesSender> _logger = loggerFactory.CreateLogger<MessagesSender>();
     private CancellationTokenSource _tokenSource = new();
-    private readonly IProducerMetrics _metrics = config.Metrics;
+    private readonly IProducerMetrics _metrics = metrics;
     private readonly ManualResetEventSlim _resetEvent = new(true);
 
     /// <inheritdoc/>
@@ -69,13 +74,12 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
 
     private async void RunAsync(object? messageSender)
     {
-        var oldThreadName = Thread.CurrentThread.Name;
-        Thread.CurrentThread.Name = "Kafka producer I/O thread";
-
-        _logger.StartMessageSenderTrace();
-
         try
         {
+            Thread.CurrentThread.Name = "Kafka producer I/O thread";
+
+            _logger.StartMessageSenderTrace();
+
             if (messageSender is not MessagesSender sender)
             {
                 throw new ArgumentException(ExceptionMessages.MessagesSenderInvalidType, nameof(messageSender));
@@ -97,10 +101,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
         {
             _logger.LogError(exc, "");
         }
-        finally
-        {
-            Thread.CurrentThread.Name = oldThreadName;
-        }
+
     }
 
     private async Task RunOnceAsync(CancellationToken token)
@@ -175,7 +176,7 @@ internal class MessagesSender(ProducerConfig config, IRecordAccumulator recordAc
             topicPartition.Topic
         };
 
-        await kafkaCluster.RefreshMetadataAsync(topics, token);
+        await kafkaCluster.RefreshMetadata(topics, token);
 
         node = kafkaCluster.LeaderFor(topicPartition);
 

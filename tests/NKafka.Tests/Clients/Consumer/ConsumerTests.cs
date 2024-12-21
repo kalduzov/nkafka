@@ -23,6 +23,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Clients.Consumer;
 using NKafka.Config;
+using NKafka.Metrics;
 using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Consumer;
@@ -49,6 +50,7 @@ public partial class ConsumerTests: IDisposable
                 valueDeserializer: NoneDeserializer<Null>.Instance,
                 fetcher: null,
                 coordinator: null,
+                metrics: new NullConsumerMetrics(),
                 loggerFactory: NullLoggerFactory.Instance);
         }
     }
@@ -73,6 +75,7 @@ public partial class ConsumerTests: IDisposable
                 stringDeserializer,
                 null!,
                 null!,
+                metrics: new NullConsumerMetrics(),
                 NullLoggerFactory.Instance);
         }
     }
@@ -84,8 +87,8 @@ public partial class ConsumerTests: IDisposable
         var consumer = Substitute.For<IConsumer<int, string>>();
 
         mockCluster.BuildConsumer(Arg.Any<ConsumerConfig>(),
-                Arg.Any<IAsyncDeserializer<int>>(),
-                Arg.Any<IAsyncDeserializer<string>>())
+                Arg.Any<IDeserializer<int>>(),
+                Arg.Any<IDeserializer<string>>())
             .Returns(consumer);
 
         var brokers = BuildBrokersMock();

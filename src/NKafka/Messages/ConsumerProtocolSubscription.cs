@@ -24,7 +24,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// 
 /// </summary>
-public sealed partial class ConsumerProtocolSubscription
+internal sealed partial class ConsumerProtocolSubscription
 {
     /// <summary>
     /// 

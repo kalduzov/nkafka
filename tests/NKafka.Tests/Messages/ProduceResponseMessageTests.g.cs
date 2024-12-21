@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//64-DF-D3-82-2D-9F-75-73-C7-D4-70-A0-D1-61-03-60-30-F6-D4-8F-64-07-76-80-99-9A-F0-45-30-7C-E6-C7
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<ProduceResponseMessage>
+public sealed partial class ProduceResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
         {
             Responses = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -54,7 +55,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -64,7 +65,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -74,7 +75,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -84,7 +85,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -94,7 +95,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -104,7 +105,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -114,7 +115,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
@@ -124,7 +125,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
@@ -134,7 +135,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             Responses = new (),
             ThrottleTimeMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version10")]
     public void SerializeAndDeserializeMessage_ApiVersion10_Success()
@@ -145,7 +146,7 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             ThrottleTimeMs = -420004200,
             NodeEndpoints = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version11")]
     public void SerializeAndDeserializeMessage_ApiVersion11_Success()
@@ -156,6 +157,6 @@ public sealed partial class ProduceResponseMessageTests: ResponseMessageTests<Pr
             ThrottleTimeMs = -420004200,
             NodeEndpoints = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
     }
 }

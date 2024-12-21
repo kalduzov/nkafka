@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//D9-E7-FB-EA-A1-B1-63-E0-80-D7-A0-A4-6D-0A-67-6D-14-15-08-98-E7-D1-E8-CD-4C-A0-B1-FA-37-32-2D-E0
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessageTests<TxnOffsetCommitResponseMessage>
+public sealed partial class TxnOffsetCommitResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,7 +66,7 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'TxnOffsetCommitResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -85,6 +86,6 @@ public sealed partial class TxnOffsetCommitResponseMessageTests: ResponseMessage
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

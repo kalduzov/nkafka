@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NKafka.Clients.Consumer;
 using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
+using NKafka.Metrics;
 using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Consumer;
@@ -34,7 +35,7 @@ public partial class ConsumerTests
     public async Task Subscribe_Success()
     {
         await using var consumer = BuildConsumer<int, string>();
-        var channel = await consumer.SubscribeAsync("test");
+        var channel = await consumer.SubscribeAsync("test", CancellationToken.None);
 
         channel.Should().NotBeNull();
     }
@@ -55,6 +56,7 @@ public partial class ConsumerTests
             NoneDeserializer<TValue>.Instance,
             fetcher,
             coordinator,
+            metrics: new NullConsumerMetrics(),
             NullLoggerFactory.Instance);
 
         return consumer;

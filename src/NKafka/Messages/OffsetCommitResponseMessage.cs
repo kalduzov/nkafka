@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class OffsetCommitResponseMessage
+internal sealed partial class OffsetCommitResponseMessage
 {
     /// <inheritdoc/>
     public bool ShouldClientThrottle(ApiVersion version)

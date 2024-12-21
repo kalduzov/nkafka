@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class HeartbeatResponseMessage
+internal sealed partial class HeartbeatResponseMessage
 {
     /// <inheritdoc/>
     public bool ShouldClientThrottle(ApiVersion version)

@@ -446,7 +446,7 @@ public class MessageGenerator: ClassGenerator, IMessageGenerator
         CodeGenerator.AppendLine("/// <summary>");
         CodeGenerator.AppendLine($"/// Describes the contract for message {collectionName}");
         CodeGenerator.AppendLine("/// </summary>");
-        CodeGenerator.AppendLine($"public sealed partial class {collectionName}: HashSet<{className}>");
+        CodeGenerator.AppendLine($"internal sealed partial class {collectionName}: HashSet<{className}>");
         CodeGenerator.AppendLeftBrace();
 
         CodeGenerator.IncrementIndent();
@@ -633,7 +633,7 @@ public class MessageGenerator: ClassGenerator, IMessageGenerator
         CodeGenerator.AppendLine("/// <summary>");
         CodeGenerator.AppendLine($"/// Describes the contract for message {className}");
         CodeGenerator.AppendLine("/// </summary>");
-        CodeGenerator.AppendLine($"public sealed partial class {className}: {string.Join(", ", implementedInterfaces)}");
+        CodeGenerator.AppendLine($"internal sealed partial class {className}: {string.Join(", ", implementedInterfaces)}");
         CodeGenerator.AppendLeftBrace();
     }
 }

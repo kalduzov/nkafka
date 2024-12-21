@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message InitProducerIdRequestMessage
 /// </summary>
-public sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEquatable<InitProducerIdRequestMessage>
+internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEquatable<InitProducerIdRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.InitProducerId;

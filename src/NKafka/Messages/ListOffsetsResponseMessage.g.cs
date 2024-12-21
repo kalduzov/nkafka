@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ListOffsetsResponseMessage
 /// </summary>
-public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquatable<ListOffsetsResponseMessage>
+internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquatable<ListOffsetsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -238,7 +238,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message ListOffsetsTopicResponseMessage
     /// </summary>
-    public sealed partial class ListOffsetsTopicResponseMessage: IMessage, IEquatable<ListOffsetsTopicResponseMessage>
+    internal sealed partial class ListOffsetsTopicResponseMessage: IMessage, IEquatable<ListOffsetsTopicResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -472,7 +472,7 @@ public sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message ListOffsetsPartitionResponseMessage
     /// </summary>
-    public sealed partial class ListOffsetsPartitionResponseMessage: IMessage, IEquatable<ListOffsetsPartitionResponseMessage>
+    internal sealed partial class ListOffsetsPartitionResponseMessage: IMessage, IEquatable<ListOffsetsPartitionResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

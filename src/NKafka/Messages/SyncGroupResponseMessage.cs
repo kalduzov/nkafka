@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class SyncGroupResponseMessage
+internal sealed partial class SyncGroupResponseMessage
 {
     /// <inheritdoc/>
     public bool ShouldClientThrottle(ApiVersion version)

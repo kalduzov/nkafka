@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeAclsResponseMessage
 /// </summary>
-public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEquatable<DescribeAclsResponseMessage>
+internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEquatable<DescribeAclsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -310,7 +310,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message DescribeAclsResourceMessage
     /// </summary>
-    public sealed partial class DescribeAclsResourceMessage: IMessage, IEquatable<DescribeAclsResourceMessage>
+    internal sealed partial class DescribeAclsResourceMessage: IMessage, IEquatable<DescribeAclsResourceMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -585,7 +585,7 @@ public sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message AclDescriptionMessage
     /// </summary>
-    public sealed partial class AclDescriptionMessage: IMessage, IEquatable<AclDescriptionMessage>
+    internal sealed partial class AclDescriptionMessage: IMessage, IEquatable<AclDescriptionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

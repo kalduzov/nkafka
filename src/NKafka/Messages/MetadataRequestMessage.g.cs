@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message MetadataRequestMessage
 /// </summary>
-public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<MetadataRequestMessage>
+internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<MetadataRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Metadata;
@@ -341,7 +341,7 @@ public sealed partial class MetadataRequestMessage: IRequestMessage, IEquatable<
     /// <summary>
     /// Describes the contract for message MetadataRequestTopicMessage
     /// </summary>
-    public sealed partial class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
+    internal sealed partial class MetadataRequestTopicMessage: IMessage, IEquatable<MetadataRequestTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

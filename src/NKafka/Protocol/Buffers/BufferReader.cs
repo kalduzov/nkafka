@@ -29,7 +29,7 @@ namespace NKafka.Protocol.Buffers;
 /// <summary>
 /// 
 /// </summary>
-public ref partial struct BufferReader
+internal ref partial struct BufferReader
 {
     private ReadOnlySequence<byte> _bufferSource;
     private readonly long _totalLength;

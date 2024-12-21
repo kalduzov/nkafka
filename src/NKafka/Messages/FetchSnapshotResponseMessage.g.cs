@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message FetchSnapshotResponseMessage
 /// </summary>
-public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<FetchSnapshotResponseMessage>
+internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEquatable<FetchSnapshotResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -198,7 +198,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message TopicSnapshotMessage
     /// </summary>
-    public sealed partial class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
+    internal sealed partial class TopicSnapshotMessage: IMessage, IEquatable<TopicSnapshotMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -373,7 +373,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message PartitionSnapshotMessage
     /// </summary>
-    public sealed partial class PartitionSnapshotMessage: IMessage, IEquatable<PartitionSnapshotMessage>
+    internal sealed partial class PartitionSnapshotMessage: IMessage, IEquatable<PartitionSnapshotMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -603,7 +603,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message SnapshotIdMessage
     /// </summary>
-    public sealed partial class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
+    internal sealed partial class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -719,7 +719,7 @@ public sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message LeaderIdAndEpochMessage
     /// </summary>
-    public sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
+    internal sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

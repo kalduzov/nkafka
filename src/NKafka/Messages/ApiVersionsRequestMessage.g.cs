@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ApiVersionsRequestMessage
 /// </summary>
-public sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVersionsRequestMessage>
+internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquatable<ApiVersionsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ApiVersions;

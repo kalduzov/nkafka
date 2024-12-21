@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message MetadataResponseMessage
 /// </summary>
-public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatable<MetadataResponseMessage>
+internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquatable<MetadataResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -438,7 +438,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MetadataResponseBrokerMessage
     /// </summary>
-    public sealed partial class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
+    internal sealed partial class MetadataResponseBrokerMessage: IMessage, IEquatable<MetadataResponseBrokerMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -697,7 +697,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MetadataResponseBrokerCollection
     /// </summary>
-    public sealed partial class MetadataResponseBrokerCollection: HashSet<MetadataResponseBrokerMessage>
+    internal sealed partial class MetadataResponseBrokerCollection: HashSet<MetadataResponseBrokerMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -723,7 +723,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MetadataResponseTopicMessage
     /// </summary>
-    public sealed partial class MetadataResponseTopicMessage: IMessage, IEquatable<MetadataResponseTopicMessage>
+    internal sealed partial class MetadataResponseTopicMessage: IMessage, IEquatable<MetadataResponseTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1063,7 +1063,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MetadataResponsePartitionMessage
     /// </summary>
-    public sealed partial class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
+    internal sealed partial class MetadataResponsePartitionMessage: IMessage, IEquatable<MetadataResponsePartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1405,7 +1405,7 @@ public sealed partial class MetadataResponseMessage: IResponseMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MetadataResponseTopicCollection
     /// </summary>
-    public sealed partial class MetadataResponseTopicCollection: HashSet<MetadataResponseTopicMessage>
+    internal sealed partial class MetadataResponseTopicCollection: HashSet<MetadataResponseTopicMessage>
     {
         /// <summary>
         /// Basic collection constructor

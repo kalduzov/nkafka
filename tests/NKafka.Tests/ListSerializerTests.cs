@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ namespace NKafka.Tests;
 public class ListSerializerTests
 {
     [Fact]
-    public async Task IntListSerializer_Successful()
+    public void IntListSerializer_Successful()
     {
         var ser = new ListSerializer<int>(new IntSerializer());
         var data = new List<int>
@@ -39,7 +39,7 @@ public class ListSerializerTests
             4,
             5
         };
-        var result = await ser.SerializeAsync(data);
+        var result = ser.Serialize(data);
 
         //serialization strategy flat len + null indexes len + data element len + elements  
         var size = 0x4 + 0x4 + 0x4 + sizeof(int) * data.Count;
@@ -48,7 +48,7 @@ public class ListSerializerTests
     }
 
     [Fact]
-    public async Task StringListSerializer_WithNulls_Successful()
+    public void StringListSerializer_WithNulls_Successful()
     {
         var ser = new ListSerializer<string>(new StringSerializer());
         var data = new List<string>
@@ -59,7 +59,7 @@ public class ListSerializerTests
             null!,
             "test5"
         };
-        var result = await ser.SerializeAsync(data);
+        var result = ser.Serialize(data);
 
         result.Length.Should().Be(43);
     }

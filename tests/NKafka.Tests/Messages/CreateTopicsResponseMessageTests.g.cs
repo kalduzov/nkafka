@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//F4-10-74-75-99-60-7F-C6-16-14-72-E0-74-96-88-D7-EB-64-69-AD-6C-59-C4-73-30-B7-93-CD-FB-0F-B4-A7
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTests<CreateTopicsResponseMessage>
+public sealed partial class CreateTopicsResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -53,7 +54,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -63,7 +64,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -73,7 +74,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -83,7 +84,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -93,7 +94,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -103,7 +104,7 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateTopicsResponseMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -113,6 +114,6 @@ public sealed partial class CreateTopicsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
 }

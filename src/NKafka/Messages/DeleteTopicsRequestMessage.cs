@@ -23,7 +23,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class DeleteTopicsRequestMessage
+internal sealed partial class DeleteTopicsRequestMessage
 {
     internal static DeleteTopicsRequestMessage Build(ApiVersion apiVersion, IReadOnlyCollection<string> topicsName, int timeoutMs)
     {

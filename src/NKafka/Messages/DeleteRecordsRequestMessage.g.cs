@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteRecordsRequestMessage
 /// </summary>
-public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<DeleteRecordsRequestMessage>
+internal sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquatable<DeleteRecordsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteRecords;
@@ -239,7 +239,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
     /// <summary>
     /// Describes the contract for message DeleteRecordsTopicMessage
     /// </summary>
-    public sealed partial class DeleteRecordsTopicMessage: IMessage, IEquatable<DeleteRecordsTopicMessage>
+    internal sealed partial class DeleteRecordsTopicMessage: IMessage, IEquatable<DeleteRecordsTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -473,7 +473,7 @@ public sealed partial class DeleteRecordsRequestMessage: IRequestMessage, IEquat
     /// <summary>
     /// Describes the contract for message DeleteRecordsPartitionMessage
     /// </summary>
-    public sealed partial class DeleteRecordsPartitionMessage: IMessage, IEquatable<DeleteRecordsPartitionMessage>
+    internal sealed partial class DeleteRecordsPartitionMessage: IMessage, IEquatable<DeleteRecordsPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

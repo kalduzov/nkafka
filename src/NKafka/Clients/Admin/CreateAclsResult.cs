@@ -24,6 +24,4 @@ namespace NKafka.Clients.Admin;
 /// <summary>
 /// 
 /// </summary>
-public record CreateAclsResult
-{
-}
+public record CreateAclsResult;

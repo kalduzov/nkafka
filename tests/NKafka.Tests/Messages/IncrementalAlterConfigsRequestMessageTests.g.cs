@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//2F-53-3D-AA-4A-1E-B0-BE-53-B5-06-01-4B-19-55-DE-E8-BF-C9-BE-3B-EB-70-C2-08-1B-C3-01-BC-98-33-A4
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class IncrementalAlterConfigsRequestMessageTests: RequestMessageTests<IncrementalAlterConfigsRequestMessage>
+public sealed partial class IncrementalAlterConfigsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class IncrementalAlterConfigsRequestMessageTests: RequestM
             Resources = new (),
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,6 +56,6 @@ public sealed partial class IncrementalAlterConfigsRequestMessageTests: RequestM
             Resources = new (),
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

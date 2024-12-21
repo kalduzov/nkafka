@@ -68,8 +68,8 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     private readonly int _totalMemorySize;
     private readonly ITransactionManager _transactionManager;
     private bool _closed;
-    private readonly IAsyncSerializer<TKey> _keySerializer;
-    private readonly IAsyncSerializer<TValue> _valueSerializer;
+    private readonly ISerializer<TKey> _keySerializer;
+    private readonly ISerializer<TValue> _valueSerializer;
     private readonly Task _senderTask;
     private readonly IMessagesSender _messagesSender;
     private readonly int _deliveryTimeoutMs;
@@ -81,10 +81,10 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         IKafkaCluster kafkaCluster,
         string name,
         ProducerConfig config,
-        IAsyncSerializer<TKey> keySerializer,
-        IAsyncSerializer<TValue> valueSerializer,
+        ISerializer<TKey> keySerializer,
+        ISerializer<TValue> valueSerializer,
         ILoggerFactory loggerFactory)
-        : this(kafkaCluster, name, config, keySerializer, valueSerializer, null, null, null, loggerFactory)
+        : this(kafkaCluster, name, config, keySerializer, valueSerializer, null, null, null, null, loggerFactory)
     {
     }
 
@@ -95,11 +95,12 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         IKafkaCluster kafkaCluster,
         string name,
         ProducerConfig config,
-        IAsyncSerializer<TKey> keySerializer,
-        IAsyncSerializer<TValue> valueSerializer,
+        ISerializer<TKey> keySerializer,
+        ISerializer<TValue> valueSerializer,
         ITransactionManager? transactionManager,
         IRecordAccumulator? recordAccumulator,
         IMessagesSender? messagesSender,
+        IProducerMetrics? producerMetrics,
         ILoggerFactory loggerFactory)
         : base(kafkaCluster, config, loggerFactory)
     {
@@ -108,7 +109,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
         _logger.StartProducerTrace(_name);
 
-        _producerMetrics = config.Metrics;
+        _producerMetrics = producerMetrics ?? new DefaultProducerMetrics();
         _maxRequestSize = config.MaxRequestSize;
         _totalMemorySize = config.BufferMemory;
         _senderTask = Task.CompletedTask; //initialize in order not to make it nullable
@@ -120,8 +121,9 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             _valueSerializer = InitializeSerializer(valueSerializer);
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
             _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
-            _accumulator = recordAccumulator ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, loggerFactory);
-            _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, loggerFactory);
+            _accumulator = recordAccumulator
+                           ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, _producerMetrics, loggerFactory);
+            _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, _producerMetrics, loggerFactory);
             _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
             _logger.StartedProducer(_name);
         }
@@ -163,7 +165,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     }
 
     /// <inheritdoc/>
-    public async Task FlushAsync(CancellationToken token)
+    public async Task Flush(CancellationToken token)
     {
         _logger.FlushingRecordsTrace();
 
@@ -181,22 +183,16 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
     }
 
     /// <inheritdoc/>
-    public Task<DeliveryResult<TKey, TValue>> ProduceAsync(
+    public Task<DeliveryResult<TKey, TValue>> Produce(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return InternalProduceAsync(topicPartition, message, false, token);
     }
 
     /// <inheritdoc/>
-    public void Close(TimeSpan timeout)
-    {
-        _closed = true;
-    }
-
-    /// <inheritdoc/>
-    public ValueTask CloseAsync(CancellationToken token)
+    public ValueTask Close(CancellationToken token)
     {
         _closed = true;
 
@@ -266,7 +262,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
     }
 
-    private static IAsyncSerializer<T> InitializeSerializer<T>(IAsyncSerializer<T> serializer)
+    private static ISerializer<T> InitializeSerializer<T>(ISerializer<T> serializer)
     {
         if (serializer != NoneSerializer<T>.Instance)
         {
@@ -275,7 +271,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
 
         if (_defaultSerializers.TryGetValue(typeof(T), out var ser))
         {
-            return (IAsyncSerializer<T>)ser;
+            return (ISerializer<T>)ser;
         }
 
         var errorMessage = string.Format(EM.Producer_SerializerError, typeof(T).Name);
@@ -296,7 +292,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
         bool isFireAndForget,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         ThrowIfProducerClosed();
 
@@ -309,11 +305,11 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            _ = await KafkaCluster.GetPartitionsAsync(newTopicPartition.Topic, token);
+            _ = await KafkaCluster.GetPartitions(newTopicPartition.Topic, token);
 
             var headers = message.Headers;
-            var serializedKey = await SerializeAsync(_keySerializer, message.Key);
-            var serializedValue = await SerializeAsync(_valueSerializer, message.Value);
+            var serializedKey = Serialize(_keySerializer, message.Key);
+            var serializedValue = Serialize(_valueSerializer, message.Value);
 
             var serializedSize = RecordsBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
@@ -321,7 +317,7 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
             // Trying to get a partition if it is not set  
             if (topicPartition.Partition.IsSpecial)
             {
-                var computedPartition = await _partitioner.PartitionAsync(
+                var computedPartition = await _partitioner.Partition(
                     topicPartition.Topic,
                     typeof(TKey),
                     serializedKey,
@@ -405,13 +401,11 @@ internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<
         }
     }
 
-    private static Task<byte[]> SerializeAsync<T>(IAsyncSerializer<T> serializer, T value)
+    private static byte[] Serialize<T>(ISerializer<T> serializer, T value)
     {
         try
         {
-            return serializer.PreferAsync
-                ? serializer.SerializeAsync(value)
-                : Task.FromResult(serializer.Serialize(value));
+            return serializer.Serialize(value);
         }
         catch (Exception exc)
         {

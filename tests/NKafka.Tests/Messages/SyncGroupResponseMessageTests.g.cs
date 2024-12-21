@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//DB-D8-DF-2E-69-9F-27-53-B6-60-58-56-FC-F2-00-A4-96-6D-49-75-6F-BD-9B-0F-2F-E6-1B-32-9E-05-C6-30
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<SyncGroupResponseMessage>
+public sealed partial class SyncGroupResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ErrorCode = -4242,
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -56,7 +57,7 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ErrorCode = -4242,
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -67,7 +68,7 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ErrorCode = -4242,
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -78,7 +79,7 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ErrorCode = -4242,
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -89,7 +90,7 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ErrorCode = -4242,
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SyncGroupResponseMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -102,6 +103,6 @@ public sealed partial class SyncGroupResponseMessageTests: ResponseMessageTests<
             ProtocolName = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Assignment = new byte[] {0, 1, 2, 3, 4, 5, 244},
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

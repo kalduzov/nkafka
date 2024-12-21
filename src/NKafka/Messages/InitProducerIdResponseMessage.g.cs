@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message InitProducerIdResponseMessage
 /// </summary>
-public sealed partial class InitProducerIdResponseMessage: IResponseMessage, IEquatable<InitProducerIdResponseMessage>
+internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, IEquatable<InitProducerIdResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

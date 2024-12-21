@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ProduceResponseMessage
 /// </summary>
-public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable<ProduceResponseMessage>
+internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable<ProduceResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -312,7 +312,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message TopicProduceResponseMessage
     /// </summary>
-    public sealed partial class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
+    internal sealed partial class TopicProduceResponseMessage: IMessage, IEquatable<TopicProduceResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -546,7 +546,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message PartitionProduceResponseMessage
     /// </summary>
-    public sealed partial class PartitionProduceResponseMessage: IMessage, IEquatable<PartitionProduceResponseMessage>
+    internal sealed partial class PartitionProduceResponseMessage: IMessage, IEquatable<PartitionProduceResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -948,7 +948,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message BatchIndexAndErrorMessageMessage
     /// </summary>
-    public sealed partial class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
+    internal sealed partial class BatchIndexAndErrorMessageMessage: IMessage, IEquatable<BatchIndexAndErrorMessageMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1136,7 +1136,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message LeaderIdAndEpochMessage
     /// </summary>
-    public sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
+    internal sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1256,7 +1256,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message TopicProduceResponseCollection
     /// </summary>
-    public sealed partial class TopicProduceResponseCollection: HashSet<TopicProduceResponseMessage>
+    internal sealed partial class TopicProduceResponseCollection: HashSet<TopicProduceResponseMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -1282,7 +1282,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message NodeEndpointMessage
     /// </summary>
-    public sealed partial class NodeEndpointMessage: IMessage, IEquatable<NodeEndpointMessage>
+    internal sealed partial class NodeEndpointMessage: IMessage, IEquatable<NodeEndpointMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1489,7 +1489,7 @@ public sealed partial class ProduceResponseMessage: IResponseMessage, IEquatable
     /// <summary>
     /// Describes the contract for message NodeEndpointCollection
     /// </summary>
-    public sealed partial class NodeEndpointCollection: HashSet<NodeEndpointMessage>
+    internal sealed partial class NodeEndpointCollection: HashSet<NodeEndpointMessage>
     {
         /// <summary>
         /// Basic collection constructor

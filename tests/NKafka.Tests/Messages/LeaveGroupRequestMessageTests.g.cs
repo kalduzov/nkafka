@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//1C-99-4C-1B-9E-CB-6D-8B-DC-7A-8B-64-0F-9B-1C-D1-2A-49-AD-0A-F0-B9-25-FF-08-19-C7-38-AC-66-94-5F
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<LeaveGroupRequestMessage>
+public sealed partial class LeaveGroupRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,7 +66,7 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -85,7 +86,7 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -95,6 +96,6 @@ public sealed partial class LeaveGroupRequestMessageTests: RequestMessageTests<L
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

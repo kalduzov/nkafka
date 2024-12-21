@@ -39,7 +39,7 @@ public interface IConsumer<TKey, TValue>: IConsumer
     /// Subscribes to read a topic and returns the channel to which messages will arrive
     /// </summary>
     /// <remarks>Calling the method again will return the same channel</remarks>
-    ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(string topicName, CancellationToken token = default);
+    ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(string topicName, CancellationToken token);
 
     /// <summary>
     /// Subscribes to read a group of topics and returns a channel to which messages from all subscribed topics will arrive
@@ -47,16 +47,16 @@ public interface IConsumer<TKey, TValue>: IConsumer
     /// <param name="topics"></param>
     /// <param name="token"></param>
     /// <remarks>Calling the method again will return the same channel</remarks>
-    ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics, CancellationToken token = default);
+    ValueTask<ChannelReader<ConsumerRecord<TKey, TValue>>> SubscribeAsync(IReadOnlyCollection<string> topics, CancellationToken token);
 
     /// <summary>
     /// Unsubscribes from reading all topics to which there were subscriptions
     /// </summary>
-    ValueTask UnsubscribeAsync(CancellationToken token = default);
+    ValueTask UnsubscribeAsync(CancellationToken token);
 
     /// <summary>
     /// Commit offsets for all subscriptions to topics and partitions to the last read from the channel
     /// </summary>
     /// <param name="token">Cancellation token to complete the operation</param>
-    Task CommitOffsetAsync(CancellationToken token = default);
+    Task CommitOffsetAsync(CancellationToken token);
 }

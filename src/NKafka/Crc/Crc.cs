@@ -27,7 +27,7 @@ namespace NKafka.Crc;
 /// <summary>
 /// 
 /// </summary>
-public static class Crc
+internal static class Crc
 {
     private static readonly ICrc32C _crc32C;
 

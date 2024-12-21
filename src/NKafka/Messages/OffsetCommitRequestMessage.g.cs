@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetCommitRequestMessage
 /// </summary>
-public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquatable<OffsetCommitRequestMessage>
+internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquatable<OffsetCommitRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.OffsetCommit;
@@ -471,7 +471,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message OffsetCommitRequestTopicMessage
     /// </summary>
-    public sealed partial class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
+    internal sealed partial class OffsetCommitRequestTopicMessage: IMessage, IEquatable<OffsetCommitRequestTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -705,7 +705,7 @@ public sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message OffsetCommitRequestPartitionMessage
     /// </summary>
-    public sealed partial class OffsetCommitRequestPartitionMessage: IMessage, IEquatable<OffsetCommitRequestPartitionMessage>
+    internal sealed partial class OffsetCommitRequestPartitionMessage: IMessage, IEquatable<OffsetCommitRequestPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

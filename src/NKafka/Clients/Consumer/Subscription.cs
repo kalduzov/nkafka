@@ -141,7 +141,7 @@ public class Subscription
         return _assignedTopicPartitions.Contains(topicPartitions);
     }
 
-    private class SubscriptionSerializer(ApiVersion apiVersion): IAsyncSerializer<Subscription>
+    private class SubscriptionSerializer(ApiVersion apiVersion): ISerializer<Subscription>
     {
         public bool PreferAsync => false;
 
@@ -170,7 +170,7 @@ public class Subscription
         }
     }
 
-    private class SubscriptionDeserializer: IAsyncDeserializer<Subscription>
+    private class SubscriptionDeserializer: IDeserializer<Subscription>
     {
         /// <inheritdoc />
         public Task<Subscription> DeserializeAsync(ReadOnlySpan<byte> data)

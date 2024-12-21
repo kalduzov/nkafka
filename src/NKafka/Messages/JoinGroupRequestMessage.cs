@@ -24,7 +24,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Messages;
 
-public sealed partial class JoinGroupRequestMessage
+internal sealed partial class JoinGroupRequestMessage
 {
     /// <summary>
     /// Builder to create a JoinGroupRequestMessage object based on API version

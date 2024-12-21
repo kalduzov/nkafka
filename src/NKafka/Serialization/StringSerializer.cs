@@ -33,13 +33,12 @@ namespace NKafka.Serialization;
 /// <summary>
 /// 
 /// </summary>
-public sealed class StringSerializer: IAsyncSerializer<string>
+internal sealed class StringSerializer: ISerializer<string>
 {
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(string data)
     {
-#if NET7_0_OR_GREATER
         var source = data.AsSpan();
 
         var maxByteCount = Encoding.UTF8.GetByteCount(source);
@@ -54,8 +53,5 @@ public sealed class StringSerializer: IAsyncSerializer<string>
         }
 
         return dest;
-#else
-        return Encoding.UTF8.GetBytes(data);
-#endif
     }
 }

@@ -28,7 +28,7 @@ namespace NKafka.Serialization;
 /// <summary>
 /// Serializer class that serializes Null objects by returning null.
 /// </summary>
-public sealed class NullSerializer: IAsyncSerializer<Null>
+internal sealed class NullSerializer: ISerializer<Null>
 {
     /// <inheritdoc />
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -26,50 +26,20 @@ namespace NKafka.Tests.Serialization;
 public class NoneSerializerTests
 {
     [Fact]
-    public async Task SerializeAsync_MustBe_Throw_Exception()
-    {
-        var serializer = NoneSerializer<int>.Instance;
-
-        async Task SerializeMethod()
-        {
-            var _ = await serializer.SerializeAsync(int.MaxValue);
-        }
-
-        await FluentActions
-            .Awaiting(SerializeMethod)
-            .Should()
-            .ThrowAsync<NotImplementedException>();
-    }
-
-    [Fact]
     public void Serialize_MustBe_Throw_Exception()
     {
         var serializer = NoneSerializer<int>.Instance;
-
-        void SerializeMethod()
-        {
-            var _ = serializer.Serialize(int.MaxValue);
-        }
 
         FluentActions
             .Invoking(SerializeMethod)
             .Should()
             .Throw<NotImplementedException>();
-    }
 
-    [Fact]
-    public void Get_PreferAsync_Value_MustBe_Throw_Exception()
-    {
-        var serializer = NoneSerializer<int>.Instance;
+        return;
 
-        void PreferGetMethod()
+        void SerializeMethod()
         {
-            var _ = serializer.PreferAsync;
+            _ = serializer.Serialize(int.MaxValue);
         }
-
-        FluentActions
-            .Invoking(PreferGetMethod)
-            .Should()
-            .Throw<NotImplementedException>();
     }
 }

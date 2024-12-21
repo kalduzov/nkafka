@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SaslAuthenticateRequestMessage
 /// </summary>
-public sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEquatable<SaslAuthenticateRequestMessage>
+internal sealed partial class SaslAuthenticateRequestMessage: IRequestMessage, IEquatable<SaslAuthenticateRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SaslAuthenticate;

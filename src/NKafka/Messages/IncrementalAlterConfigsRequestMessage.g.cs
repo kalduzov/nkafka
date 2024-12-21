@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message IncrementalAlterConfigsRequestMessage
 /// </summary>
-public sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEquatable<IncrementalAlterConfigsRequestMessage>
+internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessage, IEquatable<IncrementalAlterConfigsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.IncrementalAlterConfigs;
@@ -239,7 +239,7 @@ public sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessa
     /// <summary>
     /// Describes the contract for message AlterConfigsResourceMessage
     /// </summary>
-    public sealed partial class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
+    internal sealed partial class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -485,7 +485,7 @@ public sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessa
     /// <summary>
     /// Describes the contract for message AlterableConfigMessage
     /// </summary>
-    public sealed partial class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
+    internal sealed partial class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -724,7 +724,7 @@ public sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessa
     /// <summary>
     /// Describes the contract for message AlterableConfigCollection
     /// </summary>
-    public sealed partial class AlterableConfigCollection: HashSet<AlterableConfigMessage>
+    internal sealed partial class AlterableConfigCollection: HashSet<AlterableConfigMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -750,7 +750,7 @@ public sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMessa
     /// <summary>
     /// Describes the contract for message AlterConfigsResourceCollection
     /// </summary>
-    public sealed partial class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
+    internal sealed partial class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
     {
         /// <summary>
         /// Basic collection constructor

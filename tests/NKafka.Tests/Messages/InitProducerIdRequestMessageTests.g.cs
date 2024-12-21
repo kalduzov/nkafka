@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//F0-C2-A6-6A-4A-49-17-09-F9-D5-5A-D9-94-B6-36-C8-AC-87-83-71-97-81-43-A7-7F-7B-6A-F8-41-EC-C8-2B
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTests<InitProducerIdRequestMessage>
+public sealed partial class InitProducerIdRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             TransactionTimeoutMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             TransactionTimeoutMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,7 +66,7 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             TransactionTimeoutMs = -420004200,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -77,7 +78,7 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             ProducerId = -9223372036854775808,
             ProducerEpoch = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -89,7 +90,7 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             ProducerId = -9223372036854775808,
             ProducerEpoch = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -101,6 +102,6 @@ public sealed partial class InitProducerIdRequestMessageTests: RequestMessageTes
             ProducerId = -9223372036854775808,
             ProducerEpoch = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

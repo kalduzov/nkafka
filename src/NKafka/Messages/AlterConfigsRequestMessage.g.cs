@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AlterConfigsRequestMessage
 /// </summary>
-public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquatable<AlterConfigsRequestMessage>
+internal sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquatable<AlterConfigsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.AlterConfigs;
@@ -239,7 +239,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message AlterConfigsResourceMessage
     /// </summary>
-    public sealed partial class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
+    internal sealed partial class AlterConfigsResourceMessage: IMessage, IEquatable<AlterConfigsResourceMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -485,7 +485,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message AlterableConfigMessage
     /// </summary>
-    public sealed partial class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
+    internal sealed partial class AlterableConfigMessage: IMessage, IEquatable<AlterableConfigMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -712,7 +712,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message AlterableConfigCollection
     /// </summary>
-    public sealed partial class AlterableConfigCollection: HashSet<AlterableConfigMessage>
+    internal sealed partial class AlterableConfigCollection: HashSet<AlterableConfigMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -738,7 +738,7 @@ public sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message AlterConfigsResourceCollection
     /// </summary>
-    public sealed partial class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
+    internal sealed partial class AlterConfigsResourceCollection: HashSet<AlterConfigsResourceMessage>
     {
         /// <summary>
         /// Basic collection constructor

@@ -33,14 +33,14 @@ internal class DefaultPartitioner: IPartitioner
     private readonly Random _random = new();
 
     /// <inheritdoc/> 
-    public ValueTask<int> PartitionAsync<TKey, TValue>(
+    public ValueTask<int> Partition<TKey, TValue>(
         string topic,
         TKey key,
         byte[] keyBytes,
         TValue value,
         byte[] valueBytes,
         IKafkaCluster cluster,
-        CancellationToken token = default)
+        CancellationToken token)
         where TKey : notnull
         where TValue : notnull
     {

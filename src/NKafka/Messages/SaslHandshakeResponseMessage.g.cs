@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SaslHandshakeResponseMessage
 /// </summary>
-public sealed partial class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<SaslHandshakeResponseMessage>
+internal sealed partial class SaslHandshakeResponseMessage: IResponseMessage, IEquatable<SaslHandshakeResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

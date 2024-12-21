@@ -36,6 +36,10 @@
     <AdditionalFiles Remove="PublicAPI.Unshipped.txt"/>
   </ItemGroup>
 
+  <ItemGroup Label="InternalsVisibleTo">
+    <InternalsVisibleTo Include="NKafka.Tests"/>
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Update="Resources\StatusCodesMessages.Designer.cs">
       <DesignTime>True</DesignTime>

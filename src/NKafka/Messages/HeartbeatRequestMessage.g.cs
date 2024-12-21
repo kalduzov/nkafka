@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message HeartbeatRequestMessage
 /// </summary>
-public sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatable<HeartbeatRequestMessage>
+internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatable<HeartbeatRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Heartbeat;

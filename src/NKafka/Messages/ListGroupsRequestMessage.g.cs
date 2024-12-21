@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ListGroupsRequestMessage
 /// </summary>
-public sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGroupsRequestMessage>
+internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquatable<ListGroupsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ListGroups;

@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AddOffsetsToTxnResponseMessage
 /// </summary>
-public sealed partial class AddOffsetsToTxnResponseMessage: IResponseMessage, IEquatable<AddOffsetsToTxnResponseMessage>
+internal sealed partial class AddOffsetsToTxnResponseMessage: IResponseMessage, IEquatable<AddOffsetsToTxnResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

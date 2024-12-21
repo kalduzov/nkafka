@@ -25,6 +25,7 @@ using NKafka.Clients.Producer;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Exceptions;
+using NKafka.Metrics;
 using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Producer;
@@ -74,6 +75,7 @@ public sealed class CreateProducerTests: ClientTests
             transactionManagerMock,
             recordAccumulatorMock,
             messageSenderMock,
+            new NullProducerMetrics(),
             NullLoggerFactory.Instance);
 
         action.Should().NotThrow();
@@ -102,6 +104,7 @@ public sealed class CreateProducerTests: ClientTests
             transactionManagerMock,
             recordAccumulatorMock,
             messageSenderMock,
+            new NullProducerMetrics(),
             NullLoggerFactory.Instance);
 
         action.Should().Throw<KafkaException>().Which.Message.Should().Be(Resources.ExceptionMessages.Producer_CreateError);

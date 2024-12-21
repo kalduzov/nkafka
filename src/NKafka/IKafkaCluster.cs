@@ -26,7 +26,6 @@ using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
 using NKafka.Connection;
-using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Serialization;
 
@@ -40,18 +39,18 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <summary>
     /// Cluster identifier 
     /// </summary>
-    string? ClusterId { get; }
+    public string? ClusterId { get; }
 
     /// <summary>
     /// Cluster configuration
     /// </summary>
-    ClusterConfig Config { get; }
+    public ClusterConfig Config { get; }
 
     /// <summary>
     /// List of topics in the cluster
     /// </summary>
     /// <remarks>Depending on the situation, all topics that were requested or exist in the cluster are returned</remarks>
-    IDictionary<string, TopicMetadata> Topics { get; }
+    public IReadOnlyDictionary<string, TopicMetadata> Topics { get; }
 
     /// <summary>
     /// Gets a dictionary of topics indexed by their unique identifiers.
@@ -60,20 +59,20 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// The dictionary contains the topics stored in the system, with each topic
     /// mapped to its unique identifier.
     /// </remarks>
-    IDictionary<Guid, string> TopicsById { get; }
+    public IReadOnlyDictionary<Guid, string> TopicsById { get; }
 
     /// <summary/>
-    bool Closed { get; }
+    public bool Closed { get; }
 
     /// <summary>
     /// Information about the broker that is the controller
     /// </summary>
-    Node Controller { get; }
+    public Node Controller { get; }
 
     /// <summary>
     /// List of all cluster brokers
     /// </summary>
-    IReadOnlyCollection<Node> Brokers { get; }
+    public IReadOnlyCollection<Node> Brokers { get; }
 
     /// <summary>
     /// Gets the admin client instance for managing administrative operations.
@@ -82,7 +81,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// The <see cref="AdminClient"/> property provides access to the admin client instance
     /// that allows the user to perform various administrative operations.
     /// </remarks>
-    IAdminClient AdminClient { get; }
+    public IAdminClient AdminClient { get; }
 
     /// <summary>
     /// Retrieves partitions of a given topic asynchronously.
@@ -93,7 +92,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// A <see cref="ValueTask{T}"/> where T is a <see cref="IReadOnlyCollection{Partition}"/> is  representing the asynchronous operation.
     /// The task result contains a read-only collection of <see cref="Partition"/> objects representing the partitions of the topic.
     /// </returns>
-    ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default);
+    public ValueTask<IReadOnlyCollection<Partition>> GetPartitions(string topic, CancellationToken token);
 
     /// <summary>
     /// Возвращает список партиций для указанных топиков
@@ -101,13 +100,13 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="topics">Список топиков, для которых нужно получить партиции</param>
     /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitionsAsync(IReadOnlyCollection<string> topics, CancellationToken token = default);
+    public ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitions(IReadOnlyCollection<string> topics, CancellationToken token);
 
     /// <summary>
     /// Returns the current partition offset in the topic
     /// </summary>
     /// <remarks>If the data is not in the internal cache, then a request is made to the broker for this information</remarks>
-    ValueTask<Offset> GetOffsetAsync(string topic, Partition partition, CancellationToken token = default);
+    public ValueTask<Offset> GetOffset(string topic, Partition partition, CancellationToken token);
 
     /// <summary>
     /// Creates a producer associated with the current cluster
@@ -127,11 +126,11 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// The producer configuration will override some of the values that were set to create the cluster.
     /// </p>
     /// </remarks>
-    IProducer<TKey, TValue> BuildProducer<TKey, TValue>(
+    public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(
         string name,
         ProducerConfig producerConfig,
-        IAsyncSerializer<TKey> keySerializer,
-        IAsyncSerializer<TValue> valueSerializer)
+        ISerializer<TKey> keySerializer,
+        ISerializer<TValue> valueSerializer)
         where TKey : notnull
         where TValue : notnull;
 
@@ -142,9 +141,9 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="keyDeserializer">The configured key deserializer</param>
     /// <param name="valueDeserializer">The configured value deserializer.</param>
     /// <remarks>The method always returns a new consumer associated with a specific group</remarks>
-    IConsumer<TKey, TValue> BuildConsumer<TKey, TValue>(ConsumerConfig consumerConfig,
-        IAsyncDeserializer<TKey> keyDeserializer,
-        IAsyncDeserializer<TValue> valueDeserializer)
+    public IConsumer<TKey, TValue> BuildConsumer<TKey, TValue>(ConsumerConfig consumerConfig,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer)
         where TKey : notnull
         where TValue : notnull;
 
@@ -154,7 +153,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="token"></param>
     /// <param name="topics">List of topics for which you need to get information from brokers</param>
     /// <remarks>If no topics are specified, information on all cluster topics will be returned</remarks>
-    Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token = default);
+    public Task RefreshMetadata(IReadOnlyCollection<string> topics, CancellationToken token);
 
     /// <summary>
     /// Opens a network connection to a kafka broker and initializes metadata for the entire kafka cluster

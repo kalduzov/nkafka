@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ConsumerProtocolSubscription
 /// </summary>
-public sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable<ConsumerProtocolSubscription>
+internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable<ConsumerProtocolSubscription>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -335,7 +335,7 @@ public sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable<C
     /// <summary>
     /// Describes the contract for message TopicPartitionMessage
     /// </summary>
-    public sealed partial class TopicPartitionMessage: IMessage, IEquatable<TopicPartitionMessage>
+    internal sealed partial class TopicPartitionMessage: IMessage, IEquatable<TopicPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -504,7 +504,7 @@ public sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable<C
     /// <summary>
     /// Describes the contract for message TopicPartitionCollection
     /// </summary>
-    public sealed partial class TopicPartitionCollection: HashSet<TopicPartitionMessage>
+    internal sealed partial class TopicPartitionCollection: HashSet<TopicPartitionMessage>
     {
         /// <summary>
         /// Basic collection constructor

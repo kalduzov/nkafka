@@ -29,7 +29,7 @@ namespace NKafka.Protocol.Records;
 /// <summary>
 /// 
 /// </summary>
-public interface IRecordsBatch
+internal interface IRecordsBatch
 {
     /// <summary>
     /// The size of these records in bytes.

@@ -1,8 +1,8 @@
-//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2024 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,9 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Clients.Admin;
+namespace NKafka.Metrics;
 
-/// <summary>
-/// 
-/// </summary>
-public record DescribeAclsOptions;
+internal class DefaultConsumerMetrics: IConsumerMetrics
+{
+}

@@ -24,6 +24,4 @@ namespace NKafka.Metrics;
 /// <summary>
 /// Implements a default stub for producer metrics
 /// </summary>
-public class NullProducerMetrics: IProducerMetrics
-{
-}
+public class NullProducerMetrics: IProducerMetrics;

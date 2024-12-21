@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteGroupsRequestMessage
 /// </summary>
-public sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<DeleteGroupsRequestMessage>
+internal sealed partial class DeleteGroupsRequestMessage: IRequestMessage, IEquatable<DeleteGroupsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteGroups;

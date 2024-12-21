@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message EndTxnRequestMessage
 /// </summary>
-public sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<EndTxnRequestMessage>
+internal sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<EndTxnRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.EndTxn;

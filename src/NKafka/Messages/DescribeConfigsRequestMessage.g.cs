@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeConfigsRequestMessage
 /// </summary>
-public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<DescribeConfigsRequestMessage>
+internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEquatable<DescribeConfigsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DescribeConfigs;
@@ -285,7 +285,7 @@ public sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IEqu
     /// <summary>
     /// Describes the contract for message DescribeConfigsResourceMessage
     /// </summary>
-    public sealed partial class DescribeConfigsResourceMessage: IMessage, IEquatable<DescribeConfigsResourceMessage>
+    internal sealed partial class DescribeConfigsResourceMessage: IMessage, IEquatable<DescribeConfigsResourceMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

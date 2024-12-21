@@ -24,7 +24,7 @@ namespace NKafka.Metrics;
 /// <summary>
 /// Provides methods for emitting producer metrics
 /// </summary>
-public interface IProducerMetrics
+internal interface IProducerMetrics
 {
     /// <summary>
     /// 

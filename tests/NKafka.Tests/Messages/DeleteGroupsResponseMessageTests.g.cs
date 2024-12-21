@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//C0-6F-AD-82-E7-BB-5A-36-D1-E2-46-34-CC-DF-D8-F9-AE-AB-85-0D-9C-A5-19-5A-18-2B-43-34-81-07-5F-5C
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class DeleteGroupsResponseMessageTests: ResponseMessageTests<DeleteGroupsResponseMessage>
+public sealed partial class DeleteGroupsResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteGroupsResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class DeleteGroupsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Results = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteGroupsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class DeleteGroupsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Results = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteGroupsResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,6 +66,6 @@ public sealed partial class DeleteGroupsResponseMessageTests: ResponseMessageTes
             ThrottleTimeMs = -420004200,
             Results = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
 }

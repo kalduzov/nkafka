@@ -26,7 +26,7 @@ namespace NKafka.Protocol;
 /// <summary>
 /// Describes base interface for all protocol messages
 /// </summary>
-public interface IMessage
+internal interface IMessage
 {
     /// <summary>
     /// Returns a list of tagged fields which this software can't understand

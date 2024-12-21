@@ -25,9 +25,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NKafka.Connection;
 
-internal partial class KafkaConnectorPool
-{
-}
+internal partial class KafkaConnectorPool;
 
 internal static partial class KafkaConnectorPoolLoggerExtensions
 {
@@ -39,6 +37,7 @@ internal static partial class KafkaConnectorPoolLoggerExtensions
 
     [LoggerMessage(EventId = LogExtensions.KAFKA_CONNECTOR_POOL_EVENT_BASE_ID + 1,
         Level = LogLevel.Warning,
-        Message = LogExtensions.LOGGER_PREFIX + "Список bootstrap брокеров содержит повторы. Адрес {EndPoint} уже присутствует в списке. Текущий адрес будет проигнорирован.")]
+        Message = LogExtensions.LOGGER_PREFIX
+                  + "Список bootstrap брокеров содержит повторы. Адрес {EndPoint} уже присутствует в списке. Текущий адрес будет проигнорирован.")]
     public static partial void IgnoreBootstrapEndpointWarning(this ILogger<KafkaConnectorPool> logger, EndPoint endPoint);
 }

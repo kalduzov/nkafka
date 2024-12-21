@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//D7-8D-55-46-8F-B8-BA-77-43-7E-02-A1-43-53-70-F3-23-F3-10-34-80-E7-C9-FD-A2-A1-E3-76-CF-5E-5B-EA
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class CreateAclsRequestMessageTests: RequestMessageTests<CreateAclsRequestMessage>
+public sealed partial class CreateAclsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class CreateAclsRequestMessageTests: RequestMessageTests<C
         {
             Creations = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -53,7 +54,7 @@ public sealed partial class CreateAclsRequestMessageTests: RequestMessageTests<C
         {
             Creations = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -62,7 +63,7 @@ public sealed partial class CreateAclsRequestMessageTests: RequestMessageTests<C
         {
             Creations = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -71,6 +72,6 @@ public sealed partial class CreateAclsRequestMessageTests: RequestMessageTests<C
         {
             Creations = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
 }

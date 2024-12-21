@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AlterUserScramCredentialsResponseMessage
 /// </summary>
-public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseMessage, IEquatable<AlterUserScramCredentialsResponseMessage>
+internal sealed partial class AlterUserScramCredentialsResponseMessage: IResponseMessage, IEquatable<AlterUserScramCredentialsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -183,7 +183,7 @@ public sealed partial class AlterUserScramCredentialsResponseMessage: IResponseM
     /// <summary>
     /// Describes the contract for message AlterUserScramCredentialsResultMessage
     /// </summary>
-    public sealed partial class AlterUserScramCredentialsResultMessage: IMessage, IEquatable<AlterUserScramCredentialsResultMessage>
+    internal sealed partial class AlterUserScramCredentialsResultMessage: IMessage, IEquatable<AlterUserScramCredentialsResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

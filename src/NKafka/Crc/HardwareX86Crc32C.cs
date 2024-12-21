@@ -23,7 +23,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace NKafka.Crc;
 
-internal class HardwareX86Crc32C: ICrc32C
+internal sealed class HardwareX86Crc32C: ICrc32C
 {
     public uint Calculate(ReadOnlySpan<byte> span)
     {

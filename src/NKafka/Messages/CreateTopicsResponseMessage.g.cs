@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message CreateTopicsResponseMessage
 /// </summary>
-public sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEquatable<CreateTopicsResponseMessage>
+internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEquatable<CreateTopicsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -238,7 +238,7 @@ public sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message CreatableTopicResultMessage
     /// </summary>
-    public sealed partial class CreatableTopicResultMessage: IMessage, IEquatable<CreatableTopicResultMessage>
+    internal sealed partial class CreatableTopicResultMessage: IMessage, IEquatable<CreatableTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -642,7 +642,7 @@ public sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message CreatableTopicConfigsMessage
     /// </summary>
-    public sealed partial class CreatableTopicConfigsMessage: IMessage, IEquatable<CreatableTopicConfigsMessage>
+    internal sealed partial class CreatableTopicConfigsMessage: IMessage, IEquatable<CreatableTopicConfigsMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -861,7 +861,7 @@ public sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message CreatableTopicResultCollection
     /// </summary>
-    public sealed partial class CreatableTopicResultCollection: HashSet<CreatableTopicResultMessage>
+    internal sealed partial class CreatableTopicResultCollection: HashSet<CreatableTopicResultMessage>
     {
         /// <summary>
         /// Basic collection constructor

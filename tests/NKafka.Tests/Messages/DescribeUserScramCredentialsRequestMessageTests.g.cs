@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//DA-B3-0B-16-FE-73-94-9B-5E-4B-22-23-32-4F-D9-F3-2E-E2-17-B3-35-6A-18-F9-1F-88-F6-FB-DD-C9-6E-12
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class DescribeUserScramCredentialsRequestMessageTests: RequestMessageTests<DescribeUserScramCredentialsRequestMessage>
+public sealed partial class DescribeUserScramCredentialsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeUserScramCredentialsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,6 +45,6 @@ public sealed partial class DescribeUserScramCredentialsRequestMessageTests: Req
         {
             Users = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
 }

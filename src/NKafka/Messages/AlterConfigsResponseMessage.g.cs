@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AlterConfigsResponseMessage
 /// </summary>
-public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEquatable<AlterConfigsResponseMessage>
+internal sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEquatable<AlterConfigsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class AlterConfigsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message AlterConfigsResourceResponseMessage
     /// </summary>
-    public sealed partial class AlterConfigsResourceResponseMessage: IMessage, IEquatable<AlterConfigsResourceResponseMessage>
+    internal sealed partial class AlterConfigsResourceResponseMessage: IMessage, IEquatable<AlterConfigsResourceResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

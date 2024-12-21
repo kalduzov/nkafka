@@ -26,12 +26,12 @@ namespace NKafka.Messages;
 /// <summary>
 /// 
 /// </summary>
-public sealed partial class MetadataResponseMessage
+internal sealed partial class MetadataResponseMessage
 {
     /// <summary>
     /// 
     /// </summary>
-    public sealed partial class MetadataResponseBrokerCollection
+    internal sealed partial class MetadataResponseBrokerCollection
     {
         internal IReadOnlyDictionary<int, Node> ConvertToNodes()
         {

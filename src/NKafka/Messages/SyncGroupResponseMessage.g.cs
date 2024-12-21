@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SyncGroupResponseMessage
 /// </summary>
-public sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncGroupResponseMessage>
+internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquatable<SyncGroupResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

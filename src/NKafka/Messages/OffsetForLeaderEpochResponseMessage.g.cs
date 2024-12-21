@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetForLeaderEpochResponseMessage
 /// </summary>
-public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
+internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessage, IEquatable<OffsetForLeaderEpochResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -238,7 +238,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
     /// <summary>
     /// Describes the contract for message OffsetForLeaderTopicResultMessage
     /// </summary>
-    public sealed partial class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
+    internal sealed partial class OffsetForLeaderTopicResultMessage: IMessage, IEquatable<OffsetForLeaderTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -472,7 +472,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
     /// <summary>
     /// Describes the contract for message EpochEndOffsetMessage
     /// </summary>
-    public sealed partial class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
+    internal sealed partial class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -638,7 +638,7 @@ public sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMessag
     /// <summary>
     /// Describes the contract for message OffsetForLeaderTopicResultCollection
     /// </summary>
-    public sealed partial class OffsetForLeaderTopicResultCollection: HashSet<OffsetForLeaderTopicResultMessage>
+    internal sealed partial class OffsetForLeaderTopicResultCollection: HashSet<OffsetForLeaderTopicResultMessage>
     {
         /// <summary>
         /// Basic collection constructor

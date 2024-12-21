@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NKafka\NKafka.csproj" />
+    
   </ItemGroup>
 
   <ItemGroup>

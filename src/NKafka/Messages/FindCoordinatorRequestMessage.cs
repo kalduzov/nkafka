@@ -26,7 +26,7 @@ using NKafka.Resources;
 
 namespace NKafka.Messages;
 
-public sealed partial class FindCoordinatorRequestMessage
+internal sealed partial class FindCoordinatorRequestMessage
 {
     private const int _KEY_TYPE_GROUP = 0;
 

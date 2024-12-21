@@ -139,14 +139,14 @@ public sealed class PartitionerConfigTests
 
     private class TestPartitioner: IPartitioner
     {
-        public ValueTask<int> PartitionAsync<TKey, TValue>(
+        public ValueTask<int> Partition<TKey, TValue>(
             string topic,
             TKey key,
             byte[] keyBytes,
             TValue value,
             byte[] valueBytes,
             IKafkaCluster cluster,
-            CancellationToken token = default)
+            CancellationToken token)
             where TKey : notnull
             where TValue : notnull
         {

@@ -30,7 +30,7 @@ namespace NKafka.Protocol.Records;
 /// <summary>
 /// 
 /// </summary>
-public sealed class Records
+internal sealed class Records
 {
     /// <summary>
     /// 

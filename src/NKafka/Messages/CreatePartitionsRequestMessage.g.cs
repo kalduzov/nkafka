@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message CreatePartitionsRequestMessage
 /// </summary>
-public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<CreatePartitionsRequestMessage>
+internal sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEquatable<CreatePartitionsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.CreatePartitions;
@@ -251,7 +251,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
     /// <summary>
     /// Describes the contract for message CreatePartitionsTopicMessage
     /// </summary>
-    public sealed partial class CreatePartitionsTopicMessage: IMessage, IEquatable<CreatePartitionsTopicMessage>
+    internal sealed partial class CreatePartitionsTopicMessage: IMessage, IEquatable<CreatePartitionsTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -511,7 +511,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
     /// <summary>
     /// Describes the contract for message CreatePartitionsAssignmentMessage
     /// </summary>
-    public sealed partial class CreatePartitionsAssignmentMessage: IMessage, IEquatable<CreatePartitionsAssignmentMessage>
+    internal sealed partial class CreatePartitionsAssignmentMessage: IMessage, IEquatable<CreatePartitionsAssignmentMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -672,7 +672,7 @@ public sealed partial class CreatePartitionsRequestMessage: IRequestMessage, IEq
     /// <summary>
     /// Describes the contract for message CreatePartitionsTopicCollection
     /// </summary>
-    public sealed partial class CreatePartitionsTopicCollection: HashSet<CreatePartitionsTopicMessage>
+    internal sealed partial class CreatePartitionsTopicCollection: HashSet<CreatePartitionsTopicMessage>
     {
         /// <summary>
         /// Basic collection constructor

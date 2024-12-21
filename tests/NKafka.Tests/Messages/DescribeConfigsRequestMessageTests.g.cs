@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//72-F5-83-12-D3-AB-F7-BB-9E-46-71-F4-C6-B5-36-BB-E4-9C-8C-96-64-59-62-69-FA-90-3B-3D-02-A6-B7-9E
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTests<DescribeConfigsRequestMessage>
+public sealed partial class DescribeConfigsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTe
         {
             Resources = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -54,7 +55,7 @@ public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTe
             Resources = new (),
             IncludeSynonyms = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -64,7 +65,7 @@ public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTe
             Resources = new (),
             IncludeSynonyms = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTe
             IncludeSynonyms = true,
             IncludeDocumentation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -86,6 +87,6 @@ public sealed partial class DescribeConfigsRequestMessageTests: RequestMessageTe
             IncludeSynonyms = true,
             IncludeDocumentation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

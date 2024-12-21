@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//ED-F5-A5-DF-75-EA-AE-B2-9A-A5-47-9D-31-34-DE-57-ED-61-57-3E-E1-86-F4-1A-F7-A2-97-3B-01-E2-C8-D2
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class CreatePartitionsRequestMessageTests: RequestMessageTests<CreatePartitionsRequestMessage>
+public sealed partial class CreatePartitionsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'CreatePartitionsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -46,7 +47,7 @@ public sealed partial class CreatePartitionsRequestMessageTests: RequestMessageT
             TimeoutMs = -420004200,
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreatePartitionsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -57,7 +58,7 @@ public sealed partial class CreatePartitionsRequestMessageTests: RequestMessageT
             TimeoutMs = -420004200,
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreatePartitionsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -68,7 +69,7 @@ public sealed partial class CreatePartitionsRequestMessageTests: RequestMessageT
             TimeoutMs = -420004200,
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'CreatePartitionsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -79,6 +80,6 @@ public sealed partial class CreatePartitionsRequestMessageTests: RequestMessageT
             TimeoutMs = -420004200,
             ValidateOnly = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
 }

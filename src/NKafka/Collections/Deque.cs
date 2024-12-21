@@ -29,17 +29,19 @@ namespace NKafka.Collections;
 /// <summary>
 /// The implementation of the double ended queue is based on the internal implementation of System.Collections.Generic.Deque&lt;T&gt;
 /// </summary>
+/// <typeparam name="T">The type of elements in the Deque.</typeparam>
 [DebuggerDisplay("Count = {Count}")]
 internal class Deque<T>: ICollection
     where T : class
 {
     private readonly LinkedList<T> _buffer;
 
-    /// <summary>Creates a new instance of Deque.</summary>
-    /// <typeparam name="T">The type of elements in the Deque.</typeparam>
+    /// <summary>
+    /// Creates a new instance of Deque.
+    /// </summary>
     public Deque()
     {
-        _buffer = new LinkedList<T>();
+        _buffer = [];
     }
 
     public int Count => _buffer.Count;
@@ -87,7 +89,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Inserts an item at the front of the collection.
     /// </summary>
-    /// <typeparam name="T">The type of the item.</typeparam>
     /// <param name="item">The item to be inserted.</param>
     public void AddFirst(T item)
     {
@@ -97,7 +98,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Inserts an item to the back of the collection.
     /// </summary>
-    /// <typeparam name="T">The type of the item.</typeparam>
     /// <param name="item">The item to be inserted.</param>
     public void AddLast(T item)
     {
@@ -107,7 +107,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Removes and returns the element at the front of the array.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the array.</typeparam>
     /// <returns>The element that was removed from the front of the array.</returns>
     /// <remarks>
     /// The method assumes that the array is not empty. It is the caller's responsibility to ensure that there are elements remaining in the array before calling this method.
@@ -131,7 +130,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Removes and returns the last element in the collection.
     /// </summary>
-    /// <typeparam name="T">The type of the elements in the collection.</typeparam>
     /// <returns>The last element in the collection.</returns>
     /// <remarks>
     /// This method removes and returns the last element in the collection,
@@ -154,7 +152,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Retrieves the front element of the underlying array without removing it.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the array.</typeparam>
     /// <returns>
     /// The front element of the array if it exists; otherwise, the default value of the type <typeparamref name="T"/>.
     /// </returns>
@@ -167,7 +164,6 @@ internal class Deque<T>: ICollection
     /// <summary>
     /// Returns the last element of the queue without removing it.
     /// </summary>
-    /// <typeparam name="T">The type of elements in the queue.</typeparam>
     /// <returns>The last element of the queue if the queue is not empty; otherwise, the default value of the type.</returns>
     public bool TryPeekLast(out T element)
     {

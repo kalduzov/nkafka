@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteTopicsRequestMessage
 /// </summary>
-public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<DeleteTopicsRequestMessage>
+internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquatable<DeleteTopicsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DeleteTopics;
@@ -338,7 +338,7 @@ public sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message DeleteTopicStateMessage
     /// </summary>
-    public sealed partial class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
+    internal sealed partial class DeleteTopicStateMessage: IMessage, IEquatable<DeleteTopicStateMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

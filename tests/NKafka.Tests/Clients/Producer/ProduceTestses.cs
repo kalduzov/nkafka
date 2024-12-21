@@ -32,13 +32,13 @@ public sealed class ProduceTests: ClientTests
 
     private class TestPartitioner: IPartitioner
     {
-        public ValueTask<int> PartitionAsync<TKey, TValue>(string topic,
+        public ValueTask<int> Partition<TKey, TValue>(string topic,
             TKey key,
             byte[] keyBytes,
             TValue value,
             byte[] valueBytes,
             IKafkaCluster cluster,
-            CancellationToken token = default)
+            CancellationToken token)
             where TKey : notnull
             where TValue : notnull
         {
@@ -80,7 +80,7 @@ public sealed class ProduceTests: ClientTests
     public async Task ProduceAsync(int key, string value)
     {
         var producer = CreateProducerForTests<int, string>(_producer);
-        var action = async () => await producer.ProduceAsync("test_topic", new Message<int, string>(key, value));
+        var action = async () => await producer.Produce("test_topic", new Message<int, string>(key, value), CancellationToken.None);
         var result = await action.Should().NotThrowAsync();
         result.Subject.Status.Should().Be(PersistenceStatus.NotPersisted);
     }

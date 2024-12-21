@@ -59,7 +59,7 @@ internal class AdminClient: IAdminClient
     public async Task<Dictionary<string, CreateTopicResult>> CreateTopicsAsync(
         IReadOnlyCollection<TopicDetail> topics,
         CreateTopicsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         _logger.CallMethodTrace();
         using var activity = KafkaDiagnosticsSource.CreateTopics(topics);
@@ -118,7 +118,7 @@ internal class AdminClient: IAdminClient
     /// <param name="token"></param>
     public async Task<Dictionary<string, DeleteTopicsResult>> DeleteTopicsAsync(IReadOnlyCollection<string> topicsName,
         DeleteTopicsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         var maxApiVersion = _kafkaCluster
             .GetClusterMetadata()
@@ -144,13 +144,13 @@ internal class AdminClient: IAdminClient
     /// </summary>
     /// <param name="options">The options to use when listing the topics</param>
     /// <param name="token"></param>
-    public async Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default)
+    public async Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token)
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadataAsync(null!, cts.Token);
+        await _kafkaCluster.RefreshMetadata(null!, cts.Token);
 
         return _kafkaCluster.Topics.Values
             .Where(t => t.IsInternal is false || t.IsInternal == options.IncludeInternal)
@@ -165,13 +165,13 @@ internal class AdminClient: IAdminClient
     /// <param name="token"></param>
     public async Task<Dictionary<string, TopicDescription>> DescribeTopicsAsync(HashSet<string> topics,
         DescribeTopicsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadataAsync(topics, cts.Token);
+        await _kafkaCluster.RefreshMetadata(topics, cts.Token);
 
         var result = new Dictionary<string, TopicDescription>(topics.Count);
 
@@ -190,13 +190,13 @@ internal class AdminClient: IAdminClient
     /// </summary>
     /// <param name="options">Describe the cluster information.</param>
     /// <param name="token"></param>
-    public async Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token = default)
+    public async Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token)
     {
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadataAsync(Array.Empty<string>(), cts.Token);
+        await _kafkaCluster.RefreshMetadata(Array.Empty<string>(), cts.Token);
         var result = new DescribeClusterResult(_kafkaCluster.Brokers, _kafkaCluster.Controller, _kafkaCluster.ClusterId);
 
         return result;
@@ -208,7 +208,7 @@ internal class AdminClient: IAdminClient
     /// <param name="filter"></param>
     /// <param name="options"></param>
     /// <param name="token"></param>
-    public Task<DescribeAclsResult> DescribeAclsAsync(AclBindingFilter filter, DescribeAclsOptions options, CancellationToken token = default)
+    public Task<DescribeAclsResult> DescribeAclsAsync(AclBindingFilter filter, DescribeAclsOptions options, CancellationToken token)
     {
         return Task.FromResult(new DescribeAclsResult());
     }
@@ -222,7 +222,7 @@ internal class AdminClient: IAdminClient
     /// <returns></returns>
     public Task<CreateAclsResult> CreateAclsAsync(IReadOnlyCollection<AclBinding> aclBindings,
         CreateAclsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return Task.FromResult(new CreateAclsResult());
     }
@@ -235,7 +235,7 @@ internal class AdminClient: IAdminClient
     /// <param name="token"></param>
     public Task<DeleteAclsResult> DeleteAclsAsync(IReadOnlyCollection<AclBindingFilter> aclBindingFilters,
         DeleteAclsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return Task.FromResult(new DeleteAclsResult());
     }
@@ -248,7 +248,7 @@ internal class AdminClient: IAdminClient
     /// <param name="token"></param>
     public Task<DescribeConfigsResult> DescribeConfigsAsync(IReadOnlyCollection<ConfigResource> resources,
         DescribeConfigsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return Task.FromResult(new DescribeConfigsResult());
     }
@@ -262,7 +262,7 @@ internal class AdminClient: IAdminClient
     /// <remarks>Since 2.3.0 use <see cref="IAdminClient.IncrementalAlterConfigsAsync"/></remarks>
     public Task<AlterConfigsResult> AlterConfigsAsync(Dictionary<ConfigResource, List<ConfigEntry>> configs,
         AlterConfigsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return Task.FromResult(new AlterConfigsResult());
     }
@@ -276,7 +276,7 @@ internal class AdminClient: IAdminClient
     /// <remarks>This operation is supported by brokers with version 2.3.0 or higher</remarks>
     public Task<IncrementalAlterConfigsResult> IncrementalAlterConfigsAsync(Dictionary<ConfigResource, List<ConfigEntry>> configs,
         IncrementalAlterConfigsOptions options,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return Task.FromResult(new IncrementalAlterConfigsResult());
     }

@@ -23,7 +23,7 @@
 
 namespace NKafka.Messages;
 
-public sealed partial class FetchRequestMessage
+internal sealed partial class FetchRequestMessage
 {
     internal bool IsValidRequest { get; set; } = true;
 }

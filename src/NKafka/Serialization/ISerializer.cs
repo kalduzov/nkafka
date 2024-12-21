@@ -27,28 +27,8 @@ namespace NKafka.Serialization;
 /// Defines a serializer for use with <see cref="NKafka.Clients.Producer.IProducer{TKey,TValue}" />.
 /// </summary>
 /// <typeparam name="T">The type to serialize</typeparam>
-public interface IAsyncSerializer<in T>
+public interface ISerializer<in T>
 {
-    /// <summary>
-    /// Prefer async method for serialization
-    /// </summary>
-    /// <remarks>
-    /// If this property is set then the client will call the <see cref="SerializeAsync"/> method to serialize, otherwise <see cref="Serialize"/>
-    /// </remarks>>
-    bool PreferAsync => false;
-
-    /// <summary>
-    /// Serialize the key or value of a <see cref="Message{TKey,TValue}" /> instance.
-    /// </summary>
-    /// <param name="data">The value to serialize.</param>
-    /// <returns>The serialized value.</returns>
-    Task<byte[]> SerializeAsync(T data)
-    {
-        var result = Serialize(data);
-
-        return Task.FromResult(result);
-    }
-
     /// <summary>
     /// Serialize the key or value of a <see cref="Message{TKey,TValue}" /> instance.
     /// </summary>

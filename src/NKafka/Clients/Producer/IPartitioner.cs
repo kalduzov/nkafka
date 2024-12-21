@@ -41,14 +41,14 @@ public interface IPartitioner
     /// <typeparam name="TKey">The key type</typeparam>
     /// <typeparam name="TValue">The value type</typeparam>
     /// <returns>The partition number</returns>
-    ValueTask<int> PartitionAsync<TKey, TValue>(
+    ValueTask<int> Partition<TKey, TValue>(
         string topic,
         TKey key,
         byte[] keyBytes,
         TValue value,
         byte[] valueBytes,
         IKafkaCluster cluster,
-        CancellationToken token = default)
+        CancellationToken token)
         where TKey : notnull
         where TValue : notnull;
 }

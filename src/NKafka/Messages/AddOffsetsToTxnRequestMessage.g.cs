@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AddOffsetsToTxnRequestMessage
 /// </summary>
-public sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
+internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IEquatable<AddOffsetsToTxnRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.AddOffsetsToTxn;

@@ -46,9 +46,19 @@ public sealed record TopicPartition: IComparable<TopicPartition>
     public Partition Partition { get; init; }
 
     /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="topic"></param>
+    /// <param name="partition"></param>
+    public TopicPartition(string topic, Partition partition)
+        : this(topic, partition, Guid.Empty)
+    {
+    }
+
+    /// <summary>
     /// Information about kafka partition
     /// </summary>
-    public TopicPartition(string topic, Partition partition, Guid topicId = default)
+    public TopicPartition(string topic, Partition partition, Guid topicId)
     {
         if (string.IsNullOrWhiteSpace(topic))
         {

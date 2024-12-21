@@ -40,19 +40,19 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
     private readonly bool _checkCrc;
     private readonly IsolationLevel _isolationLevel;
     private readonly IKafkaCluster _kafkaCluster;
-    private readonly IAsyncDeserializer<TKey> _keyDeserializer;
+    private readonly IDeserializer<TKey> _keyDeserializer;
     private readonly ILogger<Fetcher<TKey, TValue>> _logger;
     private readonly int _maxBytes;
     private readonly int _maxWaitTimeMs;
     private readonly int _minBytes;
-    private readonly IAsyncDeserializer<TValue> _valueDeserializer;
+    private readonly IDeserializer<TValue> _valueDeserializer;
 
     private CancellationTokenSource _cts = new();
     private Task _currentFetcherTask = Task.CompletedTask;
 
     public Fetcher(IKafkaCluster kafkaCluster,
-        IAsyncDeserializer<TKey> keyDeserializer,
-        IAsyncDeserializer<TValue> valueDeserializer,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer,
         int minBytes,
         int maxBytes,
         int maxWaitTimeMs,

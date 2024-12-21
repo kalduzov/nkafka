@@ -26,7 +26,7 @@ namespace NKafka.Protocol.Records;
 /// <summary>
 /// 
 /// </summary>
-public class RecordsBatch: IRecordsBatch
+internal class RecordsBatch: IRecordsBatch
 {
     private readonly BufferWriter _bufferWriter = new(Stream.Null);
 

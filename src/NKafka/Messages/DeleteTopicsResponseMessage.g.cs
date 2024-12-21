@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteTopicsResponseMessage
 /// </summary>
-public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<DeleteTopicsResponseMessage>
+internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEquatable<DeleteTopicsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -238,7 +238,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message DeletableTopicResultMessage
     /// </summary>
-    public sealed partial class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
+    internal sealed partial class DeletableTopicResultMessage: IMessage, IEquatable<DeletableTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -507,7 +507,7 @@ public sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message DeletableTopicResultCollection
     /// </summary>
-    public sealed partial class DeletableTopicResultCollection: HashSet<DeletableTopicResultMessage>
+    internal sealed partial class DeletableTopicResultCollection: HashSet<DeletableTopicResultMessage>
     {
         /// <summary>
         /// Basic collection constructor

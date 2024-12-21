@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteRecordsResponseMessage
 /// </summary>
-public sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<DeleteRecordsResponseMessage>
+internal sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEquatable<DeleteRecordsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message DeleteRecordsTopicResultMessage
     /// </summary>
-    public sealed partial class DeleteRecordsTopicResultMessage: IMessage, IEquatable<DeleteRecordsTopicResultMessage>
+    internal sealed partial class DeleteRecordsTopicResultMessage: IMessage, IEquatable<DeleteRecordsTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -462,7 +462,7 @@ public sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message DeleteRecordsPartitionResultMessage
     /// </summary>
-    public sealed partial class DeleteRecordsPartitionResultMessage: IMessage, IEquatable<DeleteRecordsPartitionResultMessage>
+    internal sealed partial class DeleteRecordsPartitionResultMessage: IMessage, IEquatable<DeleteRecordsPartitionResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -606,7 +606,7 @@ public sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message DeleteRecordsPartitionResultCollection
     /// </summary>
-    public sealed partial class DeleteRecordsPartitionResultCollection: HashSet<DeleteRecordsPartitionResultMessage>
+    internal sealed partial class DeleteRecordsPartitionResultCollection: HashSet<DeleteRecordsPartitionResultMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -632,7 +632,7 @@ public sealed partial class DeleteRecordsResponseMessage: IResponseMessage, IEqu
     /// <summary>
     /// Describes the contract for message DeleteRecordsTopicResultCollection
     /// </summary>
-    public sealed partial class DeleteRecordsTopicResultCollection: HashSet<DeleteRecordsTopicResultMessage>
+    internal sealed partial class DeleteRecordsTopicResultCollection: HashSet<DeleteRecordsTopicResultMessage>
     {
         /// <summary>
         /// Basic collection constructor

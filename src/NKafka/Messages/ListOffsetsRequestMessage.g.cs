@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ListOffsetsRequestMessage
 /// </summary>
-public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListOffsetsRequestMessage>
+internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatable<ListOffsetsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.ListOffsets;
@@ -268,7 +268,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// Describes the contract for message ListOffsetsTopicMessage
     /// </summary>
-    public sealed partial class ListOffsetsTopicMessage: IMessage, IEquatable<ListOffsetsTopicMessage>
+    internal sealed partial class ListOffsetsTopicMessage: IMessage, IEquatable<ListOffsetsTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -502,7 +502,7 @@ public sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// Describes the contract for message ListOffsetsPartitionMessage
     /// </summary>
-    public sealed partial class ListOffsetsPartitionMessage: IMessage, IEquatable<ListOffsetsPartitionMessage>
+    internal sealed partial class ListOffsetsPartitionMessage: IMessage, IEquatable<ListOffsetsPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

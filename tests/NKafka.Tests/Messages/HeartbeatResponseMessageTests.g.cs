@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//00-3A-92-E2-23-23-87-26-51-75-39-88-45-63-1B-77-0C-9B-ED-3F-D6-49-FB-DC-EC-51-19-65-BA-3B-E8-DF
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<HeartbeatResponseMessage>
+public sealed partial class HeartbeatResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'HeartbeatResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<
         {
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'HeartbeatResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -54,7 +55,7 @@ public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'HeartbeatResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -64,7 +65,7 @@ public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'HeartbeatResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -74,7 +75,7 @@ public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'HeartbeatResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -84,6 +85,6 @@ public sealed partial class HeartbeatResponseMessageTests: ResponseMessageTests<
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

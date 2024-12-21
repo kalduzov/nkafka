@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message TxnOffsetCommitResponseMessage
 /// </summary>
-public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable<TxnOffsetCommitResponseMessage>
+internal sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IEquatable<TxnOffsetCommitResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message TxnOffsetCommitResponseTopicMessage
     /// </summary>
-    public sealed partial class TxnOffsetCommitResponseTopicMessage: IMessage, IEquatable<TxnOffsetCommitResponseTopicMessage>
+    internal sealed partial class TxnOffsetCommitResponseTopicMessage: IMessage, IEquatable<TxnOffsetCommitResponseTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -462,7 +462,7 @@ public sealed partial class TxnOffsetCommitResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message TxnOffsetCommitResponsePartitionMessage
     /// </summary>
-    public sealed partial class TxnOffsetCommitResponsePartitionMessage: IMessage, IEquatable<TxnOffsetCommitResponsePartitionMessage>
+    internal sealed partial class TxnOffsetCommitResponsePartitionMessage: IMessage, IEquatable<TxnOffsetCommitResponsePartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

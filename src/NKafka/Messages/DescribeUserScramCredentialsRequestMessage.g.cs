@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeUserScramCredentialsRequestMessage
 /// </summary>
-public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<DescribeUserScramCredentialsRequestMessage>
+internal sealed partial class DescribeUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<DescribeUserScramCredentialsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.DescribeUserScramCredentials;
@@ -189,7 +189,7 @@ public sealed partial class DescribeUserScramCredentialsRequestMessage: IRequest
     /// <summary>
     /// Describes the contract for message UserNameMessage
     /// </summary>
-    public sealed partial class UserNameMessage: IMessage, IEquatable<UserNameMessage>
+    internal sealed partial class UserNameMessage: IMessage, IEquatable<UserNameMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

@@ -4,16 +4,16 @@
 
 /*
  * Copyright © 2022 Aleksey Kalduzov. All rights reserved
- * 
+ *
  * Author: Aleksey Kalduzov
  * Email: alexei.kalduzov@gmail.com
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,46 +35,38 @@ namespace NKafka.Serialization;
 /// 
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
+internal sealed class ListSerializer<T>: ISerializer<List<T>>
 {
-    /// <inheritdoc />
-    public bool PreferAsync => true;
-
     private const int _NULL_ENTRY_VALUE = -1;
 
     // ReSharper disable once StaticMemberInGenericType
-    private static readonly HashSet<Type> _fixedLengthSerializers = new()
-    {
+    private static readonly HashSet<Type> _fixedLengthSerializers =
+    [
         typeof(IntSerializer),
         typeof(ShortSerializer),
         typeof(DoubleSerializer),
         typeof(LongSerializer),
         typeof(FloatSerializer),
         typeof(GuidSerializer)
-    };
+    ];
 
     private readonly SerializationStrategy _serializationStrategy;
 
-    private readonly IAsyncSerializer<T> _serializer;
+    private readonly ISerializer<T> _serializer;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="serializer"></param>
-    public ListSerializer(IAsyncSerializer<T> serializer)
+    public ListSerializer(ISerializer<T> serializer)
     {
         _serializer = serializer;
         _serializationStrategy =
             _fixedLengthSerializers.Contains(serializer.GetType()) ? SerializationStrategy.ConstantSize : SerializationStrategy.VariableSize;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    /// <exception cref="ProtocolKafkaException"></exception>
-    public async Task<byte[]> SerializeAsync(List<T> data)
+    /// <inheritdoc />
+    public byte[] Serialize(List<T> data)
     {
         try
         {
@@ -99,7 +91,7 @@ public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
                 }
                 else
                 {
-                    var bytes = await _serializer.SerializeAsync(entry);
+                    var bytes = _serializer.Serialize(entry);
 
                     if (_serializationStrategy == SerializationStrategy.VariableSize)
                     {
@@ -116,12 +108,6 @@ public sealed class ListSerializer<T>: IAsyncSerializer<List<T>>
         {
             throw new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Failed to serialize list", exc);
         }
-    }
-
-    /// <inheritdoc />
-    public byte[] Serialize(List<T> data)
-    {
-        throw new NotImplementedException();
     }
 
     private static void SerializeNullIndexList(Stream memoryStream, IList data)

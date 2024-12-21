@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeConfigsResponseMessage
 /// </summary>
-public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IEquatable<DescribeConfigsResponseMessage>
+internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IEquatable<DescribeConfigsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message DescribeConfigsResultMessage
     /// </summary>
-    public sealed partial class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
+    internal sealed partial class DescribeConfigsResultMessage: IMessage, IEquatable<DescribeConfigsResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -556,7 +556,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message DescribeConfigsResourceResultMessage
     /// </summary>
-    public sealed partial class DescribeConfigsResourceResultMessage: IMessage, IEquatable<DescribeConfigsResourceResultMessage>
+    internal sealed partial class DescribeConfigsResourceResultMessage: IMessage, IEquatable<DescribeConfigsResourceResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1038,7 +1038,7 @@ public sealed partial class DescribeConfigsResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message DescribeConfigsSynonymMessage
     /// </summary>
-    public sealed partial class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
+    internal sealed partial class DescribeConfigsSynonymMessage: IMessage, IEquatable<DescribeConfigsSynonymMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

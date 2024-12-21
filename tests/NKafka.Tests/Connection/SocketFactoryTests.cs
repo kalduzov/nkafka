@@ -48,7 +48,7 @@ public class SocketFactoryTests
     {
         var socketFactory = new SocketFactory();
         var socketProxy = socketFactory.CreateSocket(SocketType.Stream, ProtocolType.Tcp, 0);
-        await socketProxy.ConnectAsync(_endPoint);
+        await socketProxy.ConnectAsync(_endPoint, CancellationToken.None);
         var stream = socketFactory.CreateNetworkStream(socketProxy.Socket, true);
         stream.Should().NotBeNull();
         stream.CanWrite.Should().BeTrue();
@@ -59,7 +59,7 @@ public class SocketFactoryTests
     {
         var socketFactory = new SocketFactory();
         var socketProxy = socketFactory.CreateSocket(SocketType.Stream, ProtocolType.Tcp, 0);
-        await socketProxy.ConnectAsync(_endPoint);
+        await socketProxy.ConnectAsync(_endPoint, CancellationToken.None);
         var stream = socketFactory.CreateNetworkStream(socketProxy.Socket, true);
         var sslStream = socketFactory.CreateSslStream(stream);
         await ((SslStream)sslStream).AuthenticateAsClientAsync("google.com");

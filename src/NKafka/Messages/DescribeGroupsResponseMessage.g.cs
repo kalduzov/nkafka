@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DescribeGroupsResponseMessage
 /// </summary>
-public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<DescribeGroupsResponseMessage>
+internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEquatable<DescribeGroupsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -238,7 +238,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
     /// <summary>
     /// Describes the contract for message DescribedGroupMessage
     /// </summary>
-    public sealed partial class DescribedGroupMessage: IMessage, IEquatable<DescribedGroupMessage>
+    internal sealed partial class DescribedGroupMessage: IMessage, IEquatable<DescribedGroupMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -681,7 +681,7 @@ public sealed partial class DescribeGroupsResponseMessage: IResponseMessage, IEq
     /// <summary>
     /// Describes the contract for message DescribedGroupMemberMessage
     /// </summary>
-    public sealed partial class DescribedGroupMemberMessage: IMessage, IEquatable<DescribedGroupMemberMessage>
+    internal sealed partial class DescribedGroupMemberMessage: IMessage, IEquatable<DescribedGroupMemberMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

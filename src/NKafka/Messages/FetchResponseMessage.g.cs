@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message FetchResponseMessage
 /// </summary>
-public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<FetchResponseMessage>
+internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<FetchResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -366,7 +366,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message FetchableTopicResponseMessage
     /// </summary>
-    public sealed partial class FetchableTopicResponseMessage: IMessage, IEquatable<FetchableTopicResponseMessage>
+    internal sealed partial class FetchableTopicResponseMessage: IMessage, IEquatable<FetchableTopicResponseMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -630,7 +630,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message PartitionDataMessage
     /// </summary>
-    public sealed partial class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
+    internal sealed partial class PartitionDataMessage: IMessage, IEquatable<PartitionDataMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1143,7 +1143,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message EpochEndOffsetMessage
     /// </summary>
-    public sealed partial class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
+    internal sealed partial class EpochEndOffsetMessage: IMessage, IEquatable<EpochEndOffsetMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1263,7 +1263,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message LeaderIdAndEpochMessage
     /// </summary>
-    public sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
+    internal sealed partial class LeaderIdAndEpochMessage: IMessage, IEquatable<LeaderIdAndEpochMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1383,7 +1383,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message SnapshotIdMessage
     /// </summary>
-    public sealed partial class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
+    internal sealed partial class SnapshotIdMessage: IMessage, IEquatable<SnapshotIdMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1503,7 +1503,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message AbortedTransactionMessage
     /// </summary>
-    public sealed partial class AbortedTransactionMessage: IMessage, IEquatable<AbortedTransactionMessage>
+    internal sealed partial class AbortedTransactionMessage: IMessage, IEquatable<AbortedTransactionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1636,7 +1636,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message NodeEndpointMessage
     /// </summary>
-    public sealed partial class NodeEndpointMessage: IMessage, IEquatable<NodeEndpointMessage>
+    internal sealed partial class NodeEndpointMessage: IMessage, IEquatable<NodeEndpointMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1843,7 +1843,7 @@ public sealed partial class FetchResponseMessage: IResponseMessage, IEquatable<F
     /// <summary>
     /// Describes the contract for message NodeEndpointCollection
     /// </summary>
-    public sealed partial class NodeEndpointCollection: HashSet<NodeEndpointMessage>
+    internal sealed partial class NodeEndpointCollection: HashSet<NodeEndpointMessage>
     {
         /// <summary>
         /// Basic collection constructor

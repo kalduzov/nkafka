@@ -24,10 +24,10 @@ using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests.Messages;
 
-public class RequestMessageTests<T>
-    where T : IMessage, new()
+internal static class RequestMessageTests
 {
-    protected void SerializeAndDeserializeMessage(T message, ApiVersion version)
+    public static void SerializeAndDeserializeMessageTest<T>(this T message, ApiVersion version)
+        where T : IMessage, new()
     {
         using var stream = new MemoryStream();
         var writer = new BufferWriter(stream);

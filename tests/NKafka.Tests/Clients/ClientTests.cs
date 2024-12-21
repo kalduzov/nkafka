@@ -26,6 +26,7 @@ using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Messages;
+using NKafka.Metrics;
 using NKafka.Protocol;
 using NKafka.Serialization;
 
@@ -91,6 +92,7 @@ public abstract class ClientTests
             transactionManager,
             recordAccumulator,
             messagesSender,
+            new NullProducerMetrics(),
             NullLoggerFactory.Instance);
     }
 

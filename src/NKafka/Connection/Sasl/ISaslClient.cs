@@ -25,7 +25,7 @@ namespace NKafka.Connection.Sasl;
 /// Performs SASL authentication as a client.
 /// </summary>
 /// <remarks>This a port SaslClient from java</remarks>
-public interface ISaslClient: IDisposable
+internal interface ISaslClient: IDisposable
 {
     /// <summary>
     /// Returns the IANA-registered mechanism name of this SASL client.

@@ -34,7 +34,7 @@ public interface IAdminClient: IClient
     /// <param name="token"></param>
     Task<Dictionary<string, CreateTopicResult>> CreateTopicsAsync(IReadOnlyCollection<TopicDetail> topics,
         CreateTopicsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// Delete a batch of topics
@@ -44,14 +44,14 @@ public interface IAdminClient: IClient
     /// <param name="token"></param>
     Task<Dictionary<string, DeleteTopicsResult>> DeleteTopicsAsync(IReadOnlyCollection<string> topicsName,
         DeleteTopicsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// List the topics available in the cluster
     /// </summary>
     /// <param name="options">The options to use when listing the topics</param>
     /// <param name="token"></param>
-    Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token = default);
+    Task<IReadOnlyCollection<TopicMetadata>> ListTopicsAsync(ListTopicsOptions options, CancellationToken token);
 
     /// <summary>
     /// Describe some topics in the cluster
@@ -61,14 +61,14 @@ public interface IAdminClient: IClient
     /// <param name="token"></param>
     Task<Dictionary<string, TopicDescription>> DescribeTopicsAsync(HashSet<string> topics,
         DescribeTopicsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// Describe the cluster information.
     /// </summary>
     /// <param name="options">Describe the cluster information.</param>
     /// <param name="token"></param>
-    Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token = default);
+    Task<DescribeClusterResult> DescribeClusterAsync(DescribeClusterOptions options, CancellationToken token);
 
     /// <summary>
     ///  Finds ACL bindings using a filter
@@ -76,7 +76,7 @@ public interface IAdminClient: IClient
     /// <param name="filter"></param>
     /// <param name="options"></param>
     /// <param name="token"></param>
-    Task<DescribeAclsResult> DescribeAclsAsync(AclBindingFilter filter, DescribeAclsOptions options, CancellationToken token = default);
+    Task<DescribeAclsResult> DescribeAclsAsync(AclBindingFilter filter, DescribeAclsOptions options, CancellationToken token);
 
     /// <summary>
     /// 
@@ -85,7 +85,7 @@ public interface IAdminClient: IClient
     /// <param name="options"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task<CreateAclsResult> CreateAclsAsync(IReadOnlyCollection<AclBinding> aclBindings, CreateAclsOptions options, CancellationToken token = default);
+    Task<CreateAclsResult> CreateAclsAsync(IReadOnlyCollection<AclBinding> aclBindings, CreateAclsOptions options, CancellationToken token);
 
     /// <summary>
     /// 
@@ -95,7 +95,7 @@ public interface IAdminClient: IClient
     /// <param name="token"></param>
     Task<DeleteAclsResult> DeleteAclsAsync(IReadOnlyCollection<AclBindingFilter> aclBindingFilters,
         DeleteAclsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// 
@@ -105,7 +105,7 @@ public interface IAdminClient: IClient
     /// <param name="token"></param>
     Task<DescribeConfigsResult> DescribeConfigsAsync(IReadOnlyCollection<ConfigResource> resources,
         DescribeConfigsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// 
@@ -116,7 +116,7 @@ public interface IAdminClient: IClient
     /// <remarks>Since 2.3.0 use <see cref="IncrementalAlterConfigsAsync"/></remarks>
     Task<AlterConfigsResult> AlterConfigsAsync(Dictionary<ConfigResource, List<ConfigEntry>> configs,
         AlterConfigsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 
     /// <summary>
     /// 
@@ -127,5 +127,5 @@ public interface IAdminClient: IClient
     /// <remarks>This operation is supported by brokers with version 2.3.0 or higher</remarks>
     Task<IncrementalAlterConfigsResult> IncrementalAlterConfigsAsync(Dictionary<ConfigResource, List<ConfigEntry>> configs,
         IncrementalAlterConfigsOptions options,
-        CancellationToken token = default);
+        CancellationToken token);
 }

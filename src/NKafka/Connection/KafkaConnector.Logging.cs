@@ -27,16 +27,15 @@ using NKafka.Protocol;
 
 namespace NKafka.Connection;
 
-internal sealed partial class KafkaConnector
-{
-}
+internal sealed partial class KafkaConnector;
 
 internal static partial class KafkaConnectorLoggerExtensions
 {
     [LoggerMessage(
         EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID,
         Level = LogLevel.Information,
-        Message = LogExtensions.LOGGER_PREFIX + "Connection at address {EndPoint} to broker {NodeId} was dropped due to inactivity for {ConnectionsMaxIdleMs} ms.")]
+        Message = LogExtensions.LOGGER_PREFIX
+                  + "Connection at address {EndPoint} to broker {NodeId} was dropped due to inactivity for {ConnectionsMaxIdleMs} ms.")]
     public static partial void ConnectionResetInformation(this ILogger logger, EndPoint endpoint, int nodeId, int connectionsMaxIdleMs);
 
     [LoggerMessage(

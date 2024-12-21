@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//59-01-7F-DC-B0-AB-4C-C4-33-DF-C0-16-3B-23-7E-47-B3-62-3E-D5-CD-37-85-97-AF-01-52-B5-78-67-95-62
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class DeleteAclsRequestMessageTests: RequestMessageTests<DeleteAclsRequestMessage>
+public sealed partial class DeleteAclsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class DeleteAclsRequestMessageTests: RequestMessageTests<D
         {
             Filters = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -53,7 +54,7 @@ public sealed partial class DeleteAclsRequestMessageTests: RequestMessageTests<D
         {
             Filters = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -62,7 +63,7 @@ public sealed partial class DeleteAclsRequestMessageTests: RequestMessageTests<D
         {
             Filters = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -71,6 +72,6 @@ public sealed partial class DeleteAclsRequestMessageTests: RequestMessageTests<D
         {
             Filters = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
 }

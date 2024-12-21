@@ -31,18 +31,18 @@ internal class RoundRobinPartitioner: IPartitioner
     private readonly ConcurrentDictionary<string, ThreadSafeCounter> _topicCounterMap = new();
 
     ///<inheritdoc /> 
-    public async ValueTask<int> PartitionAsync<TKey, TValue>(
+    public async ValueTask<int> Partition<TKey, TValue>(
         string topic,
         TKey key,
         byte[] keyBytes,
         TValue value,
         byte[] valueBytes,
         IKafkaCluster cluster,
-        CancellationToken token = default)
+        CancellationToken token)
         where TKey : notnull
         where TValue : notnull
     {
-        var partitions = await cluster.GetPartitionsAsync(topic, token);
+        var partitions = await cluster.GetPartitions(topic, token);
         var numPartitions = partitions.Count;
         var nextValue = NextValue(topic);
 

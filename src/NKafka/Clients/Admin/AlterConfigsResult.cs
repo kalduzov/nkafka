@@ -24,6 +24,4 @@ namespace NKafka.Clients.Admin;
 /// <summary>
 /// 
 /// </summary>
-public record AlterConfigsResult
-{
-}
+public record AlterConfigsResult;

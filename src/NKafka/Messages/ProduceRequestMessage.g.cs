@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ProduceRequestMessage
 /// </summary>
-public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRequestMessage>
+internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<ProduceRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Produce;
@@ -333,7 +333,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
     /// <summary>
     /// Describes the contract for message TopicProduceDataMessage
     /// </summary>
-    public sealed partial class TopicProduceDataMessage: IMessage, IEquatable<TopicProduceDataMessage>
+    internal sealed partial class TopicProduceDataMessage: IMessage, IEquatable<TopicProduceDataMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -567,7 +567,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
     /// <summary>
     /// Describes the contract for message PartitionProduceDataMessage
     /// </summary>
-    public sealed partial class PartitionProduceDataMessage: IMessage, IEquatable<PartitionProduceDataMessage>
+    internal sealed partial class PartitionProduceDataMessage: IMessage, IEquatable<PartitionProduceDataMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -736,7 +736,7 @@ public sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable<P
     /// <summary>
     /// Describes the contract for message TopicProduceDataCollection
     /// </summary>
-    public sealed partial class TopicProduceDataCollection: HashSet<TopicProduceDataMessage>
+    internal sealed partial class TopicProduceDataCollection: HashSet<TopicProduceDataMessage>
     {
         /// <summary>
         /// Basic collection constructor

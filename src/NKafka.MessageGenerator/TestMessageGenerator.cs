@@ -76,7 +76,7 @@ public class TestMessageGenerator: ClassGenerator, ITestsMessageGenerator
 
         CodeGenerator.AppendRightBraceWithEndSymbol(";");
 
-        CodeGenerator.AppendLine($"SerializeAndDeserializeMessage(message, ApiVersion.Version{apiVersion});");
+        CodeGenerator.AppendLine($"message.SerializeAndDeserializeMessageTest(ApiVersion.Version{apiVersion});");
 
         CodeGenerator.DecrementIndent();
         CodeGenerator.AppendRightBrace();
@@ -131,7 +131,7 @@ public class TestMessageGenerator: ClassGenerator, ITestsMessageGenerator
             classPrefix = className.Replace("Header", "");
         }
 
-        CodeGenerator.AppendLine($"public sealed partial class {className}Tests: {classPrefix}MessageTests<{className}>");
+        CodeGenerator.AppendLine($"public sealed partial class {className}Tests");
         CodeGenerator.AppendLeftBrace();
     }
 }

@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SaslAuthenticateResponseMessage
 /// </summary>
-public sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, IEquatable<SaslAuthenticateResponseMessage>
+internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage, IEquatable<SaslAuthenticateResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

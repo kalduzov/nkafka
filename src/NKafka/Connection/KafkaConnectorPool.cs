@@ -315,7 +315,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         return _seedConnectors.ToArray()[index].Value;
     }
 
-    public async ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token = default)
+    public async ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
 

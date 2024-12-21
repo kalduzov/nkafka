@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SaslHandshakeRequestMessage
 /// </summary>
-public sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquatable<SaslHandshakeRequestMessage>
+internal sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEquatable<SaslHandshakeRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SaslHandshake;

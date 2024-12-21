@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//6F-3B-63-D1-57-37-45-5B-66-37-65-1D-92-2B-2C-6C-B8-93-96-61-00-BF-E7-7C-19-B7-7A-B7-BC-0A-28-55
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class IncrementalAlterConfigsResponseMessageTests: ResponseMessageTests<IncrementalAlterConfigsResponseMessage>
+public sealed partial class IncrementalAlterConfigsResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessageTests: Respons
             ThrottleTimeMs = -420004200,
             Responses = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,6 +56,6 @@ public sealed partial class IncrementalAlterConfigsResponseMessageTests: Respons
             ThrottleTimeMs = -420004200,
             Responses = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

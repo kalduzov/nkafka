@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//A2-0C-22-F3-23-21-59-3F-52-47-54-2A-E7-06-7E-4B-B5-74-8C-4A-E0-74-DD-04-31-00-41-36-0F-F6-DD-13
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchRequestMessage>
+public sealed partial class FetchRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -47,7 +48,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             MinBytes = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -59,7 +60,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             MinBytes = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -71,7 +72,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             MinBytes = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -84,7 +85,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             MaxBytes = -420004200,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -98,7 +99,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             IsolationLevel = 42,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -112,7 +113,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             IsolationLevel = 42,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -126,7 +127,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             IsolationLevel = 42,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -143,7 +144,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             Topics = new (),
             ForgottenTopicsData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
@@ -160,7 +161,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             Topics = new (),
             ForgottenTopicsData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
@@ -177,7 +178,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             Topics = new (),
             ForgottenTopicsData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version10")]
     public void SerializeAndDeserializeMessage_ApiVersion10_Success()
@@ -194,7 +195,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             Topics = new (),
             ForgottenTopicsData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version11")]
     public void SerializeAndDeserializeMessage_ApiVersion11_Success()
@@ -212,7 +213,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version12")]
     public void SerializeAndDeserializeMessage_ApiVersion12_Success()
@@ -231,7 +232,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version12);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version13")]
     public void SerializeAndDeserializeMessage_ApiVersion13_Success()
@@ -250,7 +251,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version13);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version13);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version14")]
     public void SerializeAndDeserializeMessage_ApiVersion14_Success()
@@ -269,7 +270,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version14);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version14);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version15")]
     public void SerializeAndDeserializeMessage_ApiVersion15_Success()
@@ -288,7 +289,7 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version15);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version15);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version16")]
     public void SerializeAndDeserializeMessage_ApiVersion16_Success()
@@ -307,6 +308,6 @@ public sealed partial class FetchRequestMessageTests: RequestMessageTests<FetchR
             ForgottenTopicsData = new (),
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version16);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version16);
     }
 }

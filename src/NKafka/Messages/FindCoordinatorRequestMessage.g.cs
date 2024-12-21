@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message FindCoordinatorRequestMessage
 /// </summary>
-public sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<FindCoordinatorRequestMessage>
+internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IEquatable<FindCoordinatorRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.FindCoordinator;

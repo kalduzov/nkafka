@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message SyncGroupRequestMessage
 /// </summary>
-public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGroupRequestMessage>
+internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable<SyncGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.SyncGroup;
@@ -539,7 +539,7 @@ public sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatable
     /// <summary>
     /// Describes the contract for message SyncGroupRequestAssignmentMessage
     /// </summary>
-    public sealed partial class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
+    internal sealed partial class SyncGroupRequestAssignmentMessage: IMessage, IEquatable<SyncGroupRequestAssignmentMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AddPartitionsToTxnResponseMessage
 /// </summary>
-public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquatable<AddPartitionsToTxnResponseMessage>
+internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage, IEquatable<AddPartitionsToTxnResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -325,7 +325,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnResultMessage
     /// </summary>
-    public sealed partial class AddPartitionsToTxnResultMessage: IMessage, IEquatable<AddPartitionsToTxnResultMessage>
+    internal sealed partial class AddPartitionsToTxnResultMessage: IMessage, IEquatable<AddPartitionsToTxnResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -504,7 +504,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnResultCollection
     /// </summary>
-    public sealed partial class AddPartitionsToTxnResultCollection: HashSet<AddPartitionsToTxnResultMessage>
+    internal sealed partial class AddPartitionsToTxnResultCollection: HashSet<AddPartitionsToTxnResultMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -530,7 +530,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnTopicResultMessage
     /// </summary>
-    public sealed partial class AddPartitionsToTxnTopicResultMessage: IMessage, IEquatable<AddPartitionsToTxnTopicResultMessage>
+    internal sealed partial class AddPartitionsToTxnTopicResultMessage: IMessage, IEquatable<AddPartitionsToTxnTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -764,7 +764,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnTopicResultCollection
     /// </summary>
-    public sealed partial class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
+    internal sealed partial class AddPartitionsToTxnTopicResultCollection: HashSet<AddPartitionsToTxnTopicResultMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -790,7 +790,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnPartitionResultMessage
     /// </summary>
-    public sealed partial class AddPartitionsToTxnPartitionResultMessage: IMessage, IEquatable<AddPartitionsToTxnPartitionResultMessage>
+    internal sealed partial class AddPartitionsToTxnPartitionResultMessage: IMessage, IEquatable<AddPartitionsToTxnPartitionResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -919,7 +919,7 @@ public sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessage,
     /// <summary>
     /// Describes the contract for message AddPartitionsToTxnPartitionResultCollection
     /// </summary>
-    public sealed partial class AddPartitionsToTxnPartitionResultCollection: HashSet<AddPartitionsToTxnPartitionResultMessage>
+    internal sealed partial class AddPartitionsToTxnPartitionResultCollection: HashSet<AddPartitionsToTxnPartitionResultMessage>
     {
         /// <summary>
         /// Basic collection constructor

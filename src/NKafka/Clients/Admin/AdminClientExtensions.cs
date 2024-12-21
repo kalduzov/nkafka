@@ -31,7 +31,7 @@ public static class AdminClientExtensions
     /// </summary>
     public static Task<Dictionary<string, CreateTopicResult>> CreateTopicsAsync(this IAdminClient client,
         IReadOnlyCollection<TopicDetail> topics,
-        CancellationToken token = default)
+        CancellationToken token)
     {
         return client.CreateTopicsAsync(topics, new CreateTopicsOptions(), token);
     }

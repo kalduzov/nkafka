@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetDeleteResponseMessage
 /// </summary>
-public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<OffsetDeleteResponseMessage>
+internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEquatable<OffsetDeleteResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -188,7 +188,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message OffsetDeleteResponseTopicMessage
     /// </summary>
-    public sealed partial class OffsetDeleteResponseTopicMessage: IMessage, IEquatable<OffsetDeleteResponseTopicMessage>
+    internal sealed partial class OffsetDeleteResponseTopicMessage: IMessage, IEquatable<OffsetDeleteResponseTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -353,7 +353,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message OffsetDeleteResponsePartitionMessage
     /// </summary>
-    public sealed partial class OffsetDeleteResponsePartitionMessage: IMessage, IEquatable<OffsetDeleteResponsePartitionMessage>
+    internal sealed partial class OffsetDeleteResponsePartitionMessage: IMessage, IEquatable<OffsetDeleteResponsePartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -462,7 +462,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message OffsetDeleteResponsePartitionCollection
     /// </summary>
-    public sealed partial class OffsetDeleteResponsePartitionCollection: HashSet<OffsetDeleteResponsePartitionMessage>
+    internal sealed partial class OffsetDeleteResponsePartitionCollection: HashSet<OffsetDeleteResponsePartitionMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -488,7 +488,7 @@ public sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEqua
     /// <summary>
     /// Describes the contract for message OffsetDeleteResponseTopicCollection
     /// </summary>
-    public sealed partial class OffsetDeleteResponseTopicCollection: HashSet<OffsetDeleteResponseTopicMessage>
+    internal sealed partial class OffsetDeleteResponseTopicCollection: HashSet<OffsetDeleteResponseTopicMessage>
     {
         /// <summary>
         /// Basic collection constructor

@@ -33,7 +33,7 @@ internal interface ISocketProxy: IDisposable
 
     Socket Socket { get; }
 
-    ValueTask ConnectAsync(EndPoint remoteEp, CancellationToken token = default);
+    ValueTask ConnectAsync(EndPoint remoteEp, CancellationToken token);
 
     void Close(int timeout);
 }

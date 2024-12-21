@@ -21,5 +21,4 @@
 
 namespace NKafka.Clients.Producer.Internals;
 
-internal interface ITransactionManager
-{ }
+internal interface ITransactionManager;

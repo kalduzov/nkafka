@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//69-C6-BC-ED-FF-7B-8C-DE-E8-5B-81-5A-C6-26-FB-A5-B0-6B-E9-EC-8A-8F-59-00-A7-02-FA-A7-B0-B3-6C-AF
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<ListGroupsRequestMessage>
+public sealed partial class ListGroupsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -43,7 +44,7 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         var message = new ListGroupsRequestMessage
         {
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -51,7 +52,7 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         var message = new ListGroupsRequestMessage
         {
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -59,7 +60,7 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         var message = new ListGroupsRequestMessage
         {
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -67,7 +68,7 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         var message = new ListGroupsRequestMessage
         {
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -76,7 +77,7 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
         {
             StatesFilter = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ListGroupsRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -86,6 +87,6 @@ public sealed partial class ListGroupsRequestMessageTests: RequestMessageTests<L
             StatesFilter = new (),
             TypesFilter = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

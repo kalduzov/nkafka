@@ -25,7 +25,7 @@ namespace NKafka.Protocol.Buffers;
 
 using static System.Buffers.Binary.BinaryPrimitives;
 
-public ref partial struct BufferReader
+internal ref partial struct BufferReader
 {
     /// <summary>
     /// Read int from buffer 

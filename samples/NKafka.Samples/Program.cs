@@ -44,10 +44,10 @@ var stopwatch = Stopwatch.StartNew();
 
 var clusterConfig = new ClusterConfig
 {
-    BootstrapServers = new[]
-    {
+    BootstrapServers =
+    [
         "localhost:29091"
-    },
+    ],
 
     // SecurityProtocol = SecurityProtocols.Ssl,
     // Ssl = new SslSettings
@@ -57,13 +57,13 @@ var clusterConfig = new ClusterConfig
     // },
     ClusterInitTimeoutMs = 160000, // 160сек для отладки
     MetadataUpdateTimeoutMs = 60000, // 60 секунд на обновление данных по кластеру
-    Sasl = new SaslSettings
-    {
-        Mechanism = SaslMechanism.Plain,
-        UserName = "test",
-        Password = "test"
-    },
-    SecurityProtocol = SecurityProtocols.SaslPlaintext
+    // Sasl = new SaslSettings
+    // {
+    //     Mechanism = SaslMechanism.Plain,
+    //     UserName = "test",
+    //     Password = "test"
+    // },
+    // SecurityProtocol = SecurityProtocols.SaslPlaintext
 
     //MessageMaxBytes = 400000
     //MessageMaxBytes = 20,
@@ -123,7 +123,7 @@ await using var producer = kafkaCluster.BuildProducer<Null, string>(new Producer
     LingerMs = 5
 });
 
-const int count = 10000;
+const int count = 100;
 
 foreach (var val in Enumerable.Range(0, count))
 {

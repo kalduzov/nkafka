@@ -23,7 +23,7 @@ using System.Reflection;
 
 namespace NKafka.Messages;
 
-public sealed partial class ApiVersionsRequestMessage
+internal sealed partial class ApiVersionsRequestMessage
 {
     private const string _DEFAULT_CLIENT_SOFTWARE_NAME = "NKafka";
 

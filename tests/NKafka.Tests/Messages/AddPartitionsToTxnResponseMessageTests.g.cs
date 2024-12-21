@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//24-65-B0-40-D3-18-13-EE-A4-42-B8-81-B4-1B-DC-09-8D-7D-B2-1C-F9-C1-C4-6C-49-39-D7-A1-C2-65-47-B5
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMessageTests<AddPartitionsToTxnResponseMessage>
+public sealed partial class AddPartitionsToTxnResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ThrottleTimeMs = -420004200,
             ResultsByTopicV3AndBelow = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,7 +56,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ThrottleTimeMs = -420004200,
             ResultsByTopicV3AndBelow = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -65,7 +66,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ThrottleTimeMs = -420004200,
             ResultsByTopicV3AndBelow = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ThrottleTimeMs = -420004200,
             ResultsByTopicV3AndBelow = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -86,7 +87,7 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ErrorCode = -4242,
             ResultsByTransaction = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddPartitionsToTxnResponseMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -97,6 +98,6 @@ public sealed partial class AddPartitionsToTxnResponseMessageTests: ResponseMess
             ErrorCode = -4242,
             ResultsByTransaction = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

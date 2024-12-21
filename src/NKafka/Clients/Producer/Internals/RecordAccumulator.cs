@@ -74,10 +74,11 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         ProducerConfig config,
         ITransactionManager transactionManager,
         int deliveryTimeoutMs,
+        IProducerMetrics metrics,
         ILoggerFactory loggerFactory)
     {
         _batchesByTopics = new ConcurrentDictionary<string, PartitionedBatchCollection>();
-        _metrics = config.Metrics;
+        _metrics = metrics;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
         _logger = loggerFactory.CreateLogger<RecordAccumulator>();

@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//7F-CE-01-C8-55-79-8A-7A-42-41-E1-6E-15-AD-F5-00-3F-F3-7E-6E-ED-01-E9-A6-D0-DE-C6-31-22-D7-F7-7E
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class SaslHandshakeResponseMessageTests: ResponseMessageTests<SaslHandshakeResponseMessage>
+public sealed partial class SaslHandshakeResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'SaslHandshakeResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class SaslHandshakeResponseMessageTests: ResponseMessageTe
             ErrorCode = -4242,
             Mechanisms = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'SaslHandshakeResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -55,6 +56,6 @@ public sealed partial class SaslHandshakeResponseMessageTests: ResponseMessageTe
             ErrorCode = -4242,
             Mechanisms = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

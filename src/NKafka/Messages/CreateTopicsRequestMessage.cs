@@ -21,7 +21,7 @@
 
 namespace NKafka.Messages;
 
-public sealed partial class CreateTopicsRequestMessage
+internal sealed partial class CreateTopicsRequestMessage
 {
     /// <summary>
     /// 

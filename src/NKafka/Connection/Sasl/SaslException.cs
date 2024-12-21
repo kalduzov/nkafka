@@ -29,13 +29,6 @@ public class SaslException: Exception
     /// <summary>
     /// 
     /// </summary>
-    public SaslException()
-    {
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="message"></param>
     public SaslException(string message)
         : base(message)

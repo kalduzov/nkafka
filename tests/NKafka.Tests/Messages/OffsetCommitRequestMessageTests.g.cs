@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//6B-08-76-B8-4C-C5-E3-49-D4-F2-96-9B-D7-77-0D-97-DE-5E-79-E1-95-7D-35-59-73-BA-34-79-06-B1-31-5A
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests<OffsetCommitRequestMessage>
+public sealed partial class OffsetCommitRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -45,7 +46,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -57,7 +58,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -70,7 +71,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -83,7 +84,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -96,7 +97,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             RetentionTimeMs = -9223372036854775808,
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -108,7 +109,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -120,7 +121,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -133,7 +134,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
@@ -146,7 +147,7 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
@@ -159,6 +160,6 @@ public sealed partial class OffsetCommitRequestMessageTests: RequestMessageTests
             GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
     }
 }

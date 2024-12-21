@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message FetchRequestMessage
 /// </summary>
-public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<FetchRequestMessage>
+internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<FetchRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.Fetch;
@@ -633,7 +633,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// <summary>
     /// Describes the contract for message ReplicaStateMessage
     /// </summary>
-    public sealed partial class ReplicaStateMessage: IMessage, IEquatable<ReplicaStateMessage>
+    internal sealed partial class ReplicaStateMessage: IMessage, IEquatable<ReplicaStateMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -753,7 +753,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// <summary>
     /// Describes the contract for message FetchTopicMessage
     /// </summary>
-    public sealed partial class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
+    internal sealed partial class FetchTopicMessage: IMessage, IEquatable<FetchTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1017,7 +1017,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// <summary>
     /// Describes the contract for message FetchPartitionMessage
     /// </summary>
-    public sealed partial class FetchPartitionMessage: IMessage, IEquatable<FetchPartitionMessage>
+    internal sealed partial class FetchPartitionMessage: IMessage, IEquatable<FetchPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1231,7 +1231,7 @@ public sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<Fet
     /// <summary>
     /// Describes the contract for message ForgottenTopicMessage
     /// </summary>
-    public sealed partial class ForgottenTopicMessage: IMessage, IEquatable<ForgottenTopicMessage>
+    internal sealed partial class ForgottenTopicMessage: IMessage, IEquatable<ForgottenTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

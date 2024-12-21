@@ -26,22 +26,11 @@ namespace NKafka.Tests.Serialization;
 public class GuidSerializerTests
 {
     [Fact]
-    public async Task SerializeAsync_Successful()
-    {
-        var value = Guid.NewGuid();
-        IAsyncSerializer<Guid> serializer = new GuidSerializer();
-        var result = await serializer.SerializeAsync(value);
-
-        result.Should().BeEquivalentTo(value.ToByteArray());
-    }
-
-    [Fact]
     public void Serialize_Successful()
     {
         var value = Guid.NewGuid();
-        IAsyncSerializer<Guid> serializer = new GuidSerializer();
+        ISerializer<Guid> serializer = new GuidSerializer();
         var result = serializer.Serialize(value);
-        serializer.PreferAsync.Should().BeFalse();
         result.Should().BeEquivalentTo(value.ToByteArray());
     }
 }

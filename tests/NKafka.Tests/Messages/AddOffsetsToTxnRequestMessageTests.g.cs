@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//A4-63-7C-D7-EF-8E-C6-2C-8F-98-34-D5-BD-1B-1D-65-EA-5E-A5-19-DC-59-AB-3F-21-B6-4D-04-EC-B3-27-EB
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTests<AddOffsetsToTxnRequestMessage>
+public sealed partial class AddOffsetsToTxnRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -47,7 +48,7 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
             ProducerEpoch = -4242,
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -59,7 +60,7 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
             ProducerEpoch = -4242,
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -71,7 +72,7 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
             ProducerEpoch = -4242,
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -83,7 +84,7 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
             ProducerEpoch = -4242,
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'AddOffsetsToTxnRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -95,6 +96,6 @@ public sealed partial class AddOffsetsToTxnRequestMessageTests: RequestMessageTe
             ProducerEpoch = -4242,
             GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

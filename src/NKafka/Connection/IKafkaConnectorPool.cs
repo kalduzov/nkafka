@@ -57,5 +57,5 @@ internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
     /// <param name="nodes"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token = default);
+    ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token);
 }

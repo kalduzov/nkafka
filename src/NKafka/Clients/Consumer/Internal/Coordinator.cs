@@ -118,14 +118,14 @@ internal class Coordinator: ICoordinator
         try
         {
             await TryFindCoordinatorForGroupAsync(token);
-            await _kafkaCluster.RefreshMetadataAsync(subscription.Topics, token);
+            await _kafkaCluster.RefreshMetadata(subscription.Topics, token);
             await JoinToGroupAsync(subscription, token);
 
             _heartbeatRequest = null;
             _activeSessionAwaiter.SetResult();
 
             await FetchOffsetsAsync(subscription, token);
-            await _kafkaCluster.RefreshMetadataAsync(subscription.Topics, token);
+            await _kafkaCluster.RefreshMetadata(subscription.Topics, token);
 
         }
         catch (ProtocolKafkaException exc)
@@ -530,7 +530,7 @@ internal class Coordinator: ICoordinator
             }
         }
 
-        var topicPartitions = await _kafkaCluster.GetTopicPartitionsAsync(topics, token);
+        var topicPartitions = await _kafkaCluster.GetTopicPartitions(topics, token);
 
         //Т.к. мы лидер группы, то тут проводим привязку партиций для всех членов группы
         var assignResult = _selectedPartitionAssignor.Assign(topicPartitions, subscriptions);

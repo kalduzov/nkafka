@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetFetchRequestMessage
 /// </summary>
-public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatable<OffsetFetchRequestMessage>
+internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatable<OffsetFetchRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.OffsetFetch;
@@ -425,7 +425,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// Describes the contract for message OffsetFetchRequestTopicMessage
     /// </summary>
-    public sealed partial class OffsetFetchRequestTopicMessage: IMessage, IEquatable<OffsetFetchRequestTopicMessage>
+    internal sealed partial class OffsetFetchRequestTopicMessage: IMessage, IEquatable<OffsetFetchRequestTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -641,7 +641,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// Describes the contract for message OffsetFetchRequestGroupMessage
     /// </summary>
-    public sealed partial class OffsetFetchRequestGroupMessage: IMessage, IEquatable<OffsetFetchRequestGroupMessage>
+    internal sealed partial class OffsetFetchRequestGroupMessage: IMessage, IEquatable<OffsetFetchRequestGroupMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -903,7 +903,7 @@ public sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquatab
     /// <summary>
     /// Describes the contract for message OffsetFetchRequestTopicsMessage
     /// </summary>
-    public sealed partial class OffsetFetchRequestTopicsMessage: IMessage, IEquatable<OffsetFetchRequestTopicsMessage>
+    internal sealed partial class OffsetFetchRequestTopicsMessage: IMessage, IEquatable<OffsetFetchRequestTopicsMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message CreateTopicsRequestMessage
 /// </summary>
-public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquatable<CreateTopicsRequestMessage>
+internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquatable<CreateTopicsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.CreateTopics;
@@ -268,7 +268,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreatableTopicMessage
     /// </summary>
-    public sealed partial class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
+    internal sealed partial class CreatableTopicMessage: IMessage, IEquatable<CreatableTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -600,7 +600,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreatableReplicaAssignmentMessage
     /// </summary>
-    public sealed partial class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
+    internal sealed partial class CreatableReplicaAssignmentMessage: IMessage, IEquatable<CreatableReplicaAssignmentMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -773,7 +773,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreatableReplicaAssignmentCollection
     /// </summary>
-    public sealed partial class CreatableReplicaAssignmentCollection: HashSet<CreatableReplicaAssignmentMessage>
+    internal sealed partial class CreatableReplicaAssignmentCollection: HashSet<CreatableReplicaAssignmentMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -799,7 +799,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreateableTopicConfigMessage
     /// </summary>
-    public sealed partial class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
+    internal sealed partial class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -1026,7 +1026,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreateableTopicConfigCollection
     /// </summary>
-    public sealed partial class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
+    internal sealed partial class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -1052,7 +1052,7 @@ public sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message CreatableTopicCollection
     /// </summary>
-    public sealed partial class CreatableTopicCollection: HashSet<CreatableTopicMessage>
+    internal sealed partial class CreatableTopicCollection: HashSet<CreatableTopicMessage>
     {
         /// <summary>
         /// Basic collection constructor

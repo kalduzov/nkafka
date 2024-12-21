@@ -23,5 +23,4 @@ using System.Net;
 
 namespace NKafka.Connection;
 
-internal sealed class NoEndPoint: EndPoint
-{ }
+internal sealed class NoEndPoint: EndPoint;

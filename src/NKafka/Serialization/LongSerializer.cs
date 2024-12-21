@@ -28,7 +28,7 @@ namespace NKafka.Serialization;
 /// <summary>
 /// 
 /// </summary>
-public sealed class LongSerializer: IAsyncSerializer<long>
+internal sealed class LongSerializer: ISerializer<long>
 {
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

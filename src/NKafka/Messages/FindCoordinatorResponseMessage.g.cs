@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message FindCoordinatorResponseMessage
 /// </summary>
-public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IEquatable<FindCoordinatorResponseMessage>
+internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IEquatable<FindCoordinatorResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -456,7 +456,7 @@ public sealed partial class FindCoordinatorResponseMessage: IResponseMessage, IE
     /// <summary>
     /// Describes the contract for message CoordinatorMessage
     /// </summary>
-    public sealed partial class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
+    internal sealed partial class CoordinatorMessage: IMessage, IEquatable<CoordinatorMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

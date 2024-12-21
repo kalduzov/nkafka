@@ -44,7 +44,7 @@ public class TopicsManipulationTests
         {
             new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
         };
-        var createTopicResults = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+        var createTopicResults = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
         var firstTopic = createTopicResults.First().Value;
         firstTopic.ErrorCode.Should().Be(ErrorCodes.None);
         firstTopic.NumPartitions.Should().Be(partitions);
@@ -54,7 +54,8 @@ public class TopicsManipulationTests
             {
                 topicName
             },
-            new DeleteTopicsOptions());
+            new DeleteTopicsOptions(),
+            CancellationToken.None);
 
         deleteTopicsResult.First().Value.IsError.Should().BeFalse();
     }
@@ -70,12 +71,13 @@ public class TopicsManipulationTests
         {
             new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
         };
-        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
         var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
-        {
-            IncludeInternal = true
-        });
+            {
+                IncludeInternal = true
+            },
+            CancellationToken.None);
 
         listTopics.Count.Should().BeGreaterThan(1);
         listTopics.Should().Contain(x => x.Name == topicName);
@@ -85,7 +87,8 @@ public class TopicsManipulationTests
             {
                 topicName
             },
-            new DeleteTopicsOptions());
+            new DeleteTopicsOptions(),
+            CancellationToken.None);
 
     }
 
@@ -100,12 +103,13 @@ public class TopicsManipulationTests
         {
             new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
         };
-        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
         var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
-        {
-            IncludeInternal = false
-        });
+            {
+                IncludeInternal = false
+            },
+            CancellationToken.None);
 
         listTopics.Count.Should().BeGreaterThan(1);
         listTopics.Should().Contain(x => x.Name == topicName);
@@ -115,7 +119,8 @@ public class TopicsManipulationTests
             {
                 topicName
             },
-            new DeleteTopicsOptions());
+            new DeleteTopicsOptions(),
+            CancellationToken.None);
 
     }
 
@@ -130,13 +135,14 @@ public class TopicsManipulationTests
         {
             new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
         };
-        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions());
+        _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
         var listTopics = await kafkaCluster.AdminClient.DescribeTopicsAsync(new HashSet<string>
             {
                 topicName
             },
-            new DescribeTopicsOptions());
+            new DescribeTopicsOptions(),
+            CancellationToken.None);
 
         listTopics.Count.Should().Be(1);
         listTopics.First().Key.Should().Be(topicName);
@@ -150,7 +156,8 @@ public class TopicsManipulationTests
             {
                 topicName
             },
-            new DeleteTopicsOptions());
+            new DeleteTopicsOptions(),
+            CancellationToken.None);
 
     }
 

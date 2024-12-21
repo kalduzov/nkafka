@@ -26,7 +26,7 @@ namespace NKafka.Connection.Sasl.Messages;
 /// <summary>
 /// 
 /// </summary>
-public abstract class ScramMessage
+internal abstract class ScramMessage
 {
 #pragma warning disable CS1591
     private const string _ALPHA = "[A-Za-z]+";

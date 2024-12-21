@@ -113,8 +113,6 @@ public class DeliveryResult<TKey, TValue>
     /// <summary>
     /// Represents the result of delivering a message.
     /// </summary>
-    /// <typeparam name="TKey">The type of the message key.</typeparam>
-    /// <typeparam name="TValue">The type of the message value.</typeparam>
     public DeliveryResult(Message<TKey, TValue> message, PersistenceStatus persisted, TopicPartitionOffset topicPartitionOffset)
     {
         Message = message;

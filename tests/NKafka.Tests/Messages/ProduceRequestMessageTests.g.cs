@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//08-D3-BB-A6-8F-62-94-0E-F1-76-F7-48-F8-12-75-B6-69-43-2A-44-6D-5C-1B-7D-F0-90-F1-89-D9-30-FD-34
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class ProduceRequestMessageTests: RequestMessageTests<ProduceRequestMessage>
+public sealed partial class ProduceRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -46,7 +47,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -57,7 +58,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -68,7 +69,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -80,7 +81,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -92,7 +93,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -104,7 +105,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -116,7 +117,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -128,7 +129,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
@@ -140,7 +141,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
@@ -152,7 +153,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version10")]
     public void SerializeAndDeserializeMessage_ApiVersion10_Success()
@@ -164,7 +165,7 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version11")]
     public void SerializeAndDeserializeMessage_ApiVersion11_Success()
@@ -176,6 +177,6 @@ public sealed partial class ProduceRequestMessageTests: RequestMessageTests<Prod
             TimeoutMs = -420004200,
             TopicData = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
     }
 }

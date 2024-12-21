@@ -41,10 +41,6 @@ public class TopicPartitionTests
     [InlineData("")]
     public void TopicPartitionCreate_TopicInvalid_Successful(string? topicName)
     {
-        TopicPartition BuildTopicPartition()
-        {
-            return new TopicPartition(topicName, 1);
-        }
 
         FluentActions
             .Invoking(BuildTopicPartition)
@@ -52,6 +48,13 @@ public class TopicPartitionTests
             .Throw<ArgumentNullException>()
             .And.ParamName.Should()
             .Be("topic");
+
+        return;
+
+        TopicPartition BuildTopicPartition()
+        {
+            return new TopicPartition(topicName, 1);
+        }
     }
 
     [Fact]

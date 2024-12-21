@@ -156,10 +156,10 @@ void GenerateMessages()
                         IMessageGenerator messageGenerator = new MessageGenerator("NKafka.Messages");
                         var classFileName = $"{messageGenerator.ClassName(messageSpecification)}.g.cs";
 
-                        if (DoesFileHaveSameHash(classFileName, messageSpecification))
-                        {
-                            continue;
-                        }
+                        // if (DoesFileHaveSameHash(classFileName, messageSpecification))
+                        // {
+                        //     continue;
+                        // }
                         var result = messageGenerator.Generate(messageSpecification);
 
                         WriteMessageToFile(classFileName, result);

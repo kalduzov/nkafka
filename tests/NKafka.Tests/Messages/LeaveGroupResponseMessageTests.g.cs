@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//AA-5C-A4-AB-8D-AC-F9-D3-69-59-EF-91-60-F2-35-E9-E4-43-7A-41-09-EC-01-88-0D-F0-58-6C-54-0B-7D-BC
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests<LeaveGroupResponseMessage>
+public sealed partial class LeaveGroupResponseMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
         {
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -54,7 +55,7 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -64,7 +65,7 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
             ThrottleTimeMs = -420004200,
             ErrorCode = -4242,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -75,7 +76,7 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
             ErrorCode = -4242,
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -86,7 +87,7 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
             ErrorCode = -4242,
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'LeaveGroupResponseMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -97,6 +98,6 @@ public sealed partial class LeaveGroupResponseMessageTests: ResponseMessageTests
             ErrorCode = -4242,
             Members = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

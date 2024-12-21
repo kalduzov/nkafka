@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message LeaveGroupRequestMessage
 /// </summary>
-public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveGroupRequestMessage>
+internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatable<LeaveGroupRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.LeaveGroup;
@@ -353,7 +353,7 @@ public sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquatabl
     /// <summary>
     /// Describes the contract for message MemberIdentityMessage
     /// </summary>
-    public sealed partial class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
+    internal sealed partial class MemberIdentityMessage: IMessage, IEquatable<MemberIdentityMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

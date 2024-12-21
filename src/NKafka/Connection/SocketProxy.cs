@@ -26,24 +26,80 @@ namespace NKafka.Connection;
 
 internal class SocketProxy: ISocketProxy
 {
-    public SocketProxy(SocketType socketType, ProtocolType protocolType)
-    {
-        Socket = new Socket(socketType, protocolType);
-    }
-
     public bool Connected => Socket.Connected;
 
     public Socket Socket { get; }
 
+    private readonly TaskCompletionSource _connectCompletionSource = new();
+    private readonly SocketAsyncEventArgs _socketEventArgs;
+
+    public SocketProxy(SocketType socketType, ProtocolType protocolType)
+    {
+        Socket = new Socket(socketType, protocolType);
+        _socketEventArgs = new SocketAsyncEventArgs();
+        _socketEventArgs.Completed += SocketEventArgsOnCompleted;
+
+    }
+
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public void Dispose()
     {
+        _socketEventArgs.Completed -= SocketEventArgsOnCompleted;
+        _socketEventArgs.Dispose();
         Socket.Dispose();
     }
 
-    public ValueTask ConnectAsync(EndPoint remoteEp, CancellationToken token)
+    public async ValueTask ConnectAsync(EndPoint remoteEp, CancellationToken token)
     {
-        return Socket.ConnectAsync(remoteEp, token);
+        if (Socket.Connected)
+        {
+            return;
+        }
+
+        _socketEventArgs.RemoteEndPoint = remoteEp;
+
+        if (Socket.ConnectAsync(_socketEventArgs))
+        {
+            await _connectCompletionSource.Task;
+
+            return;
+        }
+
+        ConnectCompleted(_socketEventArgs);
+    }
+
+    private void SocketEventArgsOnCompleted(object? sender, SocketAsyncEventArgs e)
+    {
+        switch (e.LastOperation)
+        {
+            case SocketAsyncOperation.Connect:
+                ConnectCompleted(e);
+
+                break;
+            case SocketAsyncOperation.None:
+            case SocketAsyncOperation.Accept:
+            case SocketAsyncOperation.Disconnect:
+            case SocketAsyncOperation.Receive:
+            case SocketAsyncOperation.ReceiveFrom:
+            case SocketAsyncOperation.ReceiveMessageFrom:
+            case SocketAsyncOperation.Send:
+            case SocketAsyncOperation.SendPackets:
+            case SocketAsyncOperation.SendTo:
+                break;
+        }
+
+    }
+
+    private void ConnectCompleted(SocketAsyncEventArgs e)
+    {
+        if (e.SocketError == SocketError.Success)
+        {
+            _connectCompletionSource.SetResult();
+        }
+        else
+        {
+            _connectCompletionSource.SetException(new SocketException((int)e.SocketError));
+        }
     }
 
     public void Close(int timeout)

@@ -112,10 +112,10 @@ internal sealed class KafkaCluster: IKafkaCluster
     public ClusterConfig Config { get; }
 
     /// <inheritdoc />
-    public IDictionary<string, TopicMetadata> Topics => _topics;
+    public IReadOnlyDictionary<string, TopicMetadata> Topics => _topics;
 
     /// <inheritdoc />
-    public IDictionary<Guid, string> TopicsById => _topicsById;
+    public IReadOnlyDictionary<Guid, string> TopicsById => _topicsById;
 
     /// <inheritdoc />
     public bool Closed { get; private set; }
@@ -138,7 +138,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public async ValueTask<IReadOnlyCollection<Partition>> GetPartitionsAsync(string topic, CancellationToken token = default)
+    public async ValueTask<IReadOnlyCollection<Partition>> GetPartitions(string topic, CancellationToken token)
     {
         ThrowExceptionIfClusterClosed();
 
@@ -151,7 +151,8 @@ internal sealed class KafkaCluster: IKafkaCluster
             [
                 topic
             ],
-            token: token);
+            false,
+            token);
 
         if (_topicPartitions.TryGetValue(topic, out partitions) && partitions.Count != 0)
         {
@@ -162,13 +163,14 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public async ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitionsAsync(IReadOnlyCollection<string> topics,
-        CancellationToken token = default)
+    public async ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitions(IReadOnlyCollection<string> topics,
+        CancellationToken token)
     {
         //Всегда забираем самые свежие данные из кластера
 
         await InternalRefreshMetadataAsync(
             topics,
+            false,
             token: token);
 
         var result = new List<TopicPartition>(topics.Count * _maxPartitionsByTopic);
@@ -185,7 +187,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public ValueTask<Offset> GetOffsetAsync(string topic, Partition partition, CancellationToken token = default)
+    public ValueTask<Offset> GetOffset(string topic, Partition partition, CancellationToken token)
     {
         return ValueTask.FromResult(Offset.Unset);
     }
@@ -194,8 +196,8 @@ internal sealed class KafkaCluster: IKafkaCluster
     public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(
         string name,
         ProducerConfig producerConfig,
-        IAsyncSerializer<TKey> keySerializer,
-        IAsyncSerializer<TValue> valueSerializer)
+        ISerializer<TKey> keySerializer,
+        ISerializer<TValue> valueSerializer)
         where TKey : notnull
         where TValue : notnull
     {
@@ -223,8 +225,8 @@ internal sealed class KafkaCluster: IKafkaCluster
 
     /// <inheritdoc />
     public IConsumer<TKey, TValue> BuildConsumer<TKey, TValue>(ConsumerConfig consumerConfig,
-        IAsyncDeserializer<TKey> keyDeserializer,
-        IAsyncDeserializer<TValue> valueDeserializer)
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer)
         where TKey : notnull
         where TValue : notnull
     {
@@ -242,9 +244,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token = default)
+    public Task RefreshMetadata(IReadOnlyCollection<string> topics, CancellationToken token)
     {
-        return InternalRefreshMetadataAsync(topics, token: token);
+        return InternalRefreshMetadataAsync(topics, false, token);
     }
 
     /// <inheritdoc />
@@ -390,9 +392,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     private async Task InternalRefreshMetadataAsync(
-        IEnumerable<string>? topics = null,
-        bool skipException = false,
-        CancellationToken token = default)
+        IEnumerable<string>? topics,
+        bool skipException,
+        CancellationToken token)
     {
         var localTopics = topics?.ToArray();
         using var activity = KafkaDiagnosticsSource.RefreshMetadata(localTopics);
@@ -594,7 +596,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         try
         {
             tokenSource.CancelAfter(Config.RequestTimeoutMs);
-            await InternalRefreshMetadataAsync(_topics.Keys, token: tokenSource.Token);
+            await InternalRefreshMetadataAsync(_topics.Keys, false, tokenSource.Token);
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {

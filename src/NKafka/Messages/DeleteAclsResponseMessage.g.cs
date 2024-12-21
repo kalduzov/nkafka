@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message DeleteAclsResponseMessage
 /// </summary>
-public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquatable<DeleteAclsResponseMessage>
+internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquatable<DeleteAclsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
     /// <summary>
     /// Describes the contract for message DeleteAclsFilterResultMessage
     /// </summary>
-    public sealed partial class DeleteAclsFilterResultMessage: IMessage, IEquatable<DeleteAclsFilterResultMessage>
+    internal sealed partial class DeleteAclsFilterResultMessage: IMessage, IEquatable<DeleteAclsFilterResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -489,7 +489,7 @@ public sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEquata
     /// <summary>
     /// Describes the contract for message DeleteAclsMatchingAclMessage
     /// </summary>
-    public sealed partial class DeleteAclsMatchingAclMessage: IMessage, IEquatable<DeleteAclsMatchingAclMessage>
+    internal sealed partial class DeleteAclsMatchingAclMessage: IMessage, IEquatable<DeleteAclsMatchingAclMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

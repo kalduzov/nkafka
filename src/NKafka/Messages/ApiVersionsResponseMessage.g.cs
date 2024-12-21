@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ApiVersionsResponseMessage
 /// </summary>
-public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquatable<ApiVersionsResponseMessage>
+internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquatable<ApiVersionsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -435,7 +435,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message ApiVersionMessage
     /// </summary>
-    public sealed partial class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
+    internal sealed partial class ApiVersionMessage: IMessage, IEquatable<ApiVersionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -576,7 +576,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message ApiVersionCollection
     /// </summary>
-    public sealed partial class ApiVersionCollection: HashSet<ApiVersionMessage>
+    internal sealed partial class ApiVersionCollection: HashSet<ApiVersionMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -602,7 +602,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message SupportedFeatureKeyMessage
     /// </summary>
-    public sealed partial class SupportedFeatureKeyMessage: IMessage, IEquatable<SupportedFeatureKeyMessage>
+    internal sealed partial class SupportedFeatureKeyMessage: IMessage, IEquatable<SupportedFeatureKeyMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -763,7 +763,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message SupportedFeatureKeyCollection
     /// </summary>
-    public sealed partial class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
+    internal sealed partial class SupportedFeatureKeyCollection: HashSet<SupportedFeatureKeyMessage>
     {
         /// <summary>
         /// Basic collection constructor
@@ -789,7 +789,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message FinalizedFeatureKeyMessage
     /// </summary>
-    public sealed partial class FinalizedFeatureKeyMessage: IMessage, IEquatable<FinalizedFeatureKeyMessage>
+    internal sealed partial class FinalizedFeatureKeyMessage: IMessage, IEquatable<FinalizedFeatureKeyMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -950,7 +950,7 @@ public sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEquat
     /// <summary>
     /// Describes the contract for message FinalizedFeatureKeyCollection
     /// </summary>
-    public sealed partial class FinalizedFeatureKeyCollection: HashSet<FinalizedFeatureKeyMessage>
+    internal sealed partial class FinalizedFeatureKeyCollection: HashSet<FinalizedFeatureKeyMessage>
     {
         /// <summary>
         /// Basic collection constructor

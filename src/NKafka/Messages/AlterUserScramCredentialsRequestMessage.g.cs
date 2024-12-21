@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message AlterUserScramCredentialsRequestMessage
 /// </summary>
-public sealed partial class AlterUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
+internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestMessage, IEquatable<AlterUserScramCredentialsRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.AlterUserScramCredentials;
@@ -224,7 +224,7 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: IRequestMes
     /// <summary>
     /// Describes the contract for message ScramCredentialDeletionMessage
     /// </summary>
-    public sealed partial class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
+    internal sealed partial class ScramCredentialDeletionMessage: IMessage, IEquatable<ScramCredentialDeletionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -369,7 +369,7 @@ public sealed partial class AlterUserScramCredentialsRequestMessage: IRequestMes
     /// <summary>
     /// Describes the contract for message ScramCredentialUpsertionMessage
     /// </summary>
-    public sealed partial class ScramCredentialUpsertionMessage: IMessage, IEquatable<ScramCredentialUpsertionMessage>
+    internal sealed partial class ScramCredentialUpsertionMessage: IMessage, IEquatable<ScramCredentialUpsertionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

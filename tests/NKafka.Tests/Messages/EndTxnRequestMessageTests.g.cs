@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//BB-F4-B6-B5-69-6D-4C-6C-B2-85-43-D4-D8-76-70-03-53-53-67-90-76-69-12-35-46-80-4D-AF-C9-10-C5-21
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTxnRequestMessage>
+public sealed partial class EndTxnRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -47,7 +48,7 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
             ProducerEpoch = -4242,
             Committed = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -59,7 +60,7 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
             ProducerEpoch = -4242,
             Committed = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -71,7 +72,7 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
             ProducerEpoch = -4242,
             Committed = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -83,7 +84,7 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
             ProducerEpoch = -4242,
             Committed = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -95,6 +96,6 @@ public sealed partial class EndTxnRequestMessageTests: RequestMessageTests<EndTx
             ProducerEpoch = -4242,
             Committed = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

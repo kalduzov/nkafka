@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message OffsetDeleteRequestMessage
 /// </summary>
-public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<OffsetDeleteRequestMessage>
+internal sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquatable<OffsetDeleteRequestMessage>
 {
     /// <inheritdoc />
     public ApiKeys ApiKey => ApiKeys.OffsetDelete;
@@ -213,7 +213,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message OffsetDeleteRequestTopicMessage
     /// </summary>
-    public sealed partial class OffsetDeleteRequestTopicMessage: IMessage, IEquatable<OffsetDeleteRequestTopicMessage>
+    internal sealed partial class OffsetDeleteRequestTopicMessage: IMessage, IEquatable<OffsetDeleteRequestTopicMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -378,7 +378,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message OffsetDeleteRequestPartitionMessage
     /// </summary>
-    public sealed partial class OffsetDeleteRequestPartitionMessage: IMessage, IEquatable<OffsetDeleteRequestPartitionMessage>
+    internal sealed partial class OffsetDeleteRequestPartitionMessage: IMessage, IEquatable<OffsetDeleteRequestPartitionMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -472,7 +472,7 @@ public sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEquata
     /// <summary>
     /// Describes the contract for message OffsetDeleteRequestTopicCollection
     /// </summary>
-    public sealed partial class OffsetDeleteRequestTopicCollection: HashSet<OffsetDeleteRequestTopicMessage>
+    internal sealed partial class OffsetDeleteRequestTopicCollection: HashSet<OffsetDeleteRequestTopicMessage>
     {
         /// <summary>
         /// Basic collection constructor

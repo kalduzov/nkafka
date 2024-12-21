@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ConsumerGroupHeartbeatResponseMessage
 /// </summary>
-public sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMessage, IEquatable<ConsumerGroupHeartbeatResponseMessage>
+internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMessage, IEquatable<ConsumerGroupHeartbeatResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -296,7 +296,7 @@ public sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMess
     /// <summary>
     /// Describes the contract for message AssignmentMessage
     /// </summary>
-    public sealed partial class AssignmentMessage: IMessage, IEquatable<AssignmentMessage>
+    internal sealed partial class AssignmentMessage: IMessage, IEquatable<AssignmentMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -430,7 +430,7 @@ public sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMess
     /// <summary>
     /// Describes the contract for message TopicPartitionsMessage
     /// </summary>
-    public sealed partial class TopicPartitionsMessage: IMessage, IEquatable<TopicPartitionsMessage>
+    internal sealed partial class TopicPartitionsMessage: IMessage, IEquatable<TopicPartitionsMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

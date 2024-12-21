@@ -28,7 +28,7 @@ namespace NKafka.Protocol;
 /// <summary>
 /// 
 /// </summary>
-public interface IResponseMessage: IMessage
+internal interface IResponseMessage: IMessage
 {
     private const ErrorCodes _DEFAULT_CODE = ErrorCodes.None;
 

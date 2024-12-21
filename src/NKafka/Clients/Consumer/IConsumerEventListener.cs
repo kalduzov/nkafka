@@ -29,15 +29,15 @@ public interface IConsumerEventListener
     /// <summary>
     /// Данные метод будет вызван в консьюмере, сразу перед тем, как консьюмер прекратит обрабатывать указанные разделы
     /// </summary>
-    Task PartitionsRevokedEventHandlerAsync();
+    Task PartitionsRevokedEventHandler();
 
     /// <summary>
     /// Данные метод будет вызван в консьюмере, сразу после того, как консьюмеру будет связан с определенным разделом
     /// </summary>
-    Task PartitionsAssignedEventHandlerAsync();
+    Task PartitionsAssignedEventHandler();
 
     /// <summary>
     /// Данные метод будет вызван в консьюмере, сразу после того, как произойдет автоматический коммит  
     /// </summary>
-    Task OffsetsCommittedEventHandlerAsync();
+    Task OffsetsCommittedEventHandler();
 }

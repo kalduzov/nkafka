@@ -32,7 +32,7 @@ public class ClusterDescribeTests
     public async Task DescribeCluster_ShouldBe_Successful()
     {
         await using var kafkaCluster = await BuildKafkaCluster();
-        var result = await kafkaCluster.AdminClient.DescribeClusterAsync(new DescribeClusterOptions());
+        var result = await kafkaCluster.AdminClient.DescribeClusterAsync(new DescribeClusterOptions(), CancellationToken.None);
         result.Controller.Should().NotBeNull();
         result.Nodes.Count.Should().Be(5);
         result.Nodes.Contains(result.Controller).Should().BeTrue();

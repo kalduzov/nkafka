@@ -137,11 +137,6 @@ public record ConsumerConfig: CommonConfig
     public int MaxPollIntervalMs { get; set; } = 300_000;
 
     /// <summary>
-    /// Gives the consumer access to the implementation of the metrics provider
-    /// </summary>
-    public IConsumerMetrics Metrics { get; set; } = new NullConsumerMetrics();
-
-    /// <summary>
     /// Creates a new configuration based on the current one
     /// </summary>
     public static ConsumerConfig BaseFrom(CommonConfig config)

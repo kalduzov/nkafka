@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//7E-A5-B3-5E-E7-CE-EE-9E-DF-49-59-E0-53-F5-C4-02-55-5C-B3-56-FA-91-16-06-37-65-4B-29-05-E2-9D-59
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class DescribeAclsRequestMessageTests: RequestMessageTests<DescribeAclsRequestMessage>
+public sealed partial class DescribeAclsRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeAclsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -49,7 +50,7 @@ public sealed partial class DescribeAclsRequestMessageTests: RequestMessageTests
             Operation = 42,
             PermissionType = 42,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeAclsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -64,7 +65,7 @@ public sealed partial class DescribeAclsRequestMessageTests: RequestMessageTests
             Operation = 42,
             PermissionType = 42,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeAclsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -79,7 +80,7 @@ public sealed partial class DescribeAclsRequestMessageTests: RequestMessageTests
             Operation = 42,
             PermissionType = 42,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeAclsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -94,6 +95,6 @@ public sealed partial class DescribeAclsRequestMessageTests: RequestMessageTests
             Operation = 42,
             PermissionType = 42,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
 }

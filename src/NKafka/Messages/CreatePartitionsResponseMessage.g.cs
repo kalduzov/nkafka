@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message CreatePartitionsResponseMessage
 /// </summary>
-public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, IEquatable<CreatePartitionsResponseMessage>
+internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage, IEquatable<CreatePartitionsResponseMessage>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -228,7 +228,7 @@ public sealed partial class CreatePartitionsResponseMessage: IResponseMessage, I
     /// <summary>
     /// Describes the contract for message CreatePartitionsTopicResultMessage
     /// </summary>
-    public sealed partial class CreatePartitionsTopicResultMessage: IMessage, IEquatable<CreatePartitionsTopicResultMessage>
+    internal sealed partial class CreatePartitionsTopicResultMessage: IMessage, IEquatable<CreatePartitionsTopicResultMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

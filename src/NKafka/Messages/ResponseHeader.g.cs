@@ -42,7 +42,7 @@ namespace NKafka.Messages;
 /// <summary>
 /// Describes the contract for message ResponseHeader
 /// </summary>
-public sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
+internal sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeader>
 {
     /// <inheritdoc />
     public List<TaggedField>? UnknownTaggedFields { get; set; } = null;

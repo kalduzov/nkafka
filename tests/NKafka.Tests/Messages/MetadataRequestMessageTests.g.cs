@@ -1,4 +1,5 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿//82-5E-7C-A1-95-48-38-1D-4C-67-52-37-6B-68-87-FE-53-7C-C7-AD-66-37-DF-D8-AA-00-BA-16-FB-F3-BF-ED
+//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
@@ -35,7 +36,7 @@ using Xunit;
 
 namespace NKafka.Tests.Messages;
 
-public sealed partial class MetadataRequestMessageTests: RequestMessageTests<MetadataRequestMessage>
+public sealed partial class MetadataRequestMessageTests
 {
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
@@ -44,7 +45,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version0);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -53,7 +54,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version1);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
@@ -62,7 +63,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version2);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -71,7 +72,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
         {
             Topics = new (),
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version3);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -81,7 +82,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             Topics = new (),
             AllowAutoTopicCreation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version4);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
@@ -91,7 +92,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             Topics = new (),
             AllowAutoTopicCreation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version5);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
@@ -101,7 +102,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             Topics = new (),
             AllowAutoTopicCreation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version6);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
@@ -111,7 +112,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             Topics = new (),
             AllowAutoTopicCreation = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version7);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
@@ -123,7 +124,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             IncludeClusterAuthorizedOperations = true,
             IncludeTopicAuthorizedOperations = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version8);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
@@ -135,7 +136,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             IncludeClusterAuthorizedOperations = true,
             IncludeTopicAuthorizedOperations = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version9);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version10")]
     public void SerializeAndDeserializeMessage_ApiVersion10_Success()
@@ -147,7 +148,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             IncludeClusterAuthorizedOperations = true,
             IncludeTopicAuthorizedOperations = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version10);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version11")]
     public void SerializeAndDeserializeMessage_ApiVersion11_Success()
@@ -158,7 +159,7 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             AllowAutoTopicCreation = true,
             IncludeTopicAuthorizedOperations = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version11);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
     }
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version12")]
     public void SerializeAndDeserializeMessage_ApiVersion12_Success()
@@ -169,6 +170,6 @@ public sealed partial class MetadataRequestMessageTests: RequestMessageTests<Met
             AllowAutoTopicCreation = true,
             IncludeTopicAuthorizedOperations = true,
         };
-        SerializeAndDeserializeMessage(message, ApiVersion.Version12);
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
     }
 }

@@ -19,6 +19,21 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Clients.Consumer;
+
 namespace NKafka.Clients.Producer.Internals;
 
-internal interface ITransactionManager;
+internal interface ITransactionManager
+{
+    bool IsTransactional { get; }
+
+    Task Init(CancellationToken token);
+
+    void Begin();
+
+    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
+
+    Task Commit(CancellationToken token);
+
+    Task Abort(CancellationToken token);
+};

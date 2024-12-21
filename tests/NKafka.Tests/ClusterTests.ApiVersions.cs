@@ -57,7 +57,7 @@ public partial class ClusterTests
             ClusterInitTimeoutMs = 10000
         };
 
-        await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
+        await using var kafkaCluster = await clusterConfig.CreateClusterInternal(
             NullLoggerFactory.Instance,
             true,
             _connectorPool,

@@ -51,4 +51,24 @@ internal interface IProducerMetrics
     void Flush(long duration)
     {
     }
+
+    void TransactionInit(long duration)
+    {
+    }
+
+    void BeginTxn(long duration)
+    {
+    }
+
+    void SendOffsets(long duration)
+    {
+    }
+
+    void CommitTxn(long duration)
+    {
+    }
+
+    void AbortTxn(long duration)
+    {
+    }
 }

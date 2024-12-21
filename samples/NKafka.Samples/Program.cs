@@ -92,7 +92,7 @@ var loggerFactory = LoggerFactory.Create(
 
 var logger = loggerFactory.CreateLogger<Program>();
 
-await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFactory);
+await using var kafkaCluster = await clusterConfig.CreateCluster(loggerFactory);
 
 // var result = await kafkaCluster.AdminClient.CreateTopicsAsync(
 //     new[]
@@ -113,7 +113,7 @@ await using var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFact
 
 //await kafkaCluster.RefreshMetadataAsync(default, "test");
 
-await using var producer = kafkaCluster.BuildProducer<Null, string>(new ProducerConfig
+var producerConfig = new ProducerConfig
 {
     PartitionerConfig = new PartitionerConfig
     {
@@ -121,7 +121,9 @@ await using var producer = kafkaCluster.BuildProducer<Null, string>(new Producer
     },
     BatchSize = 1000,
     LingerMs = 5
-});
+};
+
+await using var producer = kafkaCluster.BuildProducer<Null, string>(producerConfig);
 
 const int count = 100;
 
@@ -132,6 +134,8 @@ foreach (var val in Enumerable.Range(0, count))
         + val);
     producer.Produce("test", message);
 }
+
+await producer.Close(CancellationToken.None);
 
 // var group = Guid.NewGuid().ToString();
 //

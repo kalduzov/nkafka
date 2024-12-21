@@ -124,7 +124,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     public Node Controller => _controllerId == Node.NO_ID ? Node.NoNode : _nodes[_controllerId];
 
     /// <inheritdoc />
-    public IReadOnlyCollection<Node> Brokers { get; private set; } = Array.Empty<Node>();
+    public IReadOnlyCollection<Node> Brokers { get; private set; } = [];
 
     /// <inheritdoc />
     public IAdminClient AdminClient
@@ -159,7 +159,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             return partitions;
         }
 
-        return Array.Empty<Partition>();
+        return [];
     }
 
     /// <inheritdoc />
@@ -250,7 +250,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public Task OpenAsync(CancellationToken token)
+    public Task Open(CancellationToken token)
     {
         return OpenInternalAsync(token);
     }

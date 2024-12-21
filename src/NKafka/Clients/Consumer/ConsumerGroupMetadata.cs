@@ -1,8 +1,8 @@
-//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2023 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2024 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,9 +19,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-namespace NKafka.Metrics;
+namespace NKafka.Clients.Consumer;
 
 /// <summary>
-/// Implements a default stub for producer metrics
+/// 
 /// </summary>
-internal class NullProducerMetrics: IProducerMetrics;
+/// <param name="GroupId"></param>
+/// <param name="GenerationId"></param>
+/// <param name="MemberId"></param>
+/// <param name="GroupInstanceId"></param>
+public record ConsumerGroupMetadata(string GroupId, int GenerationId, string MemberId, string? GroupInstanceId);

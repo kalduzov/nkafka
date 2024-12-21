@@ -86,7 +86,7 @@ public partial class ClusterTests
         };
 
         var awaiting = FluentActions.Awaiting(
-            () => clusterConfig.CreateClusterInternalAsync(
+            () => clusterConfig.CreateClusterInternal(
                 NullLoggerFactory.Instance,
                 true,
                 _connectorPool,
@@ -107,7 +107,7 @@ public partial class ClusterTests
             ClusterInitTimeoutMs = 10000
         };
 
-        await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
+        await using var kafkaCluster = await clusterConfig.CreateClusterInternal(
             NullLoggerFactory.Instance,
             true,
             _connectorPool,
@@ -130,7 +130,7 @@ public partial class ClusterTests
             }
         };
 
-        var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
+        var kafkaCluster = await clusterConfig.CreateClusterInternal(
             NullLoggerFactory.Instance,
             true,
             _connectorPool,
@@ -150,7 +150,7 @@ public partial class ClusterTests
             }
         };
 
-        await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
+        await using var kafkaCluster = await clusterConfig.CreateClusterInternal(
             NullLoggerFactory.Instance,
             true,
             _connectorPool,
@@ -171,7 +171,7 @@ public partial class ClusterTests
             }
         };
 
-        await using var kafkaCluster = await clusterConfig.CreateClusterInternalAsync(
+        await using var kafkaCluster = await clusterConfig.CreateClusterInternal(
             NullLoggerFactory.Instance,
             true,
             _connectorPool,

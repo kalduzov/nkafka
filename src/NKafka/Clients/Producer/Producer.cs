@@ -40,7 +40,7 @@ namespace NKafka.Clients.Producer;
 /// <summary>
 /// A Kafka client that publishes messages to the Kafka cluster
 /// </summary>
-internal sealed class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<TKey, TValue>
+internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<TKey, TValue>
     where TKey : notnull
     where TValue : notnull
 {

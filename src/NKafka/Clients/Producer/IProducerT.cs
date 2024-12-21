@@ -19,6 +19,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Clients.Consumer;
+using NKafka.Config;
+
 namespace NKafka.Clients.Producer;
 
 /// <summary>
@@ -68,72 +71,34 @@ public interface IProducer<TKey, TValue>: IProducer
 
     #region Transaction
 
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <param name="timeout"></param>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void InitTransactions(TimeSpan timeout);
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void BeginTransaction()
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <param name="timeout"></param>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void CommitTransaction(TimeSpan timeout)
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void CommitTransaction()
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <param name="timeout"></param>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void AbortTransaction(TimeSpan timeout)
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void AbortTransaction()
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 
-    // /// </summary>
-    // /// <param name="offsets"></param>
-    // /// <param name="groupMetadata"></param>
-    // /// <exception cref="NotImplementedException"></exception>
-    // void SendOffsetsToTransaction(IEnumerable<TopicPartitionOffset> offsets, IConsumerGroupMetadata groupMetadata)
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
+    /// <summary>
+    /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.
+    /// </summary>
+    /// <param name="token"></param>
+    Task InitTransactions(CancellationToken token);
+
+    /// <summary>
+    /// Should be called before the start of each new transaction.
+    /// </summary>
+    void BeginTransaction();
+
+    /// <summary>
+    /// Commits the ongoing transaction
+    /// </summary>
+    Task CommitTransaction(CancellationToken token);
+
+    /// <summary>
+    /// Aborts the ongoing transaction
+    /// </summary>
+    Task AbortTransaction(CancellationToken token);
+
+    /// <summary>
+    /// Sends a list of specified offsets to the consumer group coordinator, and also marks those offsets as part of the current transaction.
+    /// </summary>
+    /// <param name="offsets"></param>
+    /// <param name="groupMetadata"></param>
+    /// <param name="token"></param>
+    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
 
     #endregion
 }

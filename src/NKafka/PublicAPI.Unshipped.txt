@@ -51,11 +51,17 @@ NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.set ->
 NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Value.get -> TValue
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition<TKey, TValue>(string! topic, TKey key, byte[]! keyBytes, TValue value, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
+NKafka.Clients.Producer.IProducer
 NKafka.Clients.Producer.IProducer<TKey, TValue>
+NKafka.Clients.Producer.IProducer<TKey, TValue>.AbortTransaction(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer<TKey, TValue>.BeginTransaction() -> void
 NKafka.Clients.Producer.IProducer<TKey, TValue>.Close(System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask
+NKafka.Clients.Producer.IProducer<TKey, TValue>.CommitTransaction(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer<TKey, TValue>.Flush(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer<TKey, TValue>.InitTransactions(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer<TKey, TValue>.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message<TKey, TValue>! message) -> void
 NKafka.Clients.Producer.IProducer<TKey, TValue>.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message<TKey, TValue>! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.DeliveryResult<TKey, TValue>!>!
+NKafka.Clients.Producer.IProducer<TKey, TValue>.SendOffsetsToTransaction(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.ProducerExtensions
 NKafka.Compressions.GZIPCompression
 NKafka.Compressions.GZIPCompression.Decode(byte[]! data) -> byte[]!
@@ -149,10 +155,10 @@ static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKa
 static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message<TKey, TValue>!>! messages) -> void
 static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message<TKey, TValue>!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.DeliveryResult<TKey, TValue>!>!
 static NKafka.ConsumerExtensions.BuildConsumer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ConsumerConfig! consumerConfig) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
-static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
-static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
-static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
-static NKafka.KafkaClusterExtensions.CreateClusterAsync(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.Partition.implicit operator int(NKafka.Partition partition) -> int
 static NKafka.Partition.implicit operator NKafka.Partition(int value) -> NKafka.Partition
 static NKafka.Partition.operator !=(NKafka.Partition a, NKafka.Partition b) -> bool
@@ -167,4 +173,4 @@ static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaC
 static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
 static readonly NKafka.Null.Instance -> NKafka.Null
 static readonly NKafka.Offset.Unset -> NKafka.Offset
-static readonly NKafka.Partition.Any -> NKafka.Partition
+static readonly NKafka.Partition.Any -> NKafka.Partitiona.Partition

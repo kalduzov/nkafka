@@ -50,7 +50,7 @@ public class ClusterDescribeTests
         };
 
         var loggerFactory = NullLoggerFactory.Instance;
-        var kafkaCluster = await clusterConfig.CreateClusterAsync(loggerFactory);
+        var kafkaCluster = await clusterConfig.CreateCluster(loggerFactory);
 
         return kafkaCluster;
     }

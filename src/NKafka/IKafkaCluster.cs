@@ -160,7 +160,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task OpenAsync(CancellationToken token);
+    Task Open(CancellationToken token);
 
     /// <summary>
     /// Returns a list of available partitions for a topic.

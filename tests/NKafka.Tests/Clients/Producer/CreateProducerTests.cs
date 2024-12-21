@@ -37,7 +37,7 @@ public sealed class CreateProducerTests: ClientTests
     {
         await using var cluster = CreateKafkaClusterForTests();
 
-        await cluster.OpenAsync(CancellationToken.None);
+        await cluster.Open(CancellationToken.None);
 
         await using var producer = cluster.BuildProducer<int, string>();
         producer.Should().NotBeNull();

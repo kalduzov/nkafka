@@ -36,7 +36,7 @@ public static class ProducerExtensions
     /// <param name="message">The message to be produced.</param>
     /// <param name="token">A cancellation token that can be used to cancel the asynchronous operation.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains the delivery result of the produced message.</returns>
-    public static Task<DeliveryResult<TKey, TValue>> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static Task<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
         string topicName,
         Message<TKey, TValue> message,
         CancellationToken token)
@@ -58,7 +58,7 @@ public static class ProducerExtensions
     /// <param name="messages">The messages to be produced.</param>
     /// <param name="token">A cancellation token to cancel the operation.</param>
     /// <returns>Asynchronous enumerable that represents the delivery results for each produced message.</returns>
-    public static IAsyncEnumerable<DeliveryResult<TKey, TValue>> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static IAsyncEnumerable<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
         string topicName,
         IReadOnlyCollection<Message<TKey, TValue>> messages,
         CancellationToken token)
@@ -78,14 +78,14 @@ public static class ProducerExtensions
     /// <param name="messages">The messages to be produced.</param>
     /// <param name="token">The cancellation token to cancel the operation.</param>
     /// <returns>A sequence of delivery results for each produced message.</returns>
-    public static async IAsyncEnumerable<DeliveryResult<TKey, TValue>> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static async IAsyncEnumerable<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
         TopicPartition topicPartition,
         IReadOnlyCollection<Message<TKey, TValue>> messages,
         [EnumeratorCancellation] CancellationToken token)
         where TKey : notnull
         where TValue : notnull
     {
-        var results = new List<Task<DeliveryResult<TKey, TValue>>>(messages.Count);
+        var results = new List<Task<MessageDeliveryResult>>(messages.Count);
 
         foreach (var message in messages)
         {

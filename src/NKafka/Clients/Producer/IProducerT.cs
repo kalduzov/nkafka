@@ -55,7 +55,7 @@ public interface IProducer<TKey, TValue>: IProducer
     /// <param name="message">The message to produce.</param>
     /// <param name="token">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains the delivery result.</returns>
-    public Task<DeliveryResult<TKey, TValue>> Produce(
+    public Task<MessageDeliveryResult> Produce(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
         CancellationToken token);

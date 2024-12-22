@@ -28,8 +28,6 @@ namespace NKafka.Protocol.Records;
 /// </summary>
 internal class RecordsBatch: IRecordsBatch
 {
-    private readonly BufferWriter _bufferWriter = new(Stream.Null);
-
     /// <summary>
     /// Batch header length
     /// </summary>
@@ -50,7 +48,7 @@ internal class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    public BufferWriter Buffer => _bufferWriter;
+    public BufferWriter Buffer { get; } = new(Stream.Null);
 
     /// <inheritdoc />
     public int CountRecords { get; set; }
@@ -108,7 +106,7 @@ internal class RecordsBatch: IRecordsBatch
     protected RecordsBatch(BufferWriter bufferWriter)
         : this()
     {
-        _bufferWriter = bufferWriter;
+        Buffer = bufferWriter;
 
     }
 

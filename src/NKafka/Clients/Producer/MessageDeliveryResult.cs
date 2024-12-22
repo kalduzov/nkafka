@@ -21,32 +21,15 @@
  * limitations under the License.
  */
 
-using System.IO.Compression;
-
-namespace NKafka.Compressions;
+namespace NKafka.Clients.Producer;
 
 /// <summary>
-/// 
+/// Represents the result of delivering a Kafka message.
 /// </summary>
-internal sealed class GZIPCompression(CompressionLevel compressionLevel): ICompression
-{
-    /// <inheritdoc />
-    public Stream Encode(Stream stream)
-    {
-        var gZipStream = new GZipStream(stream, compressionLevel, true);
-
-        return gZipStream;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
-    public Stream Decode(Stream stream)
-    {
-        var gZipStream = new GZipStream(stream, CompressionMode.Decompress, true);
-
-        return gZipStream;
-    }
-}
+public record MessageDeliveryResult(
+    PersistenceStatus Status,
+    TopicPartition TopicPartition,
+    long Timestamp,
+    Offset Offset,
+    int SerializedKeySize,
+    int SerializedValueSize);

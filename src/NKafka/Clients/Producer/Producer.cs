@@ -142,6 +142,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
     {
         var tp = topicPartition;
+        var m = message;
 
         _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
             .ContinueWith(
@@ -149,7 +150,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.WriteLine($"The message {task.Result.Message} was sent successfully");
+                        Debug.WriteLine($"The message {m} was sent successfully");
 
                         return;
                     }
@@ -183,7 +184,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     }
 
     /// <inheritdoc/>
-    public Task<DeliveryResult<TKey, TValue>> Produce(
+    public Task<MessageDeliveryResult> Produce(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
         CancellationToken token)
@@ -288,7 +289,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         }
     }
 
-    private async Task<DeliveryResult<TKey, TValue>> InternalProduceAsync(
+    private async Task<MessageDeliveryResult> InternalProduceAsync(
         TopicPartition topicPartition,
         Message<TKey, TValue> message,
         bool isFireAndForget,
@@ -296,20 +297,26 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     {
         ThrowIfProducerClosed();
 
-        var newTopicPartition = topicPartition;
+        var actualTopicPartition = topicPartition;
 
-        _logger.ProduceMessageTrace(newTopicPartition);
+        _logger.ProduceMessageTrace(actualTopicPartition);
 
-        using var activity = KafkaDiagnosticsSource.ProduceMessage(newTopicPartition, message, isFireAndForget);
+        using var activity = KafkaDiagnosticsSource.ProduceMessage(actualTopicPartition, message, isFireAndForget);
+
+        var serializedKeySize = 0;
+        var serializedValueSize = 0;
 
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            _ = await KafkaCluster.GetPartitions(newTopicPartition.Topic, token);
+            _ = await KafkaCluster.GetPartitions(actualTopicPartition.Topic, token);
 
             var headers = message.Headers;
             var serializedKey = Serialize(_keySerializer, message.Key);
             var serializedValue = Serialize(_valueSerializer, message.Value);
+
+            serializedKeySize = serializedKey.Length;
+            serializedValueSize = serializedValue.Length;
 
             var serializedSize = RecordsBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
@@ -326,25 +333,30 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                     KafkaCluster,
                     token);
 
-                newTopicPartition = newTopicPartition with
+                actualTopicPartition = actualTopicPartition with
                 {
                     Partition = computedPartition
                 };
             }
 
             var appendResult = _accumulator.Append(
-                newTopicPartition,
+                actualTopicPartition,
                 message.Timestamp.UnixTimestampMs,
                 serializedKey,
                 serializedValue,
                 headers);
+
+            if (_transactionManager.IsTransactional)
+            {
+                _transactionManager.TryAddPartition(actualTopicPartition);
+            }
 
             if (appendResult.BatchIsFull || appendResult.NewBatchCreated)
             {
                 _messagesSender.Wakeup();
             }
 
-            _producerMetrics.AppendBytes(newTopicPartition, appendResult.AppendedBytes);
+            _producerMetrics.AppendBytes(actualTopicPartition, appendResult.AppendedBytes);
 
             if (!isFireAndForget)
             {
@@ -352,15 +364,25 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                     .SendResult!
                     .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token);
 
-                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, sendResult.Offset);
+                var topicPartitionOffset = new TopicPartitionOffset(actualTopicPartition, sendResult.Offset);
 
-                return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.Persisted, topicPartitionOffset);
+                return new MessageDeliveryResult(PersistenceStatus.Persisted,
+                    topicPartitionOffset.TopicPartition,
+                    message.Timestamp.UnixTimestampMs,
+                    topicPartitionOffset.Offset,
+                    serializedKeySize,
+                    serializedValueSize);
             }
             else
             {
-                var topicPartitionOffset = new TopicPartitionOffset(newTopicPartition, Offset.Unset);
+                var topicPartitionOffset = new TopicPartitionOffset(actualTopicPartition, Offset.Unset);
 
-                return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.PossiblyPersisted, topicPartitionOffset);
+                return new MessageDeliveryResult(PersistenceStatus.PossiblyPersisted,
+                    topicPartitionOffset.TopicPartition,
+                    message.Timestamp.UnixTimestampMs,
+                    topicPartitionOffset.Offset,
+                    serializedKeySize,
+                    serializedValueSize);
             }
 
         }
@@ -370,7 +392,12 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
 
             var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
 
-            return new DeliveryResult<TKey, TValue>(message, PersistenceStatus.NotPersisted, topicPartitionOffset);
+            return new MessageDeliveryResult(PersistenceStatus.NotPersisted,
+                topicPartitionOffset.TopicPartition,
+                message.Timestamp.UnixTimestampMs,
+                topicPartitionOffset.Offset,
+                serializedKeySize,
+                serializedValueSize);
         }
         catch (Exception exc)
         {

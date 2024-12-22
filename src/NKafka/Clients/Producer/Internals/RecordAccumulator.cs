@@ -27,6 +27,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 
 using NKafka.Collections;
+using NKafka.Compressions;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Metrics;
@@ -60,7 +61,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     private readonly int _batchSize;
     private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly bool _closed;
-    private readonly CompressionType _compressionType;
+    private readonly ICompression _compression;
     private readonly int _deliveryTimeoutMs;
     private readonly double _lingerMs;
     private readonly ILogger _logger;
@@ -69,6 +70,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     private volatile int _appendsInProgress;
     private volatile int _flushesInProgress = 0;
     private readonly IProducerMetrics _metrics;
+    private readonly ILoggerFactory _loggerFactory;
 
     public RecordAccumulator(
         ProducerConfig config,
@@ -79,12 +81,13 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     {
         _batchesByTopics = new ConcurrentDictionary<string, PartitionedBatchCollection>();
         _metrics = metrics;
+        _loggerFactory = loggerFactory;
         _transactionManager = transactionManager;
         _deliveryTimeoutMs = deliveryTimeoutMs;
         _logger = loggerFactory.CreateLogger<RecordAccumulator>();
         _closed = false;
         _batchSize = Math.Max(1, config.BatchSize);
-        _compressionType = config.CompressionType;
+        _compression = GetCompression(config.Compression);
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
         var options = new RecyclableMemoryStreamManager.Options
@@ -93,6 +96,19 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         };
         _memoryStreamManager = new RecyclableMemoryStreamManager(options);
 
+    }
+
+    private static ICompression GetCompression(CompressionConfig compression)
+    {
+        return compression.CompressionType switch
+        {
+            CompressionType.None => new NoCompression(),
+            CompressionType.Gzip => new GZIPCompression(compression.GzipLevel),
+            CompressionType.Lz4 => new LZ4Compression(compression.LZ4Level),
+            CompressionType.ZStd => new ZStdCompression(compression.ZstdLevel),
+            CompressionType.Snappy => new SnappyCompression(),
+            _ => new NoCompression()
+        };
     }
 
     /// <summary>
@@ -194,7 +210,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
         var topicPartition = new TopicPartition(topic, partition);
 
-        var batch = new ProducerBatch(topicPartition, buffer);
+        var batch = new ProducerBatch(topicPartition, buffer, _loggerFactory);
 
         _logger.AddNewBatchTrace(topicPartition);
 

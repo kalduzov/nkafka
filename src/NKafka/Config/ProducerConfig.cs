@@ -84,9 +84,9 @@ public record ProducerConfig: CommonConfig
     public int MaxRequestSize { get; set; } = 1024 * 1024;
 
     /// <summary>
-    /// Record compression type
+    /// Record compression config
     /// </summary>
-    public CompressionType CompressionType { get; set; } = CompressionType.None;
+    public CompressionConfig Compression { get; set; } = new();
 
     /// <summary>
     /// Maximum size of one batch with records

@@ -64,12 +64,6 @@ internal sealed partial class KafkaConnector
                     continue;
                 }
 
-                // Каждое такое чтение - это заход в ядро.
-                // Перевод на полное чтение например в pipe позволит вычитывать ответы с меньшим оверхедом.
-                // Проблема в том, что нужно знать размер данных, которые нужно считать, а это можно узнать только чтением первых 4 байт из сети.
-                // А потом еще надо прочитать это количество байт.
-                // В идеальном случае можно вообще не вычитывать весь буфер, а последовательным чтением сразу формировать нужный класс ответа 
-                // Pipelines требуют свободного "потока", который будет сливать данные из сокета - его можно сделать один на весь пулл подключений aka NIO из java 
                 var countReadBytes = await _stream.ReadAsync(intBuffer);
                 _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, countReadBytes);
 
@@ -85,37 +79,25 @@ internal sealed partial class KafkaConnector
                     throw new ProtocolKafkaException(ErrorCodes.None, "Отправлен некорректный запрос к брокеру. Брокер вернул 0 байт.");
                 }
 
-                var responseIdLen = await _stream.ReadAsync(intBuffer);
-                _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, responseIdLen);
-
-                var requestId = ReadInt32BigEndian(intBuffer.Span);
-
-                var bodyLen = responseLen - responseIdLen;
                 var buffer = _arrayPool.Rent(responseLen);
 
-                // Возвращаем в буфер correlationId|requestId, он нужен для корректного считывания заголовка,
-                // а без него версию заголовка не узнать
-                buffer[0] = intBuffer.Span[0];
-                buffer[1] = intBuffer.Span[1];
-                buffer[2] = intBuffer.Span[2];
-                buffer[3] = intBuffer.Span[3];
-
-                var currentRead = 0;
-                var leftRead = bodyLen;
-                var startPosition = responseIdLen;
+                var leftRead = responseLen;
+                var startPosition = 0;
 
                 do
                 {
-                    currentRead = await _stream.ReadAsync(buffer.AsMemory(startPosition, leftRead));
+                    var memorySlice = buffer.AsMemory(startPosition, leftRead);
+                    var currentRead = await _stream.ReadAsync(memorySlice, _responseProcessingTokenSource.Token);
                     _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, currentRead);
 
                     leftRead -= currentRead;
                     startPosition += currentRead;
                 } while (leftRead != 0);
 
+                var requestId = ReadInt32BigEndian(buffer.AsSpan(0, 4));
                 _responsesTasks.TryAdd(
                     requestId,
-                    ParseResponseAsync(buffer, requestId, bodyLen, _responseProcessingTokenSource.Token));
+                    ParseResponseAsync(buffer, requestId, responseLen, _responseProcessingTokenSource.Token));
             }
         }
         catch (Exception exc)
@@ -128,7 +110,7 @@ internal sealed partial class KafkaConnector
 
     private async Task ParseResponseAsync(byte[] buffer, int requestId, int bodyLen, CancellationToken token)
     {
-        //сразу переключаемся на другой поток, что бы освободить работу для чтения ответов
+        //сразу переключаемся на другой поток, что бы освободить предыдущую таску чтения ответов
         await Task.Yield();
 
         try
@@ -136,7 +118,7 @@ internal sealed partial class KafkaConnector
             if (_inFlightRequests.TryRemove(requestId, out var responseInfo))
             {
                 Debug.WriteLine(
-                    $"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen + 4}");
+                    $"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen}");
 
                 if (token.IsCancellationRequested)
                 {
@@ -147,9 +129,9 @@ internal sealed partial class KafkaConnector
 
                 try
                 {
-                    var message = responseInfo.BuildResponseMessage(buffer, bodyLen);
+                    var message = responseInfo.BuildResponseMessage(buffer);
                     _logger.GotResponseTrace(message, NodeId);
-                    UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen);
+                    UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen + 4);
                     responseInfo.SetResult(message);
                 }
                 catch (ProtocolKafkaException exc)
@@ -179,7 +161,7 @@ internal sealed partial class KafkaConnector
         }
     }
 
-    private void UpdateResponseMetrics(int messageThrottleTimeMs, int bodyLen)
+    private void UpdateResponseMetrics(int messageThrottleTimeMs, int contentLen)
     {
     }
 }

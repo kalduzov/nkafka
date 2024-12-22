@@ -57,6 +57,7 @@ var clusterConfig = new ClusterConfig
     // },
     ClusterInitTimeoutMs = 160000, // 160сек для отладки
     MetadataUpdateTimeoutMs = 60000, // 60 секунд на обновление данных по кластеру
+
     // Sasl = new SaslSettings
     // {
     //     Mechanism = SaslMechanism.Plain,
@@ -119,8 +120,8 @@ var producerConfig = new ProducerConfig
     {
         Partitioner = Partitioner.RoundRobinPartitioner
     },
-    BatchSize = 1000,
-    LingerMs = 5
+    BatchSize = 10000,
+    LingerMs = 50000,
 };
 
 await using var producer = kafkaCluster.BuildProducer<Null, string>(producerConfig);
@@ -130,7 +131,7 @@ const int count = 100;
 foreach (var val in Enumerable.Range(0, count))
 {
     var message = new Message<Null, string>(Null.Instance,
-        "test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test test"
+        "test test test test test test test test test test test test test test test test test test"
         + val);
     producer.Produce("test", message);
 }

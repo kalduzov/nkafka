@@ -36,16 +36,19 @@ internal static partial class KafkaConnectorLoggerExtensions
         Level = LogLevel.Information,
         Message = LogExtensions.LOGGER_PREFIX
                   + "Connection at address {EndPoint} to broker {NodeId} was dropped due to inactivity for {ConnectionsMaxIdleMs} ms.")]
-    public static partial void ConnectionResetInformation(this ILogger logger, EndPoint endpoint, int nodeId, int connectionsMaxIdleMs);
+    public static partial void ConnectionResetInformation(this ILogger<KafkaConnector> logger,
+        EndPoint endpoint,
+        int nodeId,
+        int connectionsMaxIdleMs);
 
     [LoggerMessage(
         EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 1,
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Send {Message} to {NodeId}")]
-    public static partial void SendRequestTrace(this ILogger logger, IRequestMessage message, int nodeId);
+    public static partial void SendRequestTrace(this ILogger<KafkaConnector> logger, IRequestMessage message, int nodeId);
 
     [LoggerMessage(EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 2,
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Got response {Message} from {NodeId}")]
-    public static partial void GotResponseTrace(this ILogger logger, IResponseMessage message, int nodeId);
+    public static partial void GotResponseTrace(this ILogger<KafkaConnector> logger, IResponseMessage message, int nodeId);
 }

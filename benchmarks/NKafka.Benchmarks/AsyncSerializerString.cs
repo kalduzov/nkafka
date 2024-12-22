@@ -29,11 +29,11 @@ using NKafka.Serialization;
 namespace NKafka.Benchmarks;
 
 [MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net60)]
-[SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net90)]
 public class AsyncSerializerString
 {
-    private readonly IAsyncSerializer<string> _serializer = new StringSerializer();
+    private readonly ISerializer<string> _serializer = new StringSerializer();
 
     private const string _DATA =
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
@@ -42,11 +42,5 @@ public class AsyncSerializerString
     public byte[] SerializeString()
     {
         return _serializer.Serialize(_DATA);
-    }
-
-    [Benchmark]
-    public Task<byte[]> SerializeAsyncString()
-    {
-        return _serializer.SerializeAsync(_DATA);
     }
 }

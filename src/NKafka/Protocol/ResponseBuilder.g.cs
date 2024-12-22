@@ -37,9 +37,9 @@ namespace NKafka.Protocol;
 
 internal static partial class ResponseBuilder
 {
-    public static IResponseMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span, int bodyLen)
+    public static IResponseMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span)
     {
-        var reader = new BufferReader(span, bodyLen);
+        var reader = new BufferReader(span);
         var headerVersion = apiKey.GetResponseHeaderVersion(apiVersion);
         ProcessHeader(ref reader, headerVersion);
         return apiKey switch

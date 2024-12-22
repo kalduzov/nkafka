@@ -19,7 +19,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Text;
+
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol.Records;
 
@@ -27,8 +30,54 @@ namespace NKafka.Protocol.Records;
 /// Record type implementation
 /// https://kafka.apache.org/documentation/#record
 /// </summary>
-internal class Record: IRecord
+internal class Record
 {
+    /// <summary>
+    /// Full record length
+    /// </summary>
+    public int Length { get; private set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public sbyte Attributes { get; private set; }
+
+    /// <summary>
+    /// The timestamp of the first Record in the batch. The timestamp of each Record in the RecordBatch is its 'TimestampDelta' + 'FirstTimestamp'.
+    /// </summary>
+    public long TimestampDelta { get; private set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public long OffsetDelta { get; private set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public byte[]? Key { get; private set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public byte[]? Value { get; private set; }
+
+    /// <summary>
+    /// Introduced in 0.11.0.0 for KIP-82, Kafka now supports application level record level headers.
+    /// The Producer and Consumer APIS have been accordingly updated to write and read these headers.
+    /// </summary>
+    public Headers Headers { get; private set; } = Headers.Empty;
+
+    /// <summary>
+    /// Валидная запись или нет
+    /// </summary>
+    internal bool IsValid { get; private set; } = true;
+
+    /// <summary>
+    /// Запись считана лишь частично
+    /// </summary>
+    internal bool IsPartial { get; private set; } = true;
+
     /// <summary>
     /// 
     /// </summary>
@@ -47,56 +96,10 @@ internal class Record: IRecord
     }
 
     /// <summary>
-    /// Full record length
-    /// </summary>
-    public int Length { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public sbyte Attributes { get; set; }
-
-    /// <summary>
-    /// The timestamp of the first Record in the batch. The timestamp of each Record in the RecordBatch is its 'TimestampDelta' + 'FirstTimestamp'.
-    /// </summary>
-    public long TimestampDelta { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public long OffsetDelta { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public byte[]? Key { get; set; }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public byte[]? Value { get; set; }
-
-    /// <summary>
-    /// Introduced in 0.11.0.0 for KIP-82, Kafka now supports application level record level headers.
-    /// The Producer and Consumer APIS have been accordingly updated to write and read these headers.
-    /// </summary>
-    public Headers Headers { get; set; } = Headers.Empty;
-
-    /// <summary>
-    /// Валидная запись или нет
-    /// </summary>
-    internal bool IsValid { get; private set; } = true;
-
-    /// <summary>
-    /// Запись считана лишь частично
-    /// </summary>
-    internal bool IsPartial { get; private set; } = true;
-
-    /// <summary>
     /// 
     /// </summary>
     /// <param name="reader"></param>
-    public void Read(ref BufferReader reader)
+    private void Read(ref BufferReader reader)
     {
         Length = reader.ReadVarInt();
         Attributes = reader.ReadSByte();
@@ -170,6 +173,53 @@ internal class Record: IRecord
         {
             Headers = Headers.Empty;
         }
+    }
 
+    public int WriteTo(BufferWriter buffer)
+    {
+        const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
+
+        var sizeInBytes = RecordExtensions.SizeOfBodyInBytes((int)OffsetDelta, TimestampDelta, Key, Value, Headers);
+        buffer.WriteVarInt(sizeInBytes);
+        buffer.WriteByte(attributes);
+        buffer.WriteVarLong(TimestampDelta);
+        buffer.WriteVarLong(OffsetDelta);
+
+        if (Key is null)
+        {
+            buffer.WriteNullVarInt();
+        }
+        else
+        {
+            buffer.WriteBytesWithLength(Key);
+        }
+
+        if (Value is null)
+        {
+            buffer.WriteNullVarInt();
+        }
+        else
+        {
+            buffer.WriteBytesWithLength(Value);
+        }
+
+        buffer.WriteVarInt(Headers.Count);
+
+        foreach (var header in Headers)
+        {
+            var headerKey = Encoding.UTF8.GetBytes(header.Key);
+            buffer.WriteBytesWithLength(headerKey);
+
+            if (header.Value is null)
+            {
+                buffer.WriteNullVarInt();
+            }
+            else
+            {
+                buffer.WriteBytesWithLength(header.Value);
+            }
+        }
+
+        return sizeInBytes.SizeOfVarInt() + sizeInBytes;
     }
 }

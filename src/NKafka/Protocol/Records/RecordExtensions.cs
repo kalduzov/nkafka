@@ -21,16 +21,17 @@
 
 using System.Text;
 
-using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol.Records;
 
 internal static class RecordExtensions
 {
+    private const int _MAX_RECORD_OVERHEAD = 21;
+
     private static readonly int _nullVarIntSizeBytes = (-1).SizeOfVarInt();
 
-    private static int SizeOfBodyInBytes(int offsetDelta,
+    internal static int SizeOfBodyInBytes(int offsetDelta,
         long timestampDelta,
         byte[]? key,
         byte[]? value,
@@ -75,55 +76,14 @@ internal static class RecordExtensions
         return size;
     }
 
-    public static int WriteTo(this IRecord record, BufferWriter appendBuffer)
+    /// <summary>
+    /// An estimate of the upper bound on the record size in bytes
+    /// </summary>
+    internal static int EstimateSizeInBytesUpperBound(byte[]? serializedKey, byte[]? serializedValue, Headers headers)
     {
-        var sizeInBytes = SizeOfBodyInBytes((int)record.OffsetDelta, record.TimestampDelta, record.Key, record.Value, record.Headers);
-        appendBuffer.WriteVarInt(sizeInBytes);
-        const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
-        appendBuffer.WriteByte(attributes);
-        appendBuffer.WriteVarLong(record.TimestampDelta);
-        appendBuffer.WriteVarLong(record.OffsetDelta);
+        var keySize = serializedKey?.Length ?? -1;
+        var valueSize = serializedValue?.Length ?? -1;
 
-        if (record.Key is null)
-        {
-            appendBuffer.WriteNullVarInt();
-        }
-        else
-        {
-            appendBuffer.WriteBytesWithLength(record.Key);
-        }
-
-        if (record.Value is null)
-        {
-            appendBuffer.WriteNullVarInt();
-        }
-        else
-        {
-            appendBuffer.WriteBytesWithLength(record.Value);
-        }
-
-        appendBuffer.WriteVarInt(record.Headers.Count);
-
-        foreach (var header in record.Headers)
-        {
-            var headerKey = Encoding.UTF8.GetBytes(header.Key);
-            appendBuffer.WriteBytesWithLength(headerKey);
-
-            if (header.Value is null)
-            {
-                appendBuffer.WriteNullVarInt();
-            }
-            else
-            {
-                appendBuffer.WriteBytesWithLength(header.Value);
-            }
-        }
-
-        return sizeInBytes.SizeOfVarInt() + sizeInBytes;
-    }
-
-    public static Record ReadFrom(this BufferReader bufferReader)
-    {
-        return new Record();
+        return _MAX_RECORD_OVERHEAD + SizeOf(keySize, valueSize, headers);
     }
 }

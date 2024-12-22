@@ -1,8 +1,8 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2024 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,23 +19,28 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Clients.Consumer;
+using System.IO.Compression;
 
-namespace NKafka.Clients.Producer.Internals;
+namespace NKafka.Config;
 
-internal interface ITransactionManager
+/// <summary>
+/// 
+/// </summary>
+/// <param name="CompressionType"></param>
+public record CompressionConfig(CompressionType CompressionType = CompressionType.None)
 {
-    bool IsTransactional { get; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public CompressionLevel GzipLevel { get; init; }
 
-    Task Init(CancellationToken token);
+    /// <summary>
+    /// 
+    /// </summary>
+    public int LZ4Level { get; init; }
 
-    void Begin();
-
-    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
-
-    Task Commit(CancellationToken token);
-
-    Task Abort(CancellationToken token);
-
-    void TryAddPartition(TopicPartition topicPartition);
-};
+    /// <summary>
+    /// 
+    /// </summary>
+    public int ZstdLevel { get; init; }
+}

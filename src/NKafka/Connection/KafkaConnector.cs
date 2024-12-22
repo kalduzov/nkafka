@@ -282,8 +282,13 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     /// </returns>
     public async ValueTask DisposeAsync()
     {
+        ConnectorState = State.Closing;
+
         await _stream.DisposeAsync();
         _socketProxy.Dispose();
+        GC.SuppressFinalize(this);
+
+        ConnectorState = State.Closed;
     }
 
     private void ResetConnection()
@@ -427,22 +432,14 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         Closed
     }
 
-    private class ResponseTaskCompletionSource: TaskCompletionSource<IResponseMessage>
+    private class ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
+        : TaskCompletionSource<IResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously)
     {
-        public ApiKeys ApiKey { get; }
+        public ApiKeys ApiKey { get; } = apiKey;
 
-        private readonly ApiVersion _version;
-
-        public ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
-            : base(TaskCreationOptions.RunContinuationsAsynchronously)
+        internal IResponseMessage BuildResponseMessage(byte[] span)
         {
-            ApiKey = apiKey;
-            _version = version;
-        }
-
-        internal IResponseMessage BuildResponseMessage(byte[] span, int bodyLen)
-        {
-            return ResponseBuilder.Build(ApiKey, _version, span, bodyLen);
+            return ResponseBuilder.Build(ApiKey, version, span);
         }
     }
 }

@@ -25,8 +25,8 @@ using BenchmarkDotNet.Jobs;
 namespace NKafka.Benchmarks;
 
 [MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net60)]
-[SimpleJob(RuntimeMoniker.Net70)]
+[SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net90)]
 public class BigEndianBenchmarks
 {
     [Benchmark]

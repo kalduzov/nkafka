@@ -7,6 +7,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <NoWarn>RS0016;CA1822</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

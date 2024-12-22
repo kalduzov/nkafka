@@ -27,8 +27,8 @@ using NKafka.Protocol.Buffers;
 namespace NKafka.Benchmarks;
 
 [MemoryDiagnoser]
-[SimpleJob(RuntimeMoniker.Net70)]
 [SimpleJob(RuntimeMoniker.Net80)]
+[SimpleJob(RuntimeMoniker.Net90)]
 public class ReaderBenchmarks
 {
     private readonly byte[] _buffer =

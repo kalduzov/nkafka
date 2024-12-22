@@ -1,8 +1,8 @@
-﻿//  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 // 
-//  Copyright ©  2022 Aleksey Kalduzov. All rights reserved
+//  Copyright ©  2024 Aleksey Kalduzov. All rights reserved
 // 
 //  Author: Aleksey Kalduzov
 //  Email: alexei.kalduzov@gmail.com
@@ -19,23 +19,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using NKafka.Clients.Consumer;
+namespace NKafka.Compressions;
 
-namespace NKafka.Clients.Producer.Internals;
-
-internal interface ITransactionManager
-{
-    bool IsTransactional { get; }
-
-    Task Init(CancellationToken token);
-
-    void Begin();
-
-    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
-
-    Task Commit(CancellationToken token);
-
-    Task Abort(CancellationToken token);
-
-    void TryAddPartition(TopicPartition topicPartition);
-};
+internal sealed class ZStdCompression(int compressionLevel): ICompression;

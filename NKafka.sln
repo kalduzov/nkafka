@@ -18,7 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E4B8C4
 		LICENCE = LICENCE
 		README.md = README.md
 		changelog.md = changelog.md
-		global.json = global.json
 		.editorconfig = .editorconfig
 		NKafka.sln.DotSettings = NKafka.sln.DotSettings
 		update_repo.ps1 = update_repo.ps1

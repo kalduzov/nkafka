@@ -48,9 +48,9 @@ public class RecordExtensionsTests
     {
         var record = new Record
         {
-            Headers = Headers.Empty,
-            Key = null,
-            Value = "test"u8.ToArray()
+            // Headers = Headers.Empty,
+            // Key = null,
+            // Value = "test"u8.ToArray()
         };
 
         var buffer = new byte[_validRecord.Length];

@@ -49,6 +49,9 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
 
     private volatile State _currentState = State.Uninitialized;
     private volatile Exception? _lastError;
+    private readonly HashSet<TopicPartition> _newPartitionsInTransaction = [];
+    private readonly HashSet<TopicPartition> _partitionsInTransaction = [];
+    private readonly HashSet<TopicPartition> _pendingPartitionsInTransaction = [];
 
     public bool IsTransactional => !string.IsNullOrEmpty(_transactionalId);
 
@@ -88,6 +91,30 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
     {
         return null;
     }
+
+    public void TryAddPartition(TopicPartition topicPartition)
+    {
+        if (IsTransactional)
+        {
+            if (!HasProducerId)
+            {
+                throw new ProduceException("No producer id specified");
+            }
+
+            if (_currentState == State.InTransaction)
+            {
+                throw new ProduceException("No producer id specified");
+            }
+
+            if (_partitionsInTransaction.Contains(topicPartition) || _newPartitionsInTransaction.Contains(topicPartition))
+            {
+                return;
+            }
+            _newPartitionsInTransaction.Add(topicPartition);
+        }
+    }
+
+    public bool HasProducerId { get; set; } = false;
 
     private static bool IsTransitionValid(State from, State to)
     {

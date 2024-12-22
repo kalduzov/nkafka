@@ -58,8 +58,7 @@ internal ref partial struct BufferReader
     /// 
     /// </summary>
     /// <param name="buffer"></param>
-    /// <param name="bodyLen"></param>
-    public BufferReader(ReadOnlySpan<byte> buffer, int bodyLen = 0)
+    public BufferReader(ReadOnlySpan<byte> buffer)
     {
         _bufferSource = ReadOnlySequence<byte>.Empty;
         _bufferReference = ref MemoryMarshal.GetReference(buffer);

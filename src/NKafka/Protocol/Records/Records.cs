@@ -29,13 +29,14 @@ namespace NKafka.Protocol.Records;
 
 /// <summary>
 /// 
+/// https://kafka.apache.org/documentation/#record
 /// </summary>
 internal sealed class Records
 {
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyList<IRecordsBatch> Batches { get; private set; } = [];
+    public IReadOnlyCollection<IRecordsBatch> Batches { get; private set; } = [];
 
     /// <summary>
     /// The size of these records in bytes.
@@ -57,7 +58,7 @@ internal sealed class Records
     /// </summary>
     /// <param name="sizeInBytes"></param>
     /// <param name="batches"></param>
-    public Records(int sizeInBytes, IReadOnlyList<IRecordsBatch> batches)
+    public Records(int sizeInBytes, IReadOnlyCollection<IRecordsBatch> batches)
     {
         Batches = batches;
         SizeInBytes = sizeInBytes;
@@ -78,15 +79,17 @@ internal sealed class Records
                 var batch = new RecordsBatch(ref reader);
                 allBathes.Add(batch);
 
-                if (reader.Remaining < batch.SizeInBytes)
+                if (reader.Remaining >= batch.SizeInBytes)
                 {
-                    // Оставшиеся байты из буфера не позволяют считать
-                    // корректный батч записей - их мы просто пропускаем
-                    var last = endOffset - reader.CurrentOffset;
-                    reader.Advance(last);
-
-                    break;
+                    continue;
                 }
+
+                // Оставшиеся байты из буфера не позволяют считать
+                // корректный батч записей - их мы просто пропускаем
+                var last = endOffset - reader.CurrentOffset;
+                reader.Advance(last);
+
+                break;
             }
             catch (Exception exc)
             {

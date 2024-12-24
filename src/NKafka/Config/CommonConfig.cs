@@ -27,6 +27,8 @@ using System.Reflection;
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Resources;
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
+// ReSharper disable CollectionNeverUpdated.Global
 
 namespace NKafka.Config;
 
@@ -44,7 +46,7 @@ public abstract record CommonConfig
     /// <b>Mandatory indication required</b>
     /// </p>
     /// </summary>
-    public IReadOnlyList<string> BootstrapServers { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> BootstrapServers { get; set; } = [];
 
     /// <summary>
     /// Client application ID
@@ -65,7 +67,7 @@ public abstract record CommonConfig
     /// <summary>
     /// Maximum Kafka protocol request message size. Due to differing framing overhead between protocol versions the
     /// producer is unable to reliably enforce a strict max message limit at produce time and may exceed the maximum size
-    /// by one message in protocol ProduceRequests, the broker will enforce the the topic's `max.message.bytes` limit (see
+    /// by one message in protocol ProduceRequests, the broker will enforce the topic's `max.message.bytes` limit (see
     /// Apache Kafka documentation).
     /// <p>
     /// default: <b>1000000</b>
@@ -165,7 +167,7 @@ public abstract record CommonConfig
     /// The maximum number of requests per connection.
     /// </summary>
     /// <remarks>This field is still constant and cannot be changed</remarks>
-    public int MaxInflightRequests => 100;
+    public static int MaxInflightRequests => 100;
 
     /// <summary>
     /// The size of the TCP receive buffer (SO_RCVBUF) to use when reading data. If the value is -1, the OS default will be used.
@@ -209,7 +211,7 @@ public abstract record CommonConfig
     /// Для указания различий в конфигурации для брокеров используется данное свойство.
     /// Для этого требуется знать id каждого брокера, который отличается от общей конфигурации.
     /// Если конкретные настройки для брокера отсутствуют в данном словаре, то используются общие настройки</remarks>
-    public Dictionary<int, BrokerConfig> PerBrokerConfigs { get; set; } = new(0);
+    public Dictionary<int, BrokerConfig> PerBrokerConfigs { get; set; } = [];
 
     private static string GetHostName()
     {

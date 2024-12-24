@@ -24,9 +24,9 @@
 namespace NKafka;
 
 /// <summary>
-/// Описывает общие данные по топику
+/// Describe topic
 /// </summary>
-/// <param name="Name">Имя топика</param>
-/// <param name="TopicId">Id топика</param>
-/// <param name="IsInternal">Флаг, указывающий это пользовательский топик или внутренний</param>
+/// <param name="Name">Topic name</param>
+/// <param name="TopicId">Topic id</param>
+/// <param name="IsInternal">Internal kafka topic or not</param>
 public record TopicMetadata(string Name, Guid TopicId, bool IsInternal);

@@ -79,16 +79,17 @@ var clusterConfig = new ClusterConfig
 //     .Build();
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {SourceContext}  {EventId}{NewLine}{Exception}",
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Scope} {Message:lj} {SourceContext} {NewLine}{Exception}",
         theme: AnsiConsoleTheme.Code)
-    .MinimumLevel.Debug()
+    .MinimumLevel.Verbose()
     .CreateLogger();
 
 var loggerFactory = LoggerFactory.Create(
     builder =>
     {
         builder.AddSerilog();
-        builder.SetMinimumLevel(LogLevel.Debug);
+        builder.SetMinimumLevel(LogLevel.Trace);
     });
 
 var logger = loggerFactory.CreateLogger<Program>();

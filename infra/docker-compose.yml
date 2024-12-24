@@ -220,15 +220,15 @@ services:
         aliases:
           - broker-5.dev
 
-  jaeger:
-    image: jaegertracing/all-in-one
-    container_name: jaeger
-    hostname: jaeger
-    ports:
-      - "4317:4317"
-      - "16686:16686"
-    networks:
-      - kafka
+#  jaeger:
+#    image: jaegertracing/all-in-one
+#    container_name: jaeger
+#    hostname: jaeger
+#    ports:
+#      - "4317:4317"
+#      - "16686:16686"
+#    networks:
+#      - kafka
 
 networks:
   kafka:

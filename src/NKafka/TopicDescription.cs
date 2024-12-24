@@ -22,8 +22,9 @@
 namespace NKafka;
 
 /// <summary>
-/// 
+/// Full topic description with topic info and partitions info 
 /// </summary>
-public record TopicDescription(string Name, Guid TopicId, bool IsInternal, IReadOnlyCollection<PartitionMetadata> Partitions): TopicMetadata(Name,
+public sealed record TopicDescription(string Name, Guid TopicId, bool IsInternal, IReadOnlyCollection<PartitionMetadata> Partitions): TopicMetadata(
+    Name,
     TopicId,
     IsInternal);

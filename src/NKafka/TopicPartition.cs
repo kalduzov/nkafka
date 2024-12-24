@@ -24,7 +24,7 @@
 namespace NKafka;
 
 /// <summary>
-/// Information about kafka partition
+/// Information about kafka topic partition
 /// </summary>
 public sealed record TopicPartition: IComparable<TopicPartition>
 {

@@ -51,8 +51,7 @@ internal class MessagesSender(
     {
         _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
-        //run in a dedicated thread
-        return Task.Factory.StartNew(RunAsync, this, TaskCreationOptions.LongRunning | TaskCreationOptions.RunContinuationsAsynchronously);
+        return RunAsync(this);
     }
 
     /// <inheritdoc/>
@@ -72,12 +71,10 @@ internal class MessagesSender(
     {
     }
 
-    private async void RunAsync(object? messageSender)
+    private async Task RunAsync(object? messageSender)
     {
         try
         {
-            Thread.CurrentThread.Name = "Kafka producer I/O thread";
-
             _logger.StartMessageSenderTrace();
 
             if (messageSender is not MessagesSender sender)

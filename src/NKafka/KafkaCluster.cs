@@ -93,7 +93,7 @@ internal sealed class KafkaCluster: IKafkaCluster
                              seedBrokers,
                              config.Ssl,
                              config.Sasl,
-                             config.MaxInflightRequests,
+                             CommonConfig.MaxInflightRequests,
                              config.MessageMaxBytes,
                              config.CloseConnectionTimeoutMs,
                              config.ConnectionsMaxIdleMs,

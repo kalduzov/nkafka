@@ -87,6 +87,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Component cannot be null or empty..
+        /// </summary>
+        internal static string LoggingScopeExtensions_ComponentCannotBeNull {
+            get {
+                return ResourceManager.GetString("LoggingScopeExtensions_ComponentCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Expected type &apos;MessagesSender&apos; as the input to the method.
         /// </summary>
         internal static string MessagesSenderInvalidType {

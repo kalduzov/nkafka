@@ -107,6 +107,11 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         _name = name;
         _logger = loggerFactory.CreateLogger(name);
 
+        var clientId = config.ClientId;
+        var transactionId = config.TransactionalId;
+
+        LoggerScope = _logger.Begin("producer", clientId, transactionId);
+
         _logger.StartProducerTrace(_name);
 
         _producerMetrics = producerMetrics ?? new DefaultProducerMetrics();
@@ -116,7 +121,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
 
         try
         {
-            _partitioner = InitPartitionerClass(config.PartitionerConfig);
+            _partitioner = InitPartitioner(config.PartitionerConfig);
             _keySerializer = InitializeSerializer(keySerializer);
             _valueSerializer = InitializeSerializer(valueSerializer);
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
@@ -125,6 +130,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                            ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, _producerMetrics, loggerFactory);
             _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, _producerMetrics, loggerFactory);
             _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
+
+
             _logger.StartedProducer(_name);
         }
         catch (Exception exc)
@@ -230,7 +237,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         return deliveryTimeoutMs;
     }
 
-    private static IPartitioner InitPartitionerClass(PartitionerConfig partitionerConfig)
+    private static IPartitioner InitPartitioner(PartitionerConfig partitionerConfig)
     {
         switch (partitionerConfig.Partitioner)
         {

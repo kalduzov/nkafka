@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <OpenTelemtryVersion>1.9.0</OpenTelemtryVersion>
-    <BenchmarkDotNetVersion>0.13.12</BenchmarkDotNetVersion>
+    <OpenTelemtryVersion>1.10.0</OpenTelemtryVersion>
+    <BenchmarkDotNetVersion>0.14.0</BenchmarkDotNetVersion>
     <Net8Version>8.0.0</Net8Version>
-    <xUnitVersion>2.8.1</xUnitVersion>
+    <xUnitVersion>2.9.2</xUnitVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net7.0' ">
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1"/>
@@ -32,29 +32,29 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1"/>
-    <PackageVersion Include="FastEnum" Version="1.8.0"/>
+    <PackageVersion Include="FastEnum" Version="2.0.3"/>
     <PackageVersion Include="Snappier" Version="1.1.6"/>
     <!--Tests-->
-    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.3"/>
-    <PackageVersion Include="NSubstitute" Version="5.1.0"/>
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.10.0"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4"/>
+    <PackageVersion Include="NSubstitute" Version="5.3.0"/>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
     <PackageVersion Include="xunit" Version="$(xUnitVersion)"/>
-    <PackageVersion Include="xunit.runner.visualstudio" Version="$(xUnitVersion)"/>
-    <PackageVersion Include="xunit.skippablefact" Version="1.4.13"/>
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.0"/>
+    <PackageVersion Include="xunit.skippablefact" Version="1.5.23"/>
     <PackageVersion Include="coverlet.collector" Version="6.0.2"/>
-    <PackageVersion Include="FluentAssertions" Version="6.12.0"/>
+    <PackageVersion Include="FluentAssertions" Version="7.0.0"/>
     <!--OpenTelemetry-->
     <PackageVersion Include="OpenTelemetry" Version="$(OpenTelemtryVersion)"/>
     <PackageVersion Include="OpenTelemetry.Exporter.Console" Version="$(OpenTelemtryVersion)"/>
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemtryVersion)"/>
     <!--Serilog-->
-    <PackageVersion Include="Serilog" Version="4.0.0"/>
+    <PackageVersion Include="Serilog" Version="4.2.0"/>
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0"/>
-    <PackageVersion Include="Confluent.Kafka" Version="2.4.0"/>
+    <PackageVersion Include="Confluent.Kafka" Version="2.6.1"/>
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
     <!--BenchmarkDotNet-->
     <PackageVersion Include="BenchmarkDotNet" Version="$(BenchmarkDotNetVersion)"/>
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="$(BenchmarkDotNetVersion)"/>
-    <PackageVersion Include="MinVer" Version="5.0.0"/>
+    <PackageVersion Include="MinVer" Version="6.0.0"/>
   </ItemGroup>
 </Project>

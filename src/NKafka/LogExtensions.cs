@@ -38,7 +38,7 @@ internal static partial class LogExtensions
     internal const int PRODUCER_EVENT_BASE_ID = 5000;
     internal const int CONSUMER_EVENT_BASE_ID = 6000;
 
-    internal const string LOGGER_PREFIX = "[Kafka] ";
+    internal const string LOGGER_PREFIX = "";
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Trace, Message = LOGGER_PREFIX + "Creating new cluster")]
     public static partial void CreateClusterTrace(this ILogger logger);

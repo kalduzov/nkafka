@@ -71,4 +71,7 @@
   <data name="MessagesSenderInvalidType" xml:space="preserve">
     <value>Expected type 'MessagesSender' as the input to the method</value>
   </data>
+  <data name="LoggingScopeExtensions_ComponentCannotBeNull" xml:space="preserve">
+    <value>Component cannot be null or empty.</value>
+  </data>
 </root>

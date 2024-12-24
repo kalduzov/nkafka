@@ -19,60 +19,58 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace NKafka;
 
 /// <summary>
-/// Описывает состояние партиции 
+/// Describe partition 
 /// </summary>
-public readonly struct PartitionMetadata: IComparable<PartitionMetadata>
+/// <remarks>
+/// Initializes a new instance of the <see cref="T:System.Object" /> class.
+/// </remarks>
+/// <param name="leader">ID of the broker who is the leader of this partition</param>
+/// <param name="partition">Partition number</param>
+/// <param name="replicas">IDs of brokers where all replicas of the partition are located</param>
+/// <param name="leaderEpoch">Number leader epoch</param>
+/// <param name="isr">IDs of brokers where all ISR replicas of the partition are located</param>
+/// <param name="offlineReplicas"></param>
+public readonly struct PartitionMetadata(
+    Partition partition,
+    int leader,
+    int leaderEpoch,
+    IReadOnlyCollection<int> replicas,
+    IReadOnlyCollection<int> isr,
+    IReadOnlyCollection<int> offlineReplicas): IComparable<PartitionMetadata>, IEquatable<PartitionMetadata>
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="T:System.Object" /> class.
+    /// Partition number
     /// </summary>
-    public PartitionMetadata(Partition partition,
-        int leader,
-        int leaderEpoch,
-        IReadOnlyCollection<int> replicas,
-        IReadOnlyCollection<int> isr,
-        IReadOnlyCollection<int> offlineReplicas)
-    {
-        Partition = partition;
-        Leader = leader;
-        LeaderEpoch = leaderEpoch;
-        Replicas = replicas;
-        Isr = isr;
-        OfflineReplicas = offlineReplicas;
-    }
+    public Partition Partition { get; } = partition;
 
     /// <summary>
-    ///  Партиция
+    /// ID of the broker who is the leader of this partition
     /// </summary>
-    public Partition Partition { get; }
+    public int Leader { get; } = leader;
 
     /// <summary>
-    /// Id ноды, которая является лидером для данной партиции
+    /// Number leader epoch
     /// </summary>
-    public int Leader { get; }
+    public int LeaderEpoch { get; } = leaderEpoch;
 
     /// <summary>
-    /// Номер эпохи лидера
+    /// IDs of brokers where all replicas of the partition are located
     /// </summary>
-    public int LeaderEpoch { get; }
+    public IReadOnlyCollection<int> Replicas { get; } = replicas;
 
     /// <summary>
-    /// Список id нод, которые являются репликами
+    /// IDs of brokers where all ISR replicas of the partition are located
     /// </summary>
-    public IReadOnlyCollection<int> Replicas { get; }
+    public IReadOnlyCollection<int> Isr { get; } = isr;
 
     /// <summary>
-    /// Список id нод, который являются сейчас isr репликами.
+    /// IDs of brokers that have copies of the partitions, but they are currently offline
     /// </summary>
-    public IReadOnlyCollection<int> Isr { get; }
-
-    /// <summary>
-    /// Список id нод реплик, которые сейчас offline
-    /// </summary>
-    public IReadOnlyCollection<int> OfflineReplicas { get; }
+    public IReadOnlyCollection<int> OfflineReplicas { get; } = offlineReplicas;
 
     /// <inheritdoc />
     public override int GetHashCode()
@@ -84,5 +82,27 @@ public readonly struct PartitionMetadata: IComparable<PartitionMetadata>
     public int CompareTo(PartitionMetadata other)
     {
         return Partition.CompareTo(other.Partition);
+    }
+
+    /// <inheritdoc />
+    public bool Equals(PartitionMetadata other)
+    {
+        return Partition.Equals(other.Partition);
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        return obj is PartitionMetadata other && Equals(other);
+    }
+
+    public static bool operator ==(PartitionMetadata left, PartitionMetadata right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(PartitionMetadata left, PartitionMetadata right)
+    {
+        return !(left == right);
     }
 }

@@ -29,7 +29,7 @@ namespace NKafka.Protocol;
 /// <summary>
 /// A helper class for writing the required types to the stream for sending to kafka
 /// </summary>
-internal sealed class BufferWriter: IBufferWriter<byte>
+internal class BufferWriter: IBufferWriter<byte>
 {
     private const int _LEN_DATA = 4;
     private const int _NULL_VAR_INT_VALUE = -1;

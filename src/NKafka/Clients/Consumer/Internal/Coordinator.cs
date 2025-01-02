@@ -301,10 +301,18 @@ internal class Coordinator: ICoordinator
     private static ConsumerProtocolAssignment GetConsumerProtocolAssignment(SyncGroupResponseMessage response)
     {
         var bufferReader = new BufferReader(response.Assignment);
-        var version = bufferReader.ReadShort();
-        var cpa = new ConsumerProtocolAssignment(ref bufferReader, (ApiVersion)version);
+        try
+        {
+            var version = bufferReader.ReadShort();
+            var cpa = new ConsumerProtocolAssignment(ref bufferReader, (ApiVersion)version);
 
-        return cpa;
+            return cpa;
+        }
+        finally
+        {
+            bufferReader.Dispose();
+
+        }
     }
 
     private async Task JoinToGroupAsync(Subscription subscription, CancellationToken token)

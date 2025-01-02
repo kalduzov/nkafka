@@ -64,6 +64,9 @@ public class RequestBuilderGenerator
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
         _codeGenerator.AppendLine("var reader = new BufferReader(span);");
+        _codeGenerator.AppendLine("try");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
         _codeGenerator.AppendLine("var headerVersion = apiKey.GetRequestHeaderVersion(apiVersion);");
         _codeGenerator.AppendLine("ProcessHeader(ref reader, headerVersion);");
         _codeGenerator.AppendLine("return apiKey switch");
@@ -78,6 +81,16 @@ public class RequestBuilderGenerator
         _codeGenerator.AppendLine("_ => throw new UnsupportedVersionException($\"Unsupported API key {apiKey}\")");
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendLine("};");
+        
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
+        _codeGenerator.AppendLine("finally");
+        _codeGenerator.AppendLeftBrace();
+        _codeGenerator.IncrementIndent();
+        _codeGenerator.AppendLine("reader.Dispose();");
+        _codeGenerator.DecrementIndent();
+        _codeGenerator.AppendRightBrace();
+        
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendRightBrace();
 

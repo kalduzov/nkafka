@@ -34,13 +34,16 @@ namespace NKafka.Collections;
 internal class Deque<T>: ICollection
     where T : class
 {
+    private readonly T _defaultItem;
+    
     private readonly LinkedList<T> _buffer;
 
     /// <summary>
     /// Creates a new instance of Deque.
     /// </summary>
-    public Deque()
+    internal Deque(T defaultItem)
     {
+        _defaultItem = defaultItem;
         _buffer = [];
     }
 
@@ -118,7 +121,7 @@ internal class Deque<T>: ICollection
     {
         if (_buffer.First is null)
         {
-            return default!;
+            return _defaultItem;
         }
 
         var element = _buffer.First.Value;
@@ -140,7 +143,7 @@ internal class Deque<T>: ICollection
     {
         if (_buffer.Last is null)
         {
-            return default!;
+            return _defaultItem;
         }
 
         var element = _buffer.Last.Value;
@@ -157,7 +160,7 @@ internal class Deque<T>: ICollection
     /// </returns>
     public T PeekFirst()
     {
-        return _buffer.First is null ? default! : _buffer.First.Value;
+        return _buffer.First is null ? _defaultItem : _buffer.First.Value;
 
     }
 
@@ -173,7 +176,7 @@ internal class Deque<T>: ICollection
 
             return true;
         }
-        element = default!;
+        element = _defaultItem;
 
         return false;
     }

@@ -10,6 +10,11 @@
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=LZ/@EntryIndexedValue">LZ</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=ZSTD/@EntryIndexedValue">ZSTD</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpNaming/ApplyAutoDetectedRules/@EntryValue">False</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=DockerBrokersGenerator_003B_002A_003B_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=Generator_003B_002A_003B_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=NKafka_002EBenchmarks_003B_002A_003B_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=NKafka_002ESamples_002EConfluent_003B_002A_003B_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=NKafka_002ESamples_003B_002A_003B_002A_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Acls/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=authcid/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=authzid/@EntryIndexedValue">True</s:Boolean>
@@ -24,7 +29,6 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=UNASSIGN/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=ZSTD/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=_043A_043E_043D_0441_044C_044E_043C_0435_0440_0430/@EntryIndexedValue">True</s:Boolean>
-    <s:Boolean
-            x:Key="/Default/UserDictionary/Words/=_0440_0435_0431_0430_043B_0430_043D_0441_0438_0440_043E_0432_043A_0438/@EntryIndexedValue">True</s:Boolean>
+    <s:Boolean x:Key="/Default/UserDictionary/Words/=_0440_0435_0431_0430_043B_0430_043D_0441_0438_0440_043E_0432_043A_0438/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=_0441_0435_0440_0438_0430_043B_0438_0437_0430_0446_0438_0438/@EntryIndexedValue">True</s:Boolean>
     <s:Boolean x:Key="/Default/UserDictionary/Words/=_0441_0435_0440_0438_0430_043B_0438_0437_0443_0435_0442/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

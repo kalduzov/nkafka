@@ -40,49 +40,56 @@ internal static partial class RequestBuilder
     public static IRequestMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span)
     {
         var reader = new BufferReader(span);
-        var headerVersion = apiKey.GetRequestHeaderVersion(apiVersion);
-        ProcessHeader(ref reader, headerVersion);
-        return apiKey switch
+        try
         {
-            ApiKeys.AddOffsetsToTxn => new AddOffsetsToTxnRequestMessage(ref reader, apiVersion),
-            ApiKeys.AddPartitionsToTxn => new AddPartitionsToTxnRequestMessage(ref reader, apiVersion),
-            ApiKeys.AlterConfigs => new AlterConfigsRequestMessage(ref reader, apiVersion),
-            ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsRequestMessage(ref reader, apiVersion),
-            ApiKeys.ApiVersions => new ApiVersionsRequestMessage(ref reader, apiVersion),
-            ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatRequestMessage(ref reader, apiVersion),
-            ApiKeys.CreateAcls => new CreateAclsRequestMessage(ref reader, apiVersion),
-            ApiKeys.CreatePartitions => new CreatePartitionsRequestMessage(ref reader, apiVersion),
-            ApiKeys.CreateTopics => new CreateTopicsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DeleteAcls => new DeleteAclsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DeleteGroups => new DeleteGroupsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DeleteRecords => new DeleteRecordsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DeleteTopics => new DeleteTopicsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DescribeAcls => new DescribeAclsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DescribeConfigs => new DescribeConfigsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DescribeGroups => new DescribeGroupsRequestMessage(ref reader, apiVersion),
-            ApiKeys.DescribeUserScramCredentials => new DescribeUserScramCredentialsRequestMessage(ref reader, apiVersion),
-            ApiKeys.EndTxn => new EndTxnRequestMessage(ref reader, apiVersion),
-            ApiKeys.Fetch => new FetchRequestMessage(ref reader, apiVersion),
-            ApiKeys.FetchSnapshot => new FetchSnapshotRequestMessage(ref reader, apiVersion),
-            ApiKeys.FindCoordinator => new FindCoordinatorRequestMessage(ref reader, apiVersion),
-            ApiKeys.Heartbeat => new HeartbeatRequestMessage(ref reader, apiVersion),
-            ApiKeys.IncrementalAlterConfigs => new IncrementalAlterConfigsRequestMessage(ref reader, apiVersion),
-            ApiKeys.InitProducerId => new InitProducerIdRequestMessage(ref reader, apiVersion),
-            ApiKeys.JoinGroup => new JoinGroupRequestMessage(ref reader, apiVersion),
-            ApiKeys.LeaveGroup => new LeaveGroupRequestMessage(ref reader, apiVersion),
-            ApiKeys.ListGroups => new ListGroupsRequestMessage(ref reader, apiVersion),
-            ApiKeys.ListOffsets => new ListOffsetsRequestMessage(ref reader, apiVersion),
-            ApiKeys.Metadata => new MetadataRequestMessage(ref reader, apiVersion),
-            ApiKeys.OffsetCommit => new OffsetCommitRequestMessage(ref reader, apiVersion),
-            ApiKeys.OffsetDelete => new OffsetDeleteRequestMessage(ref reader, apiVersion),
-            ApiKeys.OffsetFetch => new OffsetFetchRequestMessage(ref reader, apiVersion),
-            ApiKeys.OffsetForLeaderEpoch => new OffsetForLeaderEpochRequestMessage(ref reader, apiVersion),
-            ApiKeys.Produce => new ProduceRequestMessage(ref reader, apiVersion),
-            ApiKeys.SaslAuthenticate => new SaslAuthenticateRequestMessage(ref reader, apiVersion),
-            ApiKeys.SaslHandshake => new SaslHandshakeRequestMessage(ref reader, apiVersion),
-            ApiKeys.SyncGroup => new SyncGroupRequestMessage(ref reader, apiVersion),
-            ApiKeys.TxnOffsetCommit => new TxnOffsetCommitRequestMessage(ref reader, apiVersion),
-            _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
-        };
+            var headerVersion = apiKey.GetRequestHeaderVersion(apiVersion);
+            ProcessHeader(ref reader, headerVersion);
+            return apiKey switch
+            {
+                ApiKeys.AddOffsetsToTxn => new AddOffsetsToTxnRequestMessage(ref reader, apiVersion),
+                ApiKeys.AddPartitionsToTxn => new AddPartitionsToTxnRequestMessage(ref reader, apiVersion),
+                ApiKeys.AlterConfigs => new AlterConfigsRequestMessage(ref reader, apiVersion),
+                ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsRequestMessage(ref reader, apiVersion),
+                ApiKeys.ApiVersions => new ApiVersionsRequestMessage(ref reader, apiVersion),
+                ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatRequestMessage(ref reader, apiVersion),
+                ApiKeys.CreateAcls => new CreateAclsRequestMessage(ref reader, apiVersion),
+                ApiKeys.CreatePartitions => new CreatePartitionsRequestMessage(ref reader, apiVersion),
+                ApiKeys.CreateTopics => new CreateTopicsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DeleteAcls => new DeleteAclsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DeleteGroups => new DeleteGroupsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DeleteRecords => new DeleteRecordsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DeleteTopics => new DeleteTopicsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DescribeAcls => new DescribeAclsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DescribeConfigs => new DescribeConfigsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DescribeGroups => new DescribeGroupsRequestMessage(ref reader, apiVersion),
+                ApiKeys.DescribeUserScramCredentials => new DescribeUserScramCredentialsRequestMessage(ref reader, apiVersion),
+                ApiKeys.EndTxn => new EndTxnRequestMessage(ref reader, apiVersion),
+                ApiKeys.Fetch => new FetchRequestMessage(ref reader, apiVersion),
+                ApiKeys.FetchSnapshot => new FetchSnapshotRequestMessage(ref reader, apiVersion),
+                ApiKeys.FindCoordinator => new FindCoordinatorRequestMessage(ref reader, apiVersion),
+                ApiKeys.Heartbeat => new HeartbeatRequestMessage(ref reader, apiVersion),
+                ApiKeys.IncrementalAlterConfigs => new IncrementalAlterConfigsRequestMessage(ref reader, apiVersion),
+                ApiKeys.InitProducerId => new InitProducerIdRequestMessage(ref reader, apiVersion),
+                ApiKeys.JoinGroup => new JoinGroupRequestMessage(ref reader, apiVersion),
+                ApiKeys.LeaveGroup => new LeaveGroupRequestMessage(ref reader, apiVersion),
+                ApiKeys.ListGroups => new ListGroupsRequestMessage(ref reader, apiVersion),
+                ApiKeys.ListOffsets => new ListOffsetsRequestMessage(ref reader, apiVersion),
+                ApiKeys.Metadata => new MetadataRequestMessage(ref reader, apiVersion),
+                ApiKeys.OffsetCommit => new OffsetCommitRequestMessage(ref reader, apiVersion),
+                ApiKeys.OffsetDelete => new OffsetDeleteRequestMessage(ref reader, apiVersion),
+                ApiKeys.OffsetFetch => new OffsetFetchRequestMessage(ref reader, apiVersion),
+                ApiKeys.OffsetForLeaderEpoch => new OffsetForLeaderEpochRequestMessage(ref reader, apiVersion),
+                ApiKeys.Produce => new ProduceRequestMessage(ref reader, apiVersion),
+                ApiKeys.SaslAuthenticate => new SaslAuthenticateRequestMessage(ref reader, apiVersion),
+                ApiKeys.SaslHandshake => new SaslHandshakeRequestMessage(ref reader, apiVersion),
+                ApiKeys.SyncGroup => new SyncGroupRequestMessage(ref reader, apiVersion),
+                ApiKeys.TxnOffsetCommit => new TxnOffsetCommitRequestMessage(ref reader, apiVersion),
+                _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
+            };
+        }
+        finally
+        {
+            reader.Dispose();
+        }
     }
 }

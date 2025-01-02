@@ -143,14 +143,6 @@ public class Subscription
 
     private class SubscriptionSerializer(ApiVersion apiVersion): ISerializer<Subscription>
     {
-        public bool PreferAsync => false;
-
-        /// <inheritdoc />
-        public Task<byte[]> SerializeAsync(Subscription data)
-        {
-            return Task.FromResult(Serialize(data));
-        }
-
         /// <inheritdoc />
         public byte[] Serialize(Subscription data)
         {
@@ -173,19 +165,20 @@ public class Subscription
     private class SubscriptionDeserializer: IDeserializer<Subscription>
     {
         /// <inheritdoc />
-        public Task<Subscription> DeserializeAsync(ReadOnlySpan<byte> data)
-        {
-            return Task.FromResult(Deserialize(data));
-        }
-
-        /// <inheritdoc />
         public Subscription Deserialize(ReadOnlySpan<byte> data)
         {
             var bufferReader = new BufferReader(data);
-            var version = bufferReader.ReadShort();
-            var cps = new ConsumerProtocolSubscription(ref bufferReader, (ApiVersion)version);
+            try
+            {
+                var version = bufferReader.ReadShort();
+                var cps = new ConsumerProtocolSubscription(ref bufferReader, (ApiVersion)version);
 
-            return new Subscription(cps.Topics, AutoOffsetReset.None, []);
+                return new Subscription(cps.Topics, AutoOffsetReset.None, []);
+            }
+            finally
+            {
+                bufferReader.Dispose();
+            }
         }
     }
 }

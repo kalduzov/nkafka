@@ -33,26 +33,24 @@ internal ref partial struct BufferReader
 {
     private ReadOnlySequence<byte> _bufferSource;
     private readonly long _totalLength;
-    private int _bufferLength;
     private ref byte _bufferReference;
     private byte[]? _rentBuffer;
     private int _advancedCount;
-    private int _consumed;
 
     /// <summary>
     /// 
     /// </summary>
-    public readonly long Remaining => _totalLength - _consumed;
+    public readonly long Remaining => _totalLength - CurrentOffset;
 
     /// <summary>
     /// 
     /// </summary>
-    public readonly int Length => _bufferLength;
+    public int Length { get; private set; }
 
     /// <summary>
     /// 
     /// </summary>
-    public readonly int CurrentOffset => _consumed;
+    public int CurrentOffset { get; private set; }
 
     /// <summary>
     /// 
@@ -62,9 +60,9 @@ internal ref partial struct BufferReader
     {
         _bufferSource = ReadOnlySequence<byte>.Empty;
         _bufferReference = ref MemoryMarshal.GetReference(buffer);
-        _bufferLength = buffer.Length;
+        Length = buffer.Length;
         _advancedCount = 0;
-        _consumed = 0;
+        CurrentOffset = 0;
         _rentBuffer = null;
         _totalLength = buffer.Length;
     }
@@ -79,9 +77,9 @@ internal ref partial struct BufferReader
         var span = sequence.FirstSpan;
         _bufferReference = ref MemoryMarshal.GetReference(span);
 
-        _bufferLength = span.Length;
+        Length = span.Length;
         _advancedCount = 0;
-        _consumed = 0;
+        CurrentOffset = 0;
         _rentBuffer = null;
         _totalLength = sequence.Length;
     }
@@ -94,7 +92,7 @@ internal ref partial struct BufferReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private ref byte GetSpanReference(int sizeHint)
     {
-        if (sizeHint <= _bufferLength)
+        if (sizeHint <= Length)
         {
             return ref _bufferReference;
         }
@@ -138,7 +136,7 @@ internal ref partial struct BufferReader
         {
 
             _bufferReference = ref MemoryMarshal.GetReference(_bufferSource.FirstSpan);
-            _bufferLength = _bufferSource.FirstSpan.Length;
+            Length = _bufferSource.FirstSpan.Length;
 
             return ref _bufferReference;
         }
@@ -147,7 +145,7 @@ internal ref partial struct BufferReader
         _bufferSource.Slice(0, sizeHint).CopyTo(_rentBuffer);
         var span = _rentBuffer.AsSpan(0, sizeHint);
         _bufferReference = ref MemoryMarshal.GetReference(span);
-        _bufferLength = span.Length;
+        Length = span.Length;
 
         return ref _bufferReference;
 
@@ -165,7 +163,7 @@ internal ref partial struct BufferReader
             return;
         }
 
-        var rest = _bufferLength - count;
+        var rest = Length - count;
 
         if (rest < 0)
         {
@@ -174,10 +172,10 @@ internal ref partial struct BufferReader
                 return;
             }
         }
-        _bufferLength = rest;
+        Length = rest;
         _bufferReference = ref Unsafe.Add(ref _bufferReference, count);
         _advancedCount += count;
-        _consumed += count;
+        CurrentOffset += count;
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -192,9 +190,9 @@ internal ref partial struct BufferReader
 
         _bufferSource = _bufferSource.Slice(_advancedCount + count);
         _bufferReference = ref MemoryMarshal.GetReference(_bufferSource.FirstSpan);
-        _bufferLength = _bufferSource.FirstSpan.Length;
+        Length = _bufferSource.FirstSpan.Length;
         _advancedCount = 0;
-        _consumed += count;
+        CurrentOffset += count;
 
         return true;
     }
@@ -288,7 +286,7 @@ internal ref partial struct BufferReader
         {
             VarIntCodes.BYTE => ReadUnmanaged<byte>(),
             VarIntCodes.SBYTE => checked((byte)ReadUnmanaged<sbyte>()),
-            VarIntCodes.UINT16 => checked((byte)ReadUnmanaged<byte>()),
+            VarIntCodes.UINT16 => ReadUnmanaged<byte>(),
             VarIntCodes.INT16 => checked((byte)ReadUnmanaged<short>()),
             VarIntCodes.UINT32 => checked((byte)ReadUnmanaged<uint>()),
             VarIntCodes.INT32 => checked((byte)ReadUnmanaged<int>()),
@@ -375,14 +373,14 @@ internal ref partial struct BufferReader
         return typeCode switch
         {
             VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => checked((int)ReadUnmanaged<sbyte>()),
+            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
             VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => checked((int)ReadUnmanaged<short>()),
+            VarIntCodes.INT16 => ReadUnmanaged<short>(),
             VarIntCodes.UINT32 => ReadUnmanaged<int>(),
-            VarIntCodes.INT32 => checked((int)ReadUnmanaged<int>()),
+            VarIntCodes.INT32 => ReadUnmanaged<int>(),
             VarIntCodes.UINT64 => checked((int)ReadUnmanaged<ulong>()),
             VarIntCodes.INT64 => checked((int)ReadUnmanaged<long>()),
-            _ => checked((int)typeCode)
+            _ => typeCode
         };
     }
 
@@ -463,7 +461,7 @@ internal ref partial struct BufferReader
     {
         if (unknowns is null)
         {
-            return new List<TaggedField>(0);
+            return [];
         }
 
         var data = ReadBytes(size);

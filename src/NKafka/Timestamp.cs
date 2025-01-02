@@ -42,7 +42,7 @@ public readonly struct Timestamp: IEquatable<Timestamp>
     /// </summary>
     public static readonly DateTime UnixTimeEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    private const long _UNIX_TIME_EPOCH_MILLISECONDS = 62135596800000; // = UnixTimeEpoch.TotalMiliseconds
+    private const long _UNIX_TIME_EPOCH_MILLISECONDS = 62135596800000; // = UnixTimeEpoch.TotalMilliseconds
 
     /// <summary>
     ///     Initializes a new instance of the Timestamp structure.

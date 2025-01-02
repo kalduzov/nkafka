@@ -42,7 +42,7 @@ public class TopicsManipulationTests
 
         var topics = new List<TopicDetail>
         {
-            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+            new(topicName, partitions, replicaFactor, [], [])
         };
         var createTopicResults = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
         var firstTopic = createTopicResults.First().Value;
@@ -50,10 +50,9 @@ public class TopicsManipulationTests
         firstTopic.NumPartitions.Should().Be(partitions);
         firstTopic.ReplicationFactor.Should().Be(replicaFactor);
 
-        var deleteTopicsResult = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
-            {
+        var deleteTopicsResult = await kafkaCluster.AdminClient.DeleteTopicsAsync([
                 topicName
-            },
+            ],
             new DeleteTopicsOptions(),
             CancellationToken.None);
 
@@ -69,7 +68,7 @@ public class TopicsManipulationTests
 
         var topics = new List<TopicDetail>
         {
-            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+            new(topicName, partitions, replicaFactor, [], [])
         };
         _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
@@ -83,10 +82,9 @@ public class TopicsManipulationTests
         listTopics.Should().Contain(x => x.Name == topicName);
         listTopics.Should().Contain(x => x.IsInternal);
 
-        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
-            {
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync([
                 topicName
-            },
+            ],
             new DeleteTopicsOptions(),
             CancellationToken.None);
 
@@ -101,7 +99,7 @@ public class TopicsManipulationTests
 
         var topics = new List<TopicDetail>
         {
-            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+            new(topicName, partitions, replicaFactor, [], [])
         };
         _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
@@ -115,10 +113,9 @@ public class TopicsManipulationTests
         listTopics.Should().Contain(x => x.Name == topicName);
         listTopics.Should().NotContain(x => x.IsInternal);
 
-        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
-            {
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync([
                 topicName
-            },
+            ],
             new DeleteTopicsOptions(),
             CancellationToken.None);
 
@@ -133,14 +130,11 @@ public class TopicsManipulationTests
 
         var topics = new List<TopicDetail>
         {
-            new(topicName, partitions, replicaFactor, new Dictionary<int, int>(0), new Dictionary<string, string>(0))
+            new(topicName, partitions, replicaFactor, [], [])
         };
         _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
-        var listTopics = await kafkaCluster.AdminClient.DescribeTopicsAsync(new HashSet<string>
-            {
-                topicName
-            },
+        var listTopics = await kafkaCluster.AdminClient.DescribeTopicsAsync([topicName],
             new DescribeTopicsOptions(),
             CancellationToken.None);
 
@@ -152,10 +146,9 @@ public class TopicsManipulationTests
         value.Partitions.Count.Should().Be(partitions);
         value.Partitions.First().Replicas.Count.Should().Be(replicaFactor);
 
-        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync(new[]
-            {
+        _ = await kafkaCluster.AdminClient.DeleteTopicsAsync([
                 topicName
-            },
+            ],
             new DeleteTopicsOptions(),
             CancellationToken.None);
 
@@ -165,10 +158,10 @@ public class TopicsManipulationTests
     {
         var clusterConfig = new ClusterConfig
         {
-            BootstrapServers = new[]
-            {
+            BootstrapServers =
+            [
                 "localhost:29091"
-            }
+            ]
         };
 
         var loggerFactory = NullLoggerFactory.Instance;

@@ -26,8 +26,14 @@ namespace NKafka;
 /// <summary>
 /// Represents a Kafka partition offset value.
 /// </summary>
-/// <remarks>This structure is borrowed from the Confluent.Fafka library</remarks>
-public readonly struct Offset: IEquatable<Offset>
+/// <remarks>This structure is borrowed from the Confluent.Kafka library</remarks>
+/// <remarks>
+///     Initializes a new instance of the Offset structure.
+/// </remarks>
+/// <param name="offset">
+///     The offset value
+/// </param>
+public readonly struct Offset(long offset): IEquatable<Offset>
 {
     private const long _OFFSET_INVALID = -1001;
 
@@ -37,20 +43,9 @@ public readonly struct Offset: IEquatable<Offset>
     public static readonly Offset Unset = new(_OFFSET_INVALID);
 
     /// <summary>
-    ///     Initializes a new instance of the Offset structure.
-    /// </summary>
-    /// <param name="offset">
-    ///     The offset value
-    /// </param>
-    public Offset(long offset)
-    {
-        Value = offset;
-    }
-
-    /// <summary>
     ///     Gets the long value corresponding to this offset.
     /// </summary>
-    public long Value { get; }
+    public long Value { get; } = offset;
 
     /// <summary>
     ///     Tests whether this Offset value is equal to the specified object.

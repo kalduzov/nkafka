@@ -48,12 +48,12 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     /// <summary>
     /// Коллекция пакетов в виде двухсторонней очереди
     /// </summary>
-    private class BatchDeque: Deque<ProducerBatch>;
+    private class ProducerBatchesDeque(): Deque<ProducerBatch>(ProducerBatch.Null);
 
     /// <summary>
     /// Коллекция пакетов распределенных по партициям
     /// </summary>
-    private class PartitionedBatchCollection: ConcurrentDictionary<Partition, BatchDeque>;
+    private class PartitionedBatchCollection: ConcurrentDictionary<Partition, ProducerBatchesDeque>;
 
     //Пачки распределенные по топикам
     private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics;
@@ -141,7 +141,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 var effectivePartition = topicPartition.Partition.Value;
 
                 // get a queue containing batches for adding records
-                var deque = topicBatches.GetOrAdd(effectivePartition, _ => new BatchDeque());
+                var deque = topicBatches.GetOrAdd(effectivePartition, _ => new ProducerBatchesDeque());
 
                 lock (deque) // only one thread can add data to the queue
                 {
@@ -323,7 +323,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 {
                     firstBatch = deque.PeekFirst(); // Проверяем первый пакет перед извлечением
 
-                    if (firstBatch is null) // Пакета нет - идем к следующей очереди
+                    if (firstBatch == ProducerBatch.Null) // Нет готового батча - идем к следующей очереди
                     {
                         continue;
                     }

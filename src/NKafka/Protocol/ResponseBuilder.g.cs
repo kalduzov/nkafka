@@ -40,49 +40,56 @@ internal static partial class ResponseBuilder
     public static IResponseMessage Build(ApiKeys apiKey, ApiVersion apiVersion, byte[] span)
     {
         var reader = new BufferReader(span);
-        var headerVersion = apiKey.GetResponseHeaderVersion(apiVersion);
-        ProcessHeader(ref reader, headerVersion);
-        return apiKey switch
+        try
         {
-            ApiKeys.AddOffsetsToTxn => new AddOffsetsToTxnResponseMessage(ref reader, apiVersion),
-            ApiKeys.AddPartitionsToTxn => new AddPartitionsToTxnResponseMessage(ref reader, apiVersion),
-            ApiKeys.AlterConfigs => new AlterConfigsResponseMessage(ref reader, apiVersion),
-            ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsResponseMessage(ref reader, apiVersion),
-            ApiKeys.ApiVersions => new ApiVersionsResponseMessage(ref reader, apiVersion),
-            ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatResponseMessage(ref reader, apiVersion),
-            ApiKeys.CreateAcls => new CreateAclsResponseMessage(ref reader, apiVersion),
-            ApiKeys.CreatePartitions => new CreatePartitionsResponseMessage(ref reader, apiVersion),
-            ApiKeys.CreateTopics => new CreateTopicsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DeleteAcls => new DeleteAclsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DeleteGroups => new DeleteGroupsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DeleteRecords => new DeleteRecordsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DeleteTopics => new DeleteTopicsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DescribeAcls => new DescribeAclsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DescribeConfigs => new DescribeConfigsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DescribeGroups => new DescribeGroupsResponseMessage(ref reader, apiVersion),
-            ApiKeys.DescribeUserScramCredentials => new DescribeUserScramCredentialsResponseMessage(ref reader, apiVersion),
-            ApiKeys.EndTxn => new EndTxnResponseMessage(ref reader, apiVersion),
-            ApiKeys.Fetch => new FetchResponseMessage(ref reader, apiVersion),
-            ApiKeys.FetchSnapshot => new FetchSnapshotResponseMessage(ref reader, apiVersion),
-            ApiKeys.FindCoordinator => new FindCoordinatorResponseMessage(ref reader, apiVersion),
-            ApiKeys.Heartbeat => new HeartbeatResponseMessage(ref reader, apiVersion),
-            ApiKeys.IncrementalAlterConfigs => new IncrementalAlterConfigsResponseMessage(ref reader, apiVersion),
-            ApiKeys.InitProducerId => new InitProducerIdResponseMessage(ref reader, apiVersion),
-            ApiKeys.JoinGroup => new JoinGroupResponseMessage(ref reader, apiVersion),
-            ApiKeys.LeaveGroup => new LeaveGroupResponseMessage(ref reader, apiVersion),
-            ApiKeys.ListGroups => new ListGroupsResponseMessage(ref reader, apiVersion),
-            ApiKeys.ListOffsets => new ListOffsetsResponseMessage(ref reader, apiVersion),
-            ApiKeys.Metadata => new MetadataResponseMessage(ref reader, apiVersion),
-            ApiKeys.OffsetCommit => new OffsetCommitResponseMessage(ref reader, apiVersion),
-            ApiKeys.OffsetDelete => new OffsetDeleteResponseMessage(ref reader, apiVersion),
-            ApiKeys.OffsetFetch => new OffsetFetchResponseMessage(ref reader, apiVersion),
-            ApiKeys.OffsetForLeaderEpoch => new OffsetForLeaderEpochResponseMessage(ref reader, apiVersion),
-            ApiKeys.Produce => new ProduceResponseMessage(ref reader, apiVersion),
-            ApiKeys.SaslAuthenticate => new SaslAuthenticateResponseMessage(ref reader, apiVersion),
-            ApiKeys.SaslHandshake => new SaslHandshakeResponseMessage(ref reader, apiVersion),
-            ApiKeys.SyncGroup => new SyncGroupResponseMessage(ref reader, apiVersion),
-            ApiKeys.TxnOffsetCommit => new TxnOffsetCommitResponseMessage(ref reader, apiVersion),
-            _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
-        };
+            var headerVersion = apiKey.GetResponseHeaderVersion(apiVersion);
+            ProcessHeader(ref reader, headerVersion);
+            return apiKey switch
+            {
+                ApiKeys.AddOffsetsToTxn => new AddOffsetsToTxnResponseMessage(ref reader, apiVersion),
+                ApiKeys.AddPartitionsToTxn => new AddPartitionsToTxnResponseMessage(ref reader, apiVersion),
+                ApiKeys.AlterConfigs => new AlterConfigsResponseMessage(ref reader, apiVersion),
+                ApiKeys.AlterUserScramCredentials => new AlterUserScramCredentialsResponseMessage(ref reader, apiVersion),
+                ApiKeys.ApiVersions => new ApiVersionsResponseMessage(ref reader, apiVersion),
+                ApiKeys.ConsumerGroupHeartbeat => new ConsumerGroupHeartbeatResponseMessage(ref reader, apiVersion),
+                ApiKeys.CreateAcls => new CreateAclsResponseMessage(ref reader, apiVersion),
+                ApiKeys.CreatePartitions => new CreatePartitionsResponseMessage(ref reader, apiVersion),
+                ApiKeys.CreateTopics => new CreateTopicsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DeleteAcls => new DeleteAclsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DeleteGroups => new DeleteGroupsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DeleteRecords => new DeleteRecordsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DeleteTopics => new DeleteTopicsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DescribeAcls => new DescribeAclsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DescribeConfigs => new DescribeConfigsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DescribeGroups => new DescribeGroupsResponseMessage(ref reader, apiVersion),
+                ApiKeys.DescribeUserScramCredentials => new DescribeUserScramCredentialsResponseMessage(ref reader, apiVersion),
+                ApiKeys.EndTxn => new EndTxnResponseMessage(ref reader, apiVersion),
+                ApiKeys.Fetch => new FetchResponseMessage(ref reader, apiVersion),
+                ApiKeys.FetchSnapshot => new FetchSnapshotResponseMessage(ref reader, apiVersion),
+                ApiKeys.FindCoordinator => new FindCoordinatorResponseMessage(ref reader, apiVersion),
+                ApiKeys.Heartbeat => new HeartbeatResponseMessage(ref reader, apiVersion),
+                ApiKeys.IncrementalAlterConfigs => new IncrementalAlterConfigsResponseMessage(ref reader, apiVersion),
+                ApiKeys.InitProducerId => new InitProducerIdResponseMessage(ref reader, apiVersion),
+                ApiKeys.JoinGroup => new JoinGroupResponseMessage(ref reader, apiVersion),
+                ApiKeys.LeaveGroup => new LeaveGroupResponseMessage(ref reader, apiVersion),
+                ApiKeys.ListGroups => new ListGroupsResponseMessage(ref reader, apiVersion),
+                ApiKeys.ListOffsets => new ListOffsetsResponseMessage(ref reader, apiVersion),
+                ApiKeys.Metadata => new MetadataResponseMessage(ref reader, apiVersion),
+                ApiKeys.OffsetCommit => new OffsetCommitResponseMessage(ref reader, apiVersion),
+                ApiKeys.OffsetDelete => new OffsetDeleteResponseMessage(ref reader, apiVersion),
+                ApiKeys.OffsetFetch => new OffsetFetchResponseMessage(ref reader, apiVersion),
+                ApiKeys.OffsetForLeaderEpoch => new OffsetForLeaderEpochResponseMessage(ref reader, apiVersion),
+                ApiKeys.Produce => new ProduceResponseMessage(ref reader, apiVersion),
+                ApiKeys.SaslAuthenticate => new SaslAuthenticateResponseMessage(ref reader, apiVersion),
+                ApiKeys.SaslHandshake => new SaslHandshakeResponseMessage(ref reader, apiVersion),
+                ApiKeys.SyncGroup => new SyncGroupResponseMessage(ref reader, apiVersion),
+                ApiKeys.TxnOffsetCommit => new TxnOffsetCommitResponseMessage(ref reader, apiVersion),
+                _ => throw new UnsupportedVersionException($"Unsupported API key {apiKey}")
+            };
+        }
+        finally
+        {
+            reader.Dispose();
+        }
     }
 }

@@ -22,12 +22,11 @@
  */
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Records;
-
-using CrcUtils = NKafka.Crc.Crc;
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -36,7 +35,14 @@ namespace NKafka.Clients.Producer.Internals;
 /// </summary>
 internal class ProducerBatch
 {
+    /// <summary>
+    /// This default bath 
+    /// </summary>
+    public static readonly ProducerBatch Null = new(TopicPartition.Null, NullBufferWriter.Instance,
+        NullLoggerFactory.Instance);
+
     internal const int RECORD_BATCH_OVERHEAD = 61;
+
     private readonly BufferWriter _bufferWriter;
 
     /// <summary>

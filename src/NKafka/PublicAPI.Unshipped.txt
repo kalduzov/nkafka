@@ -181,10 +181,20 @@ NKafka.Message<TKey, TValue>.Timestamp.get -> NKafka.Timestamp
 NKafka.Message<TKey, TValue>.Timestamp.set -> void
 NKafka.Message<TKey, TValue>.Value.get -> TValue
 NKafka.Message<TKey, TValue>.Value.set -> void
+NKafka.Node
+NKafka.Node.EndPoint.get -> System.Net.EndPoint!
+NKafka.Node.Host.get -> string!
+NKafka.Node.Id.get -> int
+NKafka.Node.Node(int id, string! host, int port, string? rack = null) -> void
+NKafka.Node.Port.get -> int
+NKafka.Node.Rack.get -> string?
 NKafka.Null
 NKafka.Null.Null() -> void
 NKafka.Offset
+NKafka.Offset.Equals(NKafka.Offset other) -> bool
 NKafka.Offset.Offset() -> void
+NKafka.Offset.Offset(long offset) -> void
+NKafka.Offset.Value.get -> long
 NKafka.Partition
 NKafka.Partition.CompareTo(NKafka.Partition other) -> int
 NKafka.Partition.Equals(NKafka.Partition other) -> bool
@@ -214,6 +224,10 @@ NKafka.Serialization.IDeserializer<T>
 NKafka.Serialization.IDeserializer<T>.Deserialize(System.ReadOnlySpan<byte> data) -> T
 NKafka.Serialization.ISerializer<T>
 NKafka.Serialization.ISerializer<T>.Serialize(T data) -> byte[]!
+NKafka.TimestampType
+NKafka.TimestampType.CreateTime = 1 -> NKafka.TimestampType
+NKafka.TimestampType.LogAppendTime = 2 -> NKafka.TimestampType
+NKafka.TimestampType.NotAvailable = 0 -> NKafka.TimestampType
 NKafka.TopicDescription
 NKafka.TopicDescription.Partitions.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.PartitionMetadata>!
 NKafka.TopicDescription.Partitions.init -> void
@@ -235,6 +249,9 @@ NKafka.TopicPartition.Topic.get -> string!
 NKafka.TopicPartition.TopicId.get -> System.Guid
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition) -> void
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition, System.Guid topicId) -> void
+override NKafka.Offset.Equals(object? obj) -> bool
+override NKafka.Offset.GetHashCode() -> int
+override NKafka.Offset.ToString() -> string!
 override NKafka.Partition.Equals(object? obj) -> bool
 override NKafka.Partition.GetHashCode() -> int
 override NKafka.Partition.ToString() -> string!
@@ -255,6 +272,17 @@ static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterCon
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
+static NKafka.Node.NoNode.get -> NKafka.Node!
+static NKafka.Offset.implicit operator long(NKafka.Offset o) -> long
+static NKafka.Offset.implicit operator NKafka.Offset(long v) -> NKafka.Offset
+static NKafka.Offset.operator !=(NKafka.Offset a, NKafka.Offset b) -> bool
+static NKafka.Offset.operator +(NKafka.Offset a, int b) -> NKafka.Offset
+static NKafka.Offset.operator +(NKafka.Offset a, long b) -> NKafka.Offset
+static NKafka.Offset.operator <(NKafka.Offset a, NKafka.Offset b) -> bool
+static NKafka.Offset.operator <=(NKafka.Offset a, NKafka.Offset b) -> bool
+static NKafka.Offset.operator ==(NKafka.Offset a, NKafka.Offset b) -> bool
+static NKafka.Offset.operator >(NKafka.Offset a, NKafka.Offset b) -> bool
+static NKafka.Offset.operator >=(NKafka.Offset a, NKafka.Offset b) -> bool
 static NKafka.Partition.implicit operator int(NKafka.Partition partition) -> int
 static NKafka.Partition.implicit operator NKafka.Partition(int value) -> NKafka.Partition
 static NKafka.Partition.operator !=(NKafka.Partition a, NKafka.Partition b) -> bool
@@ -272,3 +300,4 @@ static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaC
 static readonly NKafka.Null.Instance -> NKafka.Null
 static readonly NKafka.Offset.Unset -> NKafka.Offset
 static readonly NKafka.Partition.Any -> NKafka.Partitiona.Partition
+static readonly NKafka.TopicPartition.Null -> NKafka.TopicPartition!

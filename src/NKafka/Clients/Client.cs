@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NKafka.Clients;
 
-internal abstract class Client<TConfig>: IClient
+internal abstract class Client<TConfig>(IKafkaCluster kafkaCluster, TConfig config, ILoggerFactory loggerFactory): IClient
 {
     private IDisposable? _loggerScope;
 
@@ -47,18 +47,11 @@ internal abstract class Client<TConfig>: IClient
         }
     }
 
-    protected IKafkaCluster KafkaCluster { get; }
+    protected IKafkaCluster KafkaCluster { get; } = kafkaCluster;
 
-    protected ILoggerFactory LoggerFactory { get; }
+    protected ILoggerFactory LoggerFactory { get; } = loggerFactory;
 
-    protected TConfig Config { get; }
-
-    protected Client(IKafkaCluster kafkaCluster, TConfig config, ILoggerFactory loggerFactory)
-    {
-        Config = config;
-        KafkaCluster = kafkaCluster;
-        LoggerFactory = loggerFactory;
-    }
+    protected TConfig Config { get; } = config;
 
     public virtual void Dispose()
     {

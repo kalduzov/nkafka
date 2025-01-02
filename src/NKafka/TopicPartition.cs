@@ -28,6 +28,11 @@ namespace NKafka;
 /// </summary>
 public sealed record TopicPartition: IComparable<TopicPartition>
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public static readonly TopicPartition Null = new(string.Empty, Partition.Any);
+
     private readonly int _hash;
 
     /// <summary>

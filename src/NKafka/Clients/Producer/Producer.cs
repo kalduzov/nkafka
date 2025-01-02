@@ -131,7 +131,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, _producerMetrics, loggerFactory);
             _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
 
-
             _logger.StartedProducer(_name);
         }
         catch (Exception exc)

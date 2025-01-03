@@ -88,11 +88,11 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -104,7 +104,7 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -114,7 +114,7 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

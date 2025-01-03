@@ -85,7 +85,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field FilterResults was serialized as null");
@@ -122,11 +122,11 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -138,7 +138,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -147,7 +147,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             writer.WriteVarUInt(FilterResults.Count + 1);
             foreach (var element in FilterResults)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -155,7 +155,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             writer.WriteInt(FilterResults.Count);
             foreach (var element in FilterResults)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -163,7 +163,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
         if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -283,7 +283,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -306,7 +306,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 if (version >= ApiVersion.Version2)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarUInt() - 1;
+                    arrayLength = reader.ReadVarInt() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field MatchingAcls was serialized as null");
@@ -343,11 +343,11 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version2)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -359,7 +359,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
@@ -392,7 +392,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 writer.WriteVarUInt(MatchingAcls.Count + 1);
                 foreach (var element in MatchingAcls)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             else
@@ -400,7 +400,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 writer.WriteInt(MatchingAcls.Count);
                 foreach (var element in MatchingAcls)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -408,7 +408,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {
@@ -574,7 +574,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -598,7 +598,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -629,7 +629,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -652,7 +652,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -676,11 +676,11 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version2)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -692,7 +692,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
@@ -775,7 +775,7 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

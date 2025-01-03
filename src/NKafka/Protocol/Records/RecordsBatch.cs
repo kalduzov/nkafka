@@ -48,7 +48,7 @@ internal class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    public BufferWriter Buffer { get; } = new(Stream.Null);
+    public ArrayBuffer Buffer { get; } = ArrayBuffer.Null;
 
     /// <inheritdoc />
     public int CountRecords { get; set; }
@@ -103,7 +103,7 @@ internal class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    protected RecordsBatch(BufferWriter bufferWriter)
+    protected RecordsBatch(ArrayBuffer bufferWriter)
         : this()
     {
         Buffer = bufferWriter;

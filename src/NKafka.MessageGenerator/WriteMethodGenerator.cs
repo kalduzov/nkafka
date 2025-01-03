@@ -41,7 +41,7 @@ internal class WriteMethodGenerator: IMethodGenerator
         MessageFlexibleVersions = messageFlexibleVersions;
 
         _codeGenerator.AppendLine("/// <inheritdoc />");
-        _codeGenerator.AppendLine("public void Write(BufferWriter writer, ApiVersion version)");
+        _codeGenerator.AppendLine("public void Write(ref BufferWriter writer, ApiVersion version)");
         _codeGenerator.AppendLeftBrace();
         _codeGenerator.IncrementIndent();
 
@@ -137,7 +137,7 @@ internal class WriteMethodGenerator: IMethodGenerator
                     {
                         if (prevTag + 1 != field.Tag)
                         {
-                            _codeGenerator.AppendLine($"rawWriter.WriteRawTags(writer,{field.Tag});");
+                            _codeGenerator.AppendLine($"rawWriter.WriteRawTags(ref writer,{field.Tag});");
                         }
 
                         VersionConditional
@@ -228,7 +228,7 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                     if (prevTag < int.MaxValue)
                     {
-                        _codeGenerator.AppendLine("rawWriter.WriteRawTags(writer, int.MaxValue);");
+                        _codeGenerator.AppendLine("rawWriter.WriteRawTags(ref writer, int.MaxValue);");
                     }
                 })
             .Generate(_codeGenerator);
@@ -261,7 +261,7 @@ internal class WriteMethodGenerator: IMethodGenerator
             IFieldType.Int64FieldType => $"writer.WriteLong({name})",
             IFieldType.UuidFieldType => $"writer.WriteGuid({name})",
             IFieldType.Float64FieldType => $"writer.WriteDouble({name})",
-            IFieldType.StructType => $"{name}{(type.CanBeNullable ? "?" : "")}.Write(writer, version)",
+            IFieldType.StructType => $"{name}{(type.CanBeNullable ? "?" : "")}.Write(ref writer, version)",
             _ => throw new Exception($"Unsupported field type {type}")
         };
     }

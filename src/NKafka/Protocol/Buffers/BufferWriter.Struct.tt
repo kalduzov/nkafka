@@ -28,36 +28,40 @@ using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Protocol.Buffers;
 
-public ref partial struct BufferWriter<TBufferWriter>
+internal ref partial struct BufferWriter
 {
 <#
     foreach (var type in new[]
     {
-        "Int",
-        "UInt",
-        "Byte",
-        "SByte",
-        "Short",
-        "UShort",
-        "Long",
-        "ULong"
+        "Int;4",
+        "UInt;4",
+        "Byte;1",
+        "SByte;1",
+        "Short;2",
+        "UShort;2",
+        "Long;8",
+        "ULong;8",
+        "Bool;1"
     })
     {
-        var typeName = type.ToLowerInvariant();
+        var typeAndSize = type.Split(';');
+        var typeName = typeAndSize[0].ToLowerInvariant();
 #>
 
     /// <summary>
     /// Write <#= typeName #> value type to buffer 
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write<#= type #>(<#= typeName #> value)
+    public void Write<#= typeAndSize[0] #>(<#= typeName #> value)
     {   
         const int size = sizeof(<#= typeName #>);
         ref var destPointer = ref GetSpanReference(size);
+<# if (typeAndSize[1] != "1") {#>
         if (BitConverter.IsLittleEndian)
         {
             value = ReverseEndianness(value);
         }
+<#}#>
         Unsafe.WriteUnaligned(ref destPointer, value);
         Advance(size);
     }

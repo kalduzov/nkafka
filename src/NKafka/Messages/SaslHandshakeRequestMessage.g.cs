@@ -106,7 +106,7 @@ internal sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEqu
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {

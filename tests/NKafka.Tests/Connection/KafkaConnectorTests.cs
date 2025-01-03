@@ -55,7 +55,6 @@ public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
                 "test",
                 true,
                 _fixture.SocketFactory,
-                new RecyclableMemoryStreamManager(),
                 NullLoggerFactory.Instance);
 
         FluentActions.Invoking(CreateConnector).Should().NotThrow();
@@ -80,7 +79,6 @@ public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
             "test",
             apiRequest,
             _fixture.SocketFactory,
-            new RecyclableMemoryStreamManager(),
             NullLoggerFactory.Instance);
 
         await kafkaConnector.OpenAsync(CancellationToken.None);

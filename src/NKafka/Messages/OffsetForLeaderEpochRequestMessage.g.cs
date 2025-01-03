@@ -103,7 +103,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -140,11 +140,11 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -156,7 +156,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version3)
@@ -168,7 +168,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -176,7 +176,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             writer.WriteInt(Topics.Count);
             foreach (var element in Topics)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -184,7 +184,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -295,7 +295,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -318,7 +318,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
                 if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarUInt() - 1;
+                    arrayLength = reader.ReadVarInt() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -355,11 +355,11 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version4)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -371,7 +371,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -391,7 +391,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             else
@@ -399,7 +399,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -407,7 +407,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {
@@ -543,11 +543,11 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version4)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -559,7 +559,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(Partition);
@@ -573,7 +573,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
             if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

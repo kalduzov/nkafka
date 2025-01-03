@@ -23,13 +23,14 @@ using Microsoft.IO;
 
 using NKafka.Messages;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests;
 
 public class SerializationTests
 {
     [Fact]
-    public void ApiVersionsRequestMessageTest()
+    public async Task ApiVersionsRequestMessageTest()
     {
         var request = new ApiVersionsRequestMessage
         {
@@ -56,11 +57,11 @@ public class SerializationTests
 
         var hashCode2 = header1.GetHashCode();
 
-        var sendMessage = new SendMessage(header, request, ApiVersion.Version1, ApiVersion.Version1, new RecyclableMemoryStreamManager());
+        var sendMessage = new SendMessage(header, request, ApiVersion.Version1, ApiVersion.Version1, new ArrayBuffer(true, false, 10000));
 
         using var stream = new MemoryStream();
 
-        sendMessage.Write(stream);
+        await sendMessage.Write(stream);
 
         var str = Convert.ToHexString(stream.ToArray());
         stream.Length.Should().Be(18);

@@ -95,7 +95,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             if (version >= ApiVersion.Version1)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Resources was serialized as null");
@@ -133,11 +133,11 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version1)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -149,7 +149,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version1)
@@ -157,7 +157,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             writer.WriteVarUInt(Resources.Count + 1);
             foreach (var element in Resources)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -165,7 +165,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             writer.WriteInt(Resources.Count);
             foreach (var element in Resources)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         writer.WriteBool(ValidateOnly);
@@ -174,7 +174,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
         if (version >= ApiVersion.Version1)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -291,7 +291,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 int length;
                 if (version >= ApiVersion.Version1)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -314,7 +314,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 if (version >= ApiVersion.Version1)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarUInt() - 1;
+                    arrayLength = reader.ReadVarInt() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Configs was serialized as null");
@@ -351,11 +351,11 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version1)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -367,7 +367,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteSByte(ResourceType);
@@ -388,7 +388,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 writer.WriteVarUInt(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             else
@@ -396,7 +396,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 writer.WriteInt(Configs.Count);
                 foreach (var element in Configs)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -404,7 +404,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {
@@ -536,7 +536,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 int length;
                 if (version >= ApiVersion.Version1)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -560,7 +560,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
                 int length;
                 if (version >= ApiVersion.Version1)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -582,11 +582,11 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version1)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -598,7 +598,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -643,7 +643,7 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

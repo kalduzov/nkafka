@@ -95,7 +95,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
             if (version >= ApiVersion.Version5)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Groups was serialized as null");
@@ -106,7 +106,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
                     for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
-                        length = reader.ReadVarUInt() - 1;
+                        length = reader.ReadVarInt() - 1;
                         if (length < 0)
                         {
                             throw new Exception("non-nullable field Groups element was serialized as null");
@@ -166,11 +166,11 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version5)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -182,7 +182,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version5)
@@ -225,7 +225,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
         if (version >= ApiVersion.Version5)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

@@ -235,7 +235,7 @@ internal ref partial struct BufferReader
     {
         if (length == 0)
         {
-            return Array.Empty<byte>();
+            return [];
         }
 
         ref var src = ref GetSpanReference(length);
@@ -278,176 +278,54 @@ internal ref partial struct BufferReader
     /// 
     /// </summary>
     /// <returns></returns>
-    public byte ReadVarIntByte()
-    {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => checked((byte)ReadUnmanaged<sbyte>()),
-            VarIntCodes.UINT16 => ReadUnmanaged<byte>(),
-            VarIntCodes.INT16 => checked((byte)ReadUnmanaged<short>()),
-            VarIntCodes.UINT32 => checked((byte)ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => checked((byte)ReadUnmanaged<int>()),
-            VarIntCodes.UINT64 => checked((byte)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((byte)ReadUnmanaged<long>()),
-            _ => checked((byte)typeCode)
-        };
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public sbyte ReadVarIntSByte()
-    {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => checked((sbyte)ReadUnmanaged<byte>()),
-            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => checked((sbyte)ReadUnmanaged<ushort>()),
-            VarIntCodes.INT16 => checked((sbyte)ReadUnmanaged<short>()),
-            VarIntCodes.UINT32 => checked((sbyte)ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => checked((sbyte)ReadUnmanaged<int>()),
-            VarIntCodes.UINT64 => checked((sbyte)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((sbyte)ReadUnmanaged<long>()),
-            _ => typeCode
-        };
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public ushort ReadVarIntUInt16()
-    {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => checked((ushort)ReadUnmanaged<sbyte>()),
-            VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => checked((ushort)ReadUnmanaged<short>()),
-            VarIntCodes.UINT32 => checked((ushort)ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => checked((ushort)ReadUnmanaged<int>()),
-            VarIntCodes.UINT64 => checked((ushort)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((ushort)ReadUnmanaged<long>()),
-            _ => checked((ushort)typeCode)
-        };
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public short ReadVarIntInt16()
-    {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => checked((short)ReadUnmanaged<ushort>()),
-            VarIntCodes.INT16 => ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => checked((short)ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => checked((short)ReadUnmanaged<int>()),
-            VarIntCodes.UINT64 => checked((short)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((short)ReadUnmanaged<long>()),
-            _ => typeCode
-        };
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public int ReadVarUInt()
-    {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => ReadUnmanaged<int>(),
-            VarIntCodes.INT32 => ReadUnmanaged<int>(),
-            VarIntCodes.UINT64 => checked((int)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((int)ReadUnmanaged<long>()),
-            _ => typeCode
-        };
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
     public int ReadVarInt()
     {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => checked((int)ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => ReadUnmanaged<int>(),
-            VarIntCodes.UINT64 => checked((int)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((int)ReadUnmanaged<long>()),
-            _ => typeCode
-        };
+        var value = ReadVarInt64();
+        return (int)value;
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public ulong ReadVarIntUInt64()
+    public ulong ReadVarUInt64()
     {
-        var typeCode = ReadUnmanaged<sbyte>();
-
-        return typeCode switch
+        ulong b;
+        var offset = 0;
+        ulong value = 0;
+        while (true)
         {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => checked((ulong)ReadUnmanaged<sbyte>()),
-            VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => checked((ulong)ReadUnmanaged<short>()),
-            VarIntCodes.UINT32 => ReadUnmanaged<uint>(),
-            VarIntCodes.INT32 => checked((ulong)ReadUnmanaged<int>()),
-            VarIntCodes.UINT64 => ReadUnmanaged<ulong>(),
-            VarIntCodes.INT64 => checked((ulong)ReadUnmanaged<long>()),
-            _ => checked((ulong)typeCode)
-        };
+            b = ReadByte();
+            if ((b & 0x80) == 0)
+            {
+
+                break;
+            }
+            value |= (b & 0b01111111) << offset;
+            offset += 7;
+            if (offset > 63)
+            {
+                throw new OverflowException();
+            }
+        }
+        value |= b << offset;
+        return value;
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public long ReadVarIntInt64()
+    public long ReadVarInt64()
     {
-        var typeCode = ReadUnmanaged<sbyte>();
+        var uInt64Value = ReadVarUInt64();
+        var value = (long)(uInt64Value >> 1);
 
-        return typeCode switch
+        if ((uInt64Value & 1) != 0)
         {
-            VarIntCodes.BYTE => ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => ReadUnmanaged<uint>(),
-            VarIntCodes.INT32 => ReadUnmanaged<int>(),
-            VarIntCodes.UINT64 => checked((long)ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => ReadUnmanaged<long>(),
-            _ => typeCode
-        };
+            value = ~value;
+        }
+        return value;
     }
 
     /// <summary>

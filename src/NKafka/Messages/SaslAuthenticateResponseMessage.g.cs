@@ -101,7 +101,7 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -124,7 +124,7 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -150,11 +150,11 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -166,7 +166,7 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
@@ -212,7 +212,7 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
         if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

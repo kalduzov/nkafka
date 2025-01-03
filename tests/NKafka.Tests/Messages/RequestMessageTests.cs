@@ -29,12 +29,13 @@ internal static class RequestMessageTests
     public static void SerializeAndDeserializeMessageTest<T>(this T message, ApiVersion version)
         where T : IMessage, new()
     {
-        using var stream = new MemoryStream();
-        var writer = new BufferWriter(stream);
-        message.Write(writer, version);
+
+        var arrayBuffer = new ArrayBuffer(true, false, 10000);
+        var writer = new BufferWriter(ref arrayBuffer);
+        message.Write(ref writer, version);
         writer.WriteSizeToStart();
 
-        var serializeMessage = stream.ToArray()[4..]; //Первые 4 байта - это длинна сообщения
+        var serializeMessage = arrayBuffer.DangerousGetFirstBuffer().ToArray()[4..]; //Первые 4 байта - это длинна сообщения
 
         var reader = new BufferReader(serializeMessage);
         var deserializeMessage = new T();

@@ -97,7 +97,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         ErrorCode = reader.ReadShort();
         {
             int length;
-            length = reader.ReadVarUInt() - 1;
+            length = reader.ReadVarInt() - 1;
             if (length < 0)
             {
                 ErrorMessage = null;
@@ -113,7 +113,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         }
         {
             int arrayLength;
-            arrayLength = reader.ReadVarUInt() - 1;
+            arrayLength = reader.ReadVarInt() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Results was serialized as null");
@@ -129,11 +129,11 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
         }
         UnknownTaggedFields = null;
-        var numTaggedFields = reader.ReadVarUInt();
+        var numTaggedFields = reader.ReadVarInt();
         for (var t = 0; t < numTaggedFields; t++)
         {
-            var tag = reader.ReadVarUInt();
-            var size = reader.ReadVarUInt();
+            var tag = reader.ReadVarInt();
+            var size = reader.ReadVarInt();
             switch (tag)
             {
                 default:
@@ -144,7 +144,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -162,12 +162,12 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         writer.WriteVarUInt(Results.Count + 1);
         foreach (var element in Results)
         {
-            element?.Write(writer, version);
+            element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt(numTaggedFields);
-        rawWriter.WriteRawTags(writer, int.MaxValue);
+        rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
     /// <inheritdoc />
@@ -301,7 +301,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field User was serialized as null");
@@ -318,7 +318,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     ErrorMessage = null;
@@ -334,7 +334,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field CredentialInfos was serialized as null");
@@ -350,11 +350,11 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -365,7 +365,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -387,12 +387,12 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             writer.WriteVarUInt(CredentialInfos.Count + 1);
             foreach (var element in CredentialInfos)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -525,11 +525,11 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             Mechanism = reader.ReadSByte();
             Iterations = reader.ReadInt();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -540,7 +540,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteSByte(Mechanism);
@@ -548,7 +548,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />

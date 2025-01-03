@@ -112,7 +112,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         ErrorCode = reader.ReadShort();
         {
             int length;
-            length = reader.ReadVarUInt() - 1;
+            length = reader.ReadVarInt() - 1;
             if (length < 0)
             {
                 ErrorMessage = null;
@@ -128,7 +128,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         {
             int length;
-            length = reader.ReadVarUInt() - 1;
+            length = reader.ReadVarInt() - 1;
             if (length < 0)
             {
                 MemberId = null;
@@ -148,11 +148,11 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             Assignment = new AssignmentMessage(ref reader, version);
         }
         UnknownTaggedFields = null;
-        var numTaggedFields = reader.ReadVarUInt();
+        var numTaggedFields = reader.ReadVarInt();
         for (var t = 0; t < numTaggedFields; t++)
         {
-            var tag = reader.ReadVarUInt();
-            var size = reader.ReadVarUInt();
+            var tag = reader.ReadVarInt();
+            var size = reader.ReadVarInt();
             switch (tag)
             {
                 default:
@@ -163,7 +163,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -190,11 +190,11 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         writer.WriteInt(MemberEpoch);
         writer.WriteInt(HeartbeatIntervalMs);
-        Assignment?.Write(writer, version);
+        Assignment?.Write(ref writer, version);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt(numTaggedFields);
-        rawWriter.WriteRawTags(writer, int.MaxValue);
+        rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
     /// <inheritdoc />
@@ -335,7 +335,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field TopicPartitions was serialized as null");
@@ -351,11 +351,11 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -366,18 +366,18 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteVarUInt(TopicPartitions.Count + 1);
             foreach (var element in TopicPartitions)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -475,7 +475,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             TopicId = reader.ReadGuid();
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -491,11 +491,11 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -506,7 +506,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteGuid(TopicId);
@@ -518,7 +518,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />

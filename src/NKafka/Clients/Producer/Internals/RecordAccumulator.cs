@@ -31,9 +31,10 @@ using NKafka.Compressions;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Metrics;
-using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
 using NKafka.Resources;
+
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -132,7 +133,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         // list of batches for a specific topic divided by partitions
         var topicBatches = _batchesByTopics.GetOrAdd(topicPartition.Topic, _ => new PartitionedBatchCollection());
 
-        var stream = Stream.Null;
+        ArrayBuffer? arrayWriter = null;
 
         try
         {
@@ -154,17 +155,15 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
                 // There was no batch to add a record, so we continue to work,
                 // prepare the buffer into which the data in the batch will be written
-                if (stream == Stream.Null)
+                if (arrayWriter is null)
                 {
                     // We calculate what buffer size we need and try to get it 
                     var size = Math.Max(_batchSize, RecordsBatch.EstimateSizeInBytesUpperBound(key, value, headers));
-                    stream = _memoryStreamManager.GetStream();
-                    stream.SetLength(size);
+                    arrayWriter = ArrayBufferPool.Rent(size);
                 }
 
                 lock (deque)
                 {
-                    var bufferWriter = new BufferWriter(stream, ProducerBatch.BATCH_HEADER_LEN);
                     var recordAppendResult = AppendIntoNewBatch(topicPartition.Topic,
                         effectivePartition,
                         deque,
@@ -172,12 +171,12 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                         key,
                         value,
                         headers,
-                        bufferWriter);
+                        arrayWriter);
 
                     // It is possible that the batch was already created in another thread while we were preparing the buffer
                     if (recordAppendResult.NewBatchCreated)
                     {
-                        stream = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
+                        arrayWriter = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
                     }
 
                     return recordAppendResult;
@@ -186,7 +185,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         }
         finally
         {
-            stream?.Dispose(); // If the buffer has not been used, then return it to the pool
+            arrayWriter?.Reset();
 
             Interlocked.Decrement(ref _appendsInProgress);
         }
@@ -200,7 +199,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         byte[] key,
         byte[] value,
         Headers headers,
-        BufferWriter buffer)
+        ArrayBuffer buffer)
     {
         // We are trying to add, all of a sudden, while we were preparing to add, someone has already added a new batch
         if (TryAppend(timestamp, key, value, headers, deque, out var recordAppendResult))

@@ -103,12 +103,12 @@ internal class Record
     {
         Length = reader.ReadVarInt();
         Attributes = reader.ReadSByte();
-        TimestampDelta = reader.ReadVarIntInt64();
+        TimestampDelta = reader.ReadVarInt64();
         OffsetDelta = reader.ReadVarInt();
 
         var keyLen = reader.ReadVarInt();
 
-        if (reader.Remaining < keyLen) //проверка что есть данные по ключу и есть данные по длине значения
+        if (reader.Remaining < keyLen)
         {
             IsValid = false;
 
@@ -122,7 +122,7 @@ internal class Record
 
         var valueLen = reader.ReadVarInt();
 
-        if (reader.Remaining < valueLen) // проверка что есть данные по ключу и есть данные по длине заголовка
+        if (reader.Remaining < valueLen)
         {
             IsValid = false;
 
@@ -175,48 +175,48 @@ internal class Record
         }
     }
 
-    public int WriteTo(BufferWriter buffer)
+    public int WriteTo(ref BufferWriter bufferWriter)
     {
         const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
 
         var sizeInBytes = RecordExtensions.SizeOfBodyInBytes((int)OffsetDelta, TimestampDelta, Key, Value, Headers);
-        buffer.WriteVarInt(sizeInBytes);
-        buffer.WriteByte(attributes);
-        buffer.WriteVarLong(TimestampDelta);
-        buffer.WriteVarLong(OffsetDelta);
+        bufferWriter.WriteVarInt(sizeInBytes);
+        bufferWriter.WriteByte(attributes);
+        bufferWriter.WriteVarLong(TimestampDelta);
+        bufferWriter.WriteVarLong(OffsetDelta);
 
         if (Key is null)
         {
-            buffer.WriteNullVarInt();
+            bufferWriter.WriteNullVarInt();
         }
         else
         {
-            buffer.WriteBytesWithLength(Key);
+            bufferWriter.WriteBytesWithLength(Key);
         }
 
         if (Value is null)
         {
-            buffer.WriteNullVarInt();
+            bufferWriter.WriteNullVarInt();
         }
         else
         {
-            buffer.WriteBytesWithLength(Value);
+            bufferWriter.WriteBytesWithLength(Value);
         }
 
-        buffer.WriteVarInt(Headers.Count);
+        bufferWriter.WriteVarInt(Headers.Count);
 
         foreach (var header in Headers)
         {
             var headerKey = Encoding.UTF8.GetBytes(header.Key);
-            buffer.WriteBytesWithLength(headerKey);
+            bufferWriter.WriteBytesWithLength(headerKey);
 
             if (header.Value is null)
             {
-                buffer.WriteNullVarInt();
+                bufferWriter.WriteNullVarInt();
             }
             else
             {
-                buffer.WriteBytesWithLength(header.Value);
+                bufferWriter.WriteBytesWithLength(header.Value);
             }
         }
 

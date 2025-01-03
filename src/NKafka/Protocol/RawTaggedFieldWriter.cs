@@ -19,6 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using NKafka.Protocol.Buffers;
+
 namespace NKafka.Protocol;
 
 internal class RawTaggedFieldWriter
@@ -40,7 +42,7 @@ internal class RawTaggedFieldWriter
         return fields == null ? _emptyWriter : new RawTaggedFieldWriter(fields);
     }
 
-    internal void WriteRawTags(BufferWriter writer, int nextDefinedTag)
+    internal void WriteRawTags(ref BufferWriter writer, int nextDefinedTag)
     {
         foreach (var field in _fields)
         {

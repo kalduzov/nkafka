@@ -105,7 +105,7 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -129,7 +129,7 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -153,7 +153,7 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -179,11 +179,11 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -195,7 +195,7 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
@@ -262,7 +262,7 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
         if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

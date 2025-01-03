@@ -113,13 +113,13 @@ internal sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<C
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(AssignedPartitions.Count);
         foreach (var element in AssignedPartitions)
         {
-            element?.Write(writer, version);
+            element?.Write(ref writer, version);
         }
         if (UserData is null)
         {
@@ -271,7 +271,7 @@ internal sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<C
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {

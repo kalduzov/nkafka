@@ -105,7 +105,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     Topics = null;
@@ -173,11 +173,11 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version9)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -189,7 +189,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version9)
@@ -203,7 +203,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
         }
@@ -224,7 +224,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 writer.WriteInt(Topics.Count);
                 foreach (var element in Topics)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
         }
@@ -266,7 +266,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         if (version >= ApiVersion.Version9)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -395,7 +395,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 int length;
                 if (version >= ApiVersion.Version9)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -424,11 +424,11 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version9)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -440,7 +440,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             if (version >= ApiVersion.Version10)
@@ -475,7 +475,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

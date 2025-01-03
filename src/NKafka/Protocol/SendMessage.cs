@@ -19,23 +19,28 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Buffers;
+
 using Microsoft.IO;
 
 using NKafka.Exceptions;
 using NKafka.Messages;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Protocol;
 
 /// <summary>
 /// 
 /// </summary>
-internal readonly struct SendMessage(
+internal struct SendMessage(
     RequestHeader header,
     IRequestMessage requestMessage,
     ApiVersion messageVersion,
     ApiVersion headerVersion,
-    RecyclableMemoryStreamManager streamManager)
+    ArrayBuffer buffer)
 {
+    private ArrayBuffer _buffer = buffer;
+
     /// <summary>
     /// 
     /// </summary>
@@ -54,25 +59,24 @@ internal readonly struct SendMessage(
     /// <param name="messageMaxBytes"></param>
     /// <returns></returns>
     /// <exception cref="ProtocolKafkaException"></exception>
-    public long Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
+    public async Task<long> Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
     {
-        using var stream = streamManager.GetStream();
-        var writer = new BufferWriter(stream);
+        var writer = new BufferWriter(ref _buffer);
 
-        Header.Write(writer, headerVersion);
-        RequestMessage.Write(writer, messageVersion);
+        Header.Write(ref writer, headerVersion);
+        RequestMessage.Write(ref writer, messageVersion);
 
         writer.WriteSizeToStart();
 
-        if (stream.Length > messageMaxBytes && throwIfSizeLargeThen)
+        if (writer.BufferLength > messageMaxBytes && throwIfSizeLargeThen)
         {
             var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {messageMaxBytes}";
 
             throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
         }
 
-        stream.WriteTo(writableStream);
+        await _buffer.WriteToAndResetAsync(writableStream, CancellationToken.None);
 
-        return stream.Length;
+        return _buffer.TotalWritten;
     }
 }

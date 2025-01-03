@@ -26,7 +26,9 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Exceptions;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
+
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -38,12 +40,12 @@ internal class ProducerBatch
     /// <summary>
     /// This default bath 
     /// </summary>
-    public static readonly ProducerBatch Null = new(TopicPartition.Null, NullBufferWriter.Instance,
+    public static readonly ProducerBatch Null = new(TopicPartition.Null, ArrayBuffer.Null,
         NullLoggerFactory.Instance);
 
     internal const int RECORD_BATCH_OVERHEAD = 61;
 
-    private readonly BufferWriter _bufferWriter;
+    private ArrayBuffer _buffer;
 
     /// <summary>
     /// Batch header length
@@ -111,11 +113,11 @@ internal class ProducerBatch
     /// Initializes a new instance of the <see cref="ProducerBatch"/> class with the specified <see cref="TopicPartition"/> and <see cref="BufferWriter"/>.
     /// </summary>
     /// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
-    /// <param name="bufferWriter">The <see cref="BufferWriter"/> used for writing the batch data.</param>
+    /// <param name="buffer">The <see cref="BufferWriter"/> used for writing the batch data.</param>
     /// <param name="loggerFactory"></param>
-    public ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter, ILoggerFactory loggerFactory)
+    public ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory)
     {
-        _bufferWriter = bufferWriter;
+        _buffer = buffer;
         _logger = loggerFactory.CreateLogger<ProducerBatch>();
         _lastOffset = -1;
         TopicPartition = topicPartition;
@@ -124,8 +126,8 @@ internal class ProducerBatch
         CreateTimestamp = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
     }
 
-    internal ProducerBatch(TopicPartition topicPartition, BufferWriter bufferWriter, ILoggerFactory loggerFactory, long timestamp)
-        : this(topicPartition, bufferWriter, loggerFactory)
+    internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestamp)
+        : this(topicPartition, buffer, loggerFactory)
     {
         BaseTimestamp = timestamp;
         MaxTimestamp = timestamp;
@@ -144,7 +146,7 @@ internal class ProducerBatch
     {
         var estimateSizeInBytesUpperBound = RecordExtensions.EstimateSizeInBytesUpperBound(key, value, headers);
 
-        if (_bufferWriter.Remaining - estimateSizeInBytesUpperBound < 0)
+        if (_buffer.Remaining - estimateSizeInBytesUpperBound < 0)
         {
             sendResultTask = null;
 
@@ -181,45 +183,46 @@ internal class ProducerBatch
     /// </summary>
     public void Close()
     {
-        WriteRecords();
-        WriteHeader();
+        var bufferWriter = new BufferWriter(ref _buffer);
+        WriteRecords(ref bufferWriter);
+        WriteHeader(ref bufferWriter);
         IsFull = true;
     }
 
-    private void WriteRecords()
+    private void WriteRecords(ref BufferWriter bufferWriter)
     {
-        _bufferWriter.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
-
-        _bufferWriter.WriteInt(_records.Count);
-
-        var size = 0;
-
-        foreach (var record in _records)
-        {
-            size += record.WriteTo(_bufferWriter);
-        }
-        //Length += size;
-        _bufferWriter.Position = 0;
+        // bufferWriter.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
+        //
+        // bufferWriter.WriteInt(_records.Count);
+        //
+        // var size = 0;
+        //
+        // foreach (var record in _records)
+        // {
+        //     size += record.WriteTo(ref bufferWriter);
+        // }
+        // //Length += size;
+        // _buffer.Position = 0;
     }
 
-    private void WriteHeader()
+    private void WriteHeader(ref BufferWriter bufferWriter)
     {
-        // _bufferWriter.Position = 0;
+        // bufferWriter.Position = 0;
         // // https://kafka.apache.org/documentation/#recordbatch
-        // _bufferWriter.WriteLong(BaseOffset);
-        // _bufferWriter.WriteInt(Length - 12);
-        // _bufferWriter.WriteInt(PartitionLeaderEpoch);
-        // _bufferWriter.WriteByte(Magic);
-        // _bufferWriter.WriteUInt(Crc); //reserve
-        // _bufferWriter.WriteShort(Attributes);
-        // _bufferWriter.WriteInt(_lastOffset);
-        // _bufferWriter.WriteLong(BaseTimestamp);
-        // _bufferWriter.WriteLong(MaxTimestamp);
-        // _bufferWriter.WriteLong(ProducerId);
-        // _bufferWriter.WriteShort(ProducerEpoch);
-        // _bufferWriter.WriteInt(BaseSequence);
-        // Crc = CrcUtils.Calculate(_bufferWriter.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
-        // _bufferWriter.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
+        // bufferWriter.WriteLong(BaseOffset);
+        // bufferWriter.WriteInt(Length - 12);
+        // bufferWriter.WriteInt(PartitionLeaderEpoch);
+        // bufferWriter.WriteByte(Magic);
+        // bufferWriter.WriteUInt(Crc); //reserve
+        // bufferWriter.WriteShort(Attributes);
+        // bufferWriter.WriteInt(_lastOffset);
+        // bufferWriter.WriteLong(BaseTimestamp);
+        // bufferWriter.WriteLong(MaxTimestamp);
+        // bufferWriter.WriteLong(ProducerId);
+        // bufferWriter.WriteShort(ProducerEpoch);
+        // bufferWriter.WriteInt(BaseSequence);
+        // Crc = CrcUtils.Calculate(bufferWriter.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
+        // bufferWriter.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
         // _bufferWriter.Position = 0;
     }
 

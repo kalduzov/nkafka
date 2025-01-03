@@ -37,14 +37,12 @@ internal class MockStream: Stream
     private readonly ConcurrentDictionary<IRequestMessage, (int CorrelactionId, ApiVersion ApiVersion)> _correlationIds = new();
     private readonly Task _processTask;
     private readonly object _lockObject = new();
-    private readonly RecyclableMemoryStreamManager _streamManager;
 
     private readonly CancellationTokenSource _tokenSource = new();
 
     public MockStream()
     {
         _processTask = ProcessRequests(_tokenSource.Token);
-        _streamManager = new RecyclableMemoryStreamManager();
     }
 
     private async Task ProcessRequests(CancellationToken token)
@@ -66,8 +64,8 @@ internal class MockStream: Stream
     {
         try
         {
-            using var stream = _streamManager.GetStream();
-            var writer = new BufferWriter(stream);
+            var arrayBuffer = new ArrayBuffer(true, false, 10000);
+            var writer = new BufferWriter(ref arrayBuffer);
 
             _correlationIds.TryRemove(requestMessage, out var requestData);
 
@@ -76,14 +74,14 @@ internal class MockStream: Stream
                 CorrelationId = requestData.CorrelactionId,
             };
 
-            responseHeader.Write(writer, requestMessage.ApiKey.GetResponseHeaderVersion(requestData.ApiVersion));
+            responseHeader.Write(ref writer, requestMessage.ApiKey.GetResponseHeaderVersion(requestData.ApiVersion));
 
             switch (requestMessage.ApiKey)
             {
                 case ApiKeys.ApiVersions:
                     {
                         var response = new ApiVersionsResponseMessage();
-                        response.Write(writer, requestData.ApiVersion);
+                        response.Write(ref writer, requestData.ApiVersion);
 
                         writer.WriteSizeToStart();
 
@@ -94,7 +92,7 @@ internal class MockStream: Stream
             lock (_lockObject)
             {
                 //Т.к. из потока читается в 3 захода, то для эмуляции нужно отправить 3 пакета байт
-                var array = stream.ToArray();
+                var array = arrayBuffer.DangerousGetFirstBuffer();
                 _sendQueue.Enqueue(array[..4]);
                 _sendQueue.Enqueue(array[4..8]);
                 _sendQueue.Enqueue(array[8..]);

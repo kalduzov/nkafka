@@ -106,7 +106,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -155,7 +155,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         if (version >= ApiVersion.Version8)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarUInt() - 1;
+            arrayLength = reader.ReadVarInt() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Groups was serialized as null");
@@ -177,11 +177,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version6)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -193,7 +193,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version3)
@@ -207,7 +207,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 writer.WriteVarUInt(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             else
@@ -215,7 +215,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 writer.WriteInt(Topics.Count);
                 foreach (var element in Topics)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
         }
@@ -235,7 +235,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             writer.WriteVarUInt(Groups.Count + 1);
             foreach (var element in Groups)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -250,7 +250,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         if (version >= ApiVersion.Version6)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -377,7 +377,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -400,7 +400,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 if (version >= ApiVersion.Version6)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarUInt() - 1;
+                    arrayLength = reader.ReadVarInt() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -437,11 +437,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -453,7 +453,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             if (version > ApiVersion.Version7)
             {
@@ -477,7 +477,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 writer.WriteVarUInt(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             else
@@ -485,7 +485,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 writer.WriteInt(Partitions.Count);
                 foreach (var element in Partitions)
                 {
-                    element?.Write(writer, version);
+                    element?.Write(ref writer, version);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -493,7 +493,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {
@@ -639,7 +639,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -662,11 +662,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -678,7 +678,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -717,7 +717,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             if (version >= ApiVersion.Version6)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {
@@ -850,7 +850,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field GroupId was serialized as null");
@@ -866,7 +866,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -883,11 +883,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -898,7 +898,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version8)
             {
@@ -913,13 +913,13 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             writer.WriteVarUInt(Topics.Count + 1);
             foreach (var element in Topics)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -1036,7 +1036,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -1052,7 +1052,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -1068,11 +1068,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -1083,7 +1083,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -1094,12 +1094,12 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             writer.WriteVarUInt(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -1232,7 +1232,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             CommittedLeaderEpoch = reader.ReadInt();
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     Metadata = null;
@@ -1248,11 +1248,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             ErrorCode = reader.ReadShort();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -1263,7 +1263,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
@@ -1283,7 +1283,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />

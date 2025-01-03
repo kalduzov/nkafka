@@ -48,7 +48,6 @@ NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Topic.get -> string!
 NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartition.get -> NKafka.TopicPartition!
 NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.get -> NKafka.Clients.Producer.TopicPartitionOffset!
 NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.set -> void
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Value.get -> TValue
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition<TKey, TValue>(string! topic, TKey key, byte[]! keyBytes, TValue value, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer
@@ -63,17 +62,11 @@ NKafka.Clients.Producer.IProducer<TKey, TValue>.Produce(NKafka.TopicPartition! t
 NKafka.Clients.Producer.IProducer<TKey, TValue>.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message<TKey, TValue>! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
 NKafka.Clients.Producer.IProducer<TKey, TValue>.SendOffsetsToTransaction(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.ProducerExtensions
-NKafka.Compressions.GZIPCompression
-NKafka.Compressions.GZIPCompression.Decode(byte[]! data) -> byte[]!
-NKafka.Compressions.GZIPCompression.Encode(byte[]! data) -> byte[]!
-NKafka.Compressions.GZIPCompression.GZIPCompression() -> void
 NKafka.Compressions.ICompression
 NKafka.Compressions.ICompression.Decode(byte[]! data) -> byte[]!
 NKafka.Compressions.ICompression.Decode(System.IO.Stream! stream) -> System.IO.Stream!
 NKafka.Compressions.ICompression.Encode(byte[]! data) -> byte[]!
 NKafka.Compressions.ICompression.Encode(System.IO.Stream! stream) -> System.IO.Stream!
-NKafka.Compressions.NoCompression
-NKafka.Compressions.NoCompression.NoCompression() -> void
 NKafka.Config.Acks
 NKafka.Config.Acks.All = -1 -> NKafka.Config.Acks
 NKafka.Config.Acks.Leader = 1 -> NKafka.Config.Acks
@@ -169,7 +162,6 @@ NKafka.IKafkaCluster.Controller.get -> NKafka.Node!
 NKafka.IKafkaCluster.GetOffset(string! topic, NKafka.Partition partition, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<NKafka.Offset>
 NKafka.IKafkaCluster.GetPartitions(string! topic, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.Partition>!>
 NKafka.IKafkaCluster.GetTopicPartitions(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.TopicPartition!>!>
-NKafka.IKafkaCluster.OpenAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.IKafkaCluster.RefreshMetadata(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.KafkaClusterExtensions
 NKafka.Message<TKey, TValue>
@@ -299,5 +291,4 @@ static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaC
 static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
 static readonly NKafka.Null.Instance -> NKafka.Null
 static readonly NKafka.Offset.Unset -> NKafka.Offset
-static readonly NKafka.Partition.Any -> NKafka.Partitiona.Partition
 static readonly NKafka.TopicPartition.Null -> NKafka.TopicPartition!

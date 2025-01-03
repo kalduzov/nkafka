@@ -21,12 +21,13 @@
 
 using NKafka.Config;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Compressions;
 
 internal static class CompressionsExtensions
 {
-    public static BufferWriter Wrap(this CompressionType compressionType, BufferWriter buffer)
+    public static BufferWriter Wrap(this CompressionType compressionType, ref BufferWriter buffer)
     {
         return buffer;
     }

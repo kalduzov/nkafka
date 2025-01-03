@@ -433,13 +433,13 @@ internal class Coordinator: ICoordinator
             GenerationId = GenerationId,
             ProtocolType = _PROTOCOL_TYPE,
             ProtocolName = _protocolName,
-            Assignments = new List<SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage>
-            {
-                new()
+            Assignments =
+            [
+                new SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage
                 {
                     MemberId = MemberId,
                 }
-            }
+            ]
         };
 
         var calculateAssignment = await SyncGroupAsync(request, token);
@@ -486,18 +486,25 @@ internal class Coordinator: ICoordinator
 
             }
 
-            using var ms = new MemoryStream();
+            var arrayBuffer = ArrayBufferPool.Rent(10000);
 
-            var writer = new BufferWriter(ms, 0);
-            writer.WriteShort((short)ApiVersion.Version3);
-            assignment.Write(writer, ApiVersion.Version3);
-
-            request.Assignments.Add(new SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage
+            try
             {
-                MemberId = result.Key,
-                Assignment = writer.WrittenSpan.ToArray()
+                var writer = new BufferWriter(ref arrayBuffer);
+                writer.WriteShort((short)ApiVersion.Version3);
+                assignment.Write(ref writer, ApiVersion.Version3);
 
-            });
+                request.Assignments.Add(new SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage
+                {
+                    MemberId = result.Key,
+                    Assignment = arrayBuffer.ToArrayAndReset()
+
+                });
+            }
+            finally
+            {
+                ArrayBufferPool.Return(arrayBuffer);
+            }
 
         }
         var calculateAssignment = await SyncGroupAsync(request, token);

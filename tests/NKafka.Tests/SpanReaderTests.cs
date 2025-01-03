@@ -198,7 +198,7 @@ public class SpanReaderTests
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
-        var value = reader.ReadVarIntUInt64();
+        var value = reader.ReadVarUInt64();
 
         value.Should().Be(testValue);
     }
@@ -214,7 +214,7 @@ public class SpanReaderTests
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
-        var value = reader.ReadVarIntInt64();
+        var value = reader.ReadVarInt64();
 
         value.Should().Be(testValue);
     }

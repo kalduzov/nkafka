@@ -39,7 +39,7 @@ public class FastBufferReaderTests
         val.Should().Be(v2);
     }
 
-    [Theory(DisplayName = "Read varlong from simple buffer test ")]
+    [Theory(DisplayName = "Read signed varlong from simple buffer test ")]
     [InlineData(0, 0)]
     [InlineData(1, -1)]
     [InlineData(2, 1)]
@@ -51,12 +51,12 @@ public class FastBufferReaderTests
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
-        var value = reader.ReadVarIntInt64();
+        var value = reader.ReadVarInt64();
 
         value.Should().Be(testValue);
     }
 
-    [Theory(DisplayName = "Read varlong from simple buffer test ")]
+    [Theory(DisplayName = "Read signed varlong from simple buffer test ")]
     [InlineData(0, 0)]
     [InlineData(1, -1)]
     [InlineData(2, 1)]

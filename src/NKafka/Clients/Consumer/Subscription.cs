@@ -151,14 +151,21 @@ public class Subscription
                 Topics = [..data.Topics],
                 GenerationId = data.GenerationId,
             };
+            var arrayBuffer = ArrayBufferPool.Rent(10000);
 
-            using var ms = new MemoryStream();
-            var writer = new BufferWriter(ms, 0);
-            writer.WriteShort((short)apiVersion);
-            cps.Write(writer, apiVersion);
-            var result = writer.WrittenSpan.ToArray();
+            try
+            {
+                var writer = new BufferWriter(ref arrayBuffer);
+                writer.WriteShort((short)apiVersion);
+                cps.Write(ref writer, apiVersion);
+                var result = arrayBuffer.ToArrayAndReset();
 
-            return result;
+                return result;
+            }
+            finally
+            {
+                ArrayBufferPool.Return(arrayBuffer);
+            }
         }
     }
 

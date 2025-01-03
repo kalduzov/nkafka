@@ -117,11 +117,11 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -133,7 +133,7 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort(RequestApiKey);
@@ -157,7 +157,7 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         if (version >= ApiVersion.Version2)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

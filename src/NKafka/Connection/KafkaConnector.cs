@@ -35,6 +35,7 @@ using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Connection;
 
@@ -70,7 +71,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _inFlightRequests;
     private readonly ILogger<KafkaConnector> _logger;
     private readonly int _maxInflightRequests;
-    private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly int _messageMaxBytes;
     private readonly int _requestTimeoutMs;
 
@@ -126,7 +126,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         string clientId,
         bool apiVersionRequest,
         ISocketFactory socketFactory,
-        RecyclableMemoryStreamManager memoryStreamManager,
         ILoggerFactory loggerFactory)
     {
         Endpoint = endPoint;
@@ -141,9 +140,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         _clientId = clientId;
         _apiVersionRequest = apiVersionRequest;
         _socketFactory = socketFactory;
-        _memoryStreamManager = memoryStreamManager;
 
-        //_arrayPool = ArrayPool<byte>.Create(messageMaxBytes, maxInflightRequests);
         _arrayPool = ArrayPool<byte>.Shared;
         _inFlightRequests = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, _maxInflightRequests);
         _logger = loggerFactory.CreateLogger<KafkaConnector>();
@@ -192,6 +189,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         using var activity = KafkaDiagnosticsSource.InternalSendMessage(message.ApiKey, contentVersion, requestId, NodeId, Endpoint);
 
+        var arrayBuffer = ArrayBufferPool.Rent(_messageMaxBytes);
+
         var request = new SendMessage(
             new RequestHeader
             {
@@ -202,8 +201,9 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             },
             message,
             contentVersion,
-            headerVersion,
-            _memoryStreamManager);
+            headerVersion, 
+            arrayBuffer
+        );
 
         if (!isInternalRequest)
         {
@@ -243,7 +243,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
             if (CanWrite)
             {
-                var bytesSent = request.Write(_stream, true, _messageMaxBytes);
+                var bytesSent = await request.Write(_stream, true, _messageMaxBytes);
                 Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
                 _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
             }

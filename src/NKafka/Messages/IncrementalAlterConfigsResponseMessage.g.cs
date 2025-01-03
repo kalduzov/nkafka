@@ -85,7 +85,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             if (version >= ApiVersion.Version1)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Responses was serialized as null");
@@ -122,11 +122,11 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version1)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -138,7 +138,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -147,7 +147,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             writer.WriteVarUInt(Responses.Count + 1);
             foreach (var element in Responses)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -155,7 +155,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             writer.WriteInt(Responses.Count);
             foreach (var element in Responses)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -163,7 +163,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
         if (version >= ApiVersion.Version1)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -288,7 +288,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
                 int length;
                 if (version >= ApiVersion.Version1)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -312,7 +312,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
                 int length;
                 if (version >= ApiVersion.Version1)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -334,11 +334,11 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version1)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -350,7 +350,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
@@ -396,7 +396,7 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             if (version >= ApiVersion.Version1)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

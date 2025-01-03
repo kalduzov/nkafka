@@ -47,7 +47,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
     private readonly ILogger<KafkaConnectorPool> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly int _maxInflightRequests;
-    private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly int _messageMaxBytes;
     private readonly int _receiveBufferBytes;
     private readonly int _requestTimeoutMs;
@@ -92,13 +91,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
         _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
         _socketFactory = new SocketFactory();
-        var options = new RecyclableMemoryStreamManager.Options
-        {
-            BlockSize = 1024,
-            LargeBufferMultiple = messageMaxBytes / 16,
-            MaximumBufferSize = messageMaxBytes
-        };
-        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
         _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedBrokers.Count);
         _brokersNumberCounter = new RandomNumberCounter();
 
@@ -138,13 +130,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         _seedConnectors = new Dictionary<EndPoint, IKafkaConnector>();
         _logger = loggerFactory.CreateLogger<KafkaConnectorPool>();
         _socketFactory = new SocketFactory();
-        var options = new RecyclableMemoryStreamManager.Options
-        {
-            BlockSize = 1024,
-            LargeBufferMultiple = messageMaxBytes / 16,
-            MaximumBufferSize = messageMaxBytes
-        };
-        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
         _brokersNumberCounter = new RandomNumberCounter();
         _seedConnectorsNumberCounter = new RoundRobinNumberCounter(seedConnectors.Count);
 
@@ -420,7 +405,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
             _clientId,
             _apiVersionRequest,
             _socketFactory,
-            _memoryStreamManager,
             _loggerFactory)
         {
             NodeId = node.Id,

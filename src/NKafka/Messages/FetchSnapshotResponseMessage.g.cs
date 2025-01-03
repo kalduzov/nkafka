@@ -92,7 +92,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         ErrorCode = reader.ReadShort();
         {
             int arrayLength;
-            arrayLength = reader.ReadVarUInt() - 1;
+            arrayLength = reader.ReadVarInt() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Topics was serialized as null");
@@ -108,11 +108,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             }
         }
         UnknownTaggedFields = null;
-        var numTaggedFields = reader.ReadVarUInt();
+        var numTaggedFields = reader.ReadVarInt();
         for (var t = 0; t < numTaggedFields; t++)
         {
-            var tag = reader.ReadVarUInt();
-            var size = reader.ReadVarUInt();
+            var tag = reader.ReadVarInt();
+            var size = reader.ReadVarInt();
             switch (tag)
             {
                 default:
@@ -123,7 +123,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
@@ -131,12 +131,12 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         writer.WriteVarUInt(Topics.Count + 1);
         foreach (var element in Topics)
         {
-            element?.Write(writer, version);
+            element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt(numTaggedFields);
-        rawWriter.WriteRawTags(writer, int.MaxValue);
+        rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
     /// <inheritdoc />
@@ -242,7 +242,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             }
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -258,7 +258,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -274,11 +274,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -289,7 +289,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -300,12 +300,12 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             writer.WriteVarUInt(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -455,7 +455,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             Position = reader.ReadLong();
             {
                 int length;
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field UnalignedRecords was serialized as null");
@@ -466,11 +466,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     case 0:
@@ -486,12 +486,12 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(Index);
             writer.WriteShort((short)ErrorCode);
-            SnapshotId?.Write(writer, version);
+            SnapshotId?.Write(ref writer, version);
             if (!CurrentLeader.Equals(new ()))
             {
                 numTaggedFields++;
@@ -507,10 +507,10 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 if (!CurrentLeader.Equals(new ()))
                 {
                     writer.WriteVarUInt(0);
-                    CurrentLeader?.Write(writer, version);
+                    CurrentLeader?.Write(ref writer, version);
                 }
             }
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -648,11 +648,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             EndOffset = reader.ReadLong();
             Epoch = reader.ReadInt();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -663,7 +663,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteLong(EndOffset);
@@ -671,7 +671,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />
@@ -764,11 +764,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             LeaderId = reader.ReadInt();
             LeaderEpoch = reader.ReadInt();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -779,7 +779,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(LeaderId);
@@ -787,7 +787,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
         /// <inheritdoc />

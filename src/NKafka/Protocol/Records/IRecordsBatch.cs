@@ -23,6 +23,7 @@ using System.Runtime.CompilerServices;
 
 using NKafka.Config;
 using NKafka.Exceptions;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Protocol.Records;
 
@@ -39,7 +40,7 @@ internal interface IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    BufferWriter Buffer { get; }
+    ArrayBuffer Buffer { get; }
 
     /// <summary>
     /// 

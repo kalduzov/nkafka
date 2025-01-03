@@ -111,7 +111,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);
@@ -119,7 +119,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
         writer.WriteInt(Topics.Count);
         foreach (var element in Topics)
         {
-            element?.Write(writer, version);
+            element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -267,7 +267,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -278,7 +278,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -404,7 +404,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);

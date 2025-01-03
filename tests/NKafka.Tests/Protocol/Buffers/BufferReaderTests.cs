@@ -27,38 +27,45 @@ namespace NKafka.Tests.Protocol.Buffers;
 
 public class BufferReaderTests
 {
-    [Theory(DisplayName = "Read varlong from simple buffer test ")]
+    [Theory(DisplayName = "Read signed varlong from simple buffer test ")]
     [InlineData(0, 0)]
     [InlineData(1, -1)]
     [InlineData(2, 1)]
     [InlineData(3, -2)]
     [InlineData(8, 4)]
-    public void ReadVarLong_FromSimpleBuffer_Successful(long variant, long testValue)
+    [InlineData(0x2e, 23)]
+    [InlineData(0xfa03, 253)]
+    [InlineData(999, -500)]
+    [InlineData(0xfffffffe, 0x7fffffff)]
+    [InlineData(0xffffffff, -0x80000000)]
+    public void ReadVarLong_FromSimpleBuffer_Successful(long encoded, long original)
     {
-        var data = BitConverter.GetBytes(variant);
+        var data = BitConverter.GetBytes(encoded);
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
-        var value = reader.ReadVarIntInt64();
+        var value = reader.ReadVarInt64();
 
-        value.Should().Be(testValue);
+        value.Should().Be(original);
     }
 
-    [Theory(DisplayName = "Read varlong from simple buffer test ")]
+    [Theory(DisplayName = "Read signed varint from simple buffer test ")]
     [InlineData(0, 0)]
     [InlineData(1, -1)]
     [InlineData(2, 1)]
     [InlineData(3, -2)]
     [InlineData(8, 4)]
-    public void ReadVarInt_FromSimpleBuffer_Successful(int variant, int testValue)
+    [InlineData(0x2e, 23)]
+    [InlineData(0xfa03, 253)]
+    public void ReadVarInt_FromSimpleBuffer_Successful(long encoded, int original)
     {
-        var data = BitConverter.GetBytes(variant);
+        var data = BitConverter.GetBytes(encoded);
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
         var value = reader.ReadVarInt();
 
-        value.Should().Be(testValue);
+        value.Should().Be(original);
     }
 
     private static byte[] GetVariantBuffer(byte[] data)
@@ -73,9 +80,9 @@ public class BufferReaderTests
             }
         }
 
-        return new byte[]
-        {
+        return
+        [
             0
-        };
+        ];
     }
 }

@@ -120,7 +120,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -144,7 +144,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -168,7 +168,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -194,7 +194,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         if (version >= ApiVersion.Version5)
         {
             int length;
-            length = reader.ReadVarUInt() - 1;
+            length = reader.ReadVarInt() - 1;
             if (length < 0)
             {
                 ProtocolType = null;
@@ -215,7 +215,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         if (version >= ApiVersion.Version5)
         {
             int length;
-            length = reader.ReadVarUInt() - 1;
+            length = reader.ReadVarInt() - 1;
             if (length < 0)
             {
                 ProtocolName = null;
@@ -237,7 +237,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarUInt() - 1;
+                arrayLength = reader.ReadVarInt() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Assignments was serialized as null");
@@ -274,11 +274,11 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -290,7 +290,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         {
@@ -383,7 +383,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             writer.WriteVarUInt(Assignments.Count + 1);
             foreach (var element in Assignments)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         else
@@ -391,7 +391,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             writer.WriteInt(Assignments.Count);
             foreach (var element in Assignments)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -399,7 +399,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         if (version >= ApiVersion.Version4)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {
@@ -585,7 +585,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -608,7 +608,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                 }
                 else
                 {
@@ -626,11 +626,11 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version4)
             {
-                var numTaggedFields = reader.ReadVarUInt();
+                var numTaggedFields = reader.ReadVarInt();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarUInt();
-                    var size = reader.ReadVarUInt();
+                    var tag = reader.ReadVarInt();
+                    var size = reader.ReadVarInt();
                     switch (tag)
                     {
                         default:
@@ -642,7 +642,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
             {
@@ -671,7 +671,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             if (version >= ApiVersion.Version4)
             {
                 writer.WriteVarUInt(numTaggedFields);
-                rawWriter.WriteRawTags(writer, int.MaxValue);
+                rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
             {

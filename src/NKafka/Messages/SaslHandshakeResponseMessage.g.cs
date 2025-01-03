@@ -121,7 +121,7 @@ internal sealed partial class SaslHandshakeResponseMessage: IResponseMessage, IE
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteShort((short)ErrorCode);

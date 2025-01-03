@@ -101,7 +101,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarUInt() - 1;
+                length = reader.ReadVarInt() - 1;
             }
             else
             {
@@ -135,7 +135,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarUInt() - 1;
+            arrayLength = reader.ReadVarInt() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field CoordinatorKeys was serialized as null");
@@ -146,7 +146,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarUInt() - 1;
+                    length = reader.ReadVarInt() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field CoordinatorKeys element was serialized as null");
@@ -170,11 +170,11 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarUInt();
+            var numTaggedFields = reader.ReadVarInt();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarUInt();
-                var size = reader.ReadVarUInt();
+                var tag = reader.ReadVarInt();
+                var size = reader.ReadVarInt();
                 switch (tag)
                 {
                     default:
@@ -186,7 +186,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         if (version <= ApiVersion.Version3)
@@ -246,7 +246,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version3)
         {
             writer.WriteVarUInt(numTaggedFields);
-            rawWriter.WriteRawTags(writer, int.MaxValue);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
         {

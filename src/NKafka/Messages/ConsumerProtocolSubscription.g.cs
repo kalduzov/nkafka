@@ -192,7 +192,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
     }
 
     /// <inheritdoc />
-    public void Write(BufferWriter writer, ApiVersion version)
+    public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
         writer.WriteInt(Topics.Count);
@@ -218,7 +218,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
             writer.WriteInt(OwnedPartitions.Count);
             foreach (var element in OwnedPartitions)
             {
-                element?.Write(writer, version);
+                element?.Write(ref writer, version);
             }
         }
         if (version >= ApiVersion.Version2)
@@ -414,7 +414,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
         }
 
         /// <inheritdoc />
-        public void Write(BufferWriter writer, ApiVersion version)
+        public void Write(ref BufferWriter writer, ApiVersion version)
         {
             if (version < ApiVersion.Version1)
             {

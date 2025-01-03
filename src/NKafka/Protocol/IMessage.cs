@@ -19,6 +19,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Buffers;
+
 using NKafka.Protocol.Buffers;
 
 namespace NKafka.Protocol;
@@ -41,7 +43,7 @@ internal interface IMessage
     /// <summary>
     /// Writes out this message to the given writer
     /// </summary>
-    public void Write(BufferWriter writer, ApiVersion version);
+    public void Write(ref BufferWriter writer, ApiVersion version);
 
     /// <summary>
     /// Reads this message from the given BufferReader. This will overwrite all relevant fields with information from the byte buffer

@@ -24,7 +24,6 @@ using System.Collections.ObjectModel;
 using System.Net;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.IO;
 
 using NKafka.Config;
 using NKafka.Exceptions;

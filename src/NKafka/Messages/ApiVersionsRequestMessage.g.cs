@@ -94,7 +94,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt() - 1;
+            length = reader.ReadVarInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field ClientSoftwareName was serialized as null");
@@ -115,7 +115,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt() - 1;
+            length = reader.ReadVarInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field ClientSoftwareVersion was serialized as null");
@@ -136,11 +136,11 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -159,7 +159,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareName);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -167,7 +167,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareVersion);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -175,7 +175,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

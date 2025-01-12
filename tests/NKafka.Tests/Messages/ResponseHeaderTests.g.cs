@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ResponseHeaderTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'ResponseHeader' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -47,6 +48,7 @@ public sealed partial class ResponseHeaderTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'ResponseHeader' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {

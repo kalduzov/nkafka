@@ -101,7 +101,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
             }
             else
             {
@@ -135,7 +135,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt() - 1;
+            arrayLength = reader.ReadVarInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field CoordinatorKeys was serialized as null");
@@ -146,7 +146,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field CoordinatorKeys element was serialized as null");
@@ -170,11 +170,11 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -195,7 +195,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
                 var stringBytes = Encoding.UTF8.GetBytes(Key);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -224,12 +224,12 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         }
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarUInt(CoordinatorKeys.Count + 1);
+            writer.WriteVarInt32(CoordinatorKeys.Count + 1);
             foreach (var element in CoordinatorKeys)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -245,7 +245,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

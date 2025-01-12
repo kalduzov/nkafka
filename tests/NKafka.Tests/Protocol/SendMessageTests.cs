@@ -19,18 +19,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Microsoft.IO;
-
 using NKafka.Messages;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 
-namespace NKafka.Tests;
+namespace NKafka.Tests.Protocol;
 
-public class SerializationTests
+public class SendMessageTests
 {
     [Fact]
-    public async Task ApiVersionsRequestMessageTest()
+    public async Task SendMessageTest()
     {
         var request = new ApiVersionsRequestMessage
         {
@@ -45,25 +43,24 @@ public class SerializationTests
             CorrelationId = 1
         };
 
-        var hashCode = header.GetHashCode();
+        var buffer = ArrayBufferPool.Rent(10000);
 
-        var header1 = new RequestHeader
+        try
         {
-            RequestApiKey = (short)request.ApiKey,
-            RequestApiVersion = (short)ApiVersion.Version1,
-            ClientId = "test",
-            CorrelationId = 2
-        };
+            var sendMessage = new SendMessage(header, request, ApiVersion.Version1, ApiVersion.Version1, buffer);
 
-        var hashCode2 = header1.GetHashCode();
+            using var stream = new MemoryStream();
 
-        var sendMessage = new SendMessage(header, request, ApiVersion.Version1, ApiVersion.Version1, new ArrayBuffer(true, false, 10000));
+            await sendMessage.WriteToStream(stream);
 
-        using var stream = new MemoryStream();
+            stream.Length.Should().Be(18); //Всего байт данных в запросе
+            stream.Seek(3, SeekOrigin.Begin);
+            stream.ReadByte().Should().Be(14); //Длина собственно данных запроса, без учета первых 4х байтов
 
-        await sendMessage.Write(stream);
-
-        var str = Convert.ToHexString(stream.ToArray());
-        stream.Length.Should().Be(18);
+        }
+        finally
+        {
+            ArrayBufferPool.Return(buffer);
+        }
     }
 }

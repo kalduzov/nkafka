@@ -211,5 +211,14 @@ namespace NKafka.Resources {
                 return ResourceManager.GetString("SaslVersionInvalid", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream must be writable.
+        /// </summary>
+        internal static string StreamMustBeWritable {
+            get {
+                return ResourceManager.GetString("StreamMustBeWritable", resourceCulture);
+            }
+        }
     }
 }

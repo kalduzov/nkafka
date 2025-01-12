@@ -101,7 +101,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt() - 1;
+                arrayLength = reader.ReadVarInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Groups was serialized as null");
@@ -138,11 +138,11 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -164,7 +164,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(Groups.Count + 1);
+            writer.WriteVarInt32(Groups.Count + 1);
             foreach (var element in Groups)
             {
                 element?.Write(ref writer, version);
@@ -182,7 +182,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -309,7 +309,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -332,7 +332,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -354,7 +354,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version4)
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field GroupState was serialized as null");
@@ -375,7 +375,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version5)
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field GroupType was serialized as null");
@@ -396,11 +396,11 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version3)
             {
-                var numTaggedFields = reader.ReadVarInt();
+                var numTaggedFields = reader.ReadVarInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt();
-                    var size = reader.ReadVarInt();
+                    var tag = reader.ReadVarInt32();
+                    var size = reader.ReadVarInt32();
                     switch (tag)
                     {
                         default:
@@ -419,7 +419,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -431,7 +431,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -443,7 +443,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupState);
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -451,7 +451,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupType);
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -459,7 +459,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt(numTaggedFields);
+                writer.WriteVarInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ApiVersionsRequestMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'ApiVersionsRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -46,6 +47,7 @@ public sealed partial class ApiVersionsRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'ApiVersionsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {
@@ -54,6 +56,7 @@ public sealed partial class ApiVersionsRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'ApiVersionsRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
     {
@@ -62,6 +65,7 @@ public sealed partial class ApiVersionsRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'ApiVersionsRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
     {

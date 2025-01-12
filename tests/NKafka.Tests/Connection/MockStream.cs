@@ -22,8 +22,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
-using Microsoft.IO;
-
 using NKafka.Messages;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
@@ -83,19 +81,17 @@ internal class MockStream: Stream
                         var response = new ApiVersionsResponseMessage();
                         response.Write(ref writer, requestData.ApiVersion);
 
-                        writer.WriteSizeToStart();
-
                         break;
                     }
             }
 
             lock (_lockObject)
             {
-                //Т.к. из потока читается в 3 захода, то для эмуляции нужно отправить 3 пакета байт
+                //Т.к. из потока читается в 3 этапа, то для эмуляции нужно отправить 3 пакета байт
                 var array = arrayBuffer.DangerousGetFirstBuffer();
+                _sendQueue.Enqueue([]); //Тут нужно корректно написать длину данных
                 _sendQueue.Enqueue(array[..4]);
-                _sendQueue.Enqueue(array[4..8]);
-                _sendQueue.Enqueue(array[8..]);
+                _sendQueue.Enqueue(array[4..]);
             }
         }
         catch (Exception exc)

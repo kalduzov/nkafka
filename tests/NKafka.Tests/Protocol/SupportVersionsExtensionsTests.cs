@@ -21,6 +21,8 @@
 
 using NKafka.Protocol;
 
+using static NKafka.Protocol.SupportVersionsExtensions;
+
 namespace NKafka.Tests.Protocol;
 
 public sealed class SupportVersionsExtensionsTests
@@ -42,23 +44,24 @@ public sealed class SupportVersionsExtensionsTests
 
     public static IEnumerable<object[]> Data =>
     [
-        [SupportVersionsExtensions.Version20],
-        [SupportVersionsExtensions.Version21],
-        [SupportVersionsExtensions.Version22],
-        [SupportVersionsExtensions.Version23],
-        [SupportVersionsExtensions.Version24],
-        [SupportVersionsExtensions.Version25],
-        [SupportVersionsExtensions.Version26],
-        [SupportVersionsExtensions.Version27],
-        [SupportVersionsExtensions.Version28],
-        [SupportVersionsExtensions.Version30],
-        [SupportVersionsExtensions.Version31],
-        [SupportVersionsExtensions.Version32],
-        [SupportVersionsExtensions.Version33],
-        [SupportVersionsExtensions.Version34],
-        [SupportVersionsExtensions.Version35],
-        [SupportVersionsExtensions.Version36],
-        [SupportVersionsExtensions.Version37],
-        [SupportVersionsExtensions.Version38],
+        [Version20],
+        [Version21],
+        [Version22],
+        [Version23],
+        [Version24],
+        [Version25],
+        [Version26],
+        [Version27],
+        [Version28],
+        [Version30],
+        [Version31],
+        [Version32],
+        [Version33],
+        [Version34],
+        [Version35],
+        [Version36],
+        [Version37],
+        [Version38],
+        [Version39]
     ];
 }

@@ -30,7 +30,7 @@ namespace NKafka.Protocol;
 /// </summary>
 public enum ApiVersion: short
 {
-    LastVersion = Version16,
+    LastVersion = Version17,
 
     Version0 = 0x0000,
     Version1 = 0x0001,
@@ -48,7 +48,6 @@ public enum ApiVersion: short
     Version13 = 0x000D,
     Version14 = 0x000E,
     Version15 = 0x000F,
-#pragma warning disable CA1069
     Version16 = 0x0010,
-#pragma warning restore CA1069
+    Version17 = 0x0011,
 }

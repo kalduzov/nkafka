@@ -115,12 +115,12 @@ internal class ReadMethodGenerator: IMethodGenerator
             .IfMember(
                 curFlexibleVersions =>
                 {
-                    _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarInt();");
+                    _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarInt32();");
                     _codeGenerator.AppendLine("for (var t = 0; t < numTaggedFields; t++)");
                     _codeGenerator.AppendLeftBrace();
                     _codeGenerator.IncrementIndent();
-                    _codeGenerator.AppendLine("var tag = reader.ReadVarInt();");
-                    _codeGenerator.AppendLine("var size = reader.ReadVarInt();");
+                    _codeGenerator.AppendLine("var tag = reader.ReadVarInt32();");
+                    _codeGenerator.AppendLine("var size = reader.ReadVarInt32();");
                     _codeGenerator.AppendLine("switch (tag)");
                     _codeGenerator.AppendLeftBrace();
                     _codeGenerator.IncrementIndent();
@@ -233,7 +233,7 @@ internal class ReadMethodGenerator: IMethodGenerator
         _codeGenerator.AppendLine($"int {lengthVar};");
         VersionConditional
             .ForVersions(fieldFlexibleVersions, possibleVersions)
-            .IfMember(_ => { _codeGenerator.AppendLine($"{lengthVar} = reader.ReadVarInt() - 1;"); })
+            .IfMember(_ => { _codeGenerator.AppendLine($"{lengthVar} = reader.ReadVarInt32() - 1;"); })
             .IfNotMember(
                 _ =>
                 {

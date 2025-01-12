@@ -83,7 +83,7 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
         ThrottleTimeMs = reader.ReadInt();
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt() - 1;
+            arrayLength = reader.ReadVarInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Results was serialized as null");
@@ -99,11 +99,11 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
             }
         }
         UnknownTaggedFields = null;
-        var numTaggedFields = reader.ReadVarInt();
+        var numTaggedFields = reader.ReadVarInt32();
         for (var t = 0; t < numTaggedFields; t++)
         {
-            var tag = reader.ReadVarInt();
-            var size = reader.ReadVarInt();
+            var tag = reader.ReadVarInt32();
+            var size = reader.ReadVarInt32();
             switch (tag)
             {
                 default:
@@ -118,14 +118,14 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
     {
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
-        writer.WriteVarUInt(Results.Count + 1);
+        writer.WriteVarInt32(Results.Count + 1);
         foreach (var element in Results)
         {
             element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarUInt(numTaggedFields);
+        writer.WriteVarInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -235,7 +235,7 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field User was serialized as null");
@@ -252,7 +252,7 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     ErrorMessage = null;
@@ -267,11 +267,11 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -287,23 +287,23 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(User);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt(0);
+                writer.WriteVarInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

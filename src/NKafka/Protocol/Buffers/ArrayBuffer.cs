@@ -1,4 +1,25 @@
-﻿using System.Buffers;
+﻿// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+// 
+//  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+// 
+//  Copyright ©  2024 Aleksey Kalduzov. All rights reserved
+// 
+//  Author: Aleksey Kalduzov
+//  Email: alexei.kalduzov@gmail.com
+// 
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+// 
+//      http://www.apache.org/licenses/LICENSE-2.0
+// 
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
+
+using System.Buffers;
 using System.Collections;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -31,7 +52,8 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
 
     public static ArrayBuffer Null => new(true, false, 0);
 
-    public byte[] DangerousGetFirstBuffer() => _firstBuffer;
+    public byte[] DangerousGetFirstBuffer()
+        => _firstBuffer;
 
     public Memory<byte> GetMemory(int sizeHint = 0)
     {
@@ -44,6 +66,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         {
             // use firstBuffer
             var free = _firstBuffer.Length - _firstBufferWritten;
+
             if (free != 0 && sizeHint <= free)
             {
                 return _firstBuffer.AsSpan(_firstBufferWritten);
@@ -52,6 +75,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         else
         {
             var buffer = _current.FreeBuffer;
+
             if (buffer.Length > sizeHint)
             {
                 return buffer;
@@ -59,6 +83,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         }
 
         BufferSegment next;
+
         if (sizeHint <= _nextBufferSize)
         {
             next = new BufferSegment(_nextBufferSize);
@@ -74,6 +99,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
             _buffers.Add(_current);
         }
         _current = next;
+
         return next.FreeBuffer;
     }
 
@@ -91,9 +117,13 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         TotalWritten += count;
     }
 
+    /// <summary>
+    /// Return new array and reset current
+    /// </summary>
     public byte[] ToArrayAndReset()
     {
-        if (TotalWritten == 0) return [];
+        if (TotalWritten == 0)
+            return [];
 
         var result = AllocateUninitializedArray<byte>(TotalWritten);
         var dest = result.AsSpan();
@@ -101,7 +131,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         if (UseFirstBuffer)
         {
             _firstBuffer.AsSpan(0, _firstBufferWritten).CopyTo(dest);
-            dest = dest.Slice(_firstBufferWritten);
+            dest = dest[_firstBufferWritten..];
         }
 
         if (_buffers.Count > 0)
@@ -109,7 +139,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
             foreach (ref var item in CollectionsMarshal.AsSpan(_buffers))
             {
                 item.WrittenBuffer.CopyTo(dest);
-                dest = dest.Slice(item.WrittenCount);
+                dest = dest[item.WrittenCount..];
                 item.Clear(); // reset buffer-segment in this loop to avoid iterate twice for Reset
             }
         }
@@ -121,12 +151,14 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         }
 
         ResetCore();
+
         return result;
     }
 
     public async ValueTask WriteToAndResetAsync(Stream stream, CancellationToken cancellationToken)
     {
-        if (TotalWritten == 0) return;
+        if (TotalWritten == 0)
+            return;
 
         if (UseFirstBuffer)
         {
@@ -165,7 +197,9 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Reset()
     {
-        if (TotalWritten == 0) return;
+        if (TotalWritten == 0)
+            return;
+
         foreach (ref var item in CollectionsMarshal.AsSpan(_buffers))
         {
             item.Clear();
@@ -206,6 +240,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
                 if (_parent.UseFirstBuffer)
                 {
                     _current = _parent._firstBuffer.AsMemory(0, _parent._firstBufferWritten);
+
                     return true;
                 }
             }
@@ -222,6 +257,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
                 if (_buffersEnumerator.MoveNext())
                 {
                     _current = _buffersEnumerator.Current.WrittenMemory;
+
                     return true;
                 }
 
@@ -234,6 +270,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
                 _state = State.End;
 
                 _current = _parent._current.WrittenMemory;
+
                 return true;
             }
 

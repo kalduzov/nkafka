@@ -23,69 +23,138 @@
 
 using System.Numerics;
 
+using NKafka.Protocol.Buffers;
+
 namespace NKafka.Protocol.Extensions;
 
 internal static class VarIntExtensions
 {
-    /// <summary>
-    /// Write ulong value as varints to stream 
-    /// </summary>
-    internal static int WriteVarUInt64(this Stream stream, ulong value)
+    #region Read
+
+    internal static long ReadVarInt64(this ref BufferReader buffer)
     {
-        var count = 0;
+        var typeCode = buffer.ReadSByte();
 
-        byte b;
-
-        do
+        return typeCode switch
         {
-            b = (byte)(value & 0x7F | 0x80);
-            stream.WriteByte(b);
-            count++;
-        } while ((value >>= 7) != 0);
-
-        stream.Position--;
-        b &= 0x7F;
-        stream.WriteByte(b);
-
-        return count;
+            VarIntCodes.BYTE => buffer.ReadUnmanaged<byte>(),
+            VarIntCodes.SBYTE => buffer.ReadUnmanaged<sbyte>(),
+            VarIntCodes.UINT16 => buffer.ReadUnmanaged<ushort>(),
+            VarIntCodes.INT16 => buffer.ReadUnmanaged<short>(),
+            VarIntCodes.UINT32 => buffer.ReadUnmanaged<uint>(),
+            VarIntCodes.INT32 => buffer.ReadUnmanaged<int>(),
+            VarIntCodes.UINT64 => checked((long)buffer.ReadUnmanaged<ulong>()),
+            VarIntCodes.INT64 => buffer.ReadUnmanaged<long>(),
+            _ => typeCode
+        };
     }
 
-    /// <summary>
-    /// Write long value as varints to stream 
-    /// </summary>
-    internal static int WriteVarInt64(this Stream stream, long value)
+    internal static int ReadVarInt32(this ref BufferReader buffer)
     {
-        var ux = (ulong)value << 1;
+        var typeCode = buffer.ReadSByte();
 
-        if (value < 0)
+        return typeCode switch
         {
-            ux = ~ux;
+            VarIntCodes.BYTE => buffer.ReadUnmanaged<byte>(),
+            VarIntCodes.SBYTE => buffer.ReadUnmanaged<sbyte>(),
+            VarIntCodes.UINT16 => buffer.ReadUnmanaged<ushort>(),
+            VarIntCodes.INT16 => buffer.ReadUnmanaged<short>(),
+            VarIntCodes.UINT32 => checked((int)buffer.ReadUnmanaged<uint>()),
+            VarIntCodes.INT32 => buffer.ReadUnmanaged<int>(),
+            VarIntCodes.UINT64 => checked((int)buffer.ReadUnmanaged<ulong>()),
+            VarIntCodes.INT64 => checked((int)buffer.ReadUnmanaged<long>()),
+            _ => typeCode
+        };
+
+    }
+
+    #endregion
+
+    #region Write
+
+    /// <summary>
+    /// Write long value as varints to buffer 
+    /// </summary>
+    internal static void WriteVarInt64(this ref BufferWriter buffer, long value)
+    {
+        switch (value)
+        {
+            case >= 0 and <= VarIntCodes.MAX_SINGLE_VALUE:
+                buffer.WriteUnmanaged((sbyte)value);
+
+                break;
+            case >= 0 and <= short.MaxValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
+
+                break;
+            case >= 0 and <= int.MaxValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
+
+                break;
+            case >= 0:
+                buffer.WriteUnmanaged(VarIntCodes.INT64, value);
+
+                break;
+            case >= VarIntCodes.MIN_SINGLE_VALUE:
+                buffer.WriteUnmanaged((sbyte)value);
+
+                break;
+            case >= sbyte.MinValue:
+                buffer.WriteUnmanaged(VarIntCodes.SBYTE, (sbyte)value);
+
+                break;
+            case >= short.MinValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
+
+                break;
+            case >= int.MinValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
+
+                break;
+            default:
+                buffer.WriteUnmanaged(VarIntCodes.INT64, value);
+
+                break;
         }
-
-        return WriteVarUInt64(stream, ux);
     }
 
     /// <summary>
-    /// Write int value as varints to stream
+    /// Write int value as varints to buffer
     /// </summary>
-    internal static int WriteVarInt(this Stream stream, int value)
+    internal static void WriteVarInt32(this ref BufferWriter buffer, int value)
     {
-        var ux = (ulong)value << 1;
-
-        if (value < 0)
+        switch (value)
         {
-            ux = ~ux;
+            // same as sbyte.MaxValue
+            case >= 0 and <= VarIntCodes.MAX_SINGLE_VALUE:
+                buffer.WriteUnmanaged((sbyte)value);
+
+                break;
+            case >= 0 and <= short.MaxValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
+
+                break;
+            case >= 0:
+                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
+
+                break;
+            case >= VarIntCodes.MIN_SINGLE_VALUE:
+                buffer.WriteUnmanaged((sbyte)value);
+
+                break;
+            case >= sbyte.MinValue:
+                buffer.WriteUnmanaged(VarIntCodes.SBYTE, (sbyte)value);
+
+                break;
+            case >= short.MinValue:
+                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
+
+                break;
+            default:
+                buffer.WriteUnmanaged(VarIntCodes.INT32, value);
+
+                break;
         }
-
-        return WriteVarUInt64(stream, ux);
-    }
-
-    /// <summary>
-    /// Write uint value as varints to stream 
-    /// </summary>
-    internal static int WriteVarUInt(this Stream stream, uint value)
-    {
-        return WriteVarUInt64(stream, value);
     }
 
     internal static int SizeOfVarInt(this int value)
@@ -109,4 +178,6 @@ internal static class VarIntExtensions
 
         return leadingZerosBelow70DividedBy7 + (leadingZeros >> 6);
     }
+
+    #endregion
 }

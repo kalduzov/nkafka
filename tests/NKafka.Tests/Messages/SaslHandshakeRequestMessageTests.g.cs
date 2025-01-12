@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class SaslHandshakeRequestMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'SaslHandshakeRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -47,6 +48,7 @@ public sealed partial class SaslHandshakeRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'SaslHandshakeRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {

@@ -113,7 +113,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt() - 1;
+                arrayLength = reader.ReadVarInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field ApiKeys was serialized as null");
@@ -166,17 +166,17 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     case 0:
                     {
                         int arrayLength;
-                        arrayLength = reader.ReadVarInt() - 1;
+                        arrayLength = reader.ReadVarInt32() - 1;
                         if (arrayLength < 0)
                         {
                             throw new Exception("non-nullable field SupportedFeatures was serialized as null");
@@ -200,7 +200,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
                     case 2:
                     {
                         int arrayLength;
-                        arrayLength = reader.ReadVarInt() - 1;
+                        arrayLength = reader.ReadVarInt32() - 1;
                         if (arrayLength < 0)
                         {
                             throw new Exception("non-nullable field FinalizedFeatures was serialized as null");
@@ -236,7 +236,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(ApiKeys.Count + 1);
+            writer.WriteVarInt32(ApiKeys.Count + 1);
             foreach (var element in ApiKeys)
             {
                 element?.Write(ref writer, version);
@@ -286,12 +286,12 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             {
                 if (SupportedFeatures.Count != 0)
                 {
-                    writer.WriteVarUInt(0);
-                    writer.WriteVarUInt(SupportedFeatures.Count + 1);
+                    writer.WriteVarInt32(0);
+                    writer.WriteVarInt32(SupportedFeatures.Count + 1);
                     foreach (var element in SupportedFeatures)
                     {
                         element?.Write(ref writer, version);
@@ -301,16 +301,16 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             {
                 if (FinalizedFeaturesEpoch != -1)
                 {
-                    writer.WriteVarUInt(1);
-                    writer.WriteVarUInt(8);
+                    writer.WriteVarInt32(1);
+                    writer.WriteVarInt32(8);
                     writer.WriteLong(FinalizedFeaturesEpoch);
                 }
             }
             {
                 if (FinalizedFeatures.Count != 0)
                 {
-                    writer.WriteVarUInt(2);
-                    writer.WriteVarUInt(FinalizedFeatures.Count + 1);
+                    writer.WriteVarInt32(2);
+                    writer.WriteVarInt32(FinalizedFeatures.Count + 1);
                     foreach (var element in FinalizedFeatures)
                     {
                         element?.Write(ref writer, version);
@@ -320,8 +320,8 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             {
                 if (ZkMigrationReady)
                 {
-                    writer.WriteVarUInt(3);
-                    writer.WriteVarUInt(1);
+                    writer.WriteVarInt32(3);
+                    writer.WriteVarInt32(1);
                     writer.WriteBool(ZkMigrationReady);
                 }
             }
@@ -488,11 +488,11 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version3)
             {
-                var numTaggedFields = reader.ReadVarInt();
+                var numTaggedFields = reader.ReadVarInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt();
-                    var size = reader.ReadVarInt();
+                    var tag = reader.ReadVarInt32();
+                    var size = reader.ReadVarInt32();
                     switch (tag)
                     {
                         default:
@@ -514,7 +514,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt(numTaggedFields);
+                writer.WriteVarInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -651,7 +651,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -668,11 +668,11 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             MinVersion = reader.ReadShort();
             MaxVersion = reader.ReadShort();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -692,14 +692,14 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(MinVersion);
             writer.WriteShort(MaxVersion);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -838,7 +838,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -855,11 +855,11 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             MaxVersionLevel = reader.ReadShort();
             MinVersionLevel = reader.ReadShort();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -879,14 +879,14 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(MaxVersionLevel);
             writer.WriteShort(MinVersionLevel);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

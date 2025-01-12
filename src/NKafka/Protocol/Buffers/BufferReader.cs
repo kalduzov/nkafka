@@ -26,9 +26,7 @@ using System.Text;
 
 namespace NKafka.Protocol.Buffers;
 
-/// <summary>
-/// 
-/// </summary>
+// This class fork from https://github.com/Cysharp/MemoryPack
 internal ref partial struct BufferReader
 {
     private ReadOnlySequence<byte> _bufferSource;
@@ -271,60 +269,6 @@ internal ref partial struct BufferReader
         var value = Encoding.UTF8.GetString(src);
         Advance(length);
 
-        return value;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public int ReadVarInt()
-    {
-        var value = ReadVarInt64();
-        return (int)value;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public ulong ReadVarUInt64()
-    {
-        ulong b;
-        var offset = 0;
-        ulong value = 0;
-        while (true)
-        {
-            b = ReadByte();
-            if ((b & 0x80) == 0)
-            {
-
-                break;
-            }
-            value |= (b & 0b01111111) << offset;
-            offset += 7;
-            if (offset > 63)
-            {
-                throw new OverflowException();
-            }
-        }
-        value |= b << offset;
-        return value;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public long ReadVarInt64()
-    {
-        var uInt64Value = ReadVarUInt64();
-        var value = (long)(uInt64Value >> 1);
-
-        if ((uInt64Value & 1) != 0)
-        {
-            value = ~value;
-        }
         return value;
     }
 

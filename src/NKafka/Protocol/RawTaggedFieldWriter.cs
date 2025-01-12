@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol;
 
@@ -61,8 +62,8 @@ internal class RawTaggedFieldWriter
                 throw new Exception($"Invalid raw tag field list: tag {field.Tag} comes after tag {_prevTag}, but is not higher than it.");
             }
 
-            writer.WriteVarUInt(field.Tag);
-            writer.WriteVarInt(field.Data.Length);
+            writer.WriteVarInt32(field.Tag);
+            writer.WriteVarInt32(field.Data.Length);
             writer.WriteBytes(field.Data);
             _prevTag = field.Tag;
         }

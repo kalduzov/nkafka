@@ -21,9 +21,7 @@
  * limitations under the License.
  */
 
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 using static System.Buffers.Binary.BinaryPrimitives;
 
@@ -31,138 +29,14 @@ namespace NKafka.Protocol.Extensions;
 
 internal static class ProtocolWriterExtensions
 {
-    private static readonly Dictionary<string, byte[]> _clientIdCache = new(1);
-
-    public static void WriteLength(this Stream writer, int value)
+    public static void WriteInt(this Stream writer, int value)
     {
         writer.Write(value.ToBigEndian());
-    }
-
-    public static byte[] AsNullableString(this string str)
-    {
-        var buf = new byte[0x2 + str.Length];
-
-        var len = ((short)str.Length).ToBigEndian();
-
-        buf[0] = len[0];
-        buf[1] = len[1];
-
-        Array.Copy(Encoding.UTF8.GetBytes(str), 0, buf, 2, str.Length);
-
-        return buf;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static byte AsByte(this bool value)
-    {
-        return value ? (byte)1 : (byte)00;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Span<byte> AsShort(this ApiKeys apiKey)
-    {
-        return ((short)apiKey).ToBigEndian();
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static Span<byte> AsShort(this ApiVersion version)
-    {
-        return ((short)version).ToBigEndian();
-    }
-
-    public static Span<byte> ToBigEndian(this short value)
-    {
-        Span<byte> destination = stackalloc byte[sizeof(short)];
-
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
-    }
-
-    public static Span<byte> ToBigEndian(this ushort value)
-    {
-        Span<byte> destination = stackalloc byte[sizeof(ushort)];
-
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
-    }
-
-    internal static Span<byte> ToBigEndian(this uint value)
-    {
-        Span<byte> destination = stackalloc byte[sizeof(uint)];
-
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
     }
 
     internal static ReadOnlySpan<byte> ToBigEndian(this int value)
     {
         Span<byte> destination = stackalloc byte[sizeof(int)];
-
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
-    }
-
-    internal static Span<byte> ToBigEndian(this long value)
-    {
-        Span<byte> destination = stackalloc byte[sizeof(long)];
-
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
-    }
-
-    internal static Span<byte> ToBigEndian(this ulong value)
-    {
-        Span<byte> destination = stackalloc byte[sizeof(ulong)];
 
         if (BitConverter.IsLittleEndian)
         {

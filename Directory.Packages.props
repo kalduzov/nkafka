@@ -31,7 +31,6 @@
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1"/>
     <PackageVersion Include="FastEnum" Version="2.0.3"/>
     <PackageVersion Include="Snappier" Version="1.1.6"/>
     <!--Tests-->

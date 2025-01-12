@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class IncrementalAlterConfigsResponseMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -48,6 +49,7 @@ public sealed partial class IncrementalAlterConfigsResponseMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'IncrementalAlterConfigsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {

@@ -44,6 +44,7 @@ internal static partial class SupportVersionsExtensions
     internal static readonly Version Version36 = new(3, 6);
     internal static readonly Version Version37 = new(3, 7);
     internal static readonly Version Version38 = new(3, 8);
+    internal static readonly Version Version39 = new(3, 9);
 
     private static readonly SortedDictionary<Version, HashSet<ApiKeysVersion>> _supportSetOfKafkaVersions = new()
     {
@@ -433,6 +434,28 @@ internal static partial class SupportVersionsExtensions
             new ApiKeysVersion(ApiKeys.SaslAuthenticate, ApiVersion.Version0, ApiVersion.Version2),
             new ApiKeysVersion(ApiKeys.SaslHandshake, ApiVersion.Version0, ApiVersion.Version1),
             new ApiKeysVersion(ApiKeys.SyncGroup, ApiVersion.Version0, ApiVersion.Version5)
+        ],
+        [Version39] =
+        [
+            new ApiKeysVersion(ApiKeys.AddOffsetsToTxn, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.AddPartitionsToTxn, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ApiVersions, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.CreateTopics, ApiVersion.Version0, ApiVersion.Version7),
+            new ApiKeysVersion(ApiKeys.EndTxn, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.Fetch, ApiVersion.Version0, ApiVersion.Version17),
+            new ApiKeysVersion(ApiKeys.FetchSnapshot, ApiVersion.Version0, ApiVersion.Version0),
+            new ApiKeysVersion(ApiKeys.FindCoordinator, ApiVersion.Version0, ApiVersion.Version6),
+            new ApiKeysVersion(ApiKeys.Heartbeat, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.JoinGroup, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.LeaveGroup, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ListOffsets, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.Metadata, ApiVersion.Version0, ApiVersion.Version12),
+            new ApiKeysVersion(ApiKeys.OffsetCommit, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.OffsetFetch, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.Produce, ApiVersion.Version0, ApiVersion.Version11),
+            new ApiKeysVersion(ApiKeys.SaslAuthenticate, ApiVersion.Version0, ApiVersion.Version2),
+            new ApiKeysVersion(ApiKeys.SaslHandshake, ApiVersion.Version0, ApiVersion.Version1),
+            new ApiKeysVersion(ApiKeys.SyncGroup, ApiVersion.Version0, ApiVersion.Version5)
         ]
     };
 
@@ -477,14 +500,7 @@ internal static partial class SupportVersionsExtensions
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = (int)ApiKey;
-                hashCode = hashCode * 397 ^ (int)MinApiVersion;
-                hashCode = hashCode * 397 ^ (int)MaxApiVersion;
-
-                return hashCode;
-            }
+            return HashCode.Combine(ApiKey, MinApiVersion, MaxApiVersion);
         }
 
         public override bool Equals(object? obj)

@@ -20,7 +20,6 @@
 //  limitations under the License.
 
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.IO;
 
 using NKafka.Config;
 using NKafka.Connection;

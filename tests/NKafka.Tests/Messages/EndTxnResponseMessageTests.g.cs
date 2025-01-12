@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class EndTxnResponseMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -48,6 +49,7 @@ public sealed partial class EndTxnResponseMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {
@@ -58,6 +60,7 @@ public sealed partial class EndTxnResponseMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
     {
@@ -68,6 +71,7 @@ public sealed partial class EndTxnResponseMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
     {
@@ -78,6 +82,7 @@ public sealed partial class EndTxnResponseMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
     {

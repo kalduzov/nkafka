@@ -93,7 +93,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
     {
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt() - 1;
+            arrayLength = reader.ReadVarInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Deletions was serialized as null");
@@ -110,7 +110,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
         }
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt() - 1;
+            arrayLength = reader.ReadVarInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Upsertions was serialized as null");
@@ -126,11 +126,11 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             }
         }
         UnknownTaggedFields = null;
-        var numTaggedFields = reader.ReadVarInt();
+        var numTaggedFields = reader.ReadVarInt32();
         for (var t = 0; t < numTaggedFields; t++)
         {
-            var tag = reader.ReadVarInt();
-            var size = reader.ReadVarInt();
+            var tag = reader.ReadVarInt32();
+            var size = reader.ReadVarInt32();
             switch (tag)
             {
                 default:
@@ -144,19 +144,19 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        writer.WriteVarUInt(Deletions.Count + 1);
+        writer.WriteVarInt32(Deletions.Count + 1);
         foreach (var element in Deletions)
         {
             element?.Write(ref writer, version);
         }
-        writer.WriteVarUInt(Upsertions.Count + 1);
+        writer.WriteVarInt32(Upsertions.Count + 1);
         foreach (var element in Upsertions)
         {
             element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarUInt(numTaggedFields);
+        writer.WriteVarInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -268,7 +268,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -284,11 +284,11 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             }
             Mechanism = reader.ReadSByte();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -304,13 +304,13 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(Mechanism);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -428,7 +428,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -446,7 +446,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             Iterations = reader.ReadInt();
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Salt was serialized as null");
@@ -458,7 +458,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             }
             {
                 int length;
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field SaltedPassword was serialized as null");
@@ -469,11 +469,11 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -489,18 +489,18 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(Mechanism);
             writer.WriteInt(Iterations);
-            writer.WriteVarUInt(Salt.Length + 1);
+            writer.WriteVarInt32(Salt.Length + 1);
             writer.WriteBytes(Salt);
-            writer.WriteVarUInt(SaltedPassword.Length + 1);
+            writer.WriteVarInt32(SaltedPassword.Length + 1);
             writer.WriteBytes(SaltedPassword);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

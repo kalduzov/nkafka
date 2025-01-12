@@ -101,12 +101,12 @@ internal class Record
     /// <param name="reader"></param>
     private void Read(ref BufferReader reader)
     {
-        Length = reader.ReadVarInt();
+        Length = reader.ReadVarInt32();
         Attributes = reader.ReadSByte();
         TimestampDelta = reader.ReadVarInt64();
-        OffsetDelta = reader.ReadVarInt();
+        OffsetDelta = reader.ReadVarInt32();
 
-        var keyLen = reader.ReadVarInt();
+        var keyLen = reader.ReadVarInt32();
 
         if (reader.Remaining < keyLen)
         {
@@ -120,7 +120,7 @@ internal class Record
             Key = reader.ReadBytes(keyLen);
         }
 
-        var valueLen = reader.ReadVarInt();
+        var valueLen = reader.ReadVarInt32();
 
         if (reader.Remaining < valueLen)
         {
@@ -130,7 +130,7 @@ internal class Record
         }
         Value = reader.ReadBytes(valueLen);
 
-        var countHeader = reader.ReadVarInt();
+        var countHeader = reader.ReadVarInt32();
 
         if (countHeader != 0)
         {
@@ -145,7 +145,7 @@ internal class Record
                     return;
                 }
 
-                var headerKeyLen = reader.ReadVarInt();
+                var headerKeyLen = reader.ReadVarInt32();
 
                 if (reader.Remaining < headerKeyLen + 4)
                 {
@@ -154,7 +154,7 @@ internal class Record
                     return;
                 }
                 var headerKey = reader.ReadString(headerKeyLen);
-                var headerValueLen = reader.ReadVarInt();
+                var headerValueLen = reader.ReadVarInt32();
 
                 if (reader.Remaining < headerValueLen)
                 {
@@ -180,10 +180,10 @@ internal class Record
         const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
 
         var sizeInBytes = RecordExtensions.SizeOfBodyInBytes((int)OffsetDelta, TimestampDelta, Key, Value, Headers);
-        bufferWriter.WriteVarInt(sizeInBytes);
+        bufferWriter.WriteVarInt32(sizeInBytes);
         bufferWriter.WriteByte(attributes);
-        bufferWriter.WriteVarLong(TimestampDelta);
-        bufferWriter.WriteVarLong(OffsetDelta);
+        // bufferWriter.WriteVarLong(TimestampDelta);
+        // bufferWriter.WriteVarLong(OffsetDelta);
 
         if (Key is null)
         {
@@ -203,7 +203,7 @@ internal class Record
             bufferWriter.WriteBytesWithLength(Value);
         }
 
-        bufferWriter.WriteVarInt(Headers.Count);
+        bufferWriter.WriteVarInt32(Headers.Count);
 
         foreach (var header in Headers)
         {

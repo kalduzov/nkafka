@@ -24,7 +24,6 @@
 using System.Collections.Concurrent;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.IO;
 
 using NKafka.Collections;
 using NKafka.Compressions;
@@ -34,7 +33,6 @@ using NKafka.Metrics;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
 using NKafka.Resources;
-
 
 namespace NKafka.Clients.Producer.Internals;
 
@@ -60,7 +58,6 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics;
 
     private readonly int _batchSize;
-    private readonly RecyclableMemoryStreamManager _memoryStreamManager;
     private readonly bool _closed;
     private readonly ICompression _compression;
     private readonly int _deliveryTimeoutMs;
@@ -91,11 +88,6 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         _compression = GetCompression(config.Compression);
         _retryBackoffMs = config.RetryBackoffMs;
         _lingerMs = config.LingerMs;
-        var options = new RecyclableMemoryStreamManager.Options
-        {
-            BlockSize = config.BufferMemory
-        };
-        _memoryStreamManager = new RecyclableMemoryStreamManager(options);
 
     }
 
@@ -133,7 +125,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         // list of batches for a specific topic divided by partitions
         var topicBatches = _batchesByTopics.GetOrAdd(topicPartition.Topic, _ => new PartitionedBatchCollection());
 
-        ArrayBuffer? arrayWriter = null;
+        ArrayBuffer? buffer = null;
 
         try
         {
@@ -155,11 +147,11 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
                 // There was no batch to add a record, so we continue to work,
                 // prepare the buffer into which the data in the batch will be written
-                if (arrayWriter is null)
+                if (buffer is null)
                 {
                     // We calculate what buffer size we need and try to get it 
                     var size = Math.Max(_batchSize, RecordsBatch.EstimateSizeInBytesUpperBound(key, value, headers));
-                    arrayWriter = ArrayBufferPool.Rent(size);
+                    buffer = ArrayBufferPool.Rent(size);
                 }
 
                 lock (deque)
@@ -171,12 +163,12 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                         key,
                         value,
                         headers,
-                        arrayWriter);
+                        buffer);
 
                     // It is possible that the batch was already created in another thread while we were preparing the buffer
                     if (recordAppendResult.NewBatchCreated)
                     {
-                        arrayWriter = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
+                        buffer = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
                     }
 
                     return recordAppendResult;
@@ -185,7 +177,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
         }
         finally
         {
-            arrayWriter?.Reset();
+            ArrayBufferPool.Return(buffer);
 
             Interlocked.Decrement(ref _appendsInProgress);
         }

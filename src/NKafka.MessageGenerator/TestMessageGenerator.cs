@@ -63,6 +63,7 @@ public class TestMessageGenerator: ClassGenerator, ITestsMessageGenerator
 
     private void GenerateSerializeAndDeserializeMessageSuccessMethod(MessageSpecification message, string className, short apiVersion)
     {
+        CodeGenerator.AppendLine();
         CodeGenerator.AppendLine($"[Fact(DisplayName = \"Check serialize and deserialize '{className}' message by Version{apiVersion}\")]");
 
         CodeGenerator.AppendLine($"public void SerializeAndDeserializeMessage_ApiVersion{apiVersion}_Success()");

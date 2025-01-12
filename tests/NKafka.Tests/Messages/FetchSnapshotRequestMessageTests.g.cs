@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class FetchSnapshotRequestMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'FetchSnapshotRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {

@@ -28,7 +28,6 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.IO;
 
 using NKafka.Config;
 using NKafka.Diagnostics;
@@ -191,80 +190,91 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         var arrayBuffer = ArrayBufferPool.Rent(_messageMaxBytes);
 
-        var request = new SendMessage(
-            new RequestHeader
+        try
+        {
+            var requestHeader = new RequestHeader
             {
                 ClientId = _clientId,
                 RequestApiVersion = (short)contentVersion,
                 CorrelationId = requestId,
                 RequestApiKey = (short)message.ApiKey
-            },
-            message,
-            contentVersion,
-            headerVersion, 
-            arrayBuffer
-        );
+            };
 
-        if (!isInternalRequest)
-        {
-            ThrowExceptionIfRequestNotValid(request, activity);
-        }
+            var request = new SendMessage(
+                requestHeader,
+                message,
+                contentVersion,
+                headerVersion,
+                arrayBuffer
+            );
 
-        if (message is not ApiVersionsRequestMessage)
-        {
-            await ReEstablishConnectionAsync(token);
-        }
-
-        if (token.IsCancellationRequested)
-        {
-            return await Task.FromCanceled<TResponseMessage>(token);
-        }
-
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-
-        var responseCompletionSource = new ResponseTaskCompletionSource(
-            (ApiKeys)request.Header.RequestApiKey,
-            (ApiVersion)request.Header.RequestApiVersion);
-
-        token.Register(
-            state =>
+            if (!isInternalRequest)
             {
-                var awaiter = state as ResponseTaskCompletionSource;
-                awaiter?.TrySetCanceled();
-            },
-            responseCompletionSource,
-            false);
-
-        try
-        {
-            _inFlightRequests.TryAdd(requestId, responseCompletionSource);
-            WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
-            cts.CancelAfter(_requestTimeoutMs);
-
-            if (CanWrite)
-            {
-                var bytesSent = await request.Write(_stream, true, _messageMaxBytes);
-                Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
-                _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
+                ThrowExceptionIfRequestNotValid(request, activity);
             }
-            else
+
+            if (message is not ApiVersionsRequestMessage)
             {
-                throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
+                await ReEstablishConnectionAsync(token);
             }
+
+            if (token.IsCancellationRequested)
+            {
+                return await Task.FromCanceled<TResponseMessage>(token);
+            }
+
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
+
+            var responseCompletionSource = new ResponseTaskCompletionSource(
+                (ApiKeys)request.Header.RequestApiKey,
+                (ApiVersion)request.Header.RequestApiVersion);
+
+            token.Register(
+                state =>
+                {
+                    var awaiter = state as ResponseTaskCompletionSource;
+                    awaiter?.TrySetCanceled();
+                },
+                responseCompletionSource,
+                false);
+
+            try
+            {
+                _inFlightRequests.TryAdd(requestId, responseCompletionSource);
+                WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
+                cts.CancelAfter(_requestTimeoutMs);
+
+                if (CanWrite)
+                {
+                    var bytesSent = await request.WriteToStream(_stream, true, _messageMaxBytes);
+                    Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
+                    _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
+                }
+                else
+                {
+                    throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
+                }
+            }
+            catch (Exception exc)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
+
+                _inFlightRequests.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
+
+                if (!responseCompletionSource.Task.IsCanceled || !responseCompletionSource.Task.IsCompleted)
+                {
+                    responseCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError,
+                        "Не удалось отправить запрос",
+                        exc));
+                }
+            }
+
+            return (TResponseMessage)await responseCompletionSource.Task;
         }
-        catch (Exception exc)
+        finally
         {
-            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
-
-            _inFlightRequests.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
-
-            if (!responseCompletionSource.Task.IsCanceled || !responseCompletionSource.Task.IsCompleted)
-            {
-                responseCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Не удалось отправить запрос", exc));
-            }
+            ArrayBufferPool.Return(arrayBuffer);
         }
-
-        return (TResponseMessage)await responseCompletionSource.Task;
     }
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>

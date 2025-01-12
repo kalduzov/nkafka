@@ -19,13 +19,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Buffers;
-
-using Microsoft.IO;
-
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Extensions;
+
+using EM = NKafka.Resources.ExceptionMessages;
 
 namespace NKafka.Protocol;
 
@@ -52,31 +51,35 @@ internal struct SendMessage(
     public IRequestMessage RequestMessage { get; } = requestMessage;
 
     /// <summary>
-    /// 
+    /// Write body and header data to stream (e.g. NetworkStream)
     /// </summary>
     /// <param name="writableStream"></param>
     /// <param name="throwIfSizeLargeThen"></param>
     /// <param name="messageMaxBytes"></param>
     /// <returns></returns>
     /// <exception cref="ProtocolKafkaException"></exception>
-    public async Task<long> Write(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
+    public async Task<long> WriteToStream(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
     {
+        if (!writableStream.CanWrite)
+        {
+            throw new ArgumentException(EM.StreamMustBeWritable, nameof(writableStream));
+        }
+
         var writer = new BufferWriter(ref _buffer);
 
         Header.Write(ref writer, headerVersion);
         RequestMessage.Write(ref writer, messageVersion);
 
-        writer.WriteSizeToStart();
-
-        if (writer.BufferLength > messageMaxBytes && throwIfSizeLargeThen)
+        if (writer.BufferLength + 4 > messageMaxBytes && throwIfSizeLargeThen)
         {
             var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {messageMaxBytes}";
 
             throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
         }
 
+        writableStream.WriteInt(writer.WrittenCount); // First we write down the length of all data
         await _buffer.WriteToAndResetAsync(writableStream, CancellationToken.None);
 
-        return _buffer.TotalWritten;
+        return _buffer.TotalWritten + 4;
     }
 }

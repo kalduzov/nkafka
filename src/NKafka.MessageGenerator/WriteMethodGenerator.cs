@@ -130,7 +130,7 @@ internal class WriteMethodGenerator: IMethodGenerator
             .IfMember(
                 _ =>
                 {
-                    _codeGenerator.AppendLine("writer.WriteVarUInt(numTaggedFields);");
+                    _codeGenerator.AppendLine("writer.WriteVarInt32(numTaggedFields);");
                     var prevTag = -1;
 
                     foreach (var field in taggedFields.Values)
@@ -159,21 +159,21 @@ internal class WriteMethodGenerator: IMethodGenerator
                                                     _codeGenerator.IncrementIndent();
                                                 }
 
-                                                _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Tag});");
+                                                _codeGenerator.AppendLine($"writer.WriteVarInt32({field.Tag});");
 
                                                 if (field.Type.IsString)
                                                 {
                                                     _codeGenerator.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({field.Name});");
                                                     _codeGenerator.AppendLine(
-                                                        "writer.WriteVarUInt(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());");
-                                                    _codeGenerator.AppendLine("writer.WriteVarUInt(stringBytes.Length + 1);");
+                                                        "writer.WriteVarInt32(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());");
+                                                    _codeGenerator.AppendLine("writer.WriteVarInt32(stringBytes.Length + 1);");
                                                     _codeGenerator.AppendLine("writer.WriteBytes(stringBytes);");
                                                 }
                                                 else if (field.Type.IsBytes)
                                                 {
                                                     _codeGenerator.AppendLine(
-                                                        $"writer.WriteVarUInt({field.Name}.Length + ({field.Name}.Length + 1).SizeOfVarUInt());");
-                                                    _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Name}.Length + 1);");
+                                                        $"writer.WriteVarInt32({field.Name}.Length + ({field.Name}.Length + 1).SizeOfVarUInt());");
+                                                    _codeGenerator.AppendLine($"writer.WriteVarInt32({field.Name}.Length + 1);");
                                                     _codeGenerator.AppendLine($"writer.WriteBytes({field.Name});");
                                                 }
                                                 else if (field.Type.IsArray)
@@ -198,7 +198,7 @@ internal class WriteMethodGenerator: IMethodGenerator
                                                 }
                                                 else
                                                 {
-                                                    _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Type.Size});");
+                                                    _codeGenerator.AppendLine($"writer.WriteVarInt32({field.Type.Size});");
                                                     _codeGenerator.AppendLine($"{PrimitiveWriteExpression(field.Type, field.Name)};");
                                                 }
 
@@ -214,9 +214,9 @@ internal class WriteMethodGenerator: IMethodGenerator
                                         cond.IfNull(
                                             () =>
                                             {
-                                                _codeGenerator.AppendLine($"writer.WriteVarUInt({field.Tag});");
-                                                _codeGenerator.AppendLine("writer.WriteVarUInt(1);");
-                                                _codeGenerator.AppendLine("writer.WriteVarUInt(0);");
+                                                _codeGenerator.AppendLine($"writer.WriteVarInt32({field.Tag});");
+                                                _codeGenerator.AppendLine("writer.WriteVarInt32(1);");
+                                                _codeGenerator.AppendLine("writer.WriteVarInt32(0);");
                                             });
                                     }
 
@@ -285,7 +285,7 @@ internal class WriteMethodGenerator: IMethodGenerator
                             presentVersions =>
                             {
                                 VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
-                                    .IfMember(_ => { _codeGenerator.AppendLine("writer.WriteVarUInt(0);"); })
+                                    .IfMember(_ => { _codeGenerator.AppendLine("writer.WriteVarInt32(0);"); })
                                     .IfNotMember(
                                         _ => { _codeGenerator.AppendLine(type.IsString ? "writer.WriteShort(-1);" : "writer.WriteInt(-1);"); })
                                     .Generate(_codeGenerator);
@@ -321,7 +321,7 @@ internal class WriteMethodGenerator: IMethodGenerator
                     }
 
                     VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
-                        .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarUInt({lengthExpression} + 1);"); })
+                        .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarInt32({lengthExpression} + 1);"); })
                         .IfNotMember(
                             _ =>
                             {

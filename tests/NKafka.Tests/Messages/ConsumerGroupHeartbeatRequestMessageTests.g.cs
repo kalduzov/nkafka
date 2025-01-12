@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ConsumerGroupHeartbeatRequestMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'ConsumerGroupHeartbeatRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {

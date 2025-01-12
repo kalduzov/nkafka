@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class RequestHeaderTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -49,6 +50,7 @@ public sealed partial class RequestHeaderTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {
@@ -61,6 +63,7 @@ public sealed partial class RequestHeaderTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
     {

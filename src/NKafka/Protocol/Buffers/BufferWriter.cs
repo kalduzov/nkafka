@@ -31,9 +31,7 @@ using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Protocol.Buffers;
 
-/// <summary>
-/// 
-/// </summary>
+// This class fork from https://github.com/Cysharp/MemoryPack
 [StructLayout(LayoutKind.Auto)]
 internal ref partial struct BufferWriter
 {
@@ -76,6 +74,7 @@ internal ref partial struct BufferWriter
         {
             RequestNewBuffer(sizeHint);
         }
+
         return ref _bufferReference;
     }
 
@@ -216,14 +215,6 @@ internal ref partial struct BufferWriter
         Advance(size);
     }
 
-    public void WriteVarInt(int value)
-    {
-    }
-
-    public void WriteVarLong(long value)
-    {
-    }
-
     public void WriteNullVarInt()
     {
     }
@@ -232,34 +223,45 @@ internal ref partial struct BufferWriter
     {
     }
 
-    public void WriteSizeToStart()
-    {
-        // _stream.Position = 0;
-        // var streamLen = (int)_stream.Length - _LEN_DATA;
-        // WriteInt(_stream.Length == 0 ? 0 : streamLen);
-    }
-
     public void WriteBytes(byte[] bytes)
     {
         ref var dest = ref GetSpanReference(bytes.Length);
-        Unsafe.WriteUnaligned(ref dest, bytes);
+        ref var src = ref Unsafe.As<byte, byte>(ref MemoryMarshal.GetReference(bytes.AsSpan()));
+        Unsafe.CopyBlockUnaligned(ref dest, ref src, (uint)bytes.Length);
 
         Advance(bytes.Length);
 
     }
 
-    public void WriteVarUInt(int fieldTag)
-    {
-    }
-
-
-    public void WriteGuid(Guid topicId)
+    public void WriteGuid(Guid value)
     {
 
     }
 
     public void WriteRecords(Records.Records? unalignedRecords)
     {
-        throw new NotImplementedException();
+
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteUnmanaged<T1>(scoped in T1 value1)
+        where T1 : unmanaged
+    {
+        var size = Unsafe.SizeOf<T1>();
+        ref var spanRef = ref GetSpanReference(size);
+        Unsafe.WriteUnaligned(ref spanRef, value1);
+        Advance(size);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteUnmanaged<T1, T2>(scoped in T1 value1, scoped in T2 value2)
+        where T1 : unmanaged
+        where T2 : unmanaged
+    {
+        var size = Unsafe.SizeOf<T1>() + Unsafe.SizeOf<T2>();
+        ref var spanRef = ref GetSpanReference(size);
+        Unsafe.WriteUnaligned(ref spanRef, value1);
+        Unsafe.WriteUnaligned(ref Unsafe.Add(ref spanRef, Unsafe.SizeOf<T1>()), value2);
+        Advance(size);
     }
 }

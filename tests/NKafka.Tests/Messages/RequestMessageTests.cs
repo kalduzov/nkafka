@@ -33,9 +33,8 @@ internal static class RequestMessageTests
         var arrayBuffer = new ArrayBuffer(true, false, 10000);
         var writer = new BufferWriter(ref arrayBuffer);
         message.Write(ref writer, version);
-        writer.WriteSizeToStart();
 
-        var serializeMessage = arrayBuffer.DangerousGetFirstBuffer().ToArray()[4..]; //Первые 4 байта - это длинна сообщения
+        var serializeMessage = arrayBuffer.DangerousGetFirstBuffer(); //Первые 4 байта - это длинна сообщения
 
         var reader = new BufferReader(serializeMessage);
         var deserializeMessage = new T();

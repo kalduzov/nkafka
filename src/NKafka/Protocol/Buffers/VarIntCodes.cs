@@ -21,6 +21,7 @@
 
 namespace NKafka.Protocol.Buffers;
 
+// This class fork from https://github.com/Cysharp/MemoryPack
 internal static class VarIntCodes
 {
     public const byte MAX_SINGLE_VALUE = 127;

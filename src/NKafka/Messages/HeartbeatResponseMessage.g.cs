@@ -95,11 +95,11 @@ internal sealed partial class HeartbeatResponseMessage: IResponseMessage, IEquat
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version4)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -123,7 +123,7 @@ internal sealed partial class HeartbeatResponseMessage: IResponseMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

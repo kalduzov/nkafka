@@ -131,7 +131,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         if (version >= ApiVersion.Version7)
         {
             int length;
-            length = reader.ReadVarInt() - 1;
+            length = reader.ReadVarInt32() - 1;
             if (length < 0)
             {
                 ProtocolType = null;
@@ -153,7 +153,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
             }
             else
             {
@@ -183,7 +183,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
             }
             else
             {
@@ -214,7 +214,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt() - 1;
+                length = reader.ReadVarInt32() - 1;
             }
             else
             {
@@ -237,7 +237,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt() - 1;
+                arrayLength = reader.ReadVarInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Members was serialized as null");
@@ -274,11 +274,11 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version6)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -303,12 +303,12 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarUInt(0);
+                writer.WriteVarInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -316,7 +316,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (version >= ApiVersion.Version7)
             {
-                writer.WriteVarUInt(0);
+                writer.WriteVarInt32(0);
             }
             else
             {
@@ -327,7 +327,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -339,7 +339,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(Leader);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -362,7 +362,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt(stringBytes.Length + 1);
+                writer.WriteVarInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -372,7 +372,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         }
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarUInt(Members.Count + 1);
+            writer.WriteVarInt32(Members.Count + 1);
             foreach (var element in Members)
             {
                 element?.Write(ref writer, version);
@@ -390,7 +390,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -583,7 +583,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -607,7 +607,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -634,7 +634,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -652,11 +652,11 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)
             {
-                var numTaggedFields = reader.ReadVarInt();
+                var numTaggedFields = reader.ReadVarInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt();
-                    var size = reader.ReadVarInt();
+                    var tag = reader.ReadVarInt32();
+                    var size = reader.ReadVarInt32();
                     switch (tag)
                     {
                         default:
@@ -675,7 +675,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -689,7 +689,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 {
                     if (version >= ApiVersion.Version6)
                     {
-                        writer.WriteVarUInt(0);
+                        writer.WriteVarInt32(0);
                     }
                     else
                     {
@@ -701,7 +701,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                     var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                     if (version >= ApiVersion.Version6)
                     {
-                        writer.WriteVarUInt(stringBytes.Length + 1);
+                        writer.WriteVarInt32(stringBytes.Length + 1);
                     }
                     else
                     {
@@ -712,7 +712,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             }
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt(Metadata.Length + 1);
+                writer.WriteVarInt32(Metadata.Length + 1);
             }
             else
             {
@@ -723,7 +723,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt(numTaggedFields);
+                writer.WriteVarInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

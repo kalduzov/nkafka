@@ -85,7 +85,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
             if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt() - 1;
+                arrayLength = reader.ReadVarInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Results was serialized as null");
@@ -122,11 +122,11 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
-            var numTaggedFields = reader.ReadVarInt();
+            var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt();
-                var size = reader.ReadVarInt();
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
                 switch (tag)
                 {
                     default:
@@ -144,7 +144,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
         writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarUInt(Results.Count + 1);
+            writer.WriteVarInt32(Results.Count + 1);
             foreach (var element in Results)
             {
                 element?.Write(ref writer, version);
@@ -162,7 +162,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarUInt(numTaggedFields);
+            writer.WriteVarInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -282,7 +282,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -306,7 +306,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt() - 1;
+                    length = reader.ReadVarInt32() - 1;
                 }
                 else
                 {
@@ -328,11 +328,11 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version2)
             {
-                var numTaggedFields = reader.ReadVarInt();
+                var numTaggedFields = reader.ReadVarInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt();
-                    var size = reader.ReadVarInt();
+                    var tag = reader.ReadVarInt32();
+                    var size = reader.ReadVarInt32();
                     switch (tag)
                     {
                         default:
@@ -351,7 +351,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -364,7 +364,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt(0);
+                    writer.WriteVarInt32(0);
                 }
                 else
                 {
@@ -376,7 +376,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt(stringBytes.Length + 1);
+                    writer.WriteVarInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -388,7 +388,7 @@ internal sealed partial class CreatePartitionsResponseMessage: IResponseMessage,
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt(numTaggedFields);
+                writer.WriteVarInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

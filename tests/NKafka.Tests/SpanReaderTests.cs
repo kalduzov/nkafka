@@ -23,6 +23,7 @@
 
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Tests;
 
@@ -192,13 +193,13 @@ public class SpanReaderTests
     [InlineData(64, 64)]
     [InlineData(127, 127)]
     [InlineData(0b1010_1100_0000_0010, 300)]
-    public void ReadUnsignedVarLong_FromSimpleBuffer_Successful(ulong variant, ulong testValue)
+    public void ReadUnsignedVarLong_FromSimpleBuffer_Successful(ulong variant, long testValue)
     {
         var data = BitConverter.GetBytes(variant);
         var variantBuffer = GetVariantBuffer(data);
         var reader = new BufferReader(variantBuffer);
 
-        var value = reader.ReadVarUInt64();
+        var value = reader.ReadVarInt64();
 
         value.Should().Be(testValue);
     }

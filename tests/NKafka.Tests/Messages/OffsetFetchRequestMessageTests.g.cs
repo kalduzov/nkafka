@@ -38,6 +38,7 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class OffsetFetchRequestMessageTests
 {
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version0")]
     public void SerializeAndDeserializeMessage_ApiVersion0_Success()
     {
@@ -48,6 +49,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
     {
@@ -58,6 +60,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()
     {
@@ -68,6 +71,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
     {
@@ -78,6 +82,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
     {
@@ -88,6 +93,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version5")]
     public void SerializeAndDeserializeMessage_ApiVersion5_Success()
     {
@@ -98,6 +104,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version6")]
     public void SerializeAndDeserializeMessage_ApiVersion6_Success()
     {
@@ -108,6 +115,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version7")]
     public void SerializeAndDeserializeMessage_ApiVersion7_Success()
     {
@@ -119,6 +127,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version7);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version8")]
     public void SerializeAndDeserializeMessage_ApiVersion8_Success()
     {
@@ -129,6 +138,7 @@ public sealed partial class OffsetFetchRequestMessageTests
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
     }
+
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version9")]
     public void SerializeAndDeserializeMessage_ApiVersion9_Success()
     {

@@ -29,23 +29,29 @@ using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
 
-
 namespace NKafka.Clients.Producer.Internals;
 
 /// <summary>
 /// Contains batch data and metadata
 /// </summary>
-internal class ProducerBatch
+/// <remarks>
+/// Initializes a new instance of the <see cref="ProducerBatch"/> class with the specified <see cref="TopicPartition"/> and <see cref="BufferWriter"/>.
+/// </remarks>
+/// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
+/// <param name="buffer">The <see cref="BufferWriter"/> used for writing the batch data.</param>
+/// <param name="loggerFactory"></param>
+internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory)
 {
     /// <summary>
     /// This default bath 
     /// </summary>
-    public static readonly ProducerBatch Null = new(TopicPartition.Null, ArrayBuffer.Null,
+    public static readonly ProducerBatch Null = new(TopicPartition.Null,
+        ArrayBuffer.Null,
         NullLoggerFactory.Instance);
 
     internal const int RECORD_BATCH_OVERHEAD = 61;
 
-    private ArrayBuffer _buffer;
+    private ArrayBuffer _buffer = buffer;
 
     /// <summary>
     /// Batch header length
@@ -56,13 +62,13 @@ internal class ProducerBatch
 
     private const int _ATTRIBUTES_OFFSET = 17;
 
-    private readonly TaskCompletionSource _produceRequestResult;
+    private readonly TaskCompletionSource _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
     private int _maxRecordSize;
     private int _recordsCount;
     private readonly List<SendResultTask> _recordTasks = [];
-    private int _lastOffset;
+    private int _lastOffset = -1;
     private readonly List<Record> _records = new(16);
-    private readonly ILogger<ProducerBatch> _logger;
+    private readonly ILogger<ProducerBatch> _logger = loggerFactory.CreateLogger<ProducerBatch>();
 
     /// <summary>
     /// How many bytes are left to add so that the batch is complete?
@@ -77,7 +83,7 @@ internal class ProducerBatch
     /// <summary>
     /// Represents a specific partition of a topic in a Kafka cluster.
     /// </summary>
-    public TopicPartition TopicPartition { get; }
+    public TopicPartition TopicPartition { get; } = topicPartition;
 
     /// <summary>
     /// Gets a value indicating whether the property is ready.
@@ -103,28 +109,11 @@ internal class ProducerBatch
     /// <summary>
     /// 
     /// </summary>
-    public long CreateTimestamp { get; private set; }
+    public long CreateTimestamp { get; private set; } = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
 
-    public long BaseTimestamp { get; set; }
+    public long BaseTimestamp { get; set; } = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
 
     public long MaxTimestamp { get; set; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ProducerBatch"/> class with the specified <see cref="TopicPartition"/> and <see cref="BufferWriter"/>.
-    /// </summary>
-    /// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
-    /// <param name="buffer">The <see cref="BufferWriter"/> used for writing the batch data.</param>
-    /// <param name="loggerFactory"></param>
-    public ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory)
-    {
-        _buffer = buffer;
-        _logger = loggerFactory.CreateLogger<ProducerBatch>();
-        _lastOffset = -1;
-        TopicPartition = topicPartition;
-        _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        BaseTimestamp = Timestamp.DateTimeToUnixTimestampMs(Timestamp.UnixTimeEpoch);
-        CreateTimestamp = Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow);
-    }
 
     internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestamp)
         : this(topicPartition, buffer, loggerFactory)
@@ -237,7 +226,7 @@ internal class ProducerBatch
             this
         };
 
-        return new Records(0, new List<IRecordsBatch>());
+        return new Records(0, []);
         //return new Records(Length, list);
     }
 

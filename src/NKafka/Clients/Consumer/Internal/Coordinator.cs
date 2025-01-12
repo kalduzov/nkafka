@@ -301,6 +301,7 @@ internal class Coordinator: ICoordinator
     private static ConsumerProtocolAssignment GetConsumerProtocolAssignment(SyncGroupResponseMessage response)
     {
         var bufferReader = new BufferReader(response.Assignment);
+
         try
         {
             var version = bufferReader.ReadShort();
@@ -494,12 +495,14 @@ internal class Coordinator: ICoordinator
                 writer.WriteShort((short)ApiVersion.Version3);
                 assignment.Write(ref writer, ApiVersion.Version3);
 
-                request.Assignments.Add(new SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage
+                var ass = new SyncGroupRequestMessage.SyncGroupRequestAssignmentMessage
                 {
                     MemberId = result.Key,
-                    Assignment = arrayBuffer.ToArrayAndReset()
+                    Assignment = arrayBuffer.DangerousGetFirstBuffer()
 
-                });
+                };
+
+                request.Assignments.Add(ass);
             }
             finally
             {

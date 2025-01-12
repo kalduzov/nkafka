@@ -36,18 +36,6 @@ NKafka.Clients.Consumer.IConsumerEventListener
 NKafka.Clients.Consumer.IConsumerEventListener.OffsetsCommittedEventHandler() -> System.Threading.Tasks.Task!
 NKafka.Clients.Consumer.IConsumerEventListener.PartitionsAssignedEventHandler() -> System.Threading.Tasks.Task!
 NKafka.Clients.Consumer.IConsumerEventListener.PartitionsRevokedEventHandler() -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.DeliveryResult(NKafka.Message<TKey, TValue>! message, NKafka.Clients.Producer.PersistenceStatus persisted, NKafka.Clients.Producer.TopicPartitionOffset! topicPartitionOffset) -> void
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Key.get -> TKey
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Message.get -> NKafka.Message<TKey, TValue>!
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Offset.get -> NKafka.Offset
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Partition.get -> NKafka.Partition
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Status.get -> NKafka.Clients.Producer.PersistenceStatus
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Timestamp.get -> NKafka.Timestamp
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.Topic.get -> string!
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartition.get -> NKafka.TopicPartition!
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.get -> NKafka.Clients.Producer.TopicPartitionOffset!
-NKafka.Clients.Producer.DeliveryResult<TKey, TValue>.TopicPartitionOffset.set -> void
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition<TKey, TValue>(string! topic, TKey key, byte[]! keyBytes, TValue value, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer
@@ -206,6 +194,7 @@ NKafka.PartitionMetadata.PartitionMetadata() -> void
 NKafka.PartitionMetadata.PartitionMetadata(NKafka.Partition partition, int leader, int leaderEpoch, System.Collections.Generic.IReadOnlyCollection<int>! replicas, System.Collections.Generic.IReadOnlyCollection<int>! isr, System.Collections.Generic.IReadOnlyCollection<int>! offlineReplicas) -> void
 NKafka.PartitionMetadata.Replicas.get -> System.Collections.Generic.IReadOnlyCollection<int>!
 NKafka.ProducerExtensions
+NKafka.Protocol.ApiVersion
 NKafka.Protocol.TaggedField
 NKafka.Protocol.TaggedField.Data.get -> byte[]!
 NKafka.Protocol.TaggedField.Data.init -> void

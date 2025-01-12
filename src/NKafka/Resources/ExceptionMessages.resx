@@ -74,4 +74,7 @@
   <data name="LoggingScopeExtensions_ComponentCannotBeNull" xml:space="preserve">
     <value>Component cannot be null or empty.</value>
   </data>
+  <data name="StreamMustBeWritable" xml:space="preserve">
+    <value>Stream must be writable</value>
+  </data>
 </root>

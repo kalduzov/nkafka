@@ -77,45 +77,14 @@ internal static class VarIntExtensions
     /// </summary>
     internal static void WriteVarInt64(this ref BufferWriter buffer, long value)
     {
-        switch (value)
+        var v = value << 1 ^ value >> 63;
+
+        while ((v & unchecked((long)0xffffffffffffff80L)) != 0L)
         {
-            case >= 0 and <= VarIntCodes.MAX_SINGLE_VALUE:
-                buffer.WriteUnmanaged((sbyte)value);
-
-                break;
-            case >= 0 and <= short.MaxValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
-
-                break;
-            case >= 0 and <= int.MaxValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
-
-                break;
-            case >= 0:
-                buffer.WriteUnmanaged(VarIntCodes.INT64, value);
-
-                break;
-            case >= VarIntCodes.MIN_SINGLE_VALUE:
-                buffer.WriteUnmanaged((sbyte)value);
-
-                break;
-            case >= sbyte.MinValue:
-                buffer.WriteUnmanaged(VarIntCodes.SBYTE, (sbyte)value);
-
-                break;
-            case >= short.MinValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
-
-                break;
-            case >= int.MinValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
-
-                break;
-            default:
-                buffer.WriteUnmanaged(VarIntCodes.INT64, value);
-
-                break;
+            buffer.WriteByte((byte)((int)v & 0x7f | 0x80));
+            v >>= 7;
         }
+        buffer.WriteByte((byte)v);
     }
 
     /// <summary>
@@ -123,38 +92,58 @@ internal static class VarIntExtensions
     /// </summary>
     internal static void WriteVarInt32(this ref BufferWriter buffer, int value)
     {
-        switch (value)
+        WriteVarUInt32(ref buffer, value << 1 ^ value >> 31);
+    }
+
+    private static void WriteVarUInt32(ref BufferWriter buffer, int value)
+    {
+        if ((value & 0xFFFFFFFF << 7) == 0)
         {
-            // same as sbyte.MaxValue
-            case >= 0 and <= VarIntCodes.MAX_SINGLE_VALUE:
-                buffer.WriteUnmanaged((sbyte)value);
-
-                break;
-            case >= 0 and <= short.MaxValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
-
-                break;
-            case >= 0:
-                buffer.WriteUnmanaged(VarIntCodes.INT32, (int)value);
-
-                break;
-            case >= VarIntCodes.MIN_SINGLE_VALUE:
-                buffer.WriteUnmanaged((sbyte)value);
-
-                break;
-            case >= sbyte.MinValue:
-                buffer.WriteUnmanaged(VarIntCodes.SBYTE, (sbyte)value);
-
-                break;
-            case >= short.MinValue:
-                buffer.WriteUnmanaged(VarIntCodes.INT16, (short)value);
-
-                break;
-            default:
-                buffer.WriteUnmanaged(VarIntCodes.INT32, value);
-
-                break;
+            buffer.WriteByte((byte)value);
         }
+        else
+        {
+            buffer.WriteByte((byte)(value & 0xFF | 0x80));
+
+            if ((value & 0xFFFFFFFF << 14) == 0)
+            {
+                buffer.WriteByte((byte)(value >> 7));
+            }
+            else
+            {
+                buffer.WriteByte((byte)((value >> 7) & 0xFF | 0x80));
+
+                if ((value & 0xFFFFFFFF << 21) == 0)
+                {
+                    buffer.WriteByte((byte)(value >> 14));
+                }
+                else
+                {
+                    buffer.WriteByte((byte)((value >> 14) & 0xFF | 0x80));
+
+                    if ((value & 0xFFFFFFFF << 28) == 0)
+                    {
+                        buffer.WriteByte((byte)(value >> 21));
+                    }
+                    else
+                    {
+                        buffer.WriteByte((byte)((value >> 21) & 0xFF | 0x80));
+                        buffer.WriteByte((byte)(value >> 28));
+                    }
+                }
+            }
+        }
+    }
+
+    public static void WriteNullVarInt(this ref BufferWriter buffer)
+    {
+        buffer.WriteVarInt32(-1);
+    }
+
+    public static void WriteBytesWithLength(this ref BufferWriter buffer, byte[] value)
+    {
+        buffer.WriteVarInt32(value.Length);
+        buffer.WriteBytes(value);
     }
 
     internal static int SizeOfVarInt(this int value)

@@ -70,13 +70,13 @@ var clusterConfig = new ClusterConfig
     //MessageMaxBytes = 20,
 };
 
-// using var tracerProvider = Sdk.CreateTracerProviderBuilder()
-//     .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
-//     .AddSource("NKafka.Internal")
-//     .AddSource("NKafka")
-//     .AddOtlpExporter()
-//     //.AddConsoleExporter()
-//     .Build();
+using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
+    .AddSource("NKafka.Internal")
+    .AddSource("NKafka")
+    .AddOtlpExporter()
+    .AddConsoleExporter()
+    .Build();
 
 Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
@@ -85,12 +85,11 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Verbose()
     .CreateLogger();
 
-var loggerFactory = LoggerFactory.Create(
-    builder =>
-    {
-        builder.AddSerilog();
-        builder.SetMinimumLevel(LogLevel.Trace);
-    });
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddSerilog();
+    builder.SetMinimumLevel(LogLevel.Trace);
+});
 
 var logger = loggerFactory.CreateLogger<Program>();
 

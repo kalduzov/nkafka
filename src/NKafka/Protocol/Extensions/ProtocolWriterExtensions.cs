@@ -21,6 +21,7 @@
  * limitations under the License.
  */
 
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 using static System.Buffers.Binary.BinaryPrimitives;
@@ -34,6 +35,7 @@ internal static class ProtocolWriterExtensions
         writer.Write(value.ToBigEndian());
     }
 
+    [SkipLocalsInit]
     internal static ReadOnlySpan<byte> ToBigEndian(this int value)
     {
         Span<byte> destination = stackalloc byte[sizeof(int)];

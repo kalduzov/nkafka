@@ -31,7 +31,7 @@ public sealed record TopicPartition: IComparable<TopicPartition>
     /// <summary>
     /// 
     /// </summary>
-    public static readonly TopicPartition Null = new(string.Empty, Partition.Any);
+    public static readonly TopicPartition Null = new("__NULL__", Partition.Any);
 
     private readonly int _hash;
 

@@ -150,7 +150,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 if (buffer is null)
                 {
                     // We calculate what buffer size we need and try to get it 
-                    var size = Math.Max(_batchSize, RecordsBatch.EstimateSizeInBytesUpperBound(key, value, headers));
+                    var size = Math.Max(_batchSize, RecordBatch.EstimateSizeInBytesUpperBound(key, value, headers));
                     buffer = ArrayBufferPool.Rent(size);
                 }
 

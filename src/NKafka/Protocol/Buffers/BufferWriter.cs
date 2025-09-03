@@ -19,15 +19,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.Unicode;
 
 using NKafka.Exceptions;
-
-using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Protocol.Buffers;
 
@@ -132,97 +127,6 @@ internal ref partial struct BufferWriter
         WrittenCount = 0;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="value"></param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteString(string value)
-    {
-        if (value.Length == 0)
-        {
-            WriteZeroBytes<short>();
-        }
-
-        var source = value.AsSpan();
-
-        var maxByteCount = Encoding.UTF8.GetByteCount(source);
-        ref var destPointer = ref GetSpanReference(maxByteCount + 2); // header
-        var dest = MemoryMarshal.CreateSpan(ref Unsafe.Add(ref destPointer, 2), maxByteCount);
-
-        var status = Utf8.FromUtf16(source, dest, out _, out var bytesWritten, replaceInvalidSequences: false);
-
-        if (status != OperationStatus.Done)
-        {
-            throw new SerializeDataException("Cannot advance past the end of the buffer.");
-        }
-        var lenValue = ReverseEndianness((short)bytesWritten);
-        Unsafe.WriteUnaligned(ref destPointer, lenValue);
-        Advance(bytesWritten + 2);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteZeroBytes<T>()
-        where T : struct
-    {
-        var size = Unsafe.SizeOf<T>();
-        T zero = default;
-        ref var destPointer = ref GetSpanReference(size);
-        Unsafe.WriteUnaligned(ref destPointer, zero);
-        Advance(size);
-    }
-
-    /// <summary>
-    /// Write double value type to buffer 
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteDouble(double value)
-    {
-        const int size = sizeof(double);
-        ref var destPointer = ref GetSpanReference(size);
-
-        var val = BitConverter.DoubleToInt64Bits(value);
-
-        if (BitConverter.IsLittleEndian)
-        {
-            val = ReverseEndianness(val);
-        }
-
-        Unsafe.WriteUnaligned(ref destPointer, val);
-        Advance(size);
-    }
-
-    /// <summary>
-    /// Write float value type to buffer 
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteFloat(float value)
-    {
-        const int size = sizeof(double);
-        ref var destPointer = ref GetSpanReference(size);
-        var val = BitConverter.SingleToUInt32Bits(value);
-
-        if (BitConverter.IsLittleEndian)
-        {
-            val = ReverseEndianness(val);
-        }
-
-        Unsafe.WriteUnaligned(ref destPointer, val);
-        Advance(size);
-    }
-
-    public void WriteNullVarInt()
-    {
-    }
-
-    public void WriteBytesWithLength(byte[] value)
-    {
-    }
-
     public void WriteBytes(byte[] bytes)
     {
         ref var dest = ref GetSpanReference(bytes.Length);
@@ -235,12 +139,17 @@ internal ref partial struct BufferWriter
 
     public void WriteGuid(Guid value)
     {
-
+        var bytes = value.ToByteArray();
+        WriteBytes(bytes);
     }
 
-    public void WriteRecords(Records.Records? unalignedRecords)
+    public void WriteRecords(Records.Records? records)
     {
-
+        if (records is null)
+        {
+            return;
+        }
+        WriteBytes(records.Buffer.ToArrayAndReset());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

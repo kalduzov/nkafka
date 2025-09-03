@@ -21,6 +21,7 @@
  * limitations under the License.
  */
 
+using System.Collections;
 using System.Diagnostics;
 
 using NKafka.Protocol.Buffers;
@@ -28,15 +29,16 @@ using NKafka.Protocol.Buffers;
 namespace NKafka.Protocol.Records;
 
 /// <summary>
-/// 
 /// https://kafka.apache.org/documentation/#record
 /// </summary>
 internal sealed class Records
 {
+    public ArrayBuffer Buffer { get; }
+
     /// <summary>
     /// 
     /// </summary>
-    public IReadOnlyCollection<IRecordsBatch> Batches { get; private set; } = [];
+    public IEnumerable<RecordBatch> Batches { get; private set; } = [];
 
     /// <summary>
     /// The size of these records in bytes.
@@ -46,59 +48,46 @@ internal sealed class Records
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="reader"></param>
-    /// <param name="length"></param>
-    public Records(ref BufferReader reader, int length)
+    public Records(ArrayBuffer buffer)
     {
-        Read(ref reader, length);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="sizeInBytes"></param>
-    /// <param name="batches"></param>
-    public Records(int sizeInBytes, IReadOnlyCollection<IRecordsBatch> batches)
-    {
-        Batches = batches;
-        SizeInBytes = sizeInBytes;
+        Buffer = buffer;
     }
 
     private void Read(ref BufferReader reader, int length)
     {
-        var startOffset = reader.CurrentOffset;
-        var endOffset = startOffset + length;
-
-        // исходно мы не знаем количество батчей, т.к. они формируются динамически - задать нормальное capacity невозможно
-        var allBathes = new List<IRecordsBatch>(32);
-
-        while (reader.CurrentOffset < endOffset)
-        {
-            try
-            {
-                var batch = new RecordsBatch(ref reader);
-                allBathes.Add(batch);
-
-                if (reader.Remaining >= batch.SizeInBytes)
-                {
-                    continue;
-                }
-
-                // Оставшиеся байты из буфера не позволяют считать
-                // корректный батч записей - их мы просто пропускаем
-                var last = endOffset - reader.CurrentOffset;
-                reader.Advance(last);
-
-                break;
-            }
-            catch (Exception exc)
-            {
-                Debug.Write(exc);
-
-                break;
-            }
-        }
-
-        Batches = allBathes;
+        // var startOffset = reader.CurrentOffset;
+        // var endOffset = startOffset + length;
+        //
+        // // исходно мы не знаем количество батчей, т.к. они формируются динамически - задать нормальное capacity невозможно
+        // var allBathes = new List<IRecordsBatch>(32);
+        //
+        // while (reader.CurrentOffset < endOffset)
+        // {
+        //     try
+        //     {
+        //         var batch = new RecordBatch(ref reader);
+        //         allBathes.Add(batch);
+        //
+        //         if (reader.Remaining >= batch.SizeInBytes)
+        //         {
+        //             continue;
+        //         }
+        //
+        //         // Оставшиеся байты из буфера не позволяют считать
+        //         // корректный батч записей - их мы просто пропускаем
+        //         var last = endOffset - reader.CurrentOffset;
+        //         reader.Advance(last);
+        //
+        //         break;
+        //     }
+        //     catch (Exception exc)
+        //     {
+        //         Debug.Write(exc);
+        //
+        //         break;
+        //     }
+        // }
+        //
+        // Batches = allBathes;
     }
 }

@@ -34,6 +34,6 @@ internal sealed class NullSerializer: ISerializer<Null>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public byte[] Serialize(Null data)
     {
-        return null!;
+        return [];
     }
 }

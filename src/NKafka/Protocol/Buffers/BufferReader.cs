@@ -253,8 +253,16 @@ internal ref partial struct BufferReader
     /// <param name="length">Длинна блока данных с записями</param>
     public Records.Records? ReadRecords(int length)
     {
-        return length == 0 ? null : new Records.Records(ref this, length);
+        if (length == 0)
+        {
+            return null;
+        }
 
+        ref var src = ref GetSpanReference(length);
+        var arrayBuffer = new ArrayBuffer(false, false, length);
+        var bw = new BufferWriter(ref arrayBuffer);
+
+        return new Records.Records(arrayBuffer);
     }
 
     /// <summary>

@@ -144,15 +144,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
         var offset = Interlocked.Increment(ref _lastOffset);
 
-        var record = new Record
-        {
-            // Headers = headers,
-            // Value = value,
-            // Key = key,
-            // OffsetDelta = offset,
-            // TimestampDelta = timestamp
-        };
-        // _baseTimestamp = timestamp;
+        var record = new Record(headers, key, value, timestamp, offset);
+        //_baseTimestamp = timestamp;
         // _maxTimestamp = Math.Max(_baseTimestamp, timestamp);
 
         _records.Add(record);
@@ -226,7 +219,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
             this
         };
 
-        return new Records(0, []);
+        return new Records(_buffer);
         //return new Records(Length, list);
     }
 

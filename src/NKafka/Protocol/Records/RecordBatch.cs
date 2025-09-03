@@ -26,7 +26,7 @@ namespace NKafka.Protocol.Records;
 /// <summary>
 /// 
 /// </summary>
-internal class RecordsBatch: IRecordsBatch
+internal class RecordBatch: IRecordsBatch
 {
     /// <summary>
     /// Batch header length
@@ -92,7 +92,7 @@ internal class RecordsBatch: IRecordsBatch
     /// <inheritdoc />
     public IReadOnlyCollection<Record> Records { get; private set; } = [];
 
-    private RecordsBatch()
+    private RecordBatch()
     {
         Length = RECORD_BATCH_OVERHEAD;
         ProducerEpoch = _NO_PRODUCER_EPOCH;
@@ -103,7 +103,7 @@ internal class RecordsBatch: IRecordsBatch
     /// <summary>
     /// 
     /// </summary>
-    protected RecordsBatch(ArrayBuffer bufferWriter)
+    protected RecordBatch(ArrayBuffer bufferWriter)
         : this()
     {
         Buffer = bufferWriter;
@@ -114,7 +114,7 @@ internal class RecordsBatch: IRecordsBatch
     /// 
     /// </summary>
     /// <param name="reader"></param>
-    public RecordsBatch(ref BufferReader reader)
+    public RecordBatch(ref BufferReader reader)
         : this()
     {
         Read(ref reader);

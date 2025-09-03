@@ -30,7 +30,7 @@ namespace NKafka.Protocol.Records;
 /// Record type implementation
 /// https://kafka.apache.org/documentation/#record
 /// </summary>
-internal class Record
+internal sealed class Record
 {
     /// <summary>
     /// Full record length
@@ -74,16 +74,19 @@ internal class Record
     internal bool IsValid { get; private set; } = true;
 
     /// <summary>
-    /// Запись считана лишь частично
-    /// </summary>
-    internal bool IsPartial { get; private set; } = true;
-
-    /// <summary>
     /// 
     /// </summary>
-    public Record()
+    public Record(Headers headers,
+        byte[]? key,
+        byte[]? value,
+        long timestampDelta = 0,
+        long offsetDelta = 0)
     {
-
+        Headers = headers;
+        Key = key;
+        Value = value;
+        TimestampDelta = timestampDelta;
+        OffsetDelta = offsetDelta;
     }
 
     /// <summary>
@@ -182,8 +185,8 @@ internal class Record
         var sizeInBytes = RecordExtensions.SizeOfBodyInBytes((int)OffsetDelta, TimestampDelta, Key, Value, Headers);
         bufferWriter.WriteVarInt32(sizeInBytes);
         bufferWriter.WriteByte(attributes);
-        // bufferWriter.WriteVarLong(TimestampDelta);
-        // bufferWriter.WriteVarLong(OffsetDelta);
+        bufferWriter.WriteVarInt64(TimestampDelta);
+        bufferWriter.WriteVarInt64(OffsetDelta);
 
         if (Key is null)
         {

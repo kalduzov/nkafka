@@ -27,39 +27,6 @@ namespace NKafka.Tests.Protocol.Buffers;
 public class BufferWriterReaderTests
 {
     [Fact]
-    public void WriteStringTests()
-    {
-        var arrayBuffer = new ArrayBuffer(true, false, 7);
-        var bw = new BufferWriter(ref arrayBuffer);
-        bw.WriteString("range");
-        bw.Flush();
-
-        arrayBuffer.DangerousGetFirstBuffer()
-            .SequenceEqual(new byte[]
-            {
-                0x00,
-                0x05,
-                0x72,
-                0x61,
-                0x6e,
-                0x67,
-                0x65
-            })
-            .Should()
-            .BeTrue();
-    }
-
-    [Fact]
-    public void WriteZeroByteTest()
-    {
-        var arrayBuffer = new ArrayBuffer(true, false, 1);
-        var bw = new BufferWriter(ref arrayBuffer);
-        bw.WriteZeroBytes<byte>();
-        bw.Flush();
-        arrayBuffer.DangerousGetFirstBuffer()[0].Should().Be(0);
-    }
-
-    [Fact]
     public void WriteByteTest()
     {
         var arrayBuffer = new ArrayBuffer(true, false, sizeof(byte));

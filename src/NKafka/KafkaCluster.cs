@@ -69,6 +69,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     private int _maxPartitionsByTopic = 1;
     private readonly ConcurrentDictionary<Guid, string> _topicsById;
 
+    private readonly SemaphoreSlim _syncMetadataRequest = new(1, 1);
+    private readonly ConcurrentDictionary<string, TaskCompletionSource> _inflightTopics = new();
+
     /// <summary>
     ///     Create a new kafka cluster
     /// </summary>
@@ -142,24 +145,44 @@ internal sealed class KafkaCluster: IKafkaCluster
     {
         ThrowExceptionIfClusterClosed();
 
-        if (_topicPartitions.TryGetValue(topic, out var partitions) && partitions.Count != 0)
+        TaskCompletionSource? tcs = null;
+
+        try
         {
-            return partitions;
+            if (_topicPartitions.TryGetValue(topic, out var partitions) && partitions.Count != 0)
+            {
+                return partitions;
+            }
+
+            if (_inflightTopics.TryGetValue(topic, out var tcsOld))
+            {
+                await tcsOld.Task;
+            }
+            else
+            {
+                tcs = new TaskCompletionSource();
+                _inflightTopics.TryAdd(topic, tcs);
+
+                string[] topics =
+                [
+                    topic
+                ];
+
+                await InternalRefreshMetadataAsync(topics, false, token);
+            }
+
+            if (_topicPartitions.TryGetValue(topic, out partitions) && partitions.Count != 0)
+            {
+                return partitions;
+            }
+
+            return [];
         }
-
-        await InternalRefreshMetadataAsync(
-            [
-                topic
-            ],
-            false,
-            token);
-
-        if (_topicPartitions.TryGetValue(topic, out partitions) && partitions.Count != 0)
+        finally
         {
-            return partitions;
+            _inflightTopics.TryRemove(topic, out _);
+            tcs?.SetResult();
         }
-
-        return [];
     }
 
     /// <inheritdoc />
@@ -396,6 +419,8 @@ internal sealed class KafkaCluster: IKafkaCluster
         bool skipException,
         CancellationToken token)
     {
+        await _syncMetadataRequest.WaitAsync(token);
+
         var localTopics = topics?.ToArray();
         using var activity = KafkaDiagnosticsSource.RefreshMetadata(localTopics);
 
@@ -408,7 +433,7 @@ internal sealed class KafkaCluster: IKafkaCluster
 
             token.ThrowIfCancellationRequested();
 
-            var kafkaConnector = GetConnectorForServiceRequests(); //Обновляем метаданные из брокера, который является контроллером
+            var kafkaConnector = GetConnectorForServiceRequests();
             await kafkaConnector.OpenAsync(token);
             var request = MetadataRequestMessage.Build(Config.AllowAutoTopicCreation, localTopics);
             var response = await kafkaConnector.SendAsync<MetadataRequestMessage, MetadataResponseMessage>(request, true, token);
@@ -419,6 +444,10 @@ internal sealed class KafkaCluster: IKafkaCluster
             activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
 
             throw;
+        }
+        finally
+        {
+            _syncMetadataRequest.Release();
         }
     }
 

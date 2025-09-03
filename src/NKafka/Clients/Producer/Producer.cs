@@ -151,24 +151,23 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         var m = message;
 
         _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
-            .ContinueWith(
-                task =>
+            .ContinueWith(task =>
+            {
+                if (task.IsCompletedSuccessfully)
                 {
-                    if (task.IsCompletedSuccessfully)
-                    {
-                        Debug.WriteLine($"The message {m} was sent successfully");
+                    Debug.WriteLine($"The message {m} was sent successfully");
 
-                        return;
-                    }
+                    return;
+                }
 
-                    if (!task.IsFaulted)
-                    {
-                        return;
-                    }
+                if (!task.IsFaulted)
+                {
+                    return;
+                }
 
-                    _logger.ProduceMessageError(task.Exception!, tp);
+                _logger.ProduceMessageError(task.Exception!, tp);
 
-                });
+            });
     }
 
     /// <inheritdoc/>
@@ -315,7 +314,12 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            _ = await KafkaCluster.GetPartitions(actualTopicPartition.Topic, token);
+            var partitions = await KafkaCluster.GetPartitions(actualTopicPartition.Topic, token);
+
+            if (partitions.Count == 0)
+            {
+                throw new ProducerException($"No partitions found in cluster for topic {actualTopicPartition.Topic}");
+            }
 
             var headers = message.Headers;
             var serializedKey = Serialize(_keySerializer, message.Key);
@@ -324,7 +328,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             serializedKeySize = serializedKey.Length;
             serializedValueSize = serializedValue.Length;
 
-            var serializedSize = RecordsBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
+            var serializedSize = RecordBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
             EnsureValidRecordSize(serializedSize);
 
             // Trying to get a partition if it is not set  

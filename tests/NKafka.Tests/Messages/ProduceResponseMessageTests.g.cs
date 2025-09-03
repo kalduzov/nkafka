@@ -1,4 +1,4 @@
-﻿//64-DF-D3-82-2D-9F-75-73-C7-D4-70-A0-D1-61-03-60-30-F6-D4-8F-64-07-76-80-99-9A-F0-45-30-7C-E6-C7
+﻿//87-7E-3C-88-19-B8-6A-77-0E-8E-13-AD-7B-B8-BD-D6-AF-C7-5B-7C-5F-0B-E5-C8-25-C3-76-EB-D6-8A-FD-C7
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,38 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ProduceResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new ProduceResponseMessage
-        {
-            Responses = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new ProduceResponseMessage
-        {
-            Responses = new (),
-            ThrottleTimeMs = -420004200,
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version2")]
-    public void SerializeAndDeserializeMessage_ApiVersion2_Success()
-    {
-        var message = new ProduceResponseMessage
-        {
-            Responses = new (),
-            ThrottleTimeMs = -420004200,
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -170,5 +138,17 @@ public sealed partial class ProduceResponseMessageTests
             NodeEndpoints = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version12")]
+    public void SerializeAndDeserializeMessage_ApiVersion12_Success()
+    {
+        var message = new ProduceResponseMessage
+        {
+            Responses = new (),
+            ThrottleTimeMs = -420004200,
+            NodeEndpoints = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
     }
 }

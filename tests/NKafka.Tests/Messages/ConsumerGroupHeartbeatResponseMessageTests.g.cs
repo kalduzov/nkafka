@@ -1,4 +1,4 @@
-﻿//3C-00-3C-0E-2E-96-4C-48-8F-7C-89-81-BF-DA-A3-F9-89-81-BD-41-D0-D3-CD-BE-D2-48-FA-4D-CC-17-B8-07
+﻿//40-97-F7-1C-C1-48-EC-39-15-92-16-23-C5-BA-FD-8A-9B-18-1C-04-1A-3B-92-37-C4-D2-BB-DD-44-D2-A2-A3
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -53,5 +53,21 @@ public sealed partial class ConsumerGroupHeartbeatResponseMessageTests
             Assignment = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ConsumerGroupHeartbeatResponseMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new ConsumerGroupHeartbeatResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            ErrorMessage = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberEpoch = -420004200,
+            HeartbeatIntervalMs = -420004200,
+            Assignment = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

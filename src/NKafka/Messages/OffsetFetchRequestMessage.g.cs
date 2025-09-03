@@ -1,4 +1,4 @@
-﻿//81-56-E2-74-84-E4-21-EA-EE-83-03-5C-93-B4-F3-E0-FA-9E-67-48-9E-6E-AF-BD-56-40-55-C5-65-85-8D-BD
+﻿//B7-DA-12-B2-27-7E-29-E4-95-5E-18-03-99-60-FE-17-E3-73-78-69-27-A8-E8-30-2F-36-1F-A4-3B-2B-77-CD
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -72,7 +72,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
     public List<OffsetFetchRequestTopicMessage> Topics { get; set; } = new ();
 
     /// <summary>
-    /// Each group we would like to fetch offsets for
+    /// Each group we would like to fetch offsets for.
     /// </summary>
     public List<OffsetFetchRequestGroupMessage> Groups { get; set; } = new ();
 
@@ -463,6 +463,10 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
+            if (version < ApiVersion.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestTopicMessage");
+            }
             {
                 int length;
                 if (version >= ApiVersion.Version6)
@@ -655,7 +659,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         public string GroupId { get; set; } = string.Empty;
 
         /// <summary>
-        /// The member ID assigned by the group coordinator if using the new consumer protocol (KIP-848).
+        /// The member id.
         /// </summary>
         public string? MemberId { get; set; } = null;
 

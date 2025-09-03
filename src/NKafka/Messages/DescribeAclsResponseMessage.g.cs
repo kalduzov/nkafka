@@ -1,4 +1,4 @@
-﻿//01-DC-51-1D-B8-B1-80-BC-9E-16-D0-64-77-89-45-21-79-6B-5B-99-38-6F-CF-4B-9D-B0-E6-5C-E3-F1-60-87
+﻿//C9-C4-98-EA-93-B0-C0-C0-F2-09-81-20-81-E9-F3-3D-83-F2-E6-D9-FC-51-CA-71-34-60-AF-A6-35-09-91-B0
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -358,7 +358,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeAclsResourceMessage");
             }
@@ -386,14 +386,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                     ResourceName = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersion.Version1)
-            {
-                PatternType = reader.ReadSByte();
-            }
-            else
-            {
-                PatternType = 3;
-            }
+            PatternType = reader.ReadSByte();
             {
                 if (version >= ApiVersion.Version2)
                 {
@@ -467,17 +460,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteSByte(PatternType);
-            }
-            else
-            {
-                if (PatternType != 3)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default PatternType at version {version}");
-                }
-            }
+            writer.WriteSByte(PatternType);
             if (version >= ApiVersion.Version2)
             {
                 writer.WriteVarInt32(Acls.Count + 1);
@@ -633,7 +616,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AclDescriptionMessage");
             }

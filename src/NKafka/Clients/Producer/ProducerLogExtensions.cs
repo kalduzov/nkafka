@@ -46,7 +46,7 @@ internal static partial class ProducerLogExtensions
     [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 2,
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Produce new message to topic {TopicPartition}")]
-    public static partial void ProduceMessageTrace(this ILogger logger, TopicPartition topicPartition);
+    public static partial void ProduceMessage(this ILogger logger, TopicPartition topicPartition);
 
     [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 3,
         Level = LogLevel.Error,

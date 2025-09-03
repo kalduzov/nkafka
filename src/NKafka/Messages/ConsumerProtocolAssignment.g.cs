@@ -1,4 +1,4 @@
-﻿//F8-35-3A-94-82-49-30-0E-42-00-E8-F7-8B-3E-42-0B-FE-0D-D9-DA-B8-63-1C-BB-34-25-4F-0F-D7-A6-8B-E8
+﻿//87-31-F5-04-96-ED-01-6A-8E-6A-58-54-EF-FB-F1-0D-A4-34-A6-15-2B-5C-A5-F6-4C-9F-AE-AD-97-6D-1F-FF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -51,12 +51,12 @@ internal sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<C
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// 
+    /// The list of topics and partitions assigned to this consumer.
     /// </summary>
     public TopicPartitionCollection AssignedPartitions { get; set; } = new ();
 
     /// <summary>
-    /// 
+    /// User data.
     /// </summary>
     public byte[]? UserData { get; set; } = null;
 
@@ -201,12 +201,12 @@ internal sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<C
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The topic name.
         /// </summary>
         public string Topic { get; set; } = string.Empty;
 
         /// <summary>
-        /// 
+        /// The list of partitions assigned to this consumer.
         /// </summary>
         public List<int> Partitions { get; set; } = new ();
 

@@ -33,16 +33,12 @@ internal class DefaultPartitioner: IPartitioner
     private readonly Random _random = new();
 
     /// <inheritdoc/> 
-    public ValueTask<int> Partition<TKey, TValue>(
+    public ValueTask<int> Partition(
         string topic,
-        TKey key,
         byte[] keyBytes,
-        TValue value,
         byte[] valueBytes,
         IKafkaCluster cluster,
         CancellationToken token)
-        where TKey : notnull
-        where TValue : notnull
     {
         var availablePartitions = cluster.GetAvailablePartitions(topic);
 

@@ -39,7 +39,7 @@ public sealed class CreateProducerTests: ClientTests
 
         await cluster.Open(CancellationToken.None);
 
-        await using var producer = cluster.BuildProducer<int, string>();
+        await using var producer = cluster.BuildProducer();
         producer.Should().NotBeNull();
     }
 
@@ -48,11 +48,9 @@ public sealed class CreateProducerTests: ClientTests
     {
         var kafkaCluster = CreateKafkaClusterForTests();
 
-        var action = () => new Producer<int, string>(kafkaCluster,
+        var action = () => new NKafka.Clients.Producer.Producer(kafkaCluster,
             "test_producer",
             new ProducerConfig(),
-            NoneSerializer<int>.Instance,
-            NoneSerializer<string>.Instance,
             NullLoggerFactory.Instance);
 
         action.Should().NotThrow();
@@ -67,11 +65,9 @@ public sealed class CreateProducerTests: ClientTests
         var recordAccumulatorMock = Substitute.For<IRecordAccumulator>();
         var messageSenderMock = Substitute.For<IMessagesSender>();
 
-        var action = () => new Producer<int, string>(kafkaCluster,
+        var action = () => new NKafka.Clients.Producer.Producer(kafkaCluster,
             "test_producer",
             new ProducerConfig(),
-            NoneSerializer<int>.Instance,
-            NoneSerializer<string>.Instance,
             transactionManagerMock,
             recordAccumulatorMock,
             messageSenderMock,
@@ -90,7 +86,7 @@ public sealed class CreateProducerTests: ClientTests
         var recordAccumulatorMock = Substitute.For<IRecordAccumulator>();
         var messageSenderMock = Substitute.For<IMessagesSender>();
 
-        var action = () => new Producer<int, string>(kafkaCluster,
+        var action = () => new NKafka.Clients.Producer.Producer(kafkaCluster,
             "test_producer",
             new ProducerConfig
             {
@@ -99,8 +95,6 @@ public sealed class CreateProducerTests: ClientTests
                     Partitioner = (Partitioner)4
                 }
             },
-            NoneSerializer<int>.Instance,
-            NoneSerializer<string>.Instance,
             transactionManagerMock,
             recordAccumulatorMock,
             messageSenderMock,

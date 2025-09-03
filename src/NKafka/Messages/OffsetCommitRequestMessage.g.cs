@@ -1,4 +1,4 @@
-﻿//6B-08-76-B8-4C-C5-E3-49-D4-F2-96-9B-D7-77-0D-97-DE-5E-79-E1-95-7D-35-59-73-BA-34-79-06-B1-31-5A
+﻿//EC-73-65-0D-0A-48-57-92-32-89-D3-8F-A1-59-3B-71-03-BF-55-75-F0-62-4E-68-3B-90-B5-B8-5B-E8-9F-52
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -134,15 +134,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
                 GroupId = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            GenerationIdOrMemberEpoch = reader.ReadInt();
-        }
-        else
-        {
-            GenerationIdOrMemberEpoch = -1;
-        }
-        if (version >= ApiVersion.Version1)
+        GenerationIdOrMemberEpoch = reader.ReadInt();
         {
             int length;
             if (version >= ApiVersion.Version8)
@@ -165,10 +157,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             {
                 MemberId = reader.ReadString(length);
             }
-        }
-        else
-        {
-            MemberId = string.Empty;
         }
         if (version >= ApiVersion.Version7)
         {
@@ -198,7 +186,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
         {
             GroupInstanceId = null;
         }
-        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version4)
+        if (version <= ApiVersion.Version4)
         {
             RetentionTimeMs = reader.ReadLong();
         }
@@ -278,24 +266,18 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersion.Version1)
+        writer.WriteInt(GenerationIdOrMemberEpoch);
         {
-            writer.WriteInt(GenerationIdOrMemberEpoch);
-        }
-        if (version >= ApiVersion.Version1)
-        {
+            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
+            if (version >= ApiVersion.Version8)
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                if (version >= ApiVersion.Version8)
-                {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
-                }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+                writer.WriteVarInt32(stringBytes.Length + 1);
             }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
         }
         if (version >= ApiVersion.Version7)
         {
@@ -331,7 +313,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
                 throw new UnsupportedVersionException($"Attempted to write a non-default GroupInstanceId at version {version}");
             }
         }
-        if (version >= ApiVersion.Version2 && version <= ApiVersion.Version4)
+        if (version <= ApiVersion.Version4)
         {
             writer.WriteLong(RetentionTimeMs);
         }
@@ -509,7 +491,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestTopicMessage");
             }
@@ -729,11 +711,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
         public int CommittedLeaderEpoch { get; set; } = -1;
 
         /// <summary>
-        /// The timestamp of the commit.
-        /// </summary>
-        public long CommitTimestamp { get; set; } = -1;
-
-        /// <summary>
         /// Any associated metadata the client wants to keep.
         /// </summary>
         public string CommittedMetadata { get; set; } = string.Empty;
@@ -758,7 +735,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitRequestPartitionMessage");
             }
@@ -771,14 +748,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             else
             {
                 CommittedLeaderEpoch = -1;
-            }
-            if (version >= ApiVersion.Version1 && version <= ApiVersion.Version1)
-            {
-                CommitTimestamp = reader.ReadLong();
-            }
-            else
-            {
-                CommitTimestamp = -1;
             }
             {
                 int length;
@@ -830,17 +799,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             if (version >= ApiVersion.Version6)
             {
                 writer.WriteInt(CommittedLeaderEpoch);
-            }
-            if (version >= ApiVersion.Version1 && version <= ApiVersion.Version1)
-            {
-                writer.WriteLong(CommitTimestamp);
-            }
-            else
-            {
-                if (CommitTimestamp != -1)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default CommitTimestamp at version {version}");
-                }
             }
             if (CommittedMetadata is null)
             {
@@ -907,10 +865,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             {
                 return false;
             }
-            if (CommitTimestamp != other.CommitTimestamp)
-            {
-                return false;
-            }
             if (CommittedMetadata is null)
             {
                 if (other.CommittedMetadata is not null)
@@ -932,7 +886,7 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommitTimestamp, CommittedMetadata);
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CommittedOffset, CommittedLeaderEpoch, CommittedMetadata);
             return hashCode;
         }
 
@@ -943,7 +897,6 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
                 + "PartitionIndex=" + PartitionIndex
                 + ", CommittedOffset=" + CommittedOffset
                 + ", CommittedLeaderEpoch=" + CommittedLeaderEpoch
-                + ", CommitTimestamp=" + CommitTimestamp
                 + ", CommittedMetadata=" + (string.IsNullOrWhiteSpace(CommittedMetadata) ? "null" : CommittedMetadata)
                 + ")";
         }

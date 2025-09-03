@@ -1,4 +1,4 @@
-﻿//AD-73-38-86-14-D0-38-10-53-85-BE-AC-F5-66-39-F7-B9-87-F4-65-D2-75-8D-E5-FA-B2-56-0D-4A-62-E9-EA
+﻿//DB-5B-56-E9-91-C5-64-3A-A4-DF-81-06-10-BD-84-20-9F-EA-81-97-A8-48-9F-BA-14-38-08-22-9E-96-3A-6F
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,17 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ListOffsetsRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new ListOffsetsRequestMessage
-        {
-            ReplicaId = -420004200,
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -143,5 +132,30 @@ public sealed partial class ListOffsetsRequestMessageTests
             Topics = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new ListOffsetsRequestMessage
+        {
+            ReplicaId = -420004200,
+            IsolationLevel = 42,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new ListOffsetsRequestMessage
+        {
+            ReplicaId = -420004200,
+            IsolationLevel = 42,
+            Topics = new (),
+            TimeoutMs = -420004200,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
 }

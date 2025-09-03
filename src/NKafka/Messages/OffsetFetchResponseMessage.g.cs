@@ -1,4 +1,4 @@
-﻿//E3-86-AF-85-3A-CE-DA-C4-59-7E-97-FA-BF-FF-CC-16-B2-61-99-F9-E1-AA-4F-0C-01-ED-37-3B-11-47-5D-44
+﻿//48-2F-D2-09-7E-09-EE-CD-8F-1B-4F-BA-A2-39-95-79-13-F8-CA-2D-40-51-66-5A-B1-E1-2F-90-06-7F-78-24
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -349,7 +349,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The responses per partition
+        /// The responses per partition.
         /// </summary>
         public List<OffsetFetchResponsePartitionMessage> Partitions { get; set; } = new ();
 
@@ -373,6 +373,10 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
+            if (version < ApiVersion.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponseTopicMessage");
+            }
             {
                 int length;
                 if (version >= ApiVersion.Version6)
@@ -625,6 +629,10 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
+            if (version < ApiVersion.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchResponsePartitionMessage");
+            }
             PartitionIndex = reader.ReadInt();
             CommittedOffset = reader.ReadLong();
             if (version >= ApiVersion.Version5)
@@ -1006,7 +1014,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The responses per partition
+        /// The responses per partition.
         /// </summary>
         public List<OffsetFetchResponsePartitionsMessage> Partitions { get; set; } = new ();
 

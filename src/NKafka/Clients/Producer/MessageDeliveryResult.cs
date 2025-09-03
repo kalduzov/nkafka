@@ -32,4 +32,5 @@ public record MessageDeliveryResult(
     long Timestamp,
     Offset Offset,
     int SerializedKeySize,
-    int SerializedValueSize);
+    int SerializedValueSize,
+    Message Message);

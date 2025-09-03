@@ -1,4 +1,4 @@
-﻿//AD-73-38-86-14-D0-38-10-53-85-BE-AC-F5-66-39-F7-B9-87-F4-65-D2-75-8D-E5-FA-B2-56-0D-4A-62-E9-EA
+﻿//DB-5B-56-E9-91-C5-64-3A-A4-DF-81-06-10-BD-84-20-9F-EA-81-97-A8-48-9F-BA-14-38-08-22-9E-96-3A-6F
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -67,7 +67,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
     public int ReplicaId { get; set; } = 0;
 
     /// <summary>
-    /// This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records
+    /// This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records.
     /// </summary>
     public sbyte IsolationLevel { get; set; } = 0;
 
@@ -75,6 +75,11 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
     /// Each topic in the request.
     /// </summary>
     public List<ListOffsetsTopicMessage> Topics { get; set; } = new ();
+
+    /// <summary>
+    /// The timeout to await a response in milliseconds for requests that require reading from remote storage for topics enabled with tiered storage.
+    /// </summary>
+    public int TimeoutMs { get; set; } = 0;
 
     /// <summary>
     /// The basic constructor of the message ListOffsetsRequestMessage
@@ -143,6 +148,14 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 }
             }
         }
+        if (version >= ApiVersion.Version10)
+        {
+            TimeoutMs = reader.ReadInt();
+        }
+        else
+        {
+            TimeoutMs = 0;
+        }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version6)
         {
@@ -192,6 +205,10 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             {
                 element?.Write(ref writer, version);
             }
+        }
+        if (version >= ApiVersion.Version10)
+        {
+            writer.WriteInt(TimeoutMs);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -244,6 +261,10 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 return false;
             }
         }
+        if (TimeoutMs != other.TimeoutMs)
+        {
+            return false;
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -251,7 +272,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ReplicaId, IsolationLevel, Topics);
+        hashCode = HashCode.Combine(hashCode, ReplicaId, IsolationLevel, Topics, TimeoutMs);
         return hashCode;
     }
 
@@ -262,6 +283,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             + "ReplicaId=" + ReplicaId
             + ", IsolationLevel=" + IsolationLevel
             + ", Topics=" + Topics.DeepToString()
+            + ", TimeoutMs=" + TimeoutMs
             + ")";
     }
 
@@ -306,7 +328,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicMessage");
             }
@@ -526,11 +548,6 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         public long Timestamp { get; set; } = 0;
 
         /// <summary>
-        /// The maximum number of offsets to report.
-        /// </summary>
-        public int MaxNumOffsets { get; set; } = 1;
-
-        /// <summary>
         /// The basic constructor of the message ListOffsetsPartitionMessage
         /// </summary>
         public ListOffsetsPartitionMessage()
@@ -550,7 +567,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionMessage");
             }
@@ -564,14 +581,6 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 CurrentLeaderEpoch = -1;
             }
             Timestamp = reader.ReadLong();
-            if (version <= ApiVersion.Version0)
-            {
-                MaxNumOffsets = reader.ReadInt();
-            }
-            else
-            {
-                MaxNumOffsets = 1;
-            }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)
             {
@@ -600,17 +609,6 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 writer.WriteInt(CurrentLeaderEpoch);
             }
             writer.WriteLong(Timestamp);
-            if (version <= ApiVersion.Version0)
-            {
-                writer.WriteInt(MaxNumOffsets);
-            }
-            else
-            {
-                if (MaxNumOffsets != 1)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default MaxNumOffsets at version {version}");
-                }
-            }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version6)
@@ -652,10 +650,6 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             {
                 return false;
             }
-            if (MaxNumOffsets != other.MaxNumOffsets)
-            {
-                return false;
-            }
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
@@ -663,7 +657,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, PartitionIndex, CurrentLeaderEpoch, Timestamp, MaxNumOffsets);
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, CurrentLeaderEpoch, Timestamp);
             return hashCode;
         }
 
@@ -674,7 +668,6 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 + "PartitionIndex=" + PartitionIndex
                 + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
                 + ", Timestamp=" + Timestamp
-                + ", MaxNumOffsets=" + MaxNumOffsets
                 + ")";
         }
     }

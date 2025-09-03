@@ -85,12 +85,11 @@ public partial class ClusterTests
             ClusterInitTimeoutMs = 1 //из-за имитации сетевого вызова - этот код отработает корректно
         };
 
-        var awaiting = FluentActions.Awaiting(
-            () => clusterConfig.CreateClusterInternal(
-                NullLoggerFactory.Instance,
-                true,
-                _connectorPool,
-                CancellationToken.None));
+        var awaiting = FluentActions.Awaiting(() => clusterConfig.CreateClusterInternal(
+            NullLoggerFactory.Instance,
+            true,
+            _connectorPool,
+            CancellationToken.None));
 
         await awaiting.Should().ThrowAsync<ClusterKafkaException>();
     }
@@ -135,7 +134,7 @@ public partial class ClusterTests
             true,
             _connectorPool,
             CancellationToken.None); //no call dispose!
-        var func = FluentActions.Invoking(() => kafkaCluster.BuildProducer<int, string>());
+        var func = FluentActions.Invoking(() => kafkaCluster.BuildProducer());
         func.Should().NotThrow();
     }
 
@@ -155,7 +154,7 @@ public partial class ClusterTests
             true,
             _connectorPool,
             CancellationToken.None);
-        await using var producer = kafkaCluster.BuildProducer<int, string>();
+        await using var producer = kafkaCluster.BuildProducer();
 
         producer.Name.Should().Be("__Producer<Int32,String>");
     }
@@ -176,7 +175,7 @@ public partial class ClusterTests
             true,
             _connectorPool,
             CancellationToken.None);
-        await using var producer = kafkaCluster.BuildProducer<int, string>("test_producer");
+        await using var producer = kafkaCluster.BuildProducer("test_producer");
 
         producer.Name.Should().Be("test_producer");
     }

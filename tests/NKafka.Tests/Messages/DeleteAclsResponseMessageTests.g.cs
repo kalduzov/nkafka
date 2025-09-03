@@ -1,4 +1,4 @@
-﻿//4E-41-93-28-7B-9D-34-97-83-3A-02-48-6A-5E-8C-08-DB-06-79-8E-6F-DD-50-89-98-B0-08-DD-17-53-EB-85
+﻿//F5-52-82-B1-D9-8E-4A-E5-9D-93-B6-DE-02-9C-5B-63-B1-A7-A1-AE-EE-CA-A1-F9-70-68-AD-F2-3C-73-63-84
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,17 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class DeleteAclsResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new DeleteAclsResponseMessage
-        {
-            ThrottleTimeMs = -420004200,
-            FilterResults = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'DeleteAclsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()

@@ -1,4 +1,4 @@
-﻿//BA-69-43-10-99-33-CC-C8-60-A7-0C-15-67-A8-F7-66-75-4F-D4-4E-F0-43-97-A9-B8-27-97-8C-45-F3-95-C2
+﻿//25-41-00-76-5A-5D-44-6E-15-4B-EA-C0-B7-12-A1-0A-F3-89-2C-30-B5-BF-6C-E4-23-8B-ED-79-C8-3E-F0-F5
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -69,7 +69,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
     public int ThrottleTimeMs { get; set; } = 0;
 
     /// <summary>
-    /// Features supported by the broker.
+    /// Features supported by the broker. Note: in v0-v3, features with MinSupportedVersion = 0 are omitted.
     /// </summary>
     public SupportedFeatureKeyCollection SupportedFeatures { get; set; } = new ();
 
@@ -84,7 +84,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
     public FinalizedFeatureKeyCollection FinalizedFeatures { get; set; } = new ();
 
     /// <summary>
-    /// Set by a KRaft controller if the required configurations for ZK migration are present
+    /// Set by a KRaft controller if the required configurations for ZK migration are present.
     /// </summary>
     public bool ZkMigrationReady { get; set; } = false;
 
@@ -478,7 +478,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ApiVersionMessage");
             }
@@ -645,7 +645,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SupportedFeatureKeyMessage");
             }
@@ -832,7 +832,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FinalizedFeatureKeyMessage");
             }

@@ -1,4 +1,4 @@
-﻿//DA-59-21-27-5C-0A-D8-B4-A2-BA-57-D9-CE-6A-98-2C-BB-6A-C7-68-C4-54-30-D0-37-D4-2D-53-24-B9-BC-36
+﻿//AD-EB-17-70-D3-A5-29-4E-A0-10-EF-AB-2B-87-BC-F8-29-B7-69-ED-94-D1-42-04-0E-A0-00-C9-C5-1B-33-8F
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,17 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class CreateAclsResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new CreateAclsResponseMessage
-        {
-            ThrottleTimeMs = -420004200,
-            Results = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'CreateAclsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()

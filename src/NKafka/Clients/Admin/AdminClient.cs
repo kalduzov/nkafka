@@ -30,18 +30,9 @@ using NKafka.Protocol;
 
 namespace NKafka.Clients.Admin;
 
-internal class AdminClient: IAdminClient
+internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logger): IAdminClient
 {
-    private readonly IKafkaCluster _kafkaCluster;
-    private readonly ILogger<AdminClient> _logger;
-    private readonly int _defaultTimeout;
-
-    public AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logger)
-    {
-        _kafkaCluster = kafkaCluster;
-        _logger = logger;
-        _defaultTimeout = kafkaCluster.Config.RequestTimeoutMs;
-    }
+    private readonly int _defaultTimeout = kafkaCluster.Config.RequestTimeoutMs;
 
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public void Dispose()
@@ -61,7 +52,7 @@ internal class AdminClient: IAdminClient
         CreateTopicsOptions options,
         CancellationToken token)
     {
-        _logger.CallMethodTrace();
+        logger.CallMethodTrace();
         using var activity = KafkaDiagnosticsSource.CreateTopics(topics);
 
         try
@@ -80,13 +71,13 @@ internal class AdminClient: IAdminClient
                         Name = topic.Name,
                         NumPartitions = topic.Partitions,
                         ReplicationFactor = topic.ReplicationFactor,
-                        Configs = new CreateTopicsRequestMessage.CreateableTopicConfigCollection()
+                        Configs = []
                     });
             }
 
             if (topics.Count == 0)
             {
-                return new Dictionary<string, CreateTopicResult>(0);
+                return [];
             }
 
             var timeout = GetTimeout(options.TimeoutMs);
@@ -94,7 +85,7 @@ internal class AdminClient: IAdminClient
             request.validateOnly = options.ValidateOnly;
             request.Topics = topicCollection;
 
-            var result = await _kafkaCluster.SendAsync<CreateTopicsRequestMessage, CreateTopicsResponseMessage>(request, token);
+            var result = await kafkaCluster.SendAsync<CreateTopicsRequestMessage, CreateTopicsResponseMessage>(request, token);
 
             var results = result.Topics.ToDictionary(
                 x => x.Name,
@@ -120,13 +111,13 @@ internal class AdminClient: IAdminClient
         DeleteTopicsOptions options,
         CancellationToken token)
     {
-        var maxApiVersion = _kafkaCluster
+        var maxApiVersion = kafkaCluster
             .GetClusterMetadata()
             .GetMaxCurrentApiVersion(ApiKeys.DeleteTopics);
 
         var timeout = GetTimeout(options.TimeoutMs);
         var deleteTopicsRequest = DeleteTopicsRequestMessage.Build(maxApiVersion, topicsName, timeout);
-        var deleteTopicsResponse = await _kafkaCluster.SendAsync<DeleteTopicsRequestMessage, DeleteTopicsResponseMessage>(deleteTopicsRequest, token);
+        var deleteTopicsResponse = await kafkaCluster.SendAsync<DeleteTopicsRequestMessage, DeleteTopicsResponseMessage>(deleteTopicsRequest, token);
 
         var result = new Dictionary<string, DeleteTopicsResult>(deleteTopicsResponse.Responses.Count);
 
@@ -150,9 +141,9 @@ internal class AdminClient: IAdminClient
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadata(null!, cts.Token);
+        await kafkaCluster.RefreshMetadata(null!, cts.Token);
 
-        return _kafkaCluster.Topics.Values
+        return kafkaCluster.Topics.Values
             .Where(t => t.IsInternal is false || t.IsInternal == options.IncludeInternal)
             .ToArray();
     }
@@ -171,13 +162,13 @@ internal class AdminClient: IAdminClient
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadata(topics, cts.Token);
+        await kafkaCluster.RefreshMetadata(topics, cts.Token);
 
         var result = new Dictionary<string, TopicDescription>(topics.Count);
 
-        foreach (var topic in _kafkaCluster.Topics.Where(t => topics.Contains(t.Key)))
+        foreach (var topic in kafkaCluster.Topics.Where(t => topics.Contains(t.Key)))
         {
-            var topicPartitions = _kafkaCluster.PartitionsForTopic(topic.Key);
+            var topicPartitions = kafkaCluster.PartitionsForTopic(topic.Key);
             var topicDescription = new TopicDescription(topic.Key, topic.Value.TopicId, topic.Value.IsInternal, topicPartitions);
             result.Add(topic.Key, topicDescription);
         }
@@ -196,8 +187,8 @@ internal class AdminClient: IAdminClient
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await _kafkaCluster.RefreshMetadata(Array.Empty<string>(), cts.Token);
-        var result = new DescribeClusterResult(_kafkaCluster.Brokers, _kafkaCluster.Controller, _kafkaCluster.ClusterId);
+        await kafkaCluster.RefreshMetadata(Array.Empty<string>(), cts.Token);
+        var result = new DescribeClusterResult(kafkaCluster.Brokers, kafkaCluster.Controller, kafkaCluster.ClusterId);
 
         return result;
     }

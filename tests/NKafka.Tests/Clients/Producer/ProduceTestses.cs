@@ -23,6 +23,7 @@ using NKafka.Clients.Producer;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Resources;
+using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Producer;
 
@@ -32,15 +33,11 @@ public sealed class ProduceTests: ClientTests
 
     private class TestPartitioner: IPartitioner
     {
-        public ValueTask<int> Partition<TKey, TValue>(string topic,
-            TKey key,
+        public ValueTask<int> Partition(string topic,
             byte[] keyBytes,
-            TValue value,
             byte[] valueBytes,
             IKafkaCluster cluster,
             CancellationToken token)
-            where TKey : notnull
-            where TValue : notnull
         {
             return topic switch
             {
@@ -70,8 +67,10 @@ public sealed class ProduceTests: ClientTests
     [InlineData(1, "test")]
     public void Produce(int key, string value)
     {
-        var producer = CreateProducerForTests<int, string>(_producer);
-        var action = () => producer.Produce("test_topic", new Message<int, string>(key, value));
+        var producer = CreateProducerForTests(_producer);
+        var keyBytes = Serializers.Int.Serialize(key);
+        var valueBytes = Serializers.String.Serialize(value);
+        var action = () => producer.Produce("test_topic", new Message(keyBytes, valueBytes), CancellationToken.None);
         action.Should().NotThrow();
     }
 
@@ -79,8 +78,10 @@ public sealed class ProduceTests: ClientTests
     [InlineData(1, "test")]
     public async Task ProduceAsync(int key, string value)
     {
-        var producer = CreateProducerForTests<int, string>(_producer);
-        var action = async () => await producer.Produce("test_topic", new Message<int, string>(key, value), CancellationToken.None);
+        var producer = CreateProducerForTests(_producer);
+        var keyBytes = Serializers.Int.Serialize(key);
+        var valueBytes = Serializers.String.Serialize(value);
+        var action = async () => await producer.ProduceAsync("test_topic", new Message(keyBytes, valueBytes), CancellationToken.None);
         var result = await action.Should().NotThrowAsync();
         result.Subject.Status.Should().Be(PersistenceStatus.NotPersisted);
     }

@@ -1,4 +1,4 @@
-﻿//FE-67-E0-E0-C2-BE-F4-02-24-07-07-45-F1-3F-95-52-84-AA-2D-06-D2-23-23-93-88-61-B7-D0-C3-DF-4D-B2
+﻿//B6-DC-5E-68-5D-15-C3-99-C7-EA-B3-5A-D9-2F-31-39-11-79-5D-86-0C-A5-EA-B7-36-A4-FF-52-2B-C4-34-4C
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -682,7 +682,7 @@ internal sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage,
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The partition indexes to add to the transaction
+        /// The partition indexes to add to the transaction.
         /// </summary>
         public List<int> Partitions { get; set; } = new ();
 

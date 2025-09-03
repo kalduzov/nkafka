@@ -126,13 +126,9 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// The producer configuration will override some of the values that were set to create the cluster.
     /// </p>
     /// </remarks>
-    public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(
+    public IProducer BuildProducer(
         string name,
-        ProducerConfig producerConfig,
-        ISerializer<TKey> keySerializer,
-        ISerializer<TValue> valueSerializer)
-        where TKey : notnull
-        where TValue : notnull;
+        ProducerConfig producerConfig);
 
     /// <summary>
     /// Creates a consumer associated with the current cluster

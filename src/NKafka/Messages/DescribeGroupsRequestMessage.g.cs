@@ -1,4 +1,4 @@
-﻿//E7-95-E1-44-B3-A4-2F-6D-C5-20-65-0A-D8-CE-5F-46-5C-A7-6F-A7-13-BC-5E-9D-BE-02-57-80-5E-1E-FD-94
+﻿//EE-E2-A4-E9-22-68-64-2A-A9-13-84-11-DA-29-C8-D3-3F-D0-76-F8-6A-B1-4F-79-93-F3-39-D7-1D-01-43-6E
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -62,7 +62,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The names of the groups to describe
+    /// The names of the groups to describe.
     /// </summary>
     public List<string> Groups { get; set; } = new ();
 

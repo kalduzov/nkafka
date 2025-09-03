@@ -1,4 +1,4 @@
-﻿//D7-8D-55-46-8F-B8-BA-77-43-7E-02-A1-43-53-70-F3-23-F3-10-34-80-E7-C9-FD-A2-A1-E3-76-CF-5E-5B-EA
+﻿//02-B9-A0-F7-A5-77-85-06-5F-EF-E5-F9-EA-F7-24-18-87-90-6C-9D-0C-38-7F-A8-AF-31-BD-B8-C7-75-49-CC
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -290,7 +290,7 @@ internal sealed partial class CreateAclsRequestMessage: IRequestMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AclCreationMessage");
             }
@@ -318,14 +318,7 @@ internal sealed partial class CreateAclsRequestMessage: IRequestMessage, IEquata
                     ResourceName = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersion.Version1)
-            {
-                ResourcePatternType = reader.ReadSByte();
-            }
-            else
-            {
-                ResourcePatternType = 3;
-            }
+            ResourcePatternType = reader.ReadSByte();
             {
                 int length;
                 if (version >= ApiVersion.Version2)
@@ -409,17 +402,7 @@ internal sealed partial class CreateAclsRequestMessage: IRequestMessage, IEquata
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteSByte(ResourcePatternType);
-            }
-            else
-            {
-                if (ResourcePatternType != 3)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default ResourcePatternType at version {version}");
-                }
-            }
+            writer.WriteSByte(ResourcePatternType);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Principal);
                 if (version >= ApiVersion.Version2)

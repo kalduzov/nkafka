@@ -216,13 +216,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public IProducer<TKey, TValue> BuildProducer<TKey, TValue>(
+    public IProducer BuildProducer(
         string name,
-        ProducerConfig producerConfig,
-        ISerializer<TKey> keySerializer,
-        ISerializer<TValue> valueSerializer)
-        where TKey : notnull
-        where TValue : notnull
+        ProducerConfig producerConfig)
     {
         ThrowExceptionIfClusterClosed();
 
@@ -230,20 +226,18 @@ internal sealed class KafkaCluster: IKafkaCluster
         {
             Debug.Assert(producer is not null);
 
-            return (IProducer<TKey, TValue>)producer;
+            return producer;
         }
 
         producerConfig = producerConfig != ProducerConfig.EmptyProducerConfig ? producerConfig.MergeFrom(Config) : ProducerConfig.BaseFrom(Config);
 
-        producer = new Producer<TKey, TValue>(
+        producer = new Producer(
             this,
             name,
             producerConfig,
-            keySerializer,
-            valueSerializer,
             _loggerFactory);
 
-        return (IProducer<TKey, TValue>)_producers.GetOrAdd(name, producer)!;
+        return _producers.GetOrAdd(name, producer)!;
     }
 
     /// <inheritdoc />

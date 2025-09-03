@@ -48,17 +48,13 @@ internal static class KafkaDiagnosticsSource
         _internalActivitySource = new ActivitySource("NKafka.Internal", version);
     }
 
-    internal static Activity? ProduceMessage<TKey, TValue>(TopicPartition topicPartition, Message<TKey, TValue> message, bool isFireAndForget)
-        where TKey : notnull
-        where TValue : notnull
+    internal static Activity? ProduceMessage(TopicPartition topicPartition, Message message, bool isFireAndForget)
     {
         var activity = _activitySource
             .StartActivity()
             ?.AddTag("Partition", topicPartition.Partition.ToString())
             .AddTag("Topic", topicPartition.Topic)
             .AddTag("FireAndForget", isFireAndForget.ToString())
-            .AddTag("KeyType", typeof(TKey))
-            .AddTag("ValueType", typeof(TValue))
             .SetStatus(ActivityStatusCode.Ok);
 
         activity?.AddTag("Key", message.Key);

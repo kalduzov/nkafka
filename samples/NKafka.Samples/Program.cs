@@ -31,6 +31,7 @@ using NKafka;
 using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
+using NKafka.Serialization;
 
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
@@ -124,16 +125,16 @@ var producerConfig = new ProducerConfig
     LingerMs = 50000,
 };
 
-await using var producer = kafkaCluster.BuildProducer<Null, string>(producerConfig);
+await using var producer = kafkaCluster.BuildProducer(producerConfig);
 
 const int count = 100;
 
 foreach (var val in Enumerable.Range(0, count))
 {
-    var message = new Message<Null, string>(Null.Instance,
-        "test test test test test test test test test test test test test test test test test test"
-        + val);
-    producer.Produce("test", message);
+    var value = Serializers.String.Serialize("test test test test test test test test test test test test test test test test test test"
+                                             + val);
+    var message = new Message(value);
+    producer.Produce("test", message, CancellationToken.None);
 }
 
 await producer.Close(CancellationToken.None);

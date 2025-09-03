@@ -33,8 +33,9 @@
   <ItemGroup>
     <PackageVersion Include="FastEnum" Version="2.0.3"/>
     <PackageVersion Include="Snappier" Version="1.1.6"/>
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0"/>
+
     <!--Tests-->
-    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4"/>
     <PackageVersion Include="NSubstitute" Version="5.3.0"/>
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
     <PackageVersion Include="xunit" Version="$(xUnitVersion)"/>

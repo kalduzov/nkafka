@@ -32,23 +32,15 @@ public interface IPartitioner
     /// Compute the partition for the given record.
     /// </summary>
     /// <param name="topic">The topic name</param>
-    /// <param name="key">The key to partition on or Null if no key</param>
     /// <param name="keyBytes">The serialized key to partition on or empty buffer if no key</param>
-    /// <param name="value">The value to partition on or Null</param>
     /// <param name="valueBytes">The serialized value to partition on empty buffer</param>
     /// <param name="cluster">The Kafka cluster</param>
     /// <param name="token">The cancellation token</param>
-    /// <typeparam name="TKey">The key type</typeparam>
-    /// <typeparam name="TValue">The value type</typeparam>
     /// <returns>The partition number</returns>
-    ValueTask<int> Partition<TKey, TValue>(
+    ValueTask<int> Partition(
         string topic,
-        TKey key,
         byte[] keyBytes,
-        TValue value,
         byte[] valueBytes,
         IKafkaCluster cluster,
-        CancellationToken token)
-        where TKey : notnull
-        where TValue : notnull;
+        CancellationToken token);
 }

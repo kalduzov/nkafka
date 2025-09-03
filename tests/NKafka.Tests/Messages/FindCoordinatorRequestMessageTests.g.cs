@@ -1,4 +1,4 @@
-﻿//82-71-19-48-76-6E-06-C8-4F-35-6E-FA-C1-D8-FD-3B-66-01-E0-F9-EC-53-AC-CD-62-3E-2C-FB-A7-91-28-4D
+﻿//79-1C-D3-0F-CF-EC-FD-8F-5C-E3-17-8D-D7-18-59-4C-2B-63-B8-E8-2F-70-F1-A4-AF-96-F4-1D-80-54-E1-34
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -102,5 +102,16 @@ public sealed partial class FindCoordinatorRequestMessageTests
             CoordinatorKeys = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FindCoordinatorRequestMessage' message by Version6")]
+    public void SerializeAndDeserializeMessage_ApiVersion6_Success()
+    {
+        var message = new FindCoordinatorRequestMessage
+        {
+            KeyType = 42,
+            CoordinatorKeys = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
 }

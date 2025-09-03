@@ -1,4 +1,4 @@
-﻿//41-A2-2A-A9-5E-37-5D-0E-CA-C4-7F-0B-31-A2-4E-98-B9-D8-1B-2A-4E-E0-9F-55-26-F6-9E-21-4C-25-04-12
+﻿//C6-CF-53-E2-5F-22-9F-75-07-A7-36-85-1D-F9-BB-AB-40-7A-5A-44-94-3E-61-81-7C-3A-59-DD-E0-94-CD-64
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -98,14 +98,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version1)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         if (version >= ApiVersion.Version7)
         {
             ErrorCode = reader.ReadShort();
@@ -211,10 +204,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version7)
         {
             writer.WriteShort((short)ErrorCode);
@@ -380,7 +370,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public string Topic { get; set; } = string.Empty;
 
         /// <summary>
-        /// The unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -409,7 +399,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchableTopicResponseMessage");
             }
@@ -657,7 +647,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public long HighWatermark { get; set; } = 0;
 
         /// <summary>
-        /// The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED)
+        /// The last stable offset (or LSO) of the partition. This is the last offset such that the state of all transactional records prior to this offset have been decided (ABORTED or COMMITTED).
         /// </summary>
         public long LastStableOffset { get; set; } = -1;
 
@@ -667,12 +657,12 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public long LogStartOffset { get; set; } = -1;
 
         /// <summary>
-        /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge
+        /// In case divergence is detected based on the `LastFetchedEpoch` and `FetchOffset` in the request, this field indicates the largest epoch and its end offset such that subsequent records are known to diverge.
         /// </summary>
         public EpochEndOffsetMessage DivergingEpoch { get; set; } = new ();
 
         /// <summary>
-        /// 
+        /// The current leader of the partition.
         /// </summary>
         public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
@@ -687,7 +677,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public List<AbortedTransactionMessage> AbortedTransactions { get; set; } = new ();
 
         /// <summary>
-        /// The preferred read replica for the consumer to use on its next fetch request
+        /// The preferred read replica for the consumer to use on its next fetch request.
         /// </summary>
         public int PreferredReadReplica { get; set; } = -1;
 
@@ -716,21 +706,14 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             HighWatermark = reader.ReadLong();
-            if (version >= ApiVersion.Version4)
-            {
-                LastStableOffset = reader.ReadLong();
-            }
-            else
-            {
-                LastStableOffset = -1;
-            }
+            LastStableOffset = reader.ReadLong();
             if (version >= ApiVersion.Version5)
             {
                 LogStartOffset = reader.ReadLong();
@@ -748,7 +731,6 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             {
                 SnapshotId = new ();
             }
-            if (version >= ApiVersion.Version4)
             {
                 if (version >= ApiVersion.Version12)
                 {
@@ -786,10 +768,6 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                         AbortedTransactions = newCollection;
                     }
                 }
-            }
-            else
-            {
-                AbortedTransactions = new ();
             }
             if (version >= ApiVersion.Version11)
             {
@@ -858,10 +836,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(PartitionIndex);
             writer.WriteShort((short)ErrorCode);
             writer.WriteLong(HighWatermark);
-            if (version >= ApiVersion.Version4)
-            {
-                writer.WriteLong(LastStableOffset);
-            }
+            writer.WriteLong(LastStableOffset);
             if (version >= ApiVersion.Version5)
             {
                 writer.WriteLong(LogStartOffset);
@@ -908,36 +883,33 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                     throw new UnsupportedVersionException($"Attempted to write a non-default SnapshotId at version {version}");
                 }
             }
-            if (version >= ApiVersion.Version4)
+            if (version >= ApiVersion.Version12)
             {
-                if (version >= ApiVersion.Version12)
+                if (AbortedTransactions is null)
                 {
-                    if (AbortedTransactions is null)
-                    {
-                        writer.WriteVarInt32(0);
-                    }
-                    else
-                    {
-                        writer.WriteVarInt32(AbortedTransactions.Count + 1);
-                        foreach (var element in AbortedTransactions)
-                        {
-                            element?.Write(ref writer, version);
-                        }
-                    }
+                    writer.WriteVarInt32(0);
                 }
                 else
                 {
-                    if (AbortedTransactions is null)
+                    writer.WriteVarInt32(AbortedTransactions.Count + 1);
+                    foreach (var element in AbortedTransactions)
                     {
-                        writer.WriteInt(-1);
+                        element?.Write(ref writer, version);
                     }
-                    else
+                }
+            }
+            else
+            {
+                if (AbortedTransactions is null)
+                {
+                    writer.WriteInt(-1);
+                }
+                else
+                {
+                    writer.WriteInt(AbortedTransactions.Count);
+                    foreach (var element in AbortedTransactions)
                     {
-                        writer.WriteInt(AbortedTransactions.Count);
-                        foreach (var element in AbortedTransactions)
-                        {
-                            element?.Write(ref writer, version);
-                        }
+                        element?.Write(ref writer, version);
                     }
                 }
             }
@@ -1152,12 +1124,12 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The largest epoch.
         /// </summary>
         public int Epoch { get; set; } = -1;
 
         /// <summary>
-        /// 
+        /// The end offset of the epoch.
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
@@ -1181,7 +1153,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EpochEndOffsetMessage");
             }
@@ -1277,7 +1249,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public int LeaderId { get; set; } = -1;
 
         /// <summary>
-        /// The latest known leader epoch
+        /// The latest known leader epoch.
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
@@ -1301,7 +1273,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
@@ -1392,12 +1364,12 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The end offset of the epoch.
         /// </summary>
         public long EndOffset { get; set; } = -1;
 
         /// <summary>
-        /// 
+        /// The largest epoch.
         /// </summary>
         public int Epoch { get; set; } = -1;
 
@@ -1421,7 +1393,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
             }
@@ -1541,7 +1513,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AbortedTransactionMessage");
             }
@@ -1568,10 +1540,6 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersion.Version4)
-            {
-                throw new UnsupportedVersionException($"Can't write version {version} of AbortedTransactionMessage");
-            }
             var numTaggedFields = 0;
             writer.WriteLong(ProducerId);
             writer.WriteLong(FirstOffset);
@@ -1684,7 +1652,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of NodeEndpointMessage");
             }

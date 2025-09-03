@@ -42,6 +42,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
     private int _firstBufferWritten;
 
     private BufferSegment _current;
+
     private int _nextBufferSize = bufferSize;
 
     public int TotalWritten { get; private set; }

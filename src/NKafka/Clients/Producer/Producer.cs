@@ -40,24 +40,8 @@ namespace NKafka.Clients.Producer;
 /// <summary>
 /// A Kafka client that publishes messages to the Kafka cluster
 /// </summary>
-internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IProducer<TKey, TValue>
-    where TKey : notnull
-    where TValue : notnull
+internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 {
-    // ReSharper disable once StaticMemberInGenericType
-    private static readonly Dictionary<Type, object> _defaultSerializers = new()
-    {
-        [typeof(Null)] = Serializers.Null,
-        [typeof(int)] = Serializers.Int,
-        [typeof(long)] = Serializers.Long,
-        [typeof(string)] = Serializers.String,
-        [typeof(float)] = Serializers.Float,
-        [typeof(double)] = Serializers.Double,
-        [typeof(byte[])] = Serializers.ByteArray,
-        [typeof(short)] = Serializers.Short,
-        [typeof(Guid)] = Serializers.Guid
-    };
-
     private readonly IRecordAccumulator _accumulator;
     private readonly ILogger _logger;
     private readonly int _maxRequestSize;
@@ -68,8 +52,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     private readonly int _totalMemorySize;
     private readonly ITransactionManager _transactionManager;
     private bool _closed;
-    private readonly ISerializer<TKey> _keySerializer;
-    private readonly ISerializer<TValue> _valueSerializer;
     private readonly Task _senderTask;
     private readonly IMessagesSender _messagesSender;
     private readonly int _deliveryTimeoutMs;
@@ -81,10 +63,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         IKafkaCluster kafkaCluster,
         string name,
         ProducerConfig config,
-        ISerializer<TKey> keySerializer,
-        ISerializer<TValue> valueSerializer,
         ILoggerFactory loggerFactory)
-        : this(kafkaCluster, name, config, keySerializer, valueSerializer, null, null, null, null, loggerFactory)
+        : this(kafkaCluster, name, config, null, null, null, null, loggerFactory)
     {
     }
 
@@ -95,8 +75,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         IKafkaCluster kafkaCluster,
         string name,
         ProducerConfig config,
-        ISerializer<TKey> keySerializer,
-        ISerializer<TValue> valueSerializer,
         ITransactionManager? transactionManager,
         IRecordAccumulator? recordAccumulator,
         IMessagesSender? messagesSender,
@@ -122,8 +100,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         try
         {
             _partitioner = InitPartitioner(config.PartitionerConfig);
-            _keySerializer = InitializeSerializer(keySerializer);
-            _valueSerializer = InitializeSerializer(valueSerializer);
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
             _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
             _accumulator = recordAccumulator
@@ -145,29 +121,43 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     string IProducer.Name => _name;
 
     /// <inheritdoc/>
-    public void Produce(TopicPartition topicPartition, Message<TKey, TValue> message)
+    public void Produce(TopicPartition topicPartition,
+        Message message,
+        CancellationToken token,
+        Action<MessageDeliveryResult, Exception?> callback)
     {
         var tp = topicPartition;
         var m = message;
 
-        _ = InternalProduceAsync(topicPartition, message, true, CancellationToken.None)
+        _ = InternalProduceAsync(topicPartition, message, true, token)
             .ContinueWith(task =>
-            {
-                if (task.IsCompletedSuccessfully)
                 {
-                    Debug.WriteLine($"The message {m} was sent successfully");
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        Debug.WriteLine($"The message {m} was sent successfully");
+                        callback(task.Result, null);
 
-                    return;
-                }
+                        return;
+                    }
 
-                if (!task.IsFaulted)
-                {
-                    return;
-                }
+                    if (task.IsFaulted)
+                    {
+                        callback(task.Result, task.Exception);
 
-                _logger.ProduceMessageError(task.Exception!, tp);
+                        return;
+                    }
 
-            });
+                    if (task.IsCanceled)
+                    {
+                        callback(task.Result, new OperationCanceledException("The message was canceled"));
+
+                        return;
+                    }
+
+                    _logger.ProduceMessageError(task.Exception!, tp);
+
+                },
+                token);
     }
 
     /// <inheritdoc/>
@@ -189,9 +179,9 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
     }
 
     /// <inheritdoc/>
-    public Task<MessageDeliveryResult> Produce(
+    public Task<MessageDeliveryResult> ProduceAsync(
         TopicPartition topicPartition,
-        Message<TKey, TValue> message,
+        Message message,
         CancellationToken token)
     {
         return InternalProduceAsync(topicPartition, message, false, token);
@@ -268,24 +258,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
         }
     }
 
-    private static ISerializer<T> InitializeSerializer<T>(ISerializer<T> serializer)
-    {
-        if (serializer != NoneSerializer<T>.Instance)
-        {
-            return serializer;
-        }
-
-        if (_defaultSerializers.TryGetValue(typeof(T), out var ser))
-        {
-            return (ISerializer<T>)ser;
-        }
-
-        var errorMessage = string.Format(EM.Producer_SerializerError, typeof(T).Name);
-
-        throw new ArgumentNullException(errorMessage);
-
-    }
-
     private void ThrowIfProducerClosed()
     {
         if (_closed)
@@ -296,7 +268,7 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
 
     private async Task<MessageDeliveryResult> InternalProduceAsync(
         TopicPartition topicPartition,
-        Message<TKey, TValue> message,
+        Message message,
         bool isFireAndForget,
         CancellationToken token)
     {
@@ -304,12 +276,12 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
 
         var actualTopicPartition = topicPartition;
 
-        _logger.ProduceMessageTrace(actualTopicPartition);
+        _logger.ProduceMessage(actualTopicPartition);
 
         using var activity = KafkaDiagnosticsSource.ProduceMessage(actualTopicPartition, message, isFireAndForget);
 
-        var serializedKeySize = 0;
-        var serializedValueSize = 0;
+        var serializedKeySize = message.Key.Length;
+        var serializedValueSize = message.Value.Length;
 
         try
         {
@@ -322,13 +294,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             }
 
             var headers = message.Headers;
-            var serializedKey = Serialize(_keySerializer, message.Key);
-            var serializedValue = Serialize(_valueSerializer, message.Value);
 
-            serializedKeySize = serializedKey.Length;
-            serializedValueSize = serializedValue.Length;
-
-            var serializedSize = RecordBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
+            var serializedSize = RecordBatch.EstimateSizeInBytesUpperBound(message.Key, message.Value, headers);
             EnsureValidRecordSize(serializedSize);
 
             // Trying to get a partition if it is not set  
@@ -336,10 +303,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             {
                 var computedPartition = await _partitioner.Partition(
                     topicPartition.Topic,
-                    typeof(TKey),
-                    serializedKey,
-                    typeof(TValue),
-                    serializedValue,
+                    message.Key,
+                    message.Value,
                     KafkaCluster,
                     token);
 
@@ -352,8 +317,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             var appendResult = _accumulator.Append(
                 actualTopicPartition,
                 message.Timestamp.UnixTimestampMs,
-                serializedKey,
-                serializedValue,
+                message.Key,
+                message.Value,
                 headers);
 
             if (_transactionManager.IsTransactional)
@@ -381,7 +346,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                     message.Timestamp.UnixTimestampMs,
                     topicPartitionOffset.Offset,
                     serializedKeySize,
-                    serializedValueSize);
+                    serializedValueSize,
+                    message);
             }
             else
             {
@@ -392,7 +358,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                     message.Timestamp.UnixTimestampMs,
                     topicPartitionOffset.Offset,
                     serializedKeySize,
-                    serializedValueSize);
+                    serializedValueSize,
+                    message);
             }
 
         }
@@ -407,7 +374,8 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
                 message.Timestamp.UnixTimestampMs,
                 topicPartitionOffset.Offset,
                 serializedKeySize,
-                serializedValueSize);
+                serializedValueSize,
+                message);
         }
         catch (Exception exc)
         {
@@ -435,18 +403,6 @@ internal sealed partial class Producer<TKey, TValue>: Client<ProducerConfig>, IP
             var message = string.Format(EM.Producer_SizeVeryLarge, nameof(Config.BufferMemory), _totalMemorySize);
 
             throw new ProducerException(message);
-        }
-    }
-
-    private static byte[] Serialize<T>(ISerializer<T> serializer, T value)
-    {
-        try
-        {
-            return serializer.Serialize(value);
-        }
-        catch (Exception exc)
-        {
-            throw new ProduceException(exc);
         }
     }
 }

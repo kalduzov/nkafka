@@ -1,4 +1,4 @@
-﻿//38-AC-2B-AF-8A-8A-64-08-D8-17-43-9C-B7-10-66-B7-86-97-25-A8-D0-F6-75-95-7E-70-F3-66-E2-0F-57-C6
+﻿//B1-82-D5-CE-8C-9C-B2-D4-4E-E5-67-69-0F-0D-F0-C6-23-59-F6-71-A7-83-D3-A8-7E-42-A9-81-C6-C9-C1-41
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -80,14 +80,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version2)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         {
             if (version >= ApiVersion.Version4)
             {
@@ -148,10 +141,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version2)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version4)
         {
             writer.WriteVarInt32(Topics.Count + 1);
@@ -276,7 +266,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetForLeaderTopicResultMessage");
             }
@@ -523,20 +513,13 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EpochEndOffsetMessage");
             }
             ErrorCode = reader.ReadShort();
             Partition = reader.ReadInt();
-            if (version >= ApiVersion.Version1)
-            {
-                LeaderEpoch = reader.ReadInt();
-            }
-            else
-            {
-                LeaderEpoch = -1;
-            }
+            LeaderEpoch = reader.ReadInt();
             EndOffset = reader.ReadLong();
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version4)
@@ -562,10 +545,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
             var numTaggedFields = 0;
             writer.WriteShort((short)ErrorCode);
             writer.WriteInt(Partition);
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteInt(LeaderEpoch);
-            }
+            writer.WriteInt(LeaderEpoch);
             writer.WriteLong(EndOffset);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

@@ -1,4 +1,4 @@
-﻿//72-F5-83-12-D3-AB-F7-BB-9E-46-71-F4-C6-B5-36-BB-E4-9C-8C-96-64-59-62-69-FA-90-3B-3D-02-A6-B7-9E
+﻿//14-E7-6A-BA-3B-6D-E2-E1-E4-83-26-CE-E7-33-8B-36-3D-CB-3A-81-FA-16-55-71-DD-AC-73-58-34-93-71-AB
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,16 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class DescribeConfigsRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new DescribeConfigsRequestMessage
-        {
-            Resources = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'DescribeConfigsRequestMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()

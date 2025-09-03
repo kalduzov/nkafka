@@ -32,37 +32,27 @@ namespace NKafka;
 /// </summary>
 public static class ProducerExtensions
 {
-    private const string _PRODUCER_NAME_FORMAT = "__Producer<{0},{1}>";
+    private const string _PRODUCER_NAME_FORMAT = "__Producer_{0}";
 
     /// <summary>
     /// Creates a new producer with the specified key and message types
     /// </summary>
-    /// <typeparam name="TKey">Key type</typeparam>
-    /// <typeparam name="TValue">Value type</typeparam>
     /// <param name="kafkaCluster"></param>
     /// <remarks>If such a producer already exists and has not been destroyed, then he returns</remarks>
-    public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster)
-        where TKey : notnull
-        where TValue : notnull
-    {
-        return BuildProducer<TKey, TValue>(kafkaCluster, ProducerConfig.EmptyProducerConfig);
-    }
+    public static IProducer BuildProducer(this IKafkaCluster kafkaCluster)
+        => BuildProducer(kafkaCluster, ProducerConfig.EmptyProducerConfig);
 
     /// <summary>
     /// Creates a new producer with the specified key and message types
     /// </summary>
-    /// <typeparam name="TKey">Key type</typeparam>
-    /// <typeparam name="TValue">Value type</typeparam>
     /// <param name="kafkaCluster"></param>
     /// <param name="producerConfig">Producer specific configuration</param>
     /// <remarks>If such a producer already exists and has not been destroyed, then he returns</remarks>
-    public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster, ProducerConfig producerConfig)
-        where TKey : notnull
-        where TValue : notnull
+    public static IProducer BuildProducer(this IKafkaCluster kafkaCluster, ProducerConfig producerConfig)
     {
-        var name = string.Format(_PRODUCER_NAME_FORMAT, typeof(TKey).Name, typeof(TValue).Name);
+        var name = string.Format(_PRODUCER_NAME_FORMAT, Guid.NewGuid());
 
-        return kafkaCluster.BuildProducer<TKey, TValue>(name, producerConfig);
+        return kafkaCluster.BuildProducer(name, producerConfig);
     }
 
     /// <summary>
@@ -73,12 +63,8 @@ public static class ProducerExtensions
     /// <typeparam name="TKey">Key type</typeparam>
     /// <typeparam name="TValue">Value type</typeparam>
     /// <returns>If a producer with the same name has already been registered, then the existing one is returned</returns>
-    public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster, string name)
-        where TKey : notnull
-        where TValue : notnull
-    {
-        return kafkaCluster.BuildProducer<TKey, TValue>(name, ProducerConfig.EmptyProducerConfig);
-    }
+    public static IProducer BuildProducer(this IKafkaCluster kafkaCluster, string name)
+        => kafkaCluster.BuildProducer(name, ProducerConfig.EmptyProducerConfig);
 
     /// <summary>
     /// 
@@ -89,14 +75,6 @@ public static class ProducerExtensions
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
-    public static IProducer<TKey, TValue> BuildProducer<TKey, TValue>(this IKafkaCluster kafkaCluster, string name, ProducerConfig producerConfig)
-        where TKey : notnull
-        where TValue : notnull
-    {
-        return kafkaCluster.BuildProducer(
-            name,
-            producerConfig,
-            NoneSerializer<TKey>.Instance,
-            NoneSerializer<TValue>.Instance);
-    }
+    public static IProducer BuildProducer(this IKafkaCluster kafkaCluster, string name, ProducerConfig producerConfig)
+        => kafkaCluster.BuildProducer(name, producerConfig);
 }

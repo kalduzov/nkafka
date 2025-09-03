@@ -1,4 +1,4 @@
-﻿//2A-2C-BA-1C-3D-C4-1A-8F-B0-EF-F2-AB-AB-55-24-6C-81-E0-5D-27-A9-2D-ED-29-0E-5D-CE-C5-AB-A9-46-23
+﻿//F5-B2-67-54-8F-88-BE-99-91-41-19-A6-DD-E0-7C-42-AA-1F-A4-B2-B8-6E-96-7D-90-B3-1A-49-36-81-67-13
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -64,6 +64,16 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
     public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
     /// <summary>
+    /// The producer ID.
+    /// </summary>
+    public long ProducerId { get; set; } = -1;
+
+    /// <summary>
+    /// The current epoch associated with the producer.
+    /// </summary>
+    public short ProducerEpoch { get; set; } = -1;
+
+    /// <summary>
     /// The basic constructor of the message EndTxnResponseMessage
     /// </summary>
     public EndTxnResponseMessage()
@@ -85,6 +95,22 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
     {
         ThrottleTimeMs = reader.ReadInt();
         ErrorCode = reader.ReadShort();
+        if (version >= ApiVersion.Version5)
+        {
+            ProducerId = reader.ReadLong();
+        }
+        else
+        {
+            ProducerId = -1;
+        }
+        if (version >= ApiVersion.Version5)
+        {
+            ProducerEpoch = reader.ReadShort();
+        }
+        else
+        {
+            ProducerEpoch = -1;
+        }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version3)
         {
@@ -109,6 +135,14 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         var numTaggedFields = 0;
         writer.WriteInt(ThrottleTimeMs);
         writer.WriteShort((short)ErrorCode);
+        if (version >= ApiVersion.Version5)
+        {
+            writer.WriteLong(ProducerId);
+        }
+        if (version >= ApiVersion.Version5)
+        {
+            writer.WriteShort(ProducerEpoch);
+        }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
@@ -146,6 +180,14 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         {
             return false;
         }
+        if (ProducerId != other.ProducerId)
+        {
+            return false;
+        }
+        if (ProducerEpoch != other.ProducerEpoch)
+        {
+            return false;
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -153,7 +195,7 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode);
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerId, ProducerEpoch);
         return hashCode;
     }
 
@@ -163,6 +205,8 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         return "EndTxnResponseMessage("
             + "ThrottleTimeMs=" + ThrottleTimeMs
             + ", ErrorCode=" + ErrorCode
+            + ", ProducerId=" + ProducerId
+            + ", ProducerEpoch=" + ProducerEpoch
             + ")";
     }
 }

@@ -1,4 +1,4 @@
-﻿//C4-62-13-FD-2A-37-EF-9E-62-49-E5-07-D6-BF-18-76-A4-D6-34-4A-6B-72-B3-D5-3E-67-AF-F9-A9-B4-68-12
+﻿//44-A6-3A-D2-34-0A-C6-47-D0-56-EA-82-F6-63-F2-C2-A6-B0-04-45-C9-B0-04-F8-50-52-C2-17-0C-1D-82-07
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -55,5 +55,24 @@ public sealed partial class ConsumerGroupHeartbeatRequestMessageTests
             TopicPartitions = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ConsumerGroupHeartbeatRequestMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new ConsumerGroupHeartbeatRequestMessage
+        {
+            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberEpoch = -420004200,
+            InstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            RebalanceTimeoutMs = -420004200,
+            SubscribedTopicNames = new (),
+            SubscribedTopicRegex = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ServerAssignor = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            TopicPartitions = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

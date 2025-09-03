@@ -29,7 +29,7 @@ using NKafka.Exceptions;
 
 namespace NKafka.Clients.Producer;
 
-internal sealed partial class Producer<TKey, TValue>
+internal sealed partial class Producer
 {
     /// <summary>
     /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.

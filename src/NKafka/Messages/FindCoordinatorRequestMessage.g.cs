@@ -1,4 +1,4 @@
-﻿//82-71-19-48-76-6E-06-C8-4F-35-6E-FA-C1-D8-FD-3B-66-01-E0-F9-EC-53-AC-CD-62-3E-2C-FB-A7-91-28-4D
+﻿//79-1C-D3-0F-CF-EC-FD-8F-5C-E3-17-8D-D7-18-59-4C-2B-63-B8-E8-2F-70-F1-A4-AF-96-F4-1D-80-54-E1-34
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -67,7 +67,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
     public string Key { get; set; } = string.Empty;
 
     /// <summary>
-    /// The coordinator key type. (Group, transaction, etc.)
+    /// The coordinator key type. (group, transaction, share).
     /// </summary>
     public sbyte KeyType { get; set; } = 0;
 

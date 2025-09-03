@@ -1,4 +1,4 @@
-﻿//65-69-27-BD-39-33-2E-9A-67-4B-2B-46-27-A2-69-D1-F7-C4-6D-A3-20-4E-7B-AF-C1-63-6D-33-38-6B-4A-F1
+﻿//4D-6F-AE-06-AB-1F-BE-D8-C7-5C-F7-0F-29-F5-48-9A-79-8C-BE-A4-87-67-0C-CD-C3-33-B0-78-53-33-A7-B5
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -287,7 +287,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetForLeaderTopicMessage");
             }
@@ -526,19 +526,12 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetForLeaderPartitionMessage");
             }
             Partition = reader.ReadInt();
-            if (version >= ApiVersion.Version2)
-            {
-                CurrentLeaderEpoch = reader.ReadInt();
-            }
-            else
-            {
-                CurrentLeaderEpoch = -1;
-            }
+            CurrentLeaderEpoch = reader.ReadInt();
             LeaderEpoch = reader.ReadInt();
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version4)
@@ -563,10 +556,7 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         {
             var numTaggedFields = 0;
             writer.WriteInt(Partition);
-            if (version >= ApiVersion.Version2)
-            {
-                writer.WriteInt(CurrentLeaderEpoch);
-            }
+            writer.WriteInt(CurrentLeaderEpoch);
             writer.WriteInt(LeaderEpoch);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

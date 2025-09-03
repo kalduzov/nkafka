@@ -1,4 +1,4 @@
-﻿//4C-58-38-94-7A-35-5C-BD-76-A8-EC-D0-A8-43-8D-C4-BA-26-12-BB-9F-3A-D1-DF-4A-59-99-87-E7-CA-6A-FC
+﻿//74-46-46-73-3D-68-8C-8B-13-EA-60-94-25-9C-9D-84-49-8C-EC-7F-D2-9D-49-95-FB-2A-23-3F-27-0B-12-91
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -81,6 +81,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
     public int ClusterAuthorizedOperations { get; set; } = -2147483648;
 
     /// <summary>
+    /// The top-level error code, or 0 if there was no error.
+    /// </summary>
+    public short ErrorCode { get; set; } = 0;
+
+    /// <inheritdoc />
+    public ErrorCodes Code => (ErrorCodes)ErrorCode;
+
+    /// <summary>
     /// The basic constructor of the message MetadataResponseMessage
     /// </summary>
     public MetadataResponseMessage()
@@ -100,14 +108,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version3)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         {
             if (version >= ApiVersion.Version9)
             {
@@ -146,7 +147,6 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 }
             }
         }
-        if (version >= ApiVersion.Version2)
         {
             int length;
             if (version >= ApiVersion.Version9)
@@ -170,18 +170,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 ClusterId = reader.ReadString(length);
             }
         }
-        else
-        {
-            ClusterId = null;
-        }
-        if (version >= ApiVersion.Version1)
-        {
-            ControllerId = reader.ReadInt();
-        }
-        else
-        {
-            ControllerId = -1;
-        }
+        ControllerId = reader.ReadInt();
         {
             if (version >= ApiVersion.Version9)
             {
@@ -228,6 +217,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
         {
             ClusterAuthorizedOperations = -2147483648;
         }
+        if (version >= ApiVersion.Version13)
+        {
+            ErrorCode = reader.ReadShort();
+        }
+        else
+        {
+            ErrorCode = 0;
+        }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version9)
         {
@@ -250,10 +247,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version3)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version9)
         {
             writer.WriteVarInt32(Brokers.Count + 1);
@@ -270,37 +264,31 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 element?.Write(ref writer, version);
             }
         }
-        if (version >= ApiVersion.Version2)
+        if (ClusterId is null)
         {
-            if (ClusterId is null)
+            if (version >= ApiVersion.Version9)
             {
-                if (version >= ApiVersion.Version9)
-                {
-                    writer.WriteVarInt32(0);
-                }
-                else
-                {
-                    writer.WriteShort(-1);
-                }
+                writer.WriteVarInt32(0);
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
-                if (version >= ApiVersion.Version9)
-                {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
-                }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+                writer.WriteShort(-1);
             }
         }
-        if (version >= ApiVersion.Version1)
+        else
         {
-            writer.WriteInt(ControllerId);
+            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
+            if (version >= ApiVersion.Version9)
+            {
+                writer.WriteVarInt32(stringBytes.Length + 1);
+            }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
         }
+        writer.WriteInt(ControllerId);
         if (version >= ApiVersion.Version9)
         {
             writer.WriteVarInt32(Topics.Count + 1);
@@ -327,6 +315,10 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             {
                 throw new UnsupportedVersionException($"Attempted to write a non-default ClusterAuthorizedOperations at version {version}");
             }
+        }
+        if (version >= ApiVersion.Version13)
+        {
+            writer.WriteShort((short)ErrorCode);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
@@ -411,6 +403,10 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
         {
             return false;
         }
+        if (ErrorCode != other.ErrorCode)
+        {
+            return false;
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -418,7 +414,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Brokers, ClusterId, ControllerId, Topics, ClusterAuthorizedOperations);
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, Brokers, ClusterId, ControllerId, Topics, ClusterAuthorizedOperations, ErrorCode);
         return hashCode;
     }
 
@@ -432,6 +428,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             + ", ControllerId=" + ControllerId
             + ", Topics=" + Topics.DeepToString()
             + ", ClusterAuthorizedOperations=" + ClusterAuthorizedOperations
+            + ", ErrorCode=" + ErrorCode
             + ")";
     }
 
@@ -486,7 +483,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseBrokerMessage");
             }
@@ -515,7 +512,6 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 }
             }
             Port = reader.ReadInt();
-            if (version >= ApiVersion.Version1)
             {
                 int length;
                 if (version >= ApiVersion.Version9)
@@ -538,10 +534,6 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 {
                     Rack = reader.ReadString(length);
                 }
-            }
-            else
-            {
-                Rack = null;
             }
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version9)
@@ -579,32 +571,29 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
-            if (version >= ApiVersion.Version1)
+            if (Rack is null)
             {
-                if (Rack is null)
+                if (version >= ApiVersion.Version9)
                 {
-                    if (version >= ApiVersion.Version9)
-                    {
-                        writer.WriteVarInt32(0);
-                    }
-                    else
-                    {
-                        writer.WriteShort(-1);
-                    }
+                    writer.WriteVarInt32(0);
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                    if (version >= ApiVersion.Version9)
-                    {
-                        writer.WriteVarInt32(stringBytes.Length + 1);
-                    }
-                    else
-                    {
-                        writer.WriteShort((short)stringBytes.Length);
-                    }
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteShort(-1);
                 }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Rack);
+                if (version >= ApiVersion.Version9)
+                {
+                    writer.WriteVarInt32(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -784,7 +773,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponseTopicMessage");
             }
@@ -827,14 +816,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             {
                 TopicId = Guid.Empty;
             }
-            if (version >= ApiVersion.Version1)
-            {
-                IsInternal = reader.ReadByte() != 0;
-            }
-            else
-            {
-                IsInternal = false;
-            }
+            IsInternal = reader.ReadByte() != 0;
             {
                 if (version >= ApiVersion.Version9)
                 {
@@ -931,10 +913,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             {
                 writer.WriteGuid(TopicId);
             }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteBool(IsInternal);
-            }
+            writer.WriteBool(IsInternal);
             if (version >= ApiVersion.Version9)
             {
                 writer.WriteVarInt32(Partitions.Count + 1);
@@ -1129,7 +1108,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataResponsePartitionMessage");
             }

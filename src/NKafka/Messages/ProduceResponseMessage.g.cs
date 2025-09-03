@@ -1,4 +1,4 @@
-﻿//64-DF-D3-82-2D-9F-75-73-C7-D4-70-A0-D1-61-03-60-30-F6-D4-8F-64-07-76-80-99-9A-F0-45-30-7C-E6-C7
+﻿//87-7E-3C-88-19-B8-6A-77-0E-8E-13-AD-7B-B8-BD-D6-AF-C7-5B-7C-5F-0B-E5-C8-25-C3-76-EB-D6-8A-FD-C7
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -51,7 +51,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// Each produce response
+    /// Each produce response.
     /// </summary>
     public TopicProduceResponseCollection Responses { get; set; } = new ();
 
@@ -123,14 +123,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                 }
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         {
             NodeEndpoints = new ();
         }
@@ -198,10 +191,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                 element?.Write(ref writer, version);
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version10)
         {
             if (NodeEndpoints.Count != 0)
@@ -321,7 +311,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The topic name
+        /// The topic name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
@@ -350,7 +340,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceResponseMessage");
             }
@@ -583,17 +573,17 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public long LogStartOffset { get; set; } = -1;
 
         /// <summary>
-        /// The batch indices of records that caused the batch to be dropped
+        /// The batch indices of records that caused the batch to be dropped.
         /// </summary>
         public List<BatchIndexAndErrorMessageMessage> RecordErrors { get; set; } = new ();
 
         /// <summary>
-        /// The global error message summarizing the common root cause of the records that caused the batch to be dropped
+        /// The global error message summarizing the common root cause of the records that caused the batch to be dropped.
         /// </summary>
         public string? ErrorMessage { get; set; } = null;
 
         /// <summary>
-        /// 
+        /// The leader broker that the producer should use for future requests.
         /// </summary>
         public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
@@ -617,21 +607,14 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceResponseMessage");
             }
             Index = reader.ReadInt();
             ErrorCode = reader.ReadShort();
             BaseOffset = reader.ReadLong();
-            if (version >= ApiVersion.Version2)
-            {
-                LogAppendTimeMs = reader.ReadLong();
-            }
-            else
-            {
-                LogAppendTimeMs = -1;
-            }
+            LogAppendTimeMs = reader.ReadLong();
             if (version >= ApiVersion.Version5)
             {
                 LogStartOffset = reader.ReadLong();
@@ -751,10 +734,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             writer.WriteInt(Index);
             writer.WriteShort((short)ErrorCode);
             writer.WriteLong(BaseOffset);
-            if (version >= ApiVersion.Version2)
-            {
-                writer.WriteLong(LogAppendTimeMs);
-            }
+            writer.WriteLong(LogAppendTimeMs);
             if (version >= ApiVersion.Version5)
             {
                 writer.WriteLong(LogStartOffset);
@@ -957,12 +937,12 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The batch index of the record that cause the batch to be dropped
+        /// The batch index of the record that caused the batch to be dropped.
         /// </summary>
         public int BatchIndex { get; set; } = 0;
 
         /// <summary>
-        /// The error message of the record that caused the batch to be dropped
+        /// The error message of the record that caused the batch to be dropped.
         /// </summary>
         public string? BatchIndexErrorMessage { get; set; } = null;
 
@@ -986,7 +966,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of BatchIndexAndErrorMessageMessage");
             }
@@ -1150,7 +1130,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public int LeaderId { get; set; } = -1;
 
         /// <summary>
-        /// The latest known leader epoch
+        /// The latest known leader epoch.
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
@@ -1174,7 +1154,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
@@ -1330,7 +1310,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of NodeEndpointMessage");
             }

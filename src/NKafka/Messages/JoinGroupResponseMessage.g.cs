@@ -1,4 +1,4 @@
-﻿//47-6E-FB-D6-87-DE-74-07-83-7D-51-AE-23-D3-79-1B-28-55-6A-D7-15-40-46-76-18-B6-BB-EA-E0-61-9E-39
+﻿//84-38-9D-93-E4-62-2F-59-F2-77-05-56-47-21-C5-97-15-4E-F1-0D-72-56-2B-3B-63-71-AB-51-E4-95-48-8C
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -94,7 +94,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
     public string MemberId { get; set; } = string.Empty;
 
     /// <summary>
-    /// 
+    /// The group members.
     /// </summary>
     public List<JoinGroupResponseMemberMessage> Members { get; set; } = new ();
 
@@ -118,14 +118,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version2)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         ErrorCode = reader.ReadShort();
         GenerationId = reader.ReadInt();
         if (version >= ApiVersion.Version7)
@@ -293,10 +286,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version2)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         writer.WriteShort((short)ErrorCode);
         writer.WriteInt(GenerationId);
         if (version >= ApiVersion.Version7)
@@ -575,7 +565,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of JoinGroupResponseMemberMessage");
             }

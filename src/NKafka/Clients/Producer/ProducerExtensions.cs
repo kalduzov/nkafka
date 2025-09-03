@@ -36,38 +36,32 @@ public static class ProducerExtensions
     /// <param name="message">The message to be produced.</param>
     /// <param name="token">A cancellation token that can be used to cancel the asynchronous operation.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains the delivery result of the produced message.</returns>
-    public static Task<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static Task<MessageDeliveryResult> ProduceAsync(this IProducer producer,
         string topicName,
-        Message<TKey, TValue> message,
+        Message message,
         CancellationToken token)
-        where TKey : notnull
-        where TValue : notnull
     {
         var topicPartition = new TopicPartition(topicName, Partition.Any);
 
-        return producer.Produce(topicPartition, message, token);
+        return producer.ProduceAsync(topicPartition, message, token);
     }
 
     /// <summary>
     /// Produces a batch of messages to the specified topic asynchronously.
     /// </summary>
-    /// <typeparam name="TKey">The type of the message key.</typeparam>
-    /// <typeparam name="TValue">The type of the message value.</typeparam>
     /// <param name="producer"></param>
     /// <param name="topicName">The name of the topic.</param>
     /// <param name="messages">The messages to be produced.</param>
     /// <param name="token">A cancellation token to cancel the operation.</param>
     /// <returns>Asynchronous enumerable that represents the delivery results for each produced message.</returns>
-    public static IAsyncEnumerable<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static IAsyncEnumerable<MessageDeliveryResult> ProduceAsync(this IProducer producer,
         string topicName,
-        IReadOnlyCollection<Message<TKey, TValue>> messages,
+        IReadOnlyCollection<Message> messages,
         CancellationToken token)
-        where TKey : notnull
-        where TValue : notnull
     {
         var topicPartition = new TopicPartition(topicName, Partition.Any);
 
-        return producer.Produce(topicPartition, messages, token);
+        return producer.ProduceAsync(topicPartition, messages, token);
     }
 
     /// <summary>
@@ -78,18 +72,16 @@ public static class ProducerExtensions
     /// <param name="messages">The messages to be produced.</param>
     /// <param name="token">The cancellation token to cancel the operation.</param>
     /// <returns>A sequence of delivery results for each produced message.</returns>
-    public static async IAsyncEnumerable<MessageDeliveryResult> Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    public static async IAsyncEnumerable<MessageDeliveryResult> ProduceAsync(this IProducer producer,
         TopicPartition topicPartition,
-        IReadOnlyCollection<Message<TKey, TValue>> messages,
+        IReadOnlyCollection<Message> messages,
         [EnumeratorCancellation] CancellationToken token)
-        where TKey : notnull
-        where TValue : notnull
     {
         var results = new List<Task<MessageDeliveryResult>>(messages.Count);
 
         foreach (var message in messages)
         {
-            results.Add(producer.Produce(topicPartition, message, token));
+            results.Add(producer.ProduceAsync(topicPartition, message, token));
         }
 
         foreach (var result in results)
@@ -106,12 +98,14 @@ public static class ProducerExtensions
     /// <param name="producer"></param>
     /// <param name="topicName"></param>
     /// <param name="message"></param>
-    public static void Produce<TKey, TValue>(this IProducer<TKey, TValue> producer, string topicName, Message<TKey, TValue> message)
-        where TKey : notnull
-        where TValue : notnull
+    /// <param name="cancellationToken"></param>
+    public static void Produce(this IProducer producer,
+        string topicName,
+        Message message,
+        CancellationToken cancellationToken)
     {
         var topicPartition = new TopicPartition(topicName, Partition.Any);
-        producer.Produce(topicPartition, message);
+        producer.Produce(topicPartition, message, cancellationToken, (_, _) => { });
     }
 
     /// <summary>
@@ -120,14 +114,14 @@ public static class ProducerExtensions
     /// <param name="producer"></param>
     /// <param name="topicName"></param>
     /// <param name="messages"></param>
-    public static void Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    /// <param name="cancellationToken"></param>
+    public static void Produce(this IProducer producer,
         string topicName,
-        IReadOnlyCollection<Message<TKey, TValue>> messages)
-        where TKey : notnull
-        where TValue : notnull
+        IReadOnlyCollection<Message> messages,
+        CancellationToken cancellationToken)
     {
         var topicPartition = new TopicPartition(topicName, Partition.Any);
-        producer.Produce(topicPartition, messages);
+        producer.Produce(topicPartition, messages, cancellationToken);
     }
 
     /// <summary>
@@ -136,15 +130,15 @@ public static class ProducerExtensions
     /// <param name="producer"></param>
     /// <param name="topicPartition"></param>
     /// <param name="messages"></param>
-    public static void Produce<TKey, TValue>(this IProducer<TKey, TValue> producer,
+    /// <param name="cancellationToken"></param>
+    public static void Produce(this IProducer producer,
         TopicPartition topicPartition,
-        IEnumerable<Message<TKey, TValue>> messages)
-        where TKey : notnull
-        where TValue : notnull
+        IEnumerable<Message> messages,
+        CancellationToken cancellationToken)
     {
         foreach (var message in messages)
         {
-            producer.Produce(topicPartition, message);
+            producer.Produce(topicPartition, message, cancellationToken, (_, _) => { });
         }
     }
 }

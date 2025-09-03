@@ -1,4 +1,4 @@
-﻿//5D-28-B8-2D-1A-5C-EE-D2-45-10-8D-3E-A5-A7-0A-B7-A4-EF-68-80-7F-8B-67-F1-41-4F-D9-62-1B-47-3C-94
+﻿//64-DE-5A-18-F5-14-65-BE-0E-58-57-2B-33-70-0D-AC-7E-19-83-A4-74-17-3E-12-C8-44-E2-FB-6A-04-C2-17
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -80,14 +80,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version1)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         {
             if (version >= ApiVersion.Version4)
             {
@@ -148,10 +141,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version4)
         {
             writer.WriteVarInt32(Responses.Count + 1);
@@ -247,12 +237,12 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The topic name
+        /// The topic name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// the unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -289,7 +279,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version6)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version6)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DeletableTopicResultMessage");
             }

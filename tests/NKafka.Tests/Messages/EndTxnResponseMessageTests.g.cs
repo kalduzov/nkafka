@@ -1,4 +1,4 @@
-﻿//2A-2C-BA-1C-3D-C4-1A-8F-B0-EF-F2-AB-AB-55-24-6C-81-E0-5D-27-A9-2D-ED-29-0E-5D-CE-C5-AB-A9-46-23
+﻿//F5-B2-67-54-8F-88-BE-99-91-41-19-A6-DD-E0-7C-42-AA-1F-A4-B2-B8-6E-96-7D-90-B3-1A-49-36-81-67-13
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -92,5 +92,18 @@ public sealed partial class EndTxnResponseMessageTests
             ErrorCode = -4242,
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'EndTxnResponseMessage' message by Version5")]
+    public void SerializeAndDeserializeMessage_ApiVersion5_Success()
+    {
+        var message = new EndTxnResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
     }
 }

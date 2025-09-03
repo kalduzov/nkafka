@@ -1,5 +1,3 @@
-
-
 ![Hex.pm](https://img.shields.io/hexpm/l/apa)
 
 [![Build](https://github.com/kalduzov/nkafka/actions/workflows/dotnet.yml/badge.svg)](https://github.com/kalduzov/nkafka/actions/workflows/dotnet.yml)
@@ -10,7 +8,8 @@ It is a high performance fully managed client for Kafka.
 
 # Disclaimer
 
-This project is not a port of some existing library. However, some of the solutions used in it have been adapted from other sources. The following libraries acted as such sources:
+This project is not a port of some existing library. However, some of the solutions used in it have been adapted from other sources. The following
+libraries acted as such sources:
 
 * https://github.com/apache/kafka
 * https://github.com/Shopify/sarama
@@ -38,19 +37,19 @@ var clusterConfig = new ClusterConfig
 
 await using var kafkaCluster = await clusterConfig.CreateClusterAsync();
 
-await using var producer = kafkaCluster.BuildProducer<Null, int>();
+await using var producer = kafkaCluster.BuildProducer();
 
-var testMessage = new Message<Null, int>
+var value = Serializers.String.Serialize("test");
+var testMessage = new Message(value)
 {
-    Value = 1,
     Partition = new Partition(1)
 };
 
 //send message with awaiting
-await producer.ProduceAsync("test_topic", testMessage);
+await producer.ProduceAsync("test_topic", testMessage, CancellationToken.None);
 
 //send message as fire and forget
-producer.Produce("test_topic", testMessage);
+producer.Produce("test_topic", testMessage, CancellationToken.None);
 
 Console.ReadKey();
 

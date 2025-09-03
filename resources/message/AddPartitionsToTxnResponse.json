@@ -78,7 +78,7 @@
           "name": "ResultsByPartition",
           "type": "[]AddPartitionsToTxnPartitionResult",
           "versions": "0+",
-          "about": "The results for each partition"
+          "about": "The results for each partition."
         }
       ]
     },

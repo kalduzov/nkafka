@@ -1,4 +1,4 @@
-﻿//2B-11-B2-54-E7-A1-39-3D-F3-B6-9F-50-6C-94-7B-2B-66-6B-0B-FD-C8-CD-A7-5D-5C-5B-7F-CB-59-F8-A5-36
+﻿//4D-F4-CA-8C-92-CE-E0-3E-A3-2F-9E-99-78-2C-36-51-29-25-30-AE-7F-EE-4A-E5-3C-38-F1-8C-72-35-C8-16
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -145,14 +145,7 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             }
         }
         SessionTimeoutMs = reader.ReadInt();
-        if (version >= ApiVersion.Version1)
-        {
-            RebalanceTimeoutMs = reader.ReadInt();
-        }
-        else
-        {
-            RebalanceTimeoutMs = -1;
-        }
+        RebalanceTimeoutMs = reader.ReadInt();
         {
             int length;
             if (version >= ApiVersion.Version6)
@@ -321,10 +314,7 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(SessionTimeoutMs);
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteInt(RebalanceTimeoutMs);
-        }
+        writer.WriteInt(RebalanceTimeoutMs);
         {
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
             if (version >= ApiVersion.Version6)
@@ -601,7 +591,7 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of JoinGroupRequestProtocolMessage");
             }

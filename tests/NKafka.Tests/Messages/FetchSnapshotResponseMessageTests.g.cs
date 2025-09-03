@@ -1,4 +1,4 @@
-﻿//80-8B-7D-A7-0D-30-51-A9-9E-CE-2B-8A-4E-81-C0-C5-91-AF-C7-57-4A-99-96-8E-65-0C-B2-F9-6F-52-AF-96
+﻿//72-35-98-19-0D-B3-D9-16-10-16-EA-FB-F5-B5-51-13-F0-6E-EF-53-22-76-C3-3B-90-E7-D0-9F-5B-F0-B7-F3
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -49,5 +49,18 @@ public sealed partial class FetchSnapshotResponseMessageTests
             Topics = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchSnapshotResponseMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new FetchSnapshotResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            Topics = new (),
+            NodeEndpoints = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

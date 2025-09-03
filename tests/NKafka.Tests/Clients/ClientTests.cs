@@ -28,7 +28,6 @@ using NKafka.Connection;
 using NKafka.Messages;
 using NKafka.Metrics;
 using NKafka.Protocol;
-using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients;
 
@@ -64,9 +63,7 @@ public abstract class ClientTests
         return new KafkaCluster(clusterConfig, NullLoggerFactory.Instance, connectionPool, clusterMetadata);
     }
 
-    protected static IProducer<TKey, TValue> CreateProducerForTests<TKey, TValue>(ProducerConfig config)
-        where TKey : notnull
-        where TValue : notnull
+    protected static IProducer CreateProducerForTests(ProducerConfig config)
     {
         var kafkaCluster = Substitute.For<IKafkaCluster>();
         kafkaCluster.Closed.Returns(true);
@@ -84,11 +81,9 @@ public abstract class ClientTests
 
         var messagesSender = Substitute.For<IMessagesSender>();
 
-        return new Producer<TKey, TValue>(kafkaCluster,
+        return new NKafka.Clients.Producer.Producer(kafkaCluster,
             "test_producer",
             config,
-            NoneSerializer<TKey>.Instance,
-            NoneSerializer<TValue>.Instance,
             transactionManager,
             recordAccumulator,
             messagesSender,
@@ -183,10 +178,9 @@ public abstract class ClientTests
     private static void SetupJointToGroupRequests(IKafkaConnector kafkaConnector)
     {
         kafkaConnector.SendAsync<JoinGroupRequestMessage, JoinGroupResponseMessage>(
-                Arg.Is<JoinGroupRequestMessage>(
-                    r => r.GroupId == "good_test"
-                         && string.IsNullOrWhiteSpace(r.MemberId)
-                         && r.ProtocolType == "consumer"),
+                Arg.Is<JoinGroupRequestMessage>(r => r.GroupId == "good_test"
+                                                     && string.IsNullOrWhiteSpace(r.MemberId)
+                                                     && r.ProtocolType == "consumer"),
                 false,
                 Arg.Any<CancellationToken>())
             .Returns(new JoinGroupResponseMessage
@@ -202,8 +196,7 @@ public abstract class ClientTests
     private static void SetupFindCoordinatorRequests(IKafkaConnector kafkaConnector)
     {
         kafkaConnector.SendAsync<FindCoordinatorRequestMessage, FindCoordinatorResponseMessage>(
-                Arg.Is<FindCoordinatorRequestMessage>(
-                    r => r.KeyType == 0 && (r.CoordinatorKeys.Contains("good_test") || r.Key == "good_test")),
+                Arg.Is<FindCoordinatorRequestMessage>(r => r.KeyType == 0 && (r.CoordinatorKeys.Contains("good_test") || r.Key == "good_test")),
                 false,
                 Arg.Any<CancellationToken>())
             .Returns(new FindCoordinatorResponseMessage

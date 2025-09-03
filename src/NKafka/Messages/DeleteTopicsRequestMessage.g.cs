@@ -1,4 +1,4 @@
-﻿//F4-D3-44-8F-79-FE-10-48-1B-97-D5-2A-89-31-28-77-88-2C-7F-E4-59-3C-D2-5A-47-EE-B6-31-CE-45-2D-99
+﻿//92-E3-D8-6F-E1-DD-5B-44-BB-37-15-76-9C-69-62-A3-E4-9D-DD-E9-A4-E1-8A-7B-7E-15-9B-7D-4B-1A-C7-BF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -62,12 +62,12 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The name or topic ID of the topic
+    /// The name or topic ID of the topic.
     /// </summary>
     public List<DeleteTopicStateMessage> Topics { get; set; } = new ();
 
     /// <summary>
-    /// The names of the topics to delete
+    /// The names of the topics to delete.
     /// </summary>
     public List<string> TopicNames { get; set; } = new ();
 
@@ -347,12 +347,12 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The topic name
+        /// The topic name.
         /// </summary>
         public string? Name { get; set; } = null;
 
         /// <summary>
-        /// The unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 

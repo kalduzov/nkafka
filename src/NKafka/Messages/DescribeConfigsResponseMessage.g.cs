@@ -1,4 +1,4 @@
-﻿//92-F9-0D-43-6B-EA-73-C5-7C-0A-1D-F1-3B-A4-81-9D-0D-40-42-BA-20-9F-DC-73-D8-BE-86-13-FE-F3-E3-E8
+﻿//3A-49-6A-E6-9A-4A-BC-70-18-2B-4B-3E-C2-AE-D4-05-41-E2-7F-88-50-04-0F-BE-4C-7D-05-01-7E-09-EC-C6
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -284,7 +284,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResultMessage");
             }
@@ -580,11 +580,6 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         public bool ReadOnly { get; set; } = false;
 
         /// <summary>
-        /// True if the configuration is not set.
-        /// </summary>
-        public bool IsDefault { get; set; } = false;
-
-        /// <summary>
         /// The configuration source.
         /// </summary>
         public sbyte ConfigSource { get; set; } = -1;
@@ -600,7 +595,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         public List<DescribeConfigsSynonymMessage> Synonyms { get; set; } = new ();
 
         /// <summary>
-        /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD
+        /// The configuration data type. Type can be one of the following values - BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD.
         /// </summary>
         public sbyte ConfigType { get; set; } = 0;
 
@@ -629,7 +624,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResourceResultMessage");
             }
@@ -680,24 +675,8 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 }
             }
             ReadOnly = reader.ReadByte() != 0;
-            if (version <= ApiVersion.Version0)
-            {
-                IsDefault = reader.ReadByte() != 0;
-            }
-            else
-            {
-                IsDefault = false;
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                ConfigSource = reader.ReadSByte();
-            }
-            else
-            {
-                ConfigSource = -1;
-            }
+            ConfigSource = reader.ReadSByte();
             IsSensitive = reader.ReadByte() != 0;
-            if (version >= ApiVersion.Version1)
             {
                 if (version >= ApiVersion.Version4)
                 {
@@ -735,10 +714,6 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                         Synonyms = newCollection;
                     }
                 }
-            }
-            else
-            {
-                Synonyms = new ();
             }
             if (version >= ApiVersion.Version3)
             {
@@ -835,39 +810,22 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteBool(ReadOnly);
-            if (version <= ApiVersion.Version0)
+            writer.WriteSByte(ConfigSource);
+            writer.WriteBool(IsSensitive);
+            if (version >= ApiVersion.Version4)
             {
-                writer.WriteBool(IsDefault);
+                writer.WriteVarInt32(Synonyms.Count + 1);
+                foreach (var element in Synonyms)
+                {
+                    element?.Write(ref writer, version);
+                }
             }
             else
             {
-                if (IsDefault)
+                writer.WriteInt(Synonyms.Count);
+                foreach (var element in Synonyms)
                 {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default IsDefault at version {version}");
-                }
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteSByte(ConfigSource);
-            }
-            writer.WriteBool(IsSensitive);
-            if (version >= ApiVersion.Version1)
-            {
-                if (version >= ApiVersion.Version4)
-                {
-                    writer.WriteVarInt32(Synonyms.Count + 1);
-                    foreach (var element in Synonyms)
-                    {
-                        element?.Write(ref writer, version);
-                    }
-                }
-                else
-                {
-                    writer.WriteInt(Synonyms.Count);
-                    foreach (var element in Synonyms)
-                    {
-                        element?.Write(ref writer, version);
-                    }
+                    element?.Write(ref writer, version);
                 }
             }
             if (version >= ApiVersion.Version3)
@@ -962,10 +920,6 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 return false;
             }
-            if (IsDefault != other.IsDefault)
-            {
-                return false;
-            }
             if (ConfigSource != other.ConfigSource)
             {
                 return false;
@@ -1013,8 +967,8 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Name, Value, ReadOnly, IsDefault, ConfigSource, IsSensitive, Synonyms);
-            hashCode = HashCode.Combine(hashCode, ConfigType, Documentation);
+            hashCode = HashCode.Combine(hashCode, Name, Value, ReadOnly, ConfigSource, IsSensitive, Synonyms, ConfigType);
+            hashCode = HashCode.Combine(hashCode, Documentation);
             return hashCode;
         }
 
@@ -1025,7 +979,6 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
                 + ", Value=" + (string.IsNullOrWhiteSpace(Value) ? "null" : Value)
                 + ", ReadOnly=" + (ReadOnly ? "true" : "false")
-                + ", IsDefault=" + (IsDefault ? "true" : "false")
                 + ", ConfigSource=" + ConfigSource
                 + ", IsSensitive=" + (IsSensitive ? "true" : "false")
                 + ", Synonyms=" + Synonyms.DeepToString()
@@ -1153,10 +1106,6 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         /// <inheritdoc />
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
-            if (version < ApiVersion.Version1)
-            {
-                throw new UnsupportedVersionException($"Can't write version {version} of DescribeConfigsSynonymMessage");
-            }
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);

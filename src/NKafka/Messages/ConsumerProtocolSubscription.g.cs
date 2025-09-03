@@ -1,4 +1,4 @@
-﻿//63-68-6E-29-BA-F6-C1-EE-8E-6F-BC-AC-EB-FE-F3-AF-77-DF-FB-09-65-F3-FD-29-0C-2E-6A-2B-AD-55-08-33
+﻿//69-99-ED-BC-C8-23-48-26-91-2C-9E-C5-08-A9-68-D9-50-18-E8-00-2B-1C-7B-CF-46-28-1E-90-AD-5E-05-AE
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -51,27 +51,27 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// 
+    /// The topics that the member wants to consume.
     /// </summary>
     public List<string> Topics { get; set; } = new ();
 
     /// <summary>
-    /// 
+    /// User data that will be passed back to the consumer.
     /// </summary>
     public byte[]? UserData { get; set; } = null;
 
     /// <summary>
-    /// 
+    /// The partitions that the member owns.
     /// </summary>
     public TopicPartitionCollection OwnedPartitions { get; set; } = new ();
 
     /// <summary>
-    /// 
+    /// The generation id of the member.
     /// </summary>
     public int GenerationId { get; set; } = -1;
 
     /// <summary>
-    /// 
+    /// The rack id of the member.
     /// </summary>
     public string? RackId { get; set; } = null;
 
@@ -344,12 +344,12 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The topic name.
         /// </summary>
         public string Topic { get; set; } = string.Empty;
 
         /// <summary>
-        /// 
+        /// The partition ids.
         /// </summary>
         public List<int> Partitions { get; set; } = new ();
 

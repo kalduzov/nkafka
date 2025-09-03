@@ -1,4 +1,4 @@
-﻿//2B-11-B2-54-E7-A1-39-3D-F3-B6-9F-50-6C-94-7B-2B-66-6B-0B-FD-C8-CD-A7-5D-5C-5B-7F-CB-59-F8-A5-36
+﻿//4D-F4-CA-8C-92-CE-E0-3E-A3-2F-9E-99-78-2C-36-51-29-25-30-AE-7F-EE-4A-E5-3C-38-F1-8C-72-35-C8-16
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,35 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class JoinGroupRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new JoinGroupRequestMessage
-        {
-            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            SessionTimeoutMs = -420004200,
-            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProtocolType = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            Protocols = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupRequestMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new JoinGroupRequestMessage
-        {
-            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            SessionTimeoutMs = -420004200,
-            RebalanceTimeoutMs = -420004200,
-            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            ProtocolType = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            Protocols = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()

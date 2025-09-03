@@ -1,4 +1,4 @@
-﻿//7E-A5-B3-5E-E7-CE-EE-9E-DF-49-59-E0-53-F5-C4-02-55-5C-B3-56-FA-91-16-06-37-65-4B-29-05-E2-9D-59
+﻿//38-0A-E2-87-49-93-68-53-90-7E-92-CE-5A-0F-C1-58-3A-A6-32-EB-97-03-5E-3B-D2-01-35-9C-11-95-71-88
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -140,14 +140,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
                 ResourceNameFilter = reader.ReadString(length);
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            PatternTypeFilter = reader.ReadSByte();
-        }
-        else
-        {
-            PatternTypeFilter = 3;
-        }
+        PatternTypeFilter = reader.ReadSByte();
         {
             int length;
             if (version >= ApiVersion.Version2)
@@ -243,17 +236,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             }
             writer.WriteBytes(stringBytes);
         }
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteSByte(PatternTypeFilter);
-        }
-        else
-        {
-            if (PatternTypeFilter != 3)
-            {
-                throw new UnsupportedVersionException($"Attempted to write a non-default PatternTypeFilter at version {version}");
-            }
-        }
+        writer.WriteSByte(PatternTypeFilter);
         if (PrincipalFilter is null)
         {
             if (version >= ApiVersion.Version2)

@@ -1,4 +1,4 @@
-﻿//C8-56-D4-77-8B-3C-9C-AF-86-E5-C4-4A-09-74-85-91-BD-69-D4-5D-95-89-69-D9-B1-16-5B-8F-51-60-2E-E1
+﻿//3F-56-59-C7-93-B7-11-53-CC-ED-32-EA-CB-67-21-B0-51-96-19-73-14-42-BF-49-A9-F6-0A-95-85-1A-B6-19
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -546,7 +546,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestTopicMessage");
             }
@@ -790,7 +790,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version > ApiVersion.Version5)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TxnOffsetCommitRequestPartitionMessage");
             }

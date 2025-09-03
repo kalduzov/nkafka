@@ -47,11 +47,7 @@ internal sealed class StringSerializer: ISerializer<string>
 
         var status = Utf8.FromUtf16(source, dest, out _, out _, replaceInvalidSequences: false);
 
-        if (status != OperationStatus.Done)
-        {
-            throw new SerializeDataException("Cannot serialize data.");
-        }
+        return status != OperationStatus.Done ? throw new SerializeDataException("Cannot serialize data.") : dest;
 
-        return dest;
     }
 }

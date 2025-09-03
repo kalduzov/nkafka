@@ -1,4 +1,4 @@
-﻿//94-53-4F-00-58-70-C8-16-32-D3-1F-55-60-53-22-D0-A6-68-16-A2-E6-EE-F0-75-C9-C3-F7-4A-99-0A-50-15
+﻿//CF-FB-3C-CA-1F-72-88-B8-8D-D1-D2-F3-CE-5B-AD-28-D1-6A-EF-C5-E2-6E-DE-02-C2-1E-2A-52-3E-46-00-E5
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -62,22 +62,22 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The clusterId if known, this is used to validate metadata fetches prior to broker registration
+    /// The clusterId if known, this is used to validate metadata fetches prior to broker registration.
     /// </summary>
     public string? ClusterId { get; set; } = null;
 
     /// <summary>
-    /// The broker ID of the follower
+    /// The broker ID of the follower.
     /// </summary>
     public int ReplicaId { get; set; } = -1;
 
     /// <summary>
-    /// The maximum bytes to fetch from all of the snapshots
+    /// The maximum bytes to fetch from all of the snapshots.
     /// </summary>
     public int MaxBytes { get; set; } = 2147483647;
 
     /// <summary>
-    /// The topics to fetch
+    /// The topics to fetch.
     /// </summary>
     public List<TopicSnapshotMessage> Topics { get; set; } = new ();
 
@@ -268,12 +268,12 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The name of the topic to fetch
+        /// The name of the topic to fetch.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The partitions to fetch
+        /// The partitions to fetch.
         /// </summary>
         public List<PartitionSnapshotMessage> Partitions { get; set; } = new ();
 
@@ -297,7 +297,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicSnapshotMessage");
             }
@@ -443,24 +443,29 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The partition index
+        /// The partition index.
         /// </summary>
         public int Partition { get; set; } = 0;
 
         /// <summary>
-        /// The current leader epoch of the partition, -1 for unknown leader epoch
+        /// The current leader epoch of the partition, -1 for unknown leader epoch.
         /// </summary>
         public int CurrentLeaderEpoch { get; set; } = 0;
 
         /// <summary>
-        /// The snapshot endOffset and epoch to fetch
+        /// The snapshot endOffset and epoch to fetch.
         /// </summary>
         public SnapshotIdMessage SnapshotId { get; set; } = new ();
 
         /// <summary>
-        /// The byte position within the snapshot to start fetching from
+        /// The byte position within the snapshot to start fetching from.
         /// </summary>
         public long Position { get; set; } = 0;
+
+        /// <summary>
+        /// The directory id of the follower fetching.
+        /// </summary>
+        public Guid ReplicaDirectoryId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The basic constructor of the message PartitionSnapshotMessage
@@ -482,7 +487,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionSnapshotMessage");
             }
@@ -492,6 +497,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
                 SnapshotId = new SnapshotIdMessage(ref reader, version);
             }
             Position = reader.ReadLong();
+            ReplicaDirectoryId = Guid.Empty;
             UnknownTaggedFields = null;
             var numTaggedFields = reader.ReadVarInt32();
             for (var t = 0; t < numTaggedFields; t++)
@@ -500,6 +506,18 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
                 var size = reader.ReadVarInt32();
                 switch (tag)
                 {
+                    case 0:
+                    {
+                        if (version >= ApiVersion.Version1)
+                        {
+                            ReplicaDirectoryId = reader.ReadGuid();
+                            break;
+                        }
+                        else
+                        {
+                            throw new Exception($"Tag 0 is not valid for version {version}");
+                        }
+                    }
                     default:
                         UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                         break;
@@ -515,9 +533,24 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             writer.WriteInt(CurrentLeaderEpoch);
             SnapshotId?.Write(ref writer, version);
             writer.WriteLong(Position);
+            if (version >= ApiVersion.Version1)
+            {
+                if (!ReplicaDirectoryId.Equals(Guid.Empty))
+                {
+                    numTaggedFields++;
+                }
+            }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             writer.WriteVarInt32(numTaggedFields);
+            {
+                if (!ReplicaDirectoryId.Equals(Guid.Empty))
+                {
+                    writer.WriteVarInt32(0);
+                    writer.WriteVarInt32(16);
+                    writer.WriteGuid(ReplicaDirectoryId);
+                }
+            }
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -560,6 +593,10 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             {
                 return false;
             }
+            if (!ReplicaDirectoryId.Equals(other.ReplicaDirectoryId))
+            {
+                return false;
+            }
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
@@ -567,7 +604,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, SnapshotId, Position);
+            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, SnapshotId, Position, ReplicaDirectoryId);
             return hashCode;
         }
 
@@ -579,6 +616,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
                 + ", CurrentLeaderEpoch=" + CurrentLeaderEpoch
                 + ", SnapshotId=" + SnapshotId.ToString()
                 + ", Position=" + Position
+                + ", ReplicaDirectoryId=" + ReplicaDirectoryId
                 + ")";
         }
     }
@@ -595,12 +633,12 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The end offset of the snapshot.
         /// </summary>
         public long EndOffset { get; set; } = 0;
 
         /// <summary>
-        /// 
+        /// The epoch of the snapshot.
         /// </summary>
         public int Epoch { get; set; } = 0;
 
@@ -624,7 +662,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
             }

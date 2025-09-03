@@ -1,4 +1,4 @@
-﻿//08-D3-BB-A6-8F-62-94-0E-F1-76-F7-48-F8-12-75-B6-69-43-2A-44-6D-5C-1B-7D-F0-90-F1-89-D9-30-FD-34
+﻿//92-2A-A9-42-73-43-F5-CC-B9-20-BD-82-AE-40-78-FF-8B-63-22-23-8D-94-98-D2-E6-D3-10-0F-AC-FF-84-AE
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,42 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ProduceRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new ProduceRequestMessage
-        {
-            Acks = -4242,
-            TimeoutMs = -420004200,
-            TopicData = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new ProduceRequestMessage
-        {
-            Acks = -4242,
-            TimeoutMs = -420004200,
-            TopicData = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version2")]
-    public void SerializeAndDeserializeMessage_ApiVersion2_Success()
-    {
-        var message = new ProduceRequestMessage
-        {
-            Acks = -4242,
-            TimeoutMs = -420004200,
-            TopicData = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version3")]
     public void SerializeAndDeserializeMessage_ApiVersion3_Success()
@@ -190,5 +154,18 @@ public sealed partial class ProduceRequestMessageTests
             TopicData = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version12")]
+    public void SerializeAndDeserializeMessage_ApiVersion12_Success()
+    {
+        var message = new ProduceRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Acks = -4242,
+            TimeoutMs = -420004200,
+            TopicData = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
     }
 }

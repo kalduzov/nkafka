@@ -1,4 +1,4 @@
-﻿//24-65-B0-40-D3-18-13-EE-A4-42-B8-81-B4-1B-DC-09-8D-7D-B2-1C-F9-C1-C4-6C-49-39-D7-A1-C2-65-47-B5
+﻿//13-C4-34-C7-12-A1-CA-07-75-DF-05-17-5C-E9-A0-65-CE-BF-9B-80-F6-43-26-8D-75-17-CC-F8-78-BB-2B-01
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -544,7 +544,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The results for each partition
+        /// The results for each partition.
         /// </summary>
         public AddPartitionsToTxnPartitionResultCollection ResultsByPartition { get; set; } = new ();
 

@@ -298,9 +298,9 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             {
                 try
                 {
-                    var key = _keyDeserializer.Deserialize(record.Key);
-                    var value = _valueDeserializer.Deserialize(record.Value);
-                    var message = new Message<TKey, TValue>(key, value);
+                    var key = record.Key ?? [];
+                    var value = record.Value ?? [];
+                    var message = new Message(key, value);
                     var consumeRecord = new ConsumerRecord<TKey, TValue>(message)
                     {
                         Partition = partitionDataMessage.PartitionIndex,

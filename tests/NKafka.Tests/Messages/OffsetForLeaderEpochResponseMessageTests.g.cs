@@ -1,4 +1,4 @@
-﻿//38-AC-2B-AF-8A-8A-64-08-D8-17-43-9C-B7-10-66-B7-86-97-25-A8-D0-F6-75-95-7E-70-F3-66-E2-0F-57-C6
+﻿//B1-82-D5-CE-8C-9C-B2-D4-4E-E5-67-69-0F-0D-F0-C6-23-59-F6-71-A7-83-D3-A8-7E-42-A9-81-C6-C9-C1-41
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,26 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class OffsetForLeaderEpochResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new OffsetForLeaderEpochResponseMessage
-        {
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochResponseMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new OffsetForLeaderEpochResponseMessage
-        {
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetForLeaderEpochResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()

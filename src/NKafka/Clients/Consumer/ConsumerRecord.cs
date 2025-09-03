@@ -36,7 +36,7 @@ public class ConsumerRecord<TKey, TValue>
     /// 
     /// </summary>
     /// <param name="message"></param>
-    public ConsumerRecord(Message<TKey, TValue> message)
+    public ConsumerRecord(Message message)
     {
         Message = message;
     }
@@ -79,7 +79,7 @@ public class ConsumerRecord<TKey, TValue>
     ///     The Kafka message, or null if this ConsumeResult
     ///     instance represents an end of partition event.
     /// </summary>
-    public Message<TKey, TValue> Message { get; set; }
+    public Message Message { get; set; }
 
     /// <summary>
     ///     True if this instance represents an end of partition

@@ -1,4 +1,4 @@
-﻿//A2-0C-22-F3-23-21-59-3F-52-47-54-2A-E7-06-7E-4B-B5-74-8C-4A-E0-74-DD-04-31-00-41-36-0F-F6-DD-13
+﻿//5E-61-C9-42-3B-75-6B-5A-4E-83-A4-45-BE-86-CC-51-63-EF-32-8E-5E-9D-15-86-F6-0F-09-89-B7-0B-B8-23
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,59 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class FetchRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new FetchRequestMessage
-        {
-            ReplicaId = -420004200,
-            MaxWaitMs = -420004200,
-            MinBytes = -420004200,
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new FetchRequestMessage
-        {
-            ReplicaId = -420004200,
-            MaxWaitMs = -420004200,
-            MinBytes = -420004200,
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version2")]
-    public void SerializeAndDeserializeMessage_ApiVersion2_Success()
-    {
-        var message = new FetchRequestMessage
-        {
-            ReplicaId = -420004200,
-            MaxWaitMs = -420004200,
-            MinBytes = -420004200,
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version3")]
-    public void SerializeAndDeserializeMessage_ApiVersion3_Success()
-    {
-        var message = new FetchRequestMessage
-        {
-            ReplicaId = -420004200,
-            MaxWaitMs = -420004200,
-            MinBytes = -420004200,
-            MaxBytes = -420004200,
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()
@@ -326,5 +273,25 @@ public sealed partial class FetchRequestMessageTests
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version16);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version17")]
+    public void SerializeAndDeserializeMessage_ApiVersion17_Success()
+    {
+        var message = new FetchRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaState = new (),
+            MaxWaitMs = -420004200,
+            MinBytes = -420004200,
+            MaxBytes = -420004200,
+            IsolationLevel = 42,
+            SessionId = -420004200,
+            SessionEpoch = -420004200,
+            Topics = new (),
+            ForgottenTopicsData = new (),
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version17);
     }
 }

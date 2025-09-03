@@ -1,4 +1,4 @@
-﻿//5F-44-E2-56-D7-71-4C-5F-88-07-45-46-76-CF-ED-BF-C1-86-05-EA-79-62-A7-79-DC-C4-C9-DF-25-25-74-4E
+﻿//1D-3C-63-79-E1-61-55-8A-76-36-AE-37-E9-80-73-DC-FD-49-C9-4A-64-E6-98-7D-5A-FF-AA-30-FD-B2-88-8F
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -135,14 +135,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
             }
         }
         timeoutMs = reader.ReadInt();
-        if (version >= ApiVersion.Version1)
-        {
-            validateOnly = reader.ReadByte() != 0;
-        }
-        else
-        {
-            validateOnly = false;
-        }
+        validateOnly = reader.ReadByte() != 0;
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version5)
         {
@@ -182,17 +175,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
             }
         }
         writer.WriteInt(timeoutMs);
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteBool(validateOnly);
-        }
-        else
-        {
-            if (validateOnly)
-            {
-                throw new UnsupportedVersionException($"Attempted to write a non-default validateOnly at version {version}");
-            }
-        }
+        writer.WriteBool(validateOnly);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version5)
@@ -299,7 +282,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <summary>
         /// The custom topic configurations to set.
         /// </summary>
-        public CreateableTopicConfigCollection Configs { get; set; } = new ();
+        public CreatableTopicConfigCollection Configs { get; set; } = new ();
 
         /// <summary>
         /// The basic constructor of the message CreatableTopicMessage
@@ -321,7 +304,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreatableTopicMessage");
             }
@@ -399,10 +382,10 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
                     }
                     else
                     {
-                        var newCollection = new CreateableTopicConfigCollection(arrayLength);
+                        var newCollection = new CreatableTopicConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreateableTopicConfigMessage(ref reader, version));
+                            newCollection.Add(new CreatableTopicConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -417,10 +400,10 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
                     }
                     else
                     {
-                        var newCollection = new CreateableTopicConfigCollection(arrayLength);
+                        var newCollection = new CreatableTopicConfigCollection(arrayLength);
                         for (var i = 0; i < arrayLength; i++)
                         {
-                            newCollection.Add(new CreateableTopicConfigMessage(ref reader, version));
+                            newCollection.Add(new CreatableTopicConfigMessage(ref reader, version));
                         }
                         Configs = newCollection;
                     }
@@ -638,7 +621,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreatableReplicaAssignmentMessage");
             }
@@ -797,9 +780,9 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
     }
 
     /// <summary>
-    /// Describes the contract for message CreateableTopicConfigMessage
+    /// Describes the contract for message CreatableTopicConfigMessage
     /// </summary>
-    internal sealed partial class CreateableTopicConfigMessage: IMessage, IEquatable<CreateableTopicConfigMessage>
+    internal sealed partial class CreatableTopicConfigMessage: IMessage, IEquatable<CreatableTopicConfigMessage>
     {
         /// <inheritdoc />
         public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
@@ -818,16 +801,16 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         public string Value { get; set; } = string.Empty;
 
         /// <summary>
-        /// The basic constructor of the message CreateableTopicConfigMessage
+        /// The basic constructor of the message CreatableTopicConfigMessage
         /// </summary>
-        public CreateableTopicConfigMessage()
+        public CreatableTopicConfigMessage()
         {
         }
 
         /// <summary>
-        /// Base constructor for deserializing message CreateableTopicConfigMessage
+        /// Base constructor for deserializing message CreatableTopicConfigMessage
         /// </summary>
-        public CreateableTopicConfigMessage(ref BufferReader reader, ApiVersion version)
+        public CreatableTopicConfigMessage(ref BufferReader reader, ApiVersion version)
             : this()
         {
             IncomingBufferLength = reader.Length;
@@ -837,9 +820,9 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version7)
             {
-                throw new UnsupportedVersionException($"Can't read version {version} of CreateableTopicConfigMessage");
+                throw new UnsupportedVersionException($"Can't read version {version} of CreatableTopicConfigMessage");
             }
             {
                 int length;
@@ -964,11 +947,11 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return ReferenceEquals(this, obj) || obj is CreateableTopicConfigMessage other && Equals(other);
+            return ReferenceEquals(this, obj) || obj is CreatableTopicConfigMessage other && Equals(other);
         }
 
         /// <inheritdoc />
-        public bool Equals(CreateableTopicConfigMessage? other)
+        public bool Equals(CreatableTopicConfigMessage? other)
         {
             if (other is null)
             {
@@ -1016,7 +999,7 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         /// <inheritdoc />
         public override string ToString()
         {
-            return "CreateableTopicConfigMessage("
+            return "CreatableTopicConfigMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
                 + ", Value=" + (string.IsNullOrWhiteSpace(Value) ? "null" : Value)
                 + ")";
@@ -1024,28 +1007,28 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
     }
 
     /// <summary>
-    /// Describes the contract for message CreateableTopicConfigCollection
+    /// Describes the contract for message CreatableTopicConfigCollection
     /// </summary>
-    internal sealed partial class CreateableTopicConfigCollection: HashSet<CreateableTopicConfigMessage>
+    internal sealed partial class CreatableTopicConfigCollection: HashSet<CreatableTopicConfigMessage>
     {
         /// <summary>
         /// Basic collection constructor
         /// </summary>
-        public CreateableTopicConfigCollection()
+        public CreatableTopicConfigCollection()
         {
         }
 
         /// <summary>
         /// Basic collection constructor with the ability to set capacity
         /// </summary>
-        public CreateableTopicConfigCollection(int capacity)
+        public CreatableTopicConfigCollection(int capacity)
             : base(capacity)
         {
         }
         /// <inheritdoc />
         public override bool Equals(object? obj)
         {
-            return SetEquals((IEnumerable<CreateableTopicConfigMessage>)obj);
+            return SetEquals((IEnumerable<CreatableTopicConfigMessage>)obj);
         }
     }
 

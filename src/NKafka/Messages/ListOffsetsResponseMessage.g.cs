@@ -1,4 +1,4 @@
-﻿//D2-7B-90-96-02-76-F5-1B-2A-14-2D-F4-94-9A-41-8F-12-6E-E5-03-6C-82-61-41-9F-98-4F-AD-A3-53-65-C9
+﻿//0B-84-08-F8-D7-6F-9C-47-01-75-A9-CB-D0-E2-FA-10-DF-92-41-5C-5A-B0-AB-57-D7-FE-C5-9E-73-11-61-6E
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -247,7 +247,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// The topic name
+        /// The topic name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
 
@@ -276,7 +276,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicResponseMessage");
             }
@@ -494,11 +494,6 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
-        /// The result offsets.
-        /// </summary>
-        public List<long> OldStyleOffsets { get; set; } = new ();
-
-        /// <summary>
         /// The timestamp associated with the returned offset.
         /// </summary>
         public long Timestamp { get; set; } = -1;
@@ -509,7 +504,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         public long Offset { get; set; } = -1;
 
         /// <summary>
-        /// 
+        /// The leader epoch associated with the returned offset.
         /// </summary>
         public int LeaderEpoch { get; set; } = -1;
 
@@ -533,50 +528,14 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version8)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionResponseMessage");
             }
             PartitionIndex = reader.ReadInt();
             ErrorCode = reader.ReadShort();
-            if (version <= ApiVersion.Version0)
-            {
-                int arrayLength;
-                arrayLength = reader.ReadInt();
-                if (arrayLength < 0)
-                {
-                    throw new Exception("non-nullable field OldStyleOffsets was serialized as null");
-                }
-                else
-                {
-                    var newCollection = new List<long>(arrayLength);
-                    for (var i = 0; i < arrayLength; i++)
-                    {
-                        newCollection.Add(reader.ReadLong());
-                    }
-                    OldStyleOffsets = newCollection;
-                }
-            }
-            else
-            {
-                OldStyleOffsets = new ();
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                Timestamp = reader.ReadLong();
-            }
-            else
-            {
-                Timestamp = -1;
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                Offset = reader.ReadLong();
-            }
-            else
-            {
-                Offset = -1;
-            }
+            Timestamp = reader.ReadLong();
+            Offset = reader.ReadLong();
             if (version >= ApiVersion.Version4)
             {
                 LeaderEpoch = reader.ReadInt();
@@ -609,43 +568,8 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             writer.WriteInt(PartitionIndex);
             writer.WriteShort((short)ErrorCode);
-            if (version <= ApiVersion.Version0)
-            {
-                writer.WriteInt(OldStyleOffsets.Count);
-                foreach (var element in OldStyleOffsets)
-                {
-                    writer.WriteLong(element);
-                }
-            }
-            else
-            {
-                if (OldStyleOffsets.Count != 0)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default OldStyleOffsets at version {version}");
-                }
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteLong(Timestamp);
-            }
-            else
-            {
-                if (Timestamp != -1)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default Timestamp at version {version}");
-                }
-            }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteLong(Offset);
-            }
-            else
-            {
-                if (Offset != -1)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default Offset at version {version}");
-                }
-            }
+            writer.WriteLong(Timestamp);
+            writer.WriteLong(Offset);
             if (version >= ApiVersion.Version4)
             {
                 writer.WriteInt(LeaderEpoch);
@@ -694,20 +618,6 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
             {
                 return false;
             }
-            if (OldStyleOffsets is null)
-            {
-                if (other.OldStyleOffsets is not null)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (!OldStyleOffsets.SequenceEqual(other.OldStyleOffsets))
-                {
-                    return false;
-                }
-            }
             if (Timestamp != other.Timestamp)
             {
                 return false;
@@ -727,7 +637,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, OldStyleOffsets, Timestamp, Offset, LeaderEpoch);
+            hashCode = HashCode.Combine(hashCode, PartitionIndex, ErrorCode, Timestamp, Offset, LeaderEpoch);
             return hashCode;
         }
 
@@ -737,7 +647,6 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
             return "ListOffsetsPartitionResponseMessage("
                 + "PartitionIndex=" + PartitionIndex
                 + ", ErrorCode=" + ErrorCode
-                + ", OldStyleOffsets=" + OldStyleOffsets.DeepToString()
                 + ", Timestamp=" + Timestamp
                 + ", Offset=" + Offset
                 + ", LeaderEpoch=" + LeaderEpoch

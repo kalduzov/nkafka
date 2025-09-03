@@ -1,4 +1,4 @@
-﻿//72-F5-83-12-D3-AB-F7-BB-9E-46-71-F4-C6-B5-36-BB-E4-9C-8C-96-64-59-62-69-FA-90-3B-3D-02-A6-B7-9E
+﻿//14-E7-6A-BA-3B-6D-E2-E1-E4-83-26-CE-E7-33-8B-36-3D-CB-3A-81-FA-16-55-71-DD-AC-73-58-34-93-71-AB
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -134,14 +134,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                 }
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            IncludeSynonyms = reader.ReadByte() != 0;
-        }
-        else
-        {
-            IncludeSynonyms = false;
-        }
+        IncludeSynonyms = reader.ReadByte() != 0;
         if (version >= ApiVersion.Version3)
         {
             IncludeDocumentation = reader.ReadByte() != 0;
@@ -188,17 +181,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                 element?.Write(ref writer, version);
             }
         }
-        if (version >= ApiVersion.Version1)
-        {
-            writer.WriteBool(IncludeSynonyms);
-        }
-        else
-        {
-            if (IncludeSynonyms)
-            {
-                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeSynonyms at version {version}");
-            }
-        }
+        writer.WriteBool(IncludeSynonyms);
         if (version >= ApiVersion.Version3)
         {
             writer.WriteBool(IncludeDocumentation);
@@ -328,7 +311,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version4)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version4)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DescribeConfigsResourceMessage");
             }

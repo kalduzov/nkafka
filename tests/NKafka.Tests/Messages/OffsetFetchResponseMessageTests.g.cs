@@ -1,4 +1,4 @@
-﻿//E3-86-AF-85-3A-CE-DA-C4-59-7E-97-FA-BF-FF-CC-16-B2-61-99-F9-E1-AA-4F-0C-01-ED-37-3B-11-47-5D-44
+﻿//48-2F-D2-09-7E-09-EE-CD-8F-1B-4F-BA-A2-39-95-79-13-F8-CA-2D-40-51-66-5A-B1-E1-2F-90-06-7F-78-24
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,16 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class OffsetFetchResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new OffsetFetchResponseMessage
-        {
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()

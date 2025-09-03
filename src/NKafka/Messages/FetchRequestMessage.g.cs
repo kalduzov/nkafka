@@ -1,4 +1,4 @@
-﻿//A2-0C-22-F3-23-21-59-3F-52-47-54-2A-E7-06-7E-4B-B5-74-8C-4A-E0-74-DD-04-31-00-41-36-0F-F6-DD-13
+﻿//5E-61-C9-42-3B-75-6B-5A-4E-83-A4-45-BE-86-CC-51-63-EF-32-8E-5E-9D-15-86-F6-0F-09-89-B7-0B-B8-23
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -72,7 +72,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
     public int ReplicaId { get; set; } = -1;
 
     /// <summary>
-    /// 
+    /// The state of the replica in the follower.
     /// </summary>
     public ReplicaStateMessage ReplicaState { get; set; } = new ();
 
@@ -92,7 +92,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
     public int MaxBytes { get; set; } = 2147483647;
 
     /// <summary>
-    /// This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records
+    /// This setting controls the visibility of transactional records. Using READ_UNCOMMITTED (isolation_level = 0) makes all records visible. With READ_COMMITTED (isolation_level = 1), non-transactional and COMMITTED transactional records are visible. To be more concrete, READ_COMMITTED returns all data from offsets smaller than the current LSO (last stable offset), and enables the inclusion of the list of aborted transactions in the result, which allows consumers to discard ABORTED transactional records.
     /// </summary>
     public sbyte IsolationLevel { get; set; } = 0;
 
@@ -117,7 +117,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
     public List<ForgottenTopicMessage> ForgottenTopicsData { get; set; } = new ();
 
     /// <summary>
-    /// Rack ID of the consumer making this request
+    /// Rack ID of the consumer making this request.
     /// </summary>
     public string RackId { get; set; } = string.Empty;
 
@@ -157,22 +157,8 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         }
         MaxWaitMs = reader.ReadInt();
         MinBytes = reader.ReadInt();
-        if (version >= ApiVersion.Version3)
-        {
-            MaxBytes = reader.ReadInt();
-        }
-        else
-        {
-            MaxBytes = 2147483647;
-        }
-        if (version >= ApiVersion.Version4)
-        {
-            IsolationLevel = reader.ReadSByte();
-        }
-        else
-        {
-            IsolationLevel = 0;
-        }
+        MaxBytes = reader.ReadInt();
+        IsolationLevel = reader.ReadSByte();
         if (version >= ApiVersion.Version7)
         {
             SessionId = reader.ReadInt();
@@ -384,14 +370,8 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         }
         writer.WriteInt(MaxWaitMs);
         writer.WriteInt(MinBytes);
-        if (version >= ApiVersion.Version3)
-        {
-            writer.WriteInt(MaxBytes);
-        }
-        if (version >= ApiVersion.Version4)
-        {
-            writer.WriteSByte(IsolationLevel);
-        }
+        writer.WriteInt(MaxBytes);
+        writer.WriteSByte(IsolationLevel);
         if (version >= ApiVersion.Version7)
         {
             writer.WriteInt(SessionId);
@@ -671,7 +651,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ReplicaStateMessage");
             }
@@ -767,7 +747,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         public string Topic { get; set; } = string.Empty;
 
         /// <summary>
-        /// The unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -796,7 +776,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchTopicMessage");
             }
@@ -1041,7 +1021,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         public long FetchOffset { get; set; } = 0;
 
         /// <summary>
-        /// The epoch of the last fetched record or -1 if there is none
+        /// The epoch of the last fetched record or -1 if there is none.
         /// </summary>
         public int LastFetchedEpoch { get; set; } = -1;
 
@@ -1054,6 +1034,11 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// The maximum bytes to fetch from this partition.  See KIP-74 for cases where this limit may not be honored.
         /// </summary>
         public int PartitionMaxBytes { get; set; } = 0;
+
+        /// <summary>
+        /// The directory id of the follower fetching.
+        /// </summary>
+        public Guid ReplicaDirectoryId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// The basic constructor of the message FetchPartitionMessage
@@ -1075,7 +1060,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchPartitionMessage");
             }
@@ -1106,6 +1091,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                 LogStartOffset = -1;
             }
             PartitionMaxBytes = reader.ReadInt();
+            ReplicaDirectoryId = Guid.Empty;
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version12)
             {
@@ -1116,6 +1102,18 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                     var size = reader.ReadVarInt32();
                     switch (tag)
                     {
+                        case 0:
+                        {
+                            if (version >= ApiVersion.Version17)
+                            {
+                                ReplicaDirectoryId = reader.ReadGuid();
+                                break;
+                            }
+                            else
+                            {
+                                throw new Exception($"Tag 0 is not valid for version {version}");
+                            }
+                        }
                         default:
                             UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                             break;
@@ -1150,11 +1148,26 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                 writer.WriteLong(LogStartOffset);
             }
             writer.WriteInt(PartitionMaxBytes);
+            if (version >= ApiVersion.Version17)
+            {
+                if (!ReplicaDirectoryId.Equals(Guid.Empty))
+                {
+                    numTaggedFields++;
+                }
+            }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version12)
             {
                 writer.WriteVarInt32(numTaggedFields);
+                {
+                    if (!ReplicaDirectoryId.Equals(Guid.Empty))
+                    {
+                        writer.WriteVarInt32(0);
+                        writer.WriteVarInt32(16);
+                        writer.WriteGuid(ReplicaDirectoryId);
+                    }
+                }
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -1203,6 +1216,10 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
             {
                 return false;
             }
+            if (!ReplicaDirectoryId.Equals(other.ReplicaDirectoryId))
+            {
+                return false;
+            }
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
@@ -1210,7 +1227,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, FetchOffset, LastFetchedEpoch, LogStartOffset, PartitionMaxBytes);
+            hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, FetchOffset, LastFetchedEpoch, LogStartOffset, PartitionMaxBytes, ReplicaDirectoryId);
             return hashCode;
         }
 
@@ -1224,6 +1241,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                 + ", LastFetchedEpoch=" + LastFetchedEpoch
                 + ", LogStartOffset=" + LogStartOffset
                 + ", PartitionMaxBytes=" + PartitionMaxBytes
+                + ", ReplicaDirectoryId=" + ReplicaDirectoryId
                 + ")";
         }
     }
@@ -1245,7 +1263,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         public string Topic { get; set; } = string.Empty;
 
         /// <summary>
-        /// The unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -1274,7 +1292,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version16)
+            if (version > ApiVersion.Version17)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ForgottenTopicMessage");
             }

@@ -1,4 +1,4 @@
-﻿//BA-69-43-10-99-33-CC-C8-60-A7-0C-15-67-A8-F7-66-75-4F-D4-4E-F0-43-97-A9-B8-27-97-8C-45-F3-95-C2
+﻿//25-41-00-76-5A-5D-44-6E-15-4B-EA-C0-B7-12-A1-0A-F3-89-2C-30-B5-BF-6C-E4-23-8B-ED-79-C8-3E-F0-F5
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -88,5 +88,21 @@ public sealed partial class ApiVersionsResponseMessageTests
             ZkMigrationReady = true,
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ApiVersionsResponseMessage' message by Version4")]
+    public void SerializeAndDeserializeMessage_ApiVersion4_Success()
+    {
+        var message = new ApiVersionsResponseMessage
+        {
+            ErrorCode = -4242,
+            ApiKeys = new (),
+            ThrottleTimeMs = -420004200,
+            SupportedFeatures = new (),
+            FinalizedFeaturesEpoch = -9223372036854775808,
+            FinalizedFeatures = new (),
+            ZkMigrationReady = true,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version4);
     }
 }

@@ -1,4 +1,4 @@
-﻿//80-8B-7D-A7-0D-30-51-A9-9E-CE-2B-8A-4E-81-C0-C5-91-AF-C7-57-4A-99-96-8E-65-0C-B2-F9-6F-52-AF-96
+﻿//72-35-98-19-0D-B3-D9-16-10-16-EA-FB-F5-B5-51-13-F0-6E-EF-53-22-76-C3-3B-90-E7-D0-9F-5B-F0-B7-F3
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -69,6 +69,11 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
     public List<TopicSnapshotMessage> Topics { get; set; } = new ();
 
     /// <summary>
+    /// Endpoints for all current-leaders enumerated in PartitionSnapshot.
+    /// </summary>
+    public NodeEndpointCollection NodeEndpoints { get; set; } = new ();
+
+    /// <summary>
     /// The basic constructor of the message FetchSnapshotResponseMessage
     /// </summary>
     public FetchSnapshotResponseMessage()
@@ -107,6 +112,9 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 Topics = newCollection;
             }
         }
+        {
+            NodeEndpoints = new ();
+        }
         UnknownTaggedFields = null;
         var numTaggedFields = reader.ReadVarInt32();
         for (var t = 0; t < numTaggedFields; t++)
@@ -115,6 +123,32 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             var size = reader.ReadVarInt32();
             switch (tag)
             {
+                case 0:
+                {
+                    if (version >= ApiVersion.Version1)
+                    {
+                        int arrayLength;
+                        arrayLength = reader.ReadVarInt32() - 1;
+                        if (arrayLength < 0)
+                        {
+                            throw new Exception("non-nullable field NodeEndpoints was serialized as null");
+                        }
+                        else
+                        {
+                            var newCollection = new NodeEndpointCollection(arrayLength);
+                            for (var i = 0; i < arrayLength; i++)
+                            {
+                                newCollection.Add(new NodeEndpointMessage(ref reader, version));
+                            }
+                            NodeEndpoints = newCollection;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        throw new Exception($"Tag 0 is not valid for version {version}");
+                    }
+                }
                 default:
                     UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
                     break;
@@ -133,9 +167,34 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         {
             element?.Write(ref writer, version);
         }
+        if (version >= ApiVersion.Version1)
+        {
+            if (NodeEndpoints.Count != 0)
+            {
+                numTaggedFields++;
+            }
+        }
+        else
+        {
+            if (NodeEndpoints.Count != 0)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default NodeEndpoints at version {version}");
+            }
+        }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarInt32(numTaggedFields);
+        {
+            if (NodeEndpoints.Count != 0)
+            {
+                writer.WriteVarInt32(0);
+                writer.WriteVarInt32(NodeEndpoints.Count + 1);
+                foreach (var element in NodeEndpoints)
+                {
+                    element?.Write(ref writer, version);
+                }
+            }
+        }
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -174,6 +233,20 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 return false;
             }
         }
+        if (NodeEndpoints is null)
+        {
+            if (other.NodeEndpoints is not null)
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!NodeEndpoints.SequenceEqual(other.NodeEndpoints))
+            {
+                return false;
+            }
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -181,7 +254,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, Topics);
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, Topics, NodeEndpoints);
         return hashCode;
     }
 
@@ -192,6 +265,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             + "ThrottleTimeMs=" + ThrottleTimeMs
             + ", ErrorCode=" + ErrorCode
             + ", Topics=" + Topics.DeepToString()
+            + ", NodeEndpoints=" + NodeEndpoints.DeepToString()
             + ")";
     }
 
@@ -236,7 +310,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicSnapshotMessage");
             }
@@ -395,12 +469,12 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         public ErrorCodes Code => (ErrorCodes)ErrorCode;
 
         /// <summary>
-        /// The snapshot endOffset and epoch fetched
+        /// The snapshot endOffset and epoch fetched.
         /// </summary>
         public SnapshotIdMessage SnapshotId { get; set; } = new ();
 
         /// <summary>
-        /// 
+        /// The leader of the partition at the time of the snapshot.
         /// </summary>
         public LeaderIdAndEpochMessage CurrentLeader { get; set; } = new ();
 
@@ -415,7 +489,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         public long Position { get; set; } = 0;
 
         /// <summary>
-        /// Snapshot data in records format which may not be aligned on an offset boundary
+        /// Snapshot data in records format which may not be aligned on an offset boundary.
         /// </summary>
         public Records? UnalignedRecords { get; set; } = null;
 
@@ -439,7 +513,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionSnapshotMessage");
             }
@@ -612,12 +686,12 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         public int IncomingBufferLength { get; private set; } = 0;
 
         /// <summary>
-        /// 
+        /// The snapshot end offset.
         /// </summary>
         public long EndOffset { get; set; } = 0;
 
         /// <summary>
-        /// 
+        /// The snapshot epoch.
         /// </summary>
         public int Epoch { get; set; } = 0;
 
@@ -641,7 +715,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
             }
@@ -733,7 +807,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         public int LeaderId { get; set; } = 0;
 
         /// <summary>
-        /// The latest known leader epoch
+        /// The latest known leader epoch.
         /// </summary>
         public int LeaderEpoch { get; set; } = 0;
 
@@ -757,7 +831,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version0)
+            if (version > ApiVersion.Version1)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
@@ -829,6 +903,193 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
                 + "LeaderId=" + LeaderId
                 + ", LeaderEpoch=" + LeaderEpoch
                 + ")";
+        }
+    }
+
+    /// <summary>
+    /// Describes the contract for message NodeEndpointMessage
+    /// </summary>
+    internal sealed partial class NodeEndpointMessage: IMessage, IEquatable<NodeEndpointMessage>
+    {
+        /// <inheritdoc />
+        public List<TaggedField>? UnknownTaggedFields { get; set; } = null;
+
+        /// <inheritdoc />
+        public int IncomingBufferLength { get; private set; } = 0;
+
+        /// <summary>
+        /// The ID of the associated node.
+        /// </summary>
+        public int NodeId { get; set; } = 0;
+
+        /// <summary>
+        /// The node&#39;s hostname.
+        /// </summary>
+        public string Host { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The node&#39;s port.
+        /// </summary>
+        public ushort Port { get; set; } = 0;
+
+        /// <summary>
+        /// The basic constructor of the message NodeEndpointMessage
+        /// </summary>
+        public NodeEndpointMessage()
+        {
+        }
+
+        /// <summary>
+        /// Base constructor for deserializing message NodeEndpointMessage
+        /// </summary>
+        public NodeEndpointMessage(ref BufferReader reader, ApiVersion version)
+            : this()
+        {
+            IncomingBufferLength = reader.Length;
+            Read(ref reader, version);
+        }
+
+        /// <inheritdoc />
+        public void Read(ref BufferReader reader, ApiVersion version)
+        {
+            if (version > ApiVersion.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't read version {version} of NodeEndpointMessage");
+            }
+            NodeId = reader.ReadInt();
+            {
+                int length;
+                length = reader.ReadVarInt32() - 1;
+                if (length < 0)
+                {
+                    throw new Exception("non-nullable field Host was serialized as null");
+                }
+                else if (length > 0x7fff)
+                {
+                    throw new Exception($"string field Host had invalid length {length}");
+                }
+                else
+                {
+                    Host = reader.ReadString(length);
+                }
+            }
+            Port = reader.ReadUShort();
+            UnknownTaggedFields = null;
+            var numTaggedFields = reader.ReadVarInt32();
+            for (var t = 0; t < numTaggedFields; t++)
+            {
+                var tag = reader.ReadVarInt32();
+                var size = reader.ReadVarInt32();
+                switch (tag)
+                {
+                    default:
+                        UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);
+                        break;
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public void Write(ref BufferWriter writer, ApiVersion version)
+        {
+            if (version < ApiVersion.Version1)
+            {
+                throw new UnsupportedVersionException($"Can't write version {version} of NodeEndpointMessage");
+            }
+            var numTaggedFields = 0;
+            writer.WriteInt(NodeId);
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(Host);
+                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
+            }
+            writer.WriteUShort(Port);
+            var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
+            numTaggedFields += rawWriter.FieldsCount;
+            writer.WriteVarInt32(numTaggedFields);
+            rawWriter.WriteRawTags(ref writer, int.MaxValue);
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || obj is NodeEndpointMessage other && Equals(other);
+        }
+
+        /// <inheritdoc />
+        public bool Equals(NodeEndpointMessage? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (NodeId != other.NodeId)
+            {
+                return false;
+            }
+            if (Host is null)
+            {
+                if (other.Host is not null)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (!Host.Equals(other.Host))
+                {
+                    return false;
+                }
+            }
+            if (Port != other.Port)
+            {
+                return false;
+            }
+            return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            hashCode = HashCode.Combine(hashCode, NodeId);
+            return hashCode;
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return "NodeEndpointMessage("
+                + "NodeId=" + NodeId
+                + ", Host=" + (string.IsNullOrWhiteSpace(Host) ? "null" : Host)
+                + ", Port=" + Port
+                + ")";
+        }
+    }
+
+    /// <summary>
+    /// Describes the contract for message NodeEndpointCollection
+    /// </summary>
+    internal sealed partial class NodeEndpointCollection: HashSet<NodeEndpointMessage>
+    {
+        /// <summary>
+        /// Basic collection constructor
+        /// </summary>
+        public NodeEndpointCollection()
+        {
+        }
+
+        /// <summary>
+        /// Basic collection constructor with the ability to set capacity
+        /// </summary>
+        public NodeEndpointCollection(int capacity)
+            : base(capacity)
+        {
+        }
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return SetEquals((IEnumerable<NodeEndpointMessage>)obj);
         }
     }
 }

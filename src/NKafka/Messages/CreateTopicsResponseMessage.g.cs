@@ -1,4 +1,4 @@
-﻿//F4-10-74-75-99-60-7F-C6-16-14-72-E0-74-96-88-D7-EB-64-69-AD-6C-59-C4-73-30-B7-93-CD-FB-0F-B4-A7
+﻿//09-79-1C-22-56-00-E4-03-54-7B-80-6B-E1-27-95-2D-58-26-72-6A-81-8A-22-4E-22-D3-6F-FF-17-2B-C4-7B
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -80,14 +80,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version2)
-        {
-            ThrottleTimeMs = reader.ReadInt();
-        }
-        else
-        {
-            ThrottleTimeMs = 0;
-        }
+        ThrottleTimeMs = reader.ReadInt();
         {
             if (version >= ApiVersion.Version5)
             {
@@ -148,10 +141,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version2)
-        {
-            writer.WriteInt(ThrottleTimeMs);
-        }
+        writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version5)
         {
             writer.WriteVarInt32(Topics.Count + 1);
@@ -252,7 +242,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
-        /// The unique topic ID
+        /// The unique topic ID.
         /// </summary>
         public Guid TopicId { get; set; } = Guid.Empty;
 
@@ -309,7 +299,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version7)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version7)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of CreatableTopicResultMessage");
             }
@@ -345,7 +335,6 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 TopicId = Guid.Empty;
             }
             ErrorCode = reader.ReadShort();
-            if (version >= ApiVersion.Version1)
             {
                 int length;
                 if (version >= ApiVersion.Version5)
@@ -368,10 +357,6 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 {
                     ErrorMessage = reader.ReadString(length);
                 }
-            }
-            else
-            {
-                ErrorMessage = string.Empty;
             }
             TopicConfigErrorCode = 0;
             if (version >= ApiVersion.Version5)
@@ -456,32 +441,29 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 writer.WriteGuid(TopicId);
             }
             writer.WriteShort((short)ErrorCode);
-            if (version >= ApiVersion.Version1)
+            if (ErrorMessage is null)
             {
-                if (ErrorMessage is null)
+                if (version >= ApiVersion.Version5)
                 {
-                    if (version >= ApiVersion.Version5)
-                    {
-                        writer.WriteVarInt32(0);
-                    }
-                    else
-                    {
-                        writer.WriteShort(-1);
-                    }
+                    writer.WriteVarInt32(0);
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                    if (version >= ApiVersion.Version5)
-                    {
-                        writer.WriteVarInt32(stringBytes.Length + 1);
-                    }
-                    else
-                    {
-                        writer.WriteShort((short)stringBytes.Length);
-                    }
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteShort(-1);
                 }
+            }
+            else
+            {
+                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
+                if (version >= ApiVersion.Version5)
+                {
+                    writer.WriteVarInt32(stringBytes.Length + 1);
+                }
+                else
+                {
+                    writer.WriteShort((short)stringBytes.Length);
+                }
+                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version5)
             {

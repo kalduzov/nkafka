@@ -1,4 +1,4 @@
-﻿//59-01-7F-DC-B0-AB-4C-C4-33-DF-C0-16-3B-23-7E-47-B3-62-3E-D5-CD-37-85-97-AF-01-52-B5-78-67-95-62
+﻿//EA-FF-4C-BC-4D-95-F7-08-17-D5-CE-68-9D-2D-F5-90-28-5B-89-92-58-F0-96-7D-E5-47-78-BE-2B-DD-1D-10
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -290,7 +290,7 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version3)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version3)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of DeleteAclsFilterMessage");
             }
@@ -318,14 +318,7 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
                     ResourceNameFilter = reader.ReadString(length);
                 }
             }
-            if (version >= ApiVersion.Version1)
-            {
-                PatternTypeFilter = reader.ReadSByte();
-            }
-            else
-            {
-                PatternTypeFilter = 3;
-            }
+            PatternTypeFilter = reader.ReadSByte();
             {
                 int length;
                 if (version >= ApiVersion.Version2)
@@ -421,17 +414,7 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
                 }
                 writer.WriteBytes(stringBytes);
             }
-            if (version >= ApiVersion.Version1)
-            {
-                writer.WriteSByte(PatternTypeFilter);
-            }
-            else
-            {
-                if (PatternTypeFilter != 3)
-                {
-                    throw new UnsupportedVersionException($"Attempted to write a non-default PatternTypeFilter at version {version}");
-                }
-            }
+            writer.WriteSByte(PatternTypeFilter);
             if (PrincipalFilter is null)
             {
                 if (version >= ApiVersion.Version2)

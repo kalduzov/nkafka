@@ -1,4 +1,4 @@
-﻿//6B-08-76-B8-4C-C5-E3-49-D4-F2-96-9B-D7-77-0D-97-DE-5E-79-E1-95-7D-35-59-73-BA-34-79-06-B1-31-5A
+﻿//EC-73-65-0D-0A-48-57-92-32-89-D3-8F-A1-59-3B-71-03-BF-55-75-F0-62-4E-68-3B-90-B5-B8-5B-E8-9F-52
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,30 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class OffsetCommitRequestMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new OffsetCommitRequestMessage
-        {
-            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
-
-    [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version1")]
-    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
-    {
-        var message = new OffsetCommitRequestMessage
-        {
-            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            GenerationIdOrMemberEpoch = -420004200,
-            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()

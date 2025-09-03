@@ -1,4 +1,4 @@
-﻿//76-60-C4-EF-09-2B-B7-A5-E7-44-0A-8B-93-FD-EC-3D-D6-29-3E-E4-74-8B-7F-35-4E-A6-38-85-94-FE-56-5F
+﻿//0E-76-45-DE-31-02-03-46-94-42-D1-73-1E-26-EC-8D-35-5C-77-94-1E-8A-BD-C3-DB-A8-7C-08-EF-43-28-67
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -102,5 +102,16 @@ public sealed partial class DescribeGroupsResponseMessageTests
             Groups = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'DescribeGroupsResponseMessage' message by Version6")]
+    public void SerializeAndDeserializeMessage_ApiVersion6_Success()
+    {
+        var message = new DescribeGroupsResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Groups = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
 }

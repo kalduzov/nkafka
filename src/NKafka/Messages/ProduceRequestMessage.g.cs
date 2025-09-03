@@ -1,4 +1,4 @@
-﻿//08-D3-BB-A6-8F-62-94-0E-F1-76-F7-48-F8-12-75-B6-69-43-2A-44-6D-5C-1B-7D-F0-90-F1-89-D9-30-FD-34
+﻿//92-2A-A9-42-73-43-F5-CC-B9-20-BD-82-AE-40-78-FF-8B-63-22-23-8D-94-98-D2-E6-D3-10-0F-AC-FF-84-AE
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -101,7 +101,6 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version3)
         {
             int length;
             if (version >= ApiVersion.Version9)
@@ -124,10 +123,6 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
             {
                 TransactionalId = reader.ReadString(length);
             }
-        }
-        else
-        {
-            TransactionalId = null;
         }
         Acks = reader.ReadShort();
         TimeoutMs = reader.ReadInt();
@@ -191,39 +186,29 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version3)
+        if (TransactionalId is null)
         {
-            if (TransactionalId is null)
+            if (version >= ApiVersion.Version9)
             {
-                if (version >= ApiVersion.Version9)
-                {
-                    writer.WriteVarInt32(0);
-                }
-                else
-                {
-                    writer.WriteShort(-1);
-                }
+                writer.WriteVarInt32(0);
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-                if (version >= ApiVersion.Version9)
-                {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
-                }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+                writer.WriteShort(-1);
             }
         }
         else
         {
-            if (TransactionalId is not null)
+            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
+            if (version >= ApiVersion.Version9)
             {
-                throw new UnsupportedVersionException($"Attempted to write a non-default TransactionalId at version {version}");
+                writer.WriteVarInt32(stringBytes.Length + 1);
             }
+            else
+            {
+                writer.WriteShort((short)stringBytes.Length);
+            }
+            writer.WriteBytes(stringBytes);
         }
         writer.WriteShort(Acks);
         writer.WriteInt(TimeoutMs);
@@ -371,7 +356,7 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceDataMessage");
             }
@@ -605,7 +590,7 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version11)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceDataMessage");
             }

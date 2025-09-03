@@ -1,4 +1,4 @@
-﻿//D2-7B-90-96-02-76-F5-1B-2A-14-2D-F4-94-9A-41-8F-12-6E-E5-03-6C-82-61-41-9F-98-4F-AD-A3-53-65-C9
+﻿//0B-84-08-F8-D7-6F-9C-47-01-75-A9-CB-D0-E2-FA-10-DF-92-41-5C-5A-B0-AB-57-D7-FE-C5-9E-73-11-61-6E
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,16 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class ListOffsetsResponseMessageTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsResponseMessage' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new ListOffsetsResponseMessage
-        {
-            Topics = new (),
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsResponseMessage' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()
@@ -134,5 +124,27 @@ public sealed partial class ListOffsetsResponseMessageTests
             Topics = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version8);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsResponseMessage' message by Version9")]
+    public void SerializeAndDeserializeMessage_ApiVersion9_Success()
+    {
+        var message = new ListOffsetsResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsResponseMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new ListOffsetsResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
 }

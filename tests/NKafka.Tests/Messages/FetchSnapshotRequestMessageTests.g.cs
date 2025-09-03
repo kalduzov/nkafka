@@ -1,4 +1,4 @@
-﻿//94-53-4F-00-58-70-C8-16-32-D3-1F-55-60-53-22-D0-A6-68-16-A2-E6-EE-F0-75-C9-C3-F7-4A-99-0A-50-15
+﻿//CF-FB-3C-CA-1F-72-88-B8-8D-D1-D2-F3-CE-5B-AD-28-D1-6A-EF-C5-E2-6E-DE-02-C2-1E-2A-52-3E-46-00-E5
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -50,5 +50,18 @@ public sealed partial class FetchSnapshotRequestMessageTests
             Topics = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchSnapshotRequestMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new FetchSnapshotRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaId = -420004200,
+            MaxBytes = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
     }
 }

@@ -130,10 +130,31 @@
   <data name="InconsistentClusterId" xml:space="preserve"><value>The clusterId in the request does not match that found on the server</value></data>
   <data name="TransactionalIdNotFound" xml:space="preserve"><value>The transactionalId could not be found</value></data>
   <data name="FetchSessionTopicIdError" xml:space="preserve"><value>The fetch session encountered inconsistent topic ID usage</value></data>
-  <data name="IneligibleReplica" xml:space="preserve">
-        <value>The new ISR contains at least one ineligible replica.</value>
-    </data>
-  <data name="NewLeaderElected" xml:space="preserve">
-        <value>The AlterPartition request successfully updated the partition state but the leader has changed.</value>
-    </data>
+  <data name="IneligibleReplica" xml:space="preserve"><value>The new ISR contains at least one ineligible replica.</value></data>
+  <data name="NewLeaderElected" xml:space="preserve"><value>The AlterPartition request successfully updated the partition state but the leader has changed.</value></data>
+  <data name="OffsetMovedToTieredStorage" xml:space="preserve"><value>The requested offset is moved to tiered storage.</value></data>
+  <data name="FencedMemberEpoch" xml:space="preserve"><value>The member epoch is fenced by the group coordinator. The member must abandon all its partitions and rejoin.</value></data>
+  <data name="UnreleasedInstanceId" xml:space="preserve"><value>The instance ID is still used by another member in the consumer group. That member must leave first.</value></data>
+  <data name="UnsupportedAssignor" xml:space="preserve"><value>The assignor or its version range is not supported by the consumer group.</value></data>
+  <data name="StaleMemberEpoch" xml:space="preserve"><value>The member epoch is stale. The member must retry after receiving its updated member epoch via the ConsumerGroupHeartbeat API.</value></data>
+  <data name="MismatchedEndpointType" xml:space="preserve"><value>The request was sent to an endpoint of the wrong type.</value></data>
+  <data name="UnsupportedEndpointType" xml:space="preserve"><value>This endpoint type is not supported yet.</value></data>
+  <data name="UnknownControllerId" xml:space="preserve"><value>This controller ID is not known.</value></data>
+  <data name="UnknownSubscriptionId" xml:space="preserve"><value>Client sent a push telemetry request with an invalid or outdated subscription ID.</value></data>
+  <data name="TelemetryTooLarge" xml:space="preserve"><value>Client sent a push telemetry request larger than the maximum size the broker will accept.</value></data>
+  <data name="InvalidRegistration" xml:space="preserve"><value>The controller has considered the broker registration to be invalid.</value></data>
+  <data name="TransactionAbortable" xml:space="preserve"><value>The server encountered an error with the transaction. The client can abort the transaction to continue using this transactional ID.</value></data>
+  <data name="InvalidRecordState" xml:space="preserve"><value>The record state is invalid. The acknowledgement of delivery could not be completed.</value></data>
+  <data name="ShareSessionNotFound" xml:space="preserve"><value>The share session was not found.</value></data>
+  <data name="InvalidShareSessionEpoch" xml:space="preserve"><value>The share session epoch is invalid.</value></data>
+  <data name="FencedStateEpoch" xml:space="preserve"><value>The share coordinator rejected the request because the share-group state epoch did not match.</value></data>
+  <data name="InvalidVoterKey" xml:space="preserve"><value>The voter key doesn't match the receiving replica's key.</value></data>
+  <data name="VoterNotFound" xml:space="preserve"><value>The voter is not part of the set of voters.</value></data>
+  <data name="DuplicateVoter" xml:space="preserve"><value>TThe voter is already part of the set of voters.</value></data>
+  <data name="InvalidRegularExpression" xml:space="preserve"><value>The regular expression is not valid.</value></data>
+  <data name="RebootstrapRequired" xml:space="preserve"><value>Client metadata is stale. The client should rebootstrap to obtain new metadata.</value></data>
+  <data name="StreamsInvalidTopology" xml:space="preserve"><value>The supplied topology is invalid.</value></data>
+  <data name="StreamsInvalidTopologyEpoch" xml:space="preserve"><value>The supplied topology epoch is invalid.</value></data>
+  <data name="StreamsTopologyFenced" xml:space="preserve"><value>The supplied topology epoch is outdated.</value></data>
+  <data name="ShareSessionLimitReached" xml:space="preserve"><value>The limit of share sessions has been reached.</value></data>
 </root>

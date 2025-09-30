@@ -47,7 +47,7 @@ var clusterConfig = new ClusterConfig
 {
     BootstrapServers =
     [
-        "localhost:29091"
+        "localhost:29092"
     ],
 
     // SecurityProtocol = SecurityProtocols.Ssl,
@@ -76,7 +76,7 @@ using var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .AddSource("NKafka.Internal")
     .AddSource("NKafka")
     .AddOtlpExporter()
-    .AddConsoleExporter()
+    //.AddConsoleExporter()
     .Build();
 
 Log.Logger = new LoggerConfiguration()

@@ -209,5 +209,19 @@ public enum ErrorCodes: short
     UnknownControllerId = 116,
     UnknownSubscriptionId = 117,
     TelemetryTooLarge = 118,
-    InvalidRegistration = 119
+    InvalidRegistration = 119,
+    TransactionAbortable = 120,
+    InvalidRecordState = 121,
+    ShareSessionNotFound = 122,
+    InvalidShareSessionEpoch = 123,
+    FencedStateEpoch = 124,
+    InvalidVoterKey = 125,
+    DuplicateVoter = 126,
+    VoterNotFound = 127,
+    InvalidRegularExpression = 128,
+    RebootstrapRequired = 129,
+    StreamsInvalidTopology = 130,
+    StreamsInvalidTopologyEpoch = 131,
+    StreamsTopologyFenced = 132,
+    ShareSessionLimitReached = 133
 }

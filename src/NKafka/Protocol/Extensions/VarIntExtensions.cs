@@ -95,7 +95,7 @@ internal static class VarIntExtensions
         WriteVarUInt32(ref buffer, value << 1 ^ value >> 31);
     }
 
-    private static void WriteVarUInt32(ref BufferWriter buffer, int value)
+    internal static void WriteVarUInt32(this ref BufferWriter buffer, int value)
     {
         if ((value & 0xFFFFFFFF << 7) == 0)
         {

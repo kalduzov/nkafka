@@ -31,7 +31,8 @@ internal sealed partial class MetadataRequestMessage
     {
         var request = new MetadataRequestMessage
         {
-            AllowAutoTopicCreation = allowAutoTopicCreation
+            AllowAutoTopicCreation = allowAutoTopicCreation,
+
         };
 
         if (topics is not null)

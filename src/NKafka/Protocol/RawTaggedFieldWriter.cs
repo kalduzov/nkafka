@@ -26,46 +26,52 @@ namespace NKafka.Protocol;
 
 internal class RawTaggedFieldWriter
 {
-    private static readonly RawTaggedFieldWriter _emptyWriter = new(Array.Empty<TaggedField>());
-    private readonly IReadOnlyCollection<TaggedField> _fields;
+    private static readonly RawTaggedFieldWriter _emptyWriter = new([]);
+    private readonly List<TaggedField> _fields;
     private int _prevTag;
+    private int _position;
 
     public int FieldsCount => _fields.Count;
 
-    private RawTaggedFieldWriter(IReadOnlyCollection<TaggedField> fields)
+    private RawTaggedFieldWriter(List<TaggedField> fields)
     {
         _fields = fields;
         _prevTag = -1;
+        _position = 0;
     }
 
-    public static RawTaggedFieldWriter ForFields(IReadOnlyCollection<TaggedField>? fields)
+    public static RawTaggedFieldWriter ForFields(List<TaggedField>? fields)
     {
         return fields == null ? _emptyWriter : new RawTaggedFieldWriter(fields);
     }
 
     internal void WriteRawTags(ref BufferWriter writer, int nextDefinedTag)
     {
-        foreach (var field in _fields)
+        while (_position < _fields.Count)
         {
-            if (field.Tag >= nextDefinedTag)
+            var (tag, data) = _fields[_position];
+
+            if (tag >= nextDefinedTag)
             {
-                if (field.Tag == nextDefinedTag)
+                if (tag == nextDefinedTag)
                 {
-                    throw new Exception($"Attempted to use tag {field.Tag} as an undefined tag.");
+                    throw new Exception($"Attempted to use tag {tag} as an undefined tag.");
                 }
 
                 return;
             }
 
-            if (field.Tag <= _prevTag)
+            if (tag <= _prevTag)
             {
-                throw new Exception($"Invalid raw tag field list: tag {field.Tag} comes after tag {_prevTag}, but is not higher than it.");
+                throw new Exception($"Invalid raw tag field list: tag {tag} comes after tag {_prevTag}, but is not higher than it.");
             }
 
-            writer.WriteVarInt32(field.Tag);
-            writer.WriteVarInt32(field.Data.Length);
-            writer.WriteBytes(field.Data);
-            _prevTag = field.Tag;
+            writer.WriteVarUInt32(tag);
+            writer.WriteVarUInt32(data.Length);
+            writer.WriteBytes(data);
+
+            _prevTag = tag;
+            _position++;
         }
     }
 }

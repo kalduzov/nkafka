@@ -62,7 +62,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly int _connectionsMaxIdleMs;
 
     /*
-     * Когда _globalTimeWaiting.ElapsedMiliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
+     * Когда _globalTimeWaiting.ElapsedMilliseconds превысит параметр ConnectionsMaxIdleMs из конфигурации,
      * соединение с брокером автоматически закроется
      */
     private readonly Stopwatch _globalTimeWaiting = new();
@@ -146,17 +146,16 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         _socketProxy = _socketFactory.CreateSocket(SocketType.Stream, ProtocolType.Tcp, receiveBufferBytes);
 
-        _closeConnectionAfterTimeout = new Timer(
-            _ =>
+        _closeConnectionAfterTimeout = new Timer(_ =>
+        {
+            if (!_globalTimeWaiting.IsRunning || _globalTimeWaiting.ElapsedMilliseconds <= _connectionsMaxIdleMs)
             {
-                if (!_globalTimeWaiting.IsRunning || _globalTimeWaiting.ElapsedMilliseconds <= _connectionsMaxIdleMs)
-                {
-                    return;
-                }
+                return;
+            }
 
-                ResetConnection();
-                _globalTimeWaiting.Reset();
-            });
+            ResetConnection();
+            _globalTimeWaiting.Reset();
+        });
     }
 
     public async ValueTask OpenAsync(CancellationToken token)
@@ -415,6 +414,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     }
 
     private void Dispose(bool disposing)
+
     {
         ConnectorState = State.Closing;
         _stream.Dispose();

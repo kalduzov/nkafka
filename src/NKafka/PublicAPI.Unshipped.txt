@@ -178,6 +178,7 @@ NKafka.Exceptions.ProducerException.ProducerException(string! message, System.Ex
 NKafka.IKafkaCluster
 NKafka.IKafkaCluster.AdminClient.get -> NKafka.Clients.Admin.IAdminClient!
 NKafka.IKafkaCluster.Brokers.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Node!>!
+NKafka.IKafkaCluster.BuildProducer(string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer!
 NKafka.IKafkaCluster.Closed.get -> bool
 NKafka.IKafkaCluster.ClusterId.get -> string?
 NKafka.IKafkaCluster.Config.get -> NKafka.Config.ClusterConfig!
@@ -230,6 +231,142 @@ NKafka.PartitionMetadata.PartitionMetadata(NKafka.Partition partition, int leade
 NKafka.PartitionMetadata.Replicas.get -> System.Collections.Generic.IReadOnlyCollection<int>!
 NKafka.ProducerExtensions
 NKafka.Protocol.ApiVersion
+NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.BrokerIdNotRegistered = 102 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.BrokerNotAvailable = 8 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ClusterAuthorizationFailed = 31 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ConcurrentTransactions = 51 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.CoordinatorLoadInProgress = 14 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.CoordinatorNotAvailable = 15 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.CorruptMessage = 2 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenAuthDisabled = 61 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenAuthorizationFailed = 65 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenExpired = 66 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenNotFound = 62 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenOwnerMismatch = 63 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DelegationTokenRequestNotAllowed = 64 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DuplicateBrokerRegistration = 101 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DuplicateResource = 92 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DuplicateSequenceNumber = 46 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.DuplicateVoter = 126 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ElectionNotNeeded = 84 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.EligibleLeadersNotAvailable = 83 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FeatureUpdateFailed = 96 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FencedInstanceId = 82 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FencedLeaderEpoch = 74 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FencedMemberEpoch = 110 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FencedStateEpoch = 124 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FetchSessionIdNotFound = 70 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.FetchSessionTopicIdError = 106 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.GroupAuthorizationFailed = 30 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.GroupIdNotFound = 69 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.GroupMaxSizeReached = 81 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.GroupSubscribedToTopic = 86 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.IllegalGeneration = 22 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.IllegalSaslState = 34 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InconsistentClusterId = 104 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InconsistentGroupProtocol = 23 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InconsistentTopicId = 103 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InconsistentVoterSet = 94 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.IneligibleReplica = 107 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidCommitOffsetSize = 28 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidConfig = 40 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidFetchSessionEpoch = 71 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidFetchSize = 4 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidGroupId = 24 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidPartitions = 37 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidPrincipalType = 67 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidProducerEpoch = 47 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidProducerIdMapping = 49 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRecord = 87 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRecordState = 121 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRegistration = 119 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRegularExpression = 128 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidReplicaAssignment = 39 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidReplicationFactor = 38 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRequest = 42 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidRequiredAcks = 21 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidSessionTimeout = 26 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidShareSessionEpoch = 123 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidTimestamp = 32 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidTopicException = 17 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidTransactionTimeout = 50 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidTxnState = 48 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidUpdateVersion = 95 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.InvalidVoterKey = 125 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.KafkaStorageError = 56 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.LeaderNotAvailable = 5 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ListenerNotFound = 72 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.LogDirNotFound = 57 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.MemberIdRequired = 79 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.MessageTooLarge = 10 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.MismatchedEndpointType = 114 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NetworkException = 13 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NewLeaderElected = 108 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.None = 0 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NonEmptyGroup = 68 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NoReassignmentInProgress = 85 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NotController = 41 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NotCoordinator = 16 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NotEnoughReplicas = 19 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NotEnoughReplicasAfterAppend = 20 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.NotLeaderOrFollower = 6 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OffsetMetadataTooLarge = 12 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OffsetMovedToTieredStorage = 109 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OffsetNotAvailable = 78 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OffsetOutOfRange = 1 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OperationNotAttempted = 55 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.OutOfOrderSequenceNumber = 45 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.PolicyViolation = 44 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.PositionOutOfRange = 99 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.PreferredLeaderNotAvailable = 80 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.PrincipalDeserializationFailure = 97 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ProducerFenced = 90 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ReassignmentInProgress = 60 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.RebalanceInProgress = 27 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.RebootstrapRequired = 129 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.RecordListTooLarge = 18 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ReplicaNotAvailable = 9 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.RequestTimedOut = 7 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ResourceNotFound = 91 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.SaslAuthenticationFailed = 58 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.SecurityDisabled = 54 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ShareSessionLimitReached = 133 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ShareSessionNotFound = 122 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.SnapshotNotFound = 98 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StaleBrokerEpoch = 77 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StaleControllerEpoch = 11 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StaleMemberEpoch = 113 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StreamsInvalidTopology = 130 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StreamsInvalidTopologyEpoch = 131 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.StreamsTopologyFenced = 132 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TelemetryTooLarge = 118 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ThrottlingQuotaExceeded = 89 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TopicAlreadyExists = 36 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TopicAuthorizationFailed = 29 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TopicDeletionDisabled = 73 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TransactionAbortable = 120 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TransactionalIdAuthorizationFailed = 53 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TransactionalIdNotFound = 105 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.TransactionCoordinatorFenced = 52 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnacceptableCredential = 93 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownControllerId = 116 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownLeaderEpoch = 75 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownMemberId = 25 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownProducerId = 59 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownServerError = -1 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownSubscriptionId = 117 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownTopicId = 100 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnknownTopicOrPartition = 3 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnreleasedInstanceId = 111 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnstableOffsetCommit = 88 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedAssignor = 112 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedCompressionType = 76 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedEndpointType = 115 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedForMessageFormat = 43 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedSaslMechanism = 33 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.UnsupportedVersion = 35 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.VoterNotFound = 127 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.TaggedField
 NKafka.Protocol.TaggedField.Data.get -> byte[]!
 NKafka.Protocol.TaggedField.Data.init -> void

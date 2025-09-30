@@ -55,7 +55,10 @@ internal static class ErrorCodesExtensions
         ErrorCodes.ThrottlingQuotaExceeded,
         ErrorCodes.UnknownTopicId,
         ErrorCodes.InconsistentTopicId,
-        ErrorCodes.FetchSessionTopicIdError
+        ErrorCodes.FetchSessionTopicIdError,
+        ErrorCodes.ShareSessionNotFound,
+        ErrorCodes.InvalidShareSessionEpoch,
+        ErrorCodes.ShareSessionLimitReached
     ];
 
     private static readonly HashSet<ErrorCodes> _processingRequiredClientCodes =

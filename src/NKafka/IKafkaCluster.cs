@@ -113,8 +113,6 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="name">Producer name</param>
     /// <param name="producerConfig">Producer сonfiguration</param>
-    /// <param name="keySerializer">Key serializer implementation</param>
-    /// <param name="valueSerializer">Value serializer implementation</param>
     /// <remarks>
     /// <p>
     /// If a producer with the same name already exists, an instance of it will be returned. If not, a new producer will be created.

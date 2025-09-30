@@ -204,6 +204,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to TThe voter is already part of the set of voters..
+        /// </summary>
+        internal static string DuplicateVoter {
+            get {
+                return ResourceManager.GetString("DuplicateVoter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Leader election not needed for topic partition..
         /// </summary>
         internal static string ElectionNotNeeded {
@@ -245,6 +254,24 @@ namespace NKafka.Resources {
         internal static string FencedLeaderEpoch {
             get {
                 return ResourceManager.GetString("FencedLeaderEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The member epoch is fenced by the group coordinator. The member must abandon all its partitions and rejoin..
+        /// </summary>
+        internal static string FencedMemberEpoch {
+            get {
+                return ResourceManager.GetString("FencedMemberEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The share coordinator rejected the request because the share-group state epoch did not match..
+        /// </summary>
+        internal static string FencedStateEpoch {
+            get {
+                return ResourceManager.GetString("FencedStateEpoch", resourceCulture);
             }
         }
         
@@ -456,6 +483,33 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The record state is invalid. The acknowledgement of delivery could not be completed..
+        /// </summary>
+        internal static string InvalidRecordState {
+            get {
+                return ResourceManager.GetString("InvalidRecordState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The controller has considered the broker registration to be invalid..
+        /// </summary>
+        internal static string InvalidRegistration {
+            get {
+                return ResourceManager.GetString("InvalidRegistration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The regular expression is not valid..
+        /// </summary>
+        internal static string InvalidRegularExpression {
+            get {
+                return ResourceManager.GetString("InvalidRegularExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replica assignment is invalid..
         /// </summary>
         internal static string InvalidReplicaAssignment {
@@ -501,6 +555,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The share session epoch is invalid..
+        /// </summary>
+        internal static string InvalidShareSessionEpoch {
+            get {
+                return ResourceManager.GetString("InvalidShareSessionEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The timestamp of the message is out of acceptable range..
         /// </summary>
         internal static string InvalidTimestamp {
@@ -542,6 +605,15 @@ namespace NKafka.Resources {
         internal static string InvalidUpdateVersion {
             get {
                 return ResourceManager.GetString("InvalidUpdateVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The voter key doesn&apos;t match the receiving replica&apos;s key..
+        /// </summary>
+        internal static string InvalidVoterKey {
+            get {
+                return ResourceManager.GetString("InvalidVoterKey", resourceCulture);
             }
         }
         
@@ -596,6 +668,15 @@ namespace NKafka.Resources {
         internal static string MessageTooLarge {
             get {
                 return ResourceManager.GetString("MessageTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request was sent to an endpoint of the wrong type..
+        /// </summary>
+        internal static string MismatchedEndpointType {
+            get {
+                return ResourceManager.GetString("MismatchedEndpointType", resourceCulture);
             }
         }
         
@@ -686,6 +767,15 @@ namespace NKafka.Resources {
         internal static string OffsetMetadataTooLarge {
             get {
                 return ResourceManager.GetString("OffsetMetadataTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested offset is moved to tiered storage..
+        /// </summary>
+        internal static string OffsetMovedToTieredStorage {
+            get {
+                return ResourceManager.GetString("OffsetMovedToTieredStorage", resourceCulture);
             }
         }
         
@@ -789,6 +879,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client metadata is stale. The client should rebootstrap to obtain new metadata..
+        /// </summary>
+        internal static string RebootstrapRequired {
+            get {
+                return ResourceManager.GetString("RebootstrapRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The request included message batch larger than the configured segment size on the server..
         /// </summary>
         internal static string RecordListTooLarge {
@@ -843,6 +942,24 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The limit of share sessions has been reached..
+        /// </summary>
+        internal static string ShareSessionLimitReached {
+            get {
+                return ResourceManager.GetString("ShareSessionLimitReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The share session was not found..
+        /// </summary>
+        internal static string ShareSessionNotFound {
+            get {
+                return ResourceManager.GetString("ShareSessionNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Requested snapshot was not found.
         /// </summary>
         internal static string SnapshotNotFound {
@@ -866,6 +983,51 @@ namespace NKafka.Resources {
         internal static string StaleControllerEpoch {
             get {
                 return ResourceManager.GetString("StaleControllerEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The member epoch is stale. The member must retry after receiving its updated member epoch via the ConsumerGroupHeartbeat API..
+        /// </summary>
+        internal static string StaleMemberEpoch {
+            get {
+                return ResourceManager.GetString("StaleMemberEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The supplied topology is invalid..
+        /// </summary>
+        internal static string StreamsInvalidTopology {
+            get {
+                return ResourceManager.GetString("StreamsInvalidTopology", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The supplied topology epoch is invalid..
+        /// </summary>
+        internal static string StreamsInvalidTopologyEpoch {
+            get {
+                return ResourceManager.GetString("StreamsInvalidTopologyEpoch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The supplied topology epoch is outdated..
+        /// </summary>
+        internal static string StreamsTopologyFenced {
+            get {
+                return ResourceManager.GetString("StreamsTopologyFenced", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Client sent a push telemetry request larger than the maximum size the broker will accept..
+        /// </summary>
+        internal static string TelemetryTooLarge {
+            get {
+                return ResourceManager.GetString("TelemetryTooLarge", resourceCulture);
             }
         }
         
@@ -906,6 +1068,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The server encountered an error with the transaction. The client can abort the transaction to continue using this transactional ID..
+        /// </summary>
+        internal static string TransactionAbortable {
+            get {
+                return ResourceManager.GetString("TransactionAbortable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Transactional Id authorization failed..
         /// </summary>
         internal static string TransactionalIdAuthorizationFailed {
@@ -938,6 +1109,15 @@ namespace NKafka.Resources {
         internal static string UnacceptableCredential {
             get {
                 return ResourceManager.GetString("UnacceptableCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This controller ID is not known..
+        /// </summary>
+        internal static string UnknownControllerId {
+            get {
+                return ResourceManager.GetString("UnknownControllerId", resourceCulture);
             }
         }
         
@@ -978,6 +1158,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Client sent a push telemetry request with an invalid or outdated subscription ID..
+        /// </summary>
+        internal static string UnknownSubscriptionId {
+            get {
+                return ResourceManager.GetString("UnknownSubscriptionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This server does not host this topic ID..
         /// </summary>
         internal static string UnknownTopicId {
@@ -996,6 +1185,15 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The instance ID is still used by another member in the consumer group. That member must leave first..
+        /// </summary>
+        internal static string UnreleasedInstanceId {
+            get {
+                return ResourceManager.GetString("UnreleasedInstanceId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There are unstable offsets that need to be cleared..
         /// </summary>
         internal static string UnstableOffsetCommit {
@@ -1005,11 +1203,29 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The assignor or its version range is not supported by the consumer group..
+        /// </summary>
+        internal static string UnsupportedAssignor {
+            get {
+                return ResourceManager.GetString("UnsupportedAssignor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The requesting client does not support the compression type of given partition..
         /// </summary>
         internal static string UnsupportedCompressionType {
             get {
                 return ResourceManager.GetString("UnsupportedCompressionType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This endpoint type is not supported yet..
+        /// </summary>
+        internal static string UnsupportedEndpointType {
+            get {
+                return ResourceManager.GetString("UnsupportedEndpointType", resourceCulture);
             }
         }
         
@@ -1037,6 +1253,15 @@ namespace NKafka.Resources {
         internal static string UnsupportedVersion {
             get {
                 return ResourceManager.GetString("UnsupportedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The voter is not part of the set of voters..
+        /// </summary>
+        internal static string VoterNotFound {
+            get {
+                return ResourceManager.GetString("VoterNotFound", resourceCulture);
             }
         }
     }

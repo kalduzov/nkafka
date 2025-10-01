@@ -105,7 +105,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             if (version >= ApiVersion.Version9)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     Topics = null;
@@ -182,11 +182,11 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         {
             if (Topics is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
-                writer.WriteVarInt32(Topics.Count + 1);
+                writer.WriteVarUInt32(Topics.Count + 1);
                 foreach (var element in Topics)
                 {
                     element?.Write(ref writer, version);
@@ -235,7 +235,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version9)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -365,7 +365,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 int length;
                 if (version >= ApiVersion.Version9)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -421,7 +421,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             {
                 if (version >= ApiVersion.Version10)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -432,7 +432,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -444,7 +444,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version9)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

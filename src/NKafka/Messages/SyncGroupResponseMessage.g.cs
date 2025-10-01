@@ -110,7 +110,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         if (version >= ApiVersion.Version5)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ProtocolType = null;
@@ -131,7 +131,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         if (version >= ApiVersion.Version5)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ProtocolName = null;
@@ -153,7 +153,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version4)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -199,12 +199,12 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -212,18 +212,18 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolName is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(Assignment.Length + 1);
+            writer.WriteVarUInt32(Assignment.Length + 1);
         }
         else
         {
@@ -234,7 +234,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

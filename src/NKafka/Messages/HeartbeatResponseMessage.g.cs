@@ -123,7 +123,7 @@ internal sealed partial class HeartbeatResponseMessage: IResponseMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

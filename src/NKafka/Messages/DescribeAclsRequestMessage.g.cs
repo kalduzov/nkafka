@@ -121,7 +121,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -145,7 +145,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -168,7 +168,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -216,7 +216,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
@@ -228,7 +228,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             var stringBytes = Encoding.UTF8.GetBytes(ResourceNameFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -241,7 +241,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
@@ -253,7 +253,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             var stringBytes = Encoding.UTF8.GetBytes(PrincipalFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -265,7 +265,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
@@ -277,7 +277,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
             var stringBytes = Encoding.UTF8.GetBytes(HostFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -291,7 +291,7 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

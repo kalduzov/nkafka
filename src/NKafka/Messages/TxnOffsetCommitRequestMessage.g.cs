@@ -1,4 +1,4 @@
-﻿//3F-56-59-C7-93-B7-11-53-CC-ED-32-EA-CB-67-21-B0-51-96-19-73-14-42-BF-49-A9-F6-0A-95-85-1A-B6-19
+﻿//E7-EE-C6-EE-96-BF-F6-D3-68-7A-B3-34-A7-4C-C2-9F-35-18-71-FE-A2-5A-F7-5B-A4-13-1B-E3-E5-AA-E4-32
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -125,7 +125,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -148,7 +148,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -180,7 +180,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field MemberId was serialized as null");
@@ -201,7 +201,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 GroupInstanceId = null;
@@ -223,7 +223,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -283,7 +283,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -295,7 +295,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -320,7 +320,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -335,12 +335,12 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         {
             if (GroupInstanceId is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -353,7 +353,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         }
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(Topics.Count + 1);
+            writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
             {
                 element?.Write(ref writer, version);
@@ -371,7 +371,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -554,7 +554,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -577,7 +577,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
                 if (version >= ApiVersion.Version3)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -637,7 +637,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -647,7 +647,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             }
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(Partitions.Count + 1);
+                writer.WriteVarUInt32(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
                     element?.Write(ref writer, version);
@@ -665,7 +665,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -808,7 +808,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -859,7 +859,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             {
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -871,7 +871,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
                 var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -883,7 +883,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

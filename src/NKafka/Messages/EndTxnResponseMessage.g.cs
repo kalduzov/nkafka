@@ -1,4 +1,4 @@
-﻿//F5-B2-67-54-8F-88-BE-99-91-41-19-A6-DD-E0-7C-42-AA-1F-A4-B2-B8-6E-96-7D-90-B3-1A-49-36-81-67-13
+﻿//65-B3-02-60-62-76-3E-5A-6B-99-22-A0-1F-0C-78-07-88-25-8C-CA-1E-69-2B-54-40-48-62-B7-17-ED-BB-28
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -147,7 +147,7 @@ internal sealed partial class EndTxnResponseMessage: IResponseMessage, IEquatabl
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

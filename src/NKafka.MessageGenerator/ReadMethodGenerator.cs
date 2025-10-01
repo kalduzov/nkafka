@@ -47,8 +47,10 @@ internal class ReadMethodGenerator: IMethodGenerator
         VersionConditional
             .ForVersions(parentVersions, structSpecification.Versions)
             .AllowMembershipCheckAlwaysFalse(false)
-            .IfNotMember(
-                _ => { _codeGenerator.AppendLine($"throw new UnsupportedVersionException($\"Can't read version {{version}} of {className}\");"); })
+            .IfNotMember(_ =>
+            {
+                _codeGenerator.AppendLine($"throw new UnsupportedVersionException($\"Can't read version {{version}} of {className}\");");
+            })
             .Generate(_codeGenerator);
 
         var curVersions = parentVersions.Intersect(structSpecification.Versions);
@@ -70,120 +72,116 @@ internal class ReadMethodGenerator: IMethodGenerator
                 .ForVersions(mandatoryVersions!, curVersions)
                 .AlwaysEmitBlockScope(field.Type.IsVariableLength)
                 .IfNotMember(_ => { _codeGenerator.AppendLine($"{field.Name} = {field.FieldDefault()};"); })
-                .IfMember(
-                    presentAndUntaggedVersions =>
+                .IfMember(presentAndUntaggedVersions =>
+                {
+                    if (field.Type is { IsVariableLength: true, IsStruct: false })
                     {
-                        if (field.Type is { IsVariableLength: true, IsStruct: false })
+                        void CallGenerateVariableLengthReader(Versions versions)
                         {
-                            void CallGenerateVariableLengthReader(Versions versions)
-                            {
-                                GenerateVariableLengthReader(
-                                    ((IMethodGenerator)this).FieldFlexibleVersions(field),
-                                    field.Name,
-                                    field.Type,
-                                    versions,
-                                    field.NullableVersions,
-                                    $"{field.Name} = ",
-                                    ";",
-                                    _structRegistry.IsStructArrayWithKeys(field));
-                            }
+                            GenerateVariableLengthReader(
+                                ((IMethodGenerator)this).FieldFlexibleVersions(field),
+                                field.Name,
+                                field.Type,
+                                versions,
+                                field.NullableVersions,
+                                $"{field.Name} = ",
+                                ";",
+                                _structRegistry.IsStructArrayWithKeys(field));
+                        }
 
-                            if (field.Type.IsArray && ((IFieldType.ArrayType)field.Type).ElementType.SerializationIsDifferentInFlexibleVersions)
-                            {
-                                VersionConditional
-                                    .ForVersions(((IMethodGenerator)this).FieldFlexibleVersions(field), presentAndUntaggedVersions)
-                                    .IfMember(CallGenerateVariableLengthReader)
-                                    .IfNotMember(CallGenerateVariableLengthReader)
-                                    .Generate(_codeGenerator);
-                            }
-                            else
-                            {
-                                CallGenerateVariableLengthReader(presentAndUntaggedVersions);
-                            }
+                        if (field.Type.IsArray && ((IFieldType.ArrayType)field.Type).ElementType.SerializationIsDifferentInFlexibleVersions)
+                        {
+                            VersionConditional
+                                .ForVersions(((IMethodGenerator)this).FieldFlexibleVersions(field), presentAndUntaggedVersions)
+                                .IfMember(CallGenerateVariableLengthReader)
+                                .IfNotMember(CallGenerateVariableLengthReader)
+                                .Generate(_codeGenerator);
                         }
                         else
                         {
-                            _codeGenerator.AppendLine($"{field.Name} = {PrimitiveReadExpression(field.Type)};");
+                            CallGenerateVariableLengthReader(presentAndUntaggedVersions);
                         }
-                    })
+                    }
+                    else
+                    {
+                        _codeGenerator.AppendLine($"{field.Name} = {PrimitiveReadExpression(field.Type)};");
+                    }
+                })
                 .Generate(_codeGenerator);
         }
 
         _codeGenerator.AppendLine("UnknownTaggedFields = null;");
         VersionConditional
             .ForVersions(messageFlexibleVersions, curVersions)
-            .IfMember(
-                curFlexibleVersions =>
+            .IfMember(curFlexibleVersions =>
+            {
+                _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarInt32();");
+                _codeGenerator.AppendLine("for (var t = 0; t < numTaggedFields; t++)");
+                _codeGenerator.AppendLeftBrace();
+                _codeGenerator.IncrementIndent();
+                _codeGenerator.AppendLine("var tag = reader.ReadVarInt32();");
+                _codeGenerator.AppendLine("var size = reader.ReadVarInt32();");
+                _codeGenerator.AppendLine("switch (tag)");
+                _codeGenerator.AppendLeftBrace();
+                _codeGenerator.IncrementIndent();
+
+                foreach (var field in structSpecification.Fields)
                 {
-                    _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarInt32();");
-                    _codeGenerator.AppendLine("for (var t = 0; t < numTaggedFields; t++)");
-                    _codeGenerator.AppendLeftBrace();
-                    _codeGenerator.IncrementIndent();
-                    _codeGenerator.AppendLine("var tag = reader.ReadVarInt32();");
-                    _codeGenerator.AppendLine("var size = reader.ReadVarInt32();");
-                    _codeGenerator.AppendLine("switch (tag)");
-                    _codeGenerator.AppendLeftBrace();
-                    _codeGenerator.IncrementIndent();
+                    var validTaggedVersions = field.Versions.Intersect(field.TaggedVersions);
 
-                    foreach (var field in structSpecification.Fields)
+                    if (!validTaggedVersions.IsEmpty)
                     {
-                        var validTaggedVersions = field.Versions.Intersect(field.TaggedVersions);
-
-                        if (!validTaggedVersions.IsEmpty)
+                        if (!field.Tag.HasValue)
                         {
-                            if (!field.Tag.HasValue)
-                            {
-                                throw new Exception($"Field {field.Name} has tagged versions, but no tag.");
-                            }
-
-                            _codeGenerator.AppendLine($"case {field.Tag}:");
-                            _codeGenerator.AppendLeftBrace();
-                            _codeGenerator.IncrementIndent();
-                            VersionConditional
-                                .ForVersions(validTaggedVersions, curFlexibleVersions)
-                                .IfMember(
-                                    presentAndTaggedVersions =>
-                                    {
-                                        if (field.Type is { IsVariableLength: true, IsStruct: false })
-                                        {
-                                            GenerateVariableLengthReader(
-                                                ((IMethodGenerator)this).FieldFlexibleVersions(field),
-                                                field.Name,
-                                                field.Type,
-                                                presentAndTaggedVersions,
-                                                field.NullableVersions,
-                                                $"{field.Name} = ",
-                                                ";",
-                                                _structRegistry.IsStructArrayWithKeys(field));
-                                        }
-                                        else
-                                        {
-                                            _codeGenerator.AppendLine($"{field.Name} = {PrimitiveReadExpression(field.Type)};");
-                                        }
-
-                                        _codeGenerator.AppendLine("break;");
-                                    })
-                                .IfNotMember(
-                                    _ =>
-                                    {
-                                        _codeGenerator.AppendLine(
-                                            $"throw new Exception($\"Tag {field.Tag} is not valid for version {{version}}\");");
-                                    })
-                                .Generate(_codeGenerator);
-                            _codeGenerator.DecrementIndent();
-                            _codeGenerator.AppendRightBrace();
+                            throw new Exception($"Field {field.Name} has tagged versions, but no tag.");
                         }
+
+                        _codeGenerator.AppendLine($"case {field.Tag}:");
+                        _codeGenerator.AppendLeftBrace();
+                        _codeGenerator.IncrementIndent();
+                        VersionConditional
+                            .ForVersions(validTaggedVersions, curFlexibleVersions)
+                            .IfMember(presentAndTaggedVersions =>
+                            {
+                                if (field.Type is { IsVariableLength: true, IsStruct: false })
+                                {
+                                    GenerateVariableLengthReader(
+                                        ((IMethodGenerator)this).FieldFlexibleVersions(field),
+                                        field.Name,
+                                        field.Type,
+                                        presentAndTaggedVersions,
+                                        field.NullableVersions,
+                                        $"{field.Name} = ",
+                                        ";",
+                                        _structRegistry.IsStructArrayWithKeys(field));
+                                }
+                                else
+                                {
+                                    _codeGenerator.AppendLine($"{field.Name} = {PrimitiveReadExpression(field.Type)};");
+                                }
+
+                                _codeGenerator.AppendLine("break;");
+                            })
+                            .IfNotMember(_ =>
+                            {
+                                _codeGenerator.AppendLine(
+                                    $"throw new Exception($\"Tag {field.Tag} is not valid for version {{version}}\");");
+                            })
+                            .Generate(_codeGenerator);
+                        _codeGenerator.DecrementIndent();
+                        _codeGenerator.AppendRightBrace();
                     }
-                    _codeGenerator.AppendLine("default:");
-                    _codeGenerator.IncrementIndent();
-                    _codeGenerator.AppendLine("UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);");
-                    _codeGenerator.AppendLine("break;");
-                    _codeGenerator.DecrementIndent();
-                    _codeGenerator.DecrementIndent();
-                    _codeGenerator.AppendRightBrace();
-                    _codeGenerator.DecrementIndent();
-                    _codeGenerator.AppendRightBrace();
-                })
+                }
+                _codeGenerator.AppendLine("default:");
+                _codeGenerator.IncrementIndent();
+                _codeGenerator.AppendLine("UnknownTaggedFields = reader.ReadUnknownTaggedField(UnknownTaggedFields, tag, size);");
+                _codeGenerator.AppendLine("break;");
+                _codeGenerator.DecrementIndent();
+                _codeGenerator.DecrementIndent();
+                _codeGenerator.AppendRightBrace();
+                _codeGenerator.DecrementIndent();
+                _codeGenerator.AppendRightBrace();
+            })
             .Generate(_codeGenerator);
         _codeGenerator.DecrementIndent();
         _codeGenerator.AppendRightBrace();
@@ -233,23 +231,22 @@ internal class ReadMethodGenerator: IMethodGenerator
         _codeGenerator.AppendLine($"int {lengthVar};");
         VersionConditional
             .ForVersions(fieldFlexibleVersions, possibleVersions)
-            .IfMember(_ => { _codeGenerator.AppendLine($"{lengthVar} = reader.ReadVarInt32() - 1;"); })
-            .IfNotMember(
-                _ =>
+            .IfMember(_ => { _codeGenerator.AppendLine($"{lengthVar} = reader.ReadVarUInt32() - 1;"); })
+            .IfNotMember(_ =>
+            {
+                if (type.IsString)
                 {
-                    if (type.IsString)
-                    {
-                        _codeGenerator.AppendLine($"{lengthVar} = reader.ReadShort();");
-                    }
-                    else if (type.IsBytes || type.IsArray || type.IsRecords)
-                    {
-                        _codeGenerator.AppendLine($"{lengthVar} = reader.ReadInt();");
-                    }
-                    else
-                    {
-                        throw new Exception($"Can't handle variable length type {type}");
-                    }
-                })
+                    _codeGenerator.AppendLine($"{lengthVar} = reader.ReadShort();");
+                }
+                else if (type.IsBytes || type.IsArray || type.IsRecords)
+                {
+                    _codeGenerator.AppendLine($"{lengthVar} = reader.ReadInt();");
+                }
+                else
+                {
+                    throw new Exception($"Can't handle variable length type {type}");
+                }
+            })
             .Generate(_codeGenerator);
         _codeGenerator.AppendLine($"if ({lengthVar} < 0)");
         _codeGenerator.AppendLeftBrace();

@@ -97,7 +97,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         ErrorCode = reader.ReadShort();
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ErrorMessage = null;
@@ -113,7 +113,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         }
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Results was serialized as null");
@@ -151,22 +151,22 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
-        writer.WriteVarInt32(Results.Count + 1);
+        writer.WriteVarUInt32(Results.Count + 1);
         foreach (var element in Results)
         {
             element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarInt32(numTaggedFields);
+        writer.WriteVarUInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -301,7 +301,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field User was serialized as null");
@@ -318,7 +318,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     ErrorMessage = null;
@@ -334,7 +334,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field CredentialInfos was serialized as null");
@@ -370,28 +370,28 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(User);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
-            writer.WriteVarInt32(CredentialInfos.Count + 1);
+            writer.WriteVarUInt32(CredentialInfos.Count + 1);
             foreach (var element in CredentialInfos)
             {
                 element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -547,7 +547,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             writer.WriteInt(Iterations);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

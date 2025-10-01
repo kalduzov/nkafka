@@ -1,4 +1,4 @@
-﻿//3A-49-6A-E6-9A-4A-BC-70-18-2B-4B-3E-C2-AE-D4-05-41-E2-7F-88-50-04-0F-BE-4C-7D-05-01-7E-09-EC-C6
+﻿//57-C9-2B-2E-95-28-4E-F4-5B-BC-E4-A2-C0-B9-A0-F2-42-8C-D4-C7-78-C4-5C-1D-F0-90-9D-1A-0E-D7-89-25
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -85,7 +85,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Results was serialized as null");
@@ -144,7 +144,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(Results.Count + 1);
+            writer.WriteVarUInt32(Results.Count + 1);
             foreach (var element in Results)
             {
                 element?.Write(ref writer, version);
@@ -162,7 +162,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -293,7 +293,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -317,7 +317,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -340,7 +340,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Configs was serialized as null");
@@ -401,7 +401,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -413,7 +413,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -426,7 +426,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -436,7 +436,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             }
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(Configs.Count + 1);
+                writer.WriteVarUInt32(Configs.Count + 1);
                 foreach (var element in Configs)
                 {
                     element?.Write(ref writer, version);
@@ -454,7 +454,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -632,7 +632,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -655,7 +655,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -681,7 +681,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Synonyms was serialized as null");
@@ -728,7 +728,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -777,7 +777,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -789,7 +789,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -801,7 +801,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -814,7 +814,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             writer.WriteBool(IsSensitive);
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(Synonyms.Count + 1);
+                writer.WriteVarUInt32(Synonyms.Count + 1);
                 foreach (var element in Synonyms)
                 {
                     element?.Write(ref writer, version);
@@ -838,7 +838,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 {
                     if (version >= ApiVersion.Version4)
                     {
-                        writer.WriteVarInt32(0);
+                        writer.WriteVarUInt32(0);
                     }
                     else
                     {
@@ -850,7 +850,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                     var stringBytes = Encoding.UTF8.GetBytes(Documentation);
                     if (version >= ApiVersion.Version4)
                     {
-                        writer.WriteVarInt32(stringBytes.Length + 1);
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
                     }
                     else
                     {
@@ -863,7 +863,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -1042,7 +1042,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -1065,7 +1065,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -1111,7 +1111,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -1123,7 +1123,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -1135,7 +1135,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -1148,7 +1148,7 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

@@ -1,4 +1,4 @@
-﻿//B8-C5-B9-55-C6-21-DD-07-01-9A-D6-7C-3B-26-1E-58-B3-5C-FF-3C-AE-F4-B6-CA-69-B6-03-E6-3D-08-E4-12
+﻿//85-D7-CF-F6-81-B8-33-F1-B1-32-1A-4B-F3-59-E0-B2-5B-AB-93-01-2E-4F-82-14-1C-FC-5B-65-78-B7-5E-95
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -85,7 +85,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
             if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Results was serialized as null");
@@ -144,7 +144,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
         writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarInt32(Results.Count + 1);
+            writer.WriteVarUInt32(Results.Count + 1);
             foreach (var element in Results)
             {
                 element?.Write(ref writer, version);
@@ -162,7 +162,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -277,7 +277,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -323,7 +323,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -336,7 +336,7 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

@@ -1,4 +1,4 @@
-﻿//57-A1-0B-81-90-93-50-6A-17-F3-E9-99-15-03-84-98-77-3D-49-14-A8-FB-63-55-38-D7-76-5C-27-84-D6-DD
+﻿//30-BB-AB-A0-17-52-CB-6F-DE-B8-1F-16-F7-6D-51-30-1A-0A-E5-C4-4B-2F-2A-8D-FB-8F-DC-33-D5-B8-40-34
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -101,7 +101,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Groups was serialized as null");
@@ -164,7 +164,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(Groups.Count + 1);
+            writer.WriteVarUInt32(Groups.Count + 1);
             foreach (var element in Groups)
             {
                 element?.Write(ref writer, version);
@@ -182,7 +182,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -309,7 +309,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -332,7 +332,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -354,7 +354,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version4)
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field GroupState was serialized as null");
@@ -375,7 +375,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             if (version >= ApiVersion.Version5)
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field GroupType was serialized as null");
@@ -419,7 +419,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -431,7 +431,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -443,7 +443,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupState);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -451,7 +451,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(GroupType);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -459,7 +459,7 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

@@ -1,4 +1,4 @@
-﻿//CF-FB-3C-CA-1F-72-88-B8-8D-D1-D2-F3-CE-5B-AD-28-D1-6A-EF-C5-E2-6E-DE-02-C2-1E-2A-52-3E-46-00-E5
+﻿//B4-82-24-5C-12-EB-23-0C-2D-76-FB-78-0C-03-4E-86-4A-C3-F3-3E-C9-0F-EC-23-38-BE-3D-51-BF-20-87-5C
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -108,7 +108,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         MaxBytes = reader.ReadInt();
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Topics was serialized as null");
@@ -134,7 +134,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
                 case 0:
                 {
                     int length;
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                     if (length < 0)
                     {
                         ClusterId = null;
@@ -166,20 +166,20 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         }
         writer.WriteInt(ReplicaId);
         writer.WriteInt(MaxBytes);
-        writer.WriteVarInt32(Topics.Count + 1);
+        writer.WriteVarUInt32(Topics.Count + 1);
         foreach (var element in Topics)
         {
             element?.Write(ref writer, version);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarInt32(numTaggedFields);
+        writer.WriteVarUInt32(numTaggedFields);
         if (ClusterId is not null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
             var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
-            writer.WriteVarInt32(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
@@ -303,7 +303,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -319,7 +319,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -355,17 +355,17 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
-            writer.WriteVarInt32(Partitions.Count + 1);
+            writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
                 element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -542,12 +542,12 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             {
                 if (!ReplicaDirectoryId.Equals(Guid.Empty))
                 {
-                    writer.WriteVarInt32(0);
-                    writer.WriteVarInt32(16);
+                    writer.WriteVarUInt32(0);
+                    writer.WriteVarUInt32(16);
                     writer.WriteGuid(ReplicaDirectoryId);
                 }
             }
@@ -691,7 +691,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
             writer.WriteInt(Epoch);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

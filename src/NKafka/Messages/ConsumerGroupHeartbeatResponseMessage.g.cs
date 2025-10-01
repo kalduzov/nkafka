@@ -112,7 +112,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         ErrorCode = reader.ReadShort();
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ErrorMessage = null;
@@ -128,7 +128,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 MemberId = null;
@@ -170,22 +170,22 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         if (MemberId is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(MemberEpoch);
@@ -193,7 +193,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         Assignment?.Write(ref writer, version);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarInt32(numTaggedFields);
+        writer.WriteVarUInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -335,7 +335,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field TopicPartitions was serialized as null");
@@ -369,14 +369,14 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
-            writer.WriteVarInt32(TopicPartitions.Count + 1);
+            writer.WriteVarUInt32(TopicPartitions.Count + 1);
             foreach (var element in TopicPartitions)
             {
                 element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -475,7 +475,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
             TopicId = reader.ReadGuid();
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -510,14 +510,14 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         {
             var numTaggedFields = 0;
             writer.WriteGuid(TopicId);
-            writer.WriteVarInt32(Partitions.Count + 1);
+            writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
                 writer.WriteInt(element);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

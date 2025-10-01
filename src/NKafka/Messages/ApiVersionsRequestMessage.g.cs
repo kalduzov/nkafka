@@ -94,7 +94,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field ClientSoftwareName was serialized as null");
@@ -115,7 +115,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         if (version >= ApiVersion.Version3)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field ClientSoftwareVersion was serialized as null");
@@ -159,7 +159,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareName);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -167,7 +167,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         {
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareVersion);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -175,7 +175,7 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

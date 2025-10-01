@@ -1,4 +1,4 @@
-﻿//25-41-00-76-5A-5D-44-6E-15-4B-EA-C0-B7-12-A1-0A-F3-89-2C-30-B5-BF-6C-E4-23-8B-ED-79-C8-3E-F0-F5
+﻿//47-DB-37-7C-E5-A8-80-D6-FF-79-9D-D2-BB-B0-D8-36-15-B8-A8-B8-4A-89-E4-70-CC-60-75-56-DE-25-58-52
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -113,7 +113,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field ApiKeys was serialized as null");
@@ -176,7 +176,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
                     case 0:
                     {
                         int arrayLength;
-                        arrayLength = reader.ReadVarInt32() - 1;
+                        arrayLength = reader.ReadVarUInt32() - 1;
                         if (arrayLength < 0)
                         {
                             throw new Exception("non-nullable field SupportedFeatures was serialized as null");
@@ -200,7 +200,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
                     case 2:
                     {
                         int arrayLength;
-                        arrayLength = reader.ReadVarInt32() - 1;
+                        arrayLength = reader.ReadVarUInt32() - 1;
                         if (arrayLength < 0)
                         {
                             throw new Exception("non-nullable field FinalizedFeatures was serialized as null");
@@ -236,7 +236,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         writer.WriteShort((short)ErrorCode);
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(ApiKeys.Count + 1);
+            writer.WriteVarUInt32(ApiKeys.Count + 1);
             foreach (var element in ApiKeys)
             {
                 element?.Write(ref writer, version);
@@ -286,12 +286,12 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             {
                 if (SupportedFeatures.Count != 0)
                 {
-                    writer.WriteVarInt32(0);
-                    writer.WriteVarInt32(SupportedFeatures.Count + 1);
+                    writer.WriteVarUInt32(0);
+                    writer.WriteVarUInt32(SupportedFeatures.Count + 1);
                     foreach (var element in SupportedFeatures)
                     {
                         element?.Write(ref writer, version);
@@ -301,16 +301,16 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             {
                 if (FinalizedFeaturesEpoch != -1)
                 {
-                    writer.WriteVarInt32(1);
-                    writer.WriteVarInt32(8);
+                    writer.WriteVarUInt32(1);
+                    writer.WriteVarUInt32(8);
                     writer.WriteLong(FinalizedFeaturesEpoch);
                 }
             }
             {
                 if (FinalizedFeatures.Count != 0)
                 {
-                    writer.WriteVarInt32(2);
-                    writer.WriteVarInt32(FinalizedFeatures.Count + 1);
+                    writer.WriteVarUInt32(2);
+                    writer.WriteVarUInt32(FinalizedFeatures.Count + 1);
                     foreach (var element in FinalizedFeatures)
                     {
                         element?.Write(ref writer, version);
@@ -320,8 +320,8 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             {
                 if (ZkMigrationReady)
                 {
-                    writer.WriteVarInt32(3);
-                    writer.WriteVarInt32(1);
+                    writer.WriteVarUInt32(3);
+                    writer.WriteVarUInt32(1);
                     writer.WriteBool(ZkMigrationReady);
                 }
             }
@@ -514,7 +514,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -651,7 +651,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -692,14 +692,14 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(MinVersion);
             writer.WriteShort(MaxVersion);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -838,7 +838,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -879,14 +879,14 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteShort(MaxVersionLevel);
             writer.WriteShort(MinVersionLevel);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

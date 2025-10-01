@@ -1,4 +1,4 @@
-﻿//29-19-55-68-3B-23-EA-33-93-2C-FD-69-08-D0-51-78-D6-C7-87-D4-0C-FE-61-54-49-70-9E-76-77-BB-38-B9
+﻿//DA-B3-0B-16-FE-73-94-9B-5E-4B-22-23-32-4F-D9-F3-2E-E2-17-B3-35-6A-18-F9-1F-88-F6-FB-DD-C9-6E-12
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -88,7 +88,7 @@ internal sealed partial class DescribeUserScramCredentialsRequestMessage: IReque
     {
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 Users = null;
@@ -124,11 +124,11 @@ internal sealed partial class DescribeUserScramCredentialsRequestMessage: IReque
         var numTaggedFields = 0;
         if (Users is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
-            writer.WriteVarInt32(Users.Count + 1);
+            writer.WriteVarUInt32(Users.Count + 1);
             foreach (var element in Users)
             {
                 element?.Write(ref writer, version);
@@ -136,7 +136,7 @@ internal sealed partial class DescribeUserScramCredentialsRequestMessage: IReque
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarInt32(numTaggedFields);
+        writer.WriteVarUInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -228,7 +228,7 @@ internal sealed partial class DescribeUserScramCredentialsRequestMessage: IReque
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -263,12 +263,12 @@ internal sealed partial class DescribeUserScramCredentialsRequestMessage: IReque
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

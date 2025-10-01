@@ -1,4 +1,4 @@
-﻿//79-1C-D3-0F-CF-EC-FD-8F-5C-E3-17-8D-D7-18-59-4C-2B-63-B8-E8-2F-70-F1-A4-AF-96-F4-1D-80-54-E1-34
+﻿//FF-E0-71-94-62-39-E2-E1-1A-0B-8E-55-CE-75-25-B2-2B-FC-F2-BD-21-7B-D6-18-A7-96-48-0F-35-46-62-32
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -101,7 +101,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -135,7 +135,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field CoordinatorKeys was serialized as null");
@@ -146,7 +146,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field CoordinatorKeys element was serialized as null");
@@ -195,7 +195,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
                 var stringBytes = Encoding.UTF8.GetBytes(Key);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -224,12 +224,12 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         }
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(CoordinatorKeys.Count + 1);
+            writer.WriteVarUInt32(CoordinatorKeys.Count + 1);
             foreach (var element in CoordinatorKeys)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -245,7 +245,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

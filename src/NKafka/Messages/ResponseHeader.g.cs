@@ -103,7 +103,7 @@ internal sealed partial class ResponseHeader: IMessage, IEquatable<ResponseHeade
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version1)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

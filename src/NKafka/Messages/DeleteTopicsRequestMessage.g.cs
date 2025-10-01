@@ -1,4 +1,4 @@
-﻿//92-E3-D8-6F-E1-DD-5B-44-BB-37-15-76-9C-69-62-A3-E4-9D-DD-E9-A4-E1-8A-7B-7E-15-9B-7D-4B-1A-C7-BF
+﻿//4E-43-54-26-A1-63-28-F2-D1-BE-11-7A-60-F4-3E-D6-AF-C2-C1-FF-74-00-B1-0B-9E-FC-EE-C8-FB-1C-6A-AA
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -99,7 +99,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
         if (version >= ApiVersion.Version6)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Topics was serialized as null");
@@ -123,7 +123,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field TopicNames was serialized as null");
@@ -134,7 +134,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
                     for (var i = 0; i < arrayLength; i++)
                     {
                         int length;
-                        length = reader.ReadVarInt32() - 1;
+                        length = reader.ReadVarUInt32() - 1;
                         if (length < 0)
                         {
                             throw new Exception("non-nullable field TopicNames element was serialized as null");
@@ -212,7 +212,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarInt32(Topics.Count + 1);
+            writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
             {
                 element?.Write(ref writer, version);
@@ -229,12 +229,12 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
         {
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(TopicNames.Count + 1);
+                writer.WriteVarUInt32(TopicNames.Count + 1);
                 foreach (var element in TopicNames)
                 {
                     {
                         var stringBytes = Encoding.UTF8.GetBytes(element);
-                        writer.WriteVarInt32(stringBytes.Length + 1);
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
                         writer.WriteBytes(stringBytes);
                     }
                 }
@@ -257,7 +257,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -382,7 +382,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     Name = null;
@@ -422,18 +422,18 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
             var numTaggedFields = 0;
             if (Name is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteGuid(TopicId);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

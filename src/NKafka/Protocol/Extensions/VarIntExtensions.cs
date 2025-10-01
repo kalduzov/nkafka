@@ -33,39 +33,85 @@ internal static class VarIntExtensions
 
     internal static long ReadVarInt64(this ref BufferReader buffer)
     {
-        var typeCode = buffer.ReadSByte();
+        var value = ReadVarUInt64(ref buffer);
 
-        return typeCode switch
-        {
-            VarIntCodes.BYTE => buffer.ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => buffer.ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => buffer.ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => buffer.ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => buffer.ReadUnmanaged<uint>(),
-            VarIntCodes.INT32 => buffer.ReadUnmanaged<int>(),
-            VarIntCodes.UINT64 => checked((long)buffer.ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => buffer.ReadUnmanaged<long>(),
-            _ => typeCode
-        };
+        return value >>> 1 ^ -(value & 1);
     }
 
     internal static int ReadVarInt32(this ref BufferReader buffer)
     {
-        var typeCode = buffer.ReadSByte();
+        var value = ReadVarUInt32(ref buffer);
 
-        return typeCode switch
+        return value >>> 1 ^ -(value & 1);
+    }
+
+    internal static long ReadVarUInt64(this ref BufferReader buffer)
+    {
+        var value = 0L;
+        var i = 0;
+        long b;
+
+        while (((b = buffer.ReadSByte()) & 0x80) != 0)
         {
-            VarIntCodes.BYTE => buffer.ReadUnmanaged<byte>(),
-            VarIntCodes.SBYTE => buffer.ReadUnmanaged<sbyte>(),
-            VarIntCodes.UINT16 => buffer.ReadUnmanaged<ushort>(),
-            VarIntCodes.INT16 => buffer.ReadUnmanaged<short>(),
-            VarIntCodes.UINT32 => checked((int)buffer.ReadUnmanaged<uint>()),
-            VarIntCodes.INT32 => buffer.ReadUnmanaged<int>(),
-            VarIntCodes.UINT64 => checked((int)buffer.ReadUnmanaged<ulong>()),
-            VarIntCodes.INT64 => checked((int)buffer.ReadUnmanaged<long>()),
-            _ => typeCode
-        };
+            value |= (b & 0x7F) << i;
+            i += 7;
 
+            if (i > 63)
+            {
+                throw new ArgumentException("VarUInt64 is too long");
+            }
+        }
+
+        value |= b << i;
+
+        return value;
+    }
+
+    internal static int ReadVarUInt32(this ref BufferReader buffer)
+    {
+        var tmp = buffer.ReadSByte();
+
+        if (tmp >= 0)
+        {
+            return tmp;
+        }
+
+        var result = tmp & 127;
+
+        if ((tmp = buffer.ReadSByte()) >= 0)
+        {
+            result |= tmp << 7;
+        }
+        else
+        {
+            result |= (tmp & 127) << 7;
+
+            if ((tmp = buffer.ReadSByte()) >= 0)
+            {
+                result |= tmp << 14;
+            }
+            else
+            {
+                result |= (tmp & 127) << 14;
+
+                if ((tmp = buffer.ReadSByte()) >= 0)
+                {
+                    result |= tmp << 21;
+                }
+                else
+                {
+                    result |= (tmp & 127) << 21;
+                    result |= (tmp = buffer.ReadSByte()) << 28;
+
+                    if (tmp < 0)
+                    {
+                        throw new ArgumentException("VarUInt32 is too long");
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     #endregion

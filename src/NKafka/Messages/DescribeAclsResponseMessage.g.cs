@@ -99,7 +99,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             int length;
             if (version >= ApiVersion.Version2)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -122,7 +122,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             if (version >= ApiVersion.Version2)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Resources was serialized as null");
@@ -184,7 +184,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
@@ -196,7 +196,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -206,7 +206,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
         }
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarInt32(Resources.Count + 1);
+            writer.WriteVarUInt32(Resources.Count + 1);
             foreach (var element in Resources)
             {
                 element?.Write(ref writer, version);
@@ -224,7 +224,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -367,7 +367,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -391,7 +391,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 if (version >= ApiVersion.Version2)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Acls was serialized as null");
@@ -452,7 +452,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -463,7 +463,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             writer.WriteSByte(PatternType);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(Acls.Count + 1);
+                writer.WriteVarUInt32(Acls.Count + 1);
                 foreach (var element in Acls)
                 {
                     element?.Write(ref writer, version);
@@ -481,7 +481,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -624,7 +624,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -647,7 +647,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version2)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -694,7 +694,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(Principal);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -706,7 +706,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(Host);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -720,7 +720,7 @@ internal sealed partial class DescribeAclsResponseMessage: IResponseMessage, IEq
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

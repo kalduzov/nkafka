@@ -1,4 +1,4 @@
-﻿//1D-6E-AC-45-DE-F6-1D-96-E7-D8-DF-1A-BE-E2-84-D2-F6-B8-5B-3E-A5-6C-5F-3C-63-F4-C9-CE-E0-83-FC-DF
+﻿//69-41-51-1D-38-CF-7C-2D-87-DE-F2-E7-9D-26-BE-71-31-82-A6-FE-D8-49-B6-82-F4-E0-7F-E7-FB-71-5B-47
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -129,7 +129,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -165,7 +165,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -199,7 +199,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field Coordinators was serialized as null");
@@ -261,7 +261,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -273,7 +273,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -299,7 +299,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
                 var stringBytes = Encoding.UTF8.GetBytes(Host);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -328,7 +328,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
         }
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(Coordinators.Count + 1);
+            writer.WriteVarUInt32(Coordinators.Count + 1);
             foreach (var element in Coordinators)
             {
                 element?.Write(ref writer, version);
@@ -345,7 +345,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -523,7 +523,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Key was serialized as null");
@@ -540,7 +540,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             NodeId = reader.ReadInt();
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Host was serialized as null");
@@ -558,7 +558,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             ErrorCode = reader.ReadShort();
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     ErrorMessage = null;
@@ -597,30 +597,30 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Key);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(NodeId);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

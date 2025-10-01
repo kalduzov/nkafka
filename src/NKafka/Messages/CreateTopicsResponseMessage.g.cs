@@ -1,4 +1,4 @@
-﻿//09-79-1C-22-56-00-E4-03-54-7B-80-6B-E1-27-95-2D-58-26-72-6A-81-8A-22-4E-22-D3-6F-FF-17-2B-C4-7B
+﻿//FC-25-AE-1B-60-0F-BD-C2-8D-87-EE-E8-1E-7D-30-F4-3B-10-6D-84-9E-D8-CB-FE-A8-43-78-0D-DE-D3-36-8B
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -85,7 +85,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             if (version >= ApiVersion.Version5)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -144,7 +144,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
         writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version5)
         {
-            writer.WriteVarInt32(Topics.Count + 1);
+            writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
             {
                 element?.Write(ref writer, version);
@@ -162,7 +162,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version5)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -307,7 +307,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version5)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -339,7 +339,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 int length;
                 if (version >= ApiVersion.Version5)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -378,7 +378,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             if (version >= ApiVersion.Version5)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     Configs = null;
@@ -428,7 +428,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -445,7 +445,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             {
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -457,7 +457,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
                 var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -484,11 +484,11 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             {
                 if (Configs is null)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
-                    writer.WriteVarInt32(Configs.Count + 1);
+                    writer.WriteVarUInt32(Configs.Count + 1);
                     foreach (var element in Configs)
                     {
                         element?.Write(ref writer, version);
@@ -499,12 +499,12 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version5)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 {
                     if (TopicConfigErrorCode != 0)
                     {
-                        writer.WriteVarInt32(0);
-                        writer.WriteVarInt32(2);
+                        writer.WriteVarUInt32(0);
+                        writer.WriteVarUInt32(2);
                         writer.WriteShort(TopicConfigErrorCode);
                     }
                 }
@@ -683,7 +683,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Name was serialized as null");
@@ -699,7 +699,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     Value = null;
@@ -741,17 +741,17 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             if (Value is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Value);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteBool(ReadOnly);
@@ -759,7 +759,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             writer.WriteBool(IsSensitive);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

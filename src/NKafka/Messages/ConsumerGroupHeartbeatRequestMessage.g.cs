@@ -133,7 +133,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
     {
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field GroupId was serialized as null");
@@ -149,7 +149,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 throw new Exception("non-nullable field MemberId was serialized as null");
@@ -166,7 +166,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         MemberEpoch = reader.ReadInt();
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 InstanceId = null;
@@ -182,7 +182,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 RackId = null;
@@ -199,7 +199,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         RebalanceTimeoutMs = reader.ReadInt();
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 SubscribedTopicNames = null;
@@ -210,7 +210,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field SubscribedTopicNames element was serialized as null");
@@ -230,7 +230,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         if (version >= ApiVersion.Version1)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 SubscribedTopicRegex = null;
@@ -250,7 +250,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ServerAssignor = null;
@@ -266,7 +266,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 TopicPartitions = null;
@@ -302,48 +302,48 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         var numTaggedFields = 0;
         {
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         {
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(MemberEpoch);
         if (InstanceId is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(InstanceId);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         if (RackId is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(RackId);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(RebalanceTimeoutMs);
         if (SubscribedTopicNames is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
-            writer.WriteVarInt32(SubscribedTopicNames.Count + 1);
+            writer.WriteVarUInt32(SubscribedTopicNames.Count + 1);
             foreach (var element in SubscribedTopicNames)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -352,12 +352,12 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         {
             if (SubscribedTopicRegex is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(SubscribedTopicRegex);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -370,21 +370,21 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         if (ServerAssignor is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
             var stringBytes = Encoding.UTF8.GetBytes(ServerAssignor);
-            writer.WriteVarInt32(stringBytes.Length + 1);
+            writer.WriteVarUInt32(stringBytes.Length + 1);
             writer.WriteBytes(stringBytes);
         }
         if (TopicPartitions is null)
         {
-            writer.WriteVarInt32(0);
+            writer.WriteVarUInt32(0);
         }
         else
         {
-            writer.WriteVarInt32(TopicPartitions.Count + 1);
+            writer.WriteVarUInt32(TopicPartitions.Count + 1);
             foreach (var element in TopicPartitions)
             {
                 element?.Write(ref writer, version);
@@ -392,7 +392,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
-        writer.WriteVarInt32(numTaggedFields);
+        writer.WriteVarUInt32(numTaggedFields);
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
 
@@ -606,7 +606,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
             TopicId = reader.ReadGuid();
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Partitions was serialized as null");
@@ -641,14 +641,14 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         {
             var numTaggedFields = 0;
             writer.WriteGuid(TopicId);
-            writer.WriteVarInt32(Partitions.Count + 1);
+            writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)
             {
                 writer.WriteInt(element);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

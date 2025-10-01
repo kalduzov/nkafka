@@ -1,4 +1,4 @@
-﻿//F5-BC-D1-0C-7B-15-7D-F7-30-46-64-9C-2B-00-E5-E4-9B-70-D8-CB-29-28-D7-91-12-7C-DD-1C-2D-3B-44-1A
+﻿//69-C6-BC-ED-FF-7B-8C-DE-E8-5B-81-5A-C6-26-FB-A5-B0-6B-E9-EC-8A-8F-59-00-A7-02-FA-A7-B0-B3-6C-AF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -94,7 +94,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field StatesFilter was serialized as null");
@@ -105,7 +105,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field StatesFilter element was serialized as null");
@@ -129,7 +129,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
         if (version >= ApiVersion.Version5)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field TypesFilter was serialized as null");
@@ -140,7 +140,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
                 for (var i = 0; i < arrayLength; i++)
                 {
                     int length;
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                     if (length < 0)
                     {
                         throw new Exception("non-nullable field TypesFilter element was serialized as null");
@@ -185,12 +185,12 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(StatesFilter.Count + 1);
+            writer.WriteVarUInt32(StatesFilter.Count + 1);
             foreach (var element in StatesFilter)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -204,12 +204,12 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
         }
         if (version >= ApiVersion.Version5)
         {
-            writer.WriteVarInt32(TypesFilter.Count + 1);
+            writer.WriteVarUInt32(TypesFilter.Count + 1);
             foreach (var element in TypesFilter)
             {
                 {
                     var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                     writer.WriteBytes(stringBytes);
                 }
             }
@@ -225,7 +225,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

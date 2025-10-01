@@ -85,7 +85,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -144,7 +144,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
         writer.WriteInt(ThrottleTimeMs);
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(Topics.Count + 1);
+            writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
             {
                 element?.Write(ref writer, version);
@@ -162,7 +162,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -274,7 +274,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -297,7 +297,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
                 if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -357,7 +357,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
                 var stringBytes = Encoding.UTF8.GetBytes(Topic);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -367,7 +367,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
             }
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(Partitions.Count + 1);
+                writer.WriteVarUInt32(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
                     element?.Write(ref writer, version);
@@ -385,7 +385,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -551,7 +551,7 @@ internal sealed partial class OffsetForLeaderEpochResponseMessage: IResponseMess
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

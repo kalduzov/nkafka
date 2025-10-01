@@ -105,7 +105,7 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -130,7 +130,7 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
             int length;
             if (version >= ApiVersion.Version3)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -175,7 +175,7 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
             var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -189,7 +189,7 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
             var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -201,7 +201,7 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else

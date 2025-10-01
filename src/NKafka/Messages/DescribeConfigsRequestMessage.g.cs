@@ -1,4 +1,4 @@
-﻿//14-E7-6A-BA-3B-6D-E2-E1-E4-83-26-CE-E7-33-8B-36-3D-CB-3A-81-FA-16-55-71-DD-AC-73-58-34-93-71-AB
+﻿//69-2C-BD-35-11-D7-8A-D9-CF-BB-D7-6B-A0-2C-A0-65-A6-A3-2B-2B-27-AA-16-8F-BD-1B-64-32-E4-1F-30-70
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -100,7 +100,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
             if (version >= ApiVersion.Version4)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Resources was serialized as null");
@@ -167,7 +167,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
         var numTaggedFields = 0;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(Resources.Count + 1);
+            writer.WriteVarUInt32(Resources.Count + 1);
             foreach (var element in Resources)
             {
                 element?.Write(ref writer, version);
@@ -197,7 +197,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -320,7 +320,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                 int length;
                 if (version >= ApiVersion.Version4)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -343,7 +343,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                 if (version >= ApiVersion.Version4)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         ConfigurationKeys = null;
@@ -354,7 +354,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                         for (var i = 0; i < arrayLength; i++)
                         {
                             int length;
-                            length = reader.ReadVarInt32() - 1;
+                            length = reader.ReadVarUInt32() - 1;
                             if (length < 0)
                             {
                                 throw new Exception("non-nullable field ConfigurationKeys element was serialized as null");
@@ -430,7 +430,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                 var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -442,16 +442,16 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
             {
                 if (ConfigurationKeys is null)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
-                    writer.WriteVarInt32(ConfigurationKeys.Count + 1);
+                    writer.WriteVarUInt32(ConfigurationKeys.Count + 1);
                     foreach (var element in ConfigurationKeys)
                     {
                         {
                             var stringBytes = Encoding.UTF8.GetBytes(element);
-                            writer.WriteVarInt32(stringBytes.Length + 1);
+                            writer.WriteVarUInt32(stringBytes.Length + 1);
                             writer.WriteBytes(stringBytes);
                         }
                     }
@@ -480,7 +480,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

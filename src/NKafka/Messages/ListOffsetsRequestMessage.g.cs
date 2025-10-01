@@ -1,4 +1,4 @@
-﻿//DB-5B-56-E9-91-C5-64-3A-A4-DF-81-06-10-BD-84-20-9F-EA-81-97-A8-48-9F-BA-14-38-08-22-9E-96-3A-6F
+﻿//55-A5-97-A1-23-A8-3D-7C-0D-76-B2-01-83-B0-11-D6-28-25-02-88-56-CC-29-D8-FF-05-3F-5B-EB-4E-84-65
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -114,7 +114,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Topics was serialized as null");
@@ -192,7 +192,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         }
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarInt32(Topics.Count + 1);
+            writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
             {
                 element?.Write(ref writer, version);
@@ -214,7 +214,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -336,7 +336,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -359,7 +359,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 if (version >= ApiVersion.Version6)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -419,7 +419,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -429,7 +429,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             }
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(Partitions.Count + 1);
+                writer.WriteVarUInt32(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
                     element?.Write(ref writer, version);
@@ -447,7 +447,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -613,7 +613,7 @@ internal sealed partial class ListOffsetsRequestMessage: IRequestMessage, IEquat
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

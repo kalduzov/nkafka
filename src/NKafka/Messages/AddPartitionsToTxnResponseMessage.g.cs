@@ -1,4 +1,4 @@
-﻿//13-C4-34-C7-12-A1-CA-07-75-DF-05-17-5C-E9-A0-65-CE-BF-9B-80-F6-43-26-8D-75-17-CC-F8-78-BB-2B-01
+﻿//66-3F-76-23-1E-F2-41-0E-58-17-1B-56-28-BB-5D-E0-B9-79-3B-EE-D1-5E-5C-19-37-2F-21-FF-29-D3-EC-A3
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -105,7 +105,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
         if (version >= ApiVersion.Version4)
         {
             int arrayLength;
-            arrayLength = reader.ReadVarInt32() - 1;
+            arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
                 throw new Exception("non-nullable field ResultsByTransaction was serialized as null");
@@ -129,7 +129,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             if (version >= ApiVersion.Version3)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field ResultsByTopicV3AndBelow was serialized as null");
@@ -196,7 +196,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
         }
         if (version >= ApiVersion.Version4)
         {
-            writer.WriteVarInt32(ResultsByTransaction.Count + 1);
+            writer.WriteVarUInt32(ResultsByTransaction.Count + 1);
             foreach (var element in ResultsByTransaction)
             {
                 element?.Write(ref writer, version);
@@ -213,7 +213,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
         {
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(ResultsByTopicV3AndBelow.Count + 1);
+                writer.WriteVarUInt32(ResultsByTopicV3AndBelow.Count + 1);
                 foreach (var element in ResultsByTopicV3AndBelow)
                 {
                     element?.Write(ref writer, version);
@@ -239,7 +239,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version3)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -369,7 +369,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             }
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field TransactionalId was serialized as null");
@@ -385,7 +385,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             }
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field TopicResults was serialized as null");
@@ -425,17 +425,17 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             var numTaggedFields = 0;
             {
                 var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
-            writer.WriteVarInt32(TopicResults.Count + 1);
+            writer.WriteVarUInt32(TopicResults.Count + 1);
             foreach (var element in TopicResults)
             {
                 element?.Write(ref writer, version);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -576,7 +576,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
                 int length;
                 if (version >= ApiVersion.Version3)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -599,7 +599,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
                 if (version >= ApiVersion.Version3)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field ResultsByPartition was serialized as null");
@@ -659,7 +659,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
                 var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -669,7 +669,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             }
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(ResultsByPartition.Count + 1);
+                writer.WriteVarUInt32(ResultsByPartition.Count + 1);
                 foreach (var element in ResultsByPartition)
                 {
                     element?.Write(ref writer, version);
@@ -687,7 +687,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -862,7 +862,7 @@ internal sealed partial class AddPartitionsToTxnResponseMessage: IResponseMessag
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

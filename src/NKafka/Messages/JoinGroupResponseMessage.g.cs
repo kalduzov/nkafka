@@ -1,4 +1,4 @@
-﻿//84-38-9D-93-E4-62-2F-59-F2-77-05-56-47-21-C5-97-15-4E-F1-0D-72-56-2B-3B-63-71-AB-51-E4-95-48-8C
+﻿//C7-A2-53-9C-06-EA-45-33-FD-70-EC-82-1E-E6-91-17-7C-C4-FF-58-10-AE-D9-A8-7E-0E-81-28-5E-3E-FF-E0
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -124,7 +124,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         if (version >= ApiVersion.Version7)
         {
             int length;
-            length = reader.ReadVarInt32() - 1;
+            length = reader.ReadVarUInt32() - 1;
             if (length < 0)
             {
                 ProtocolType = null;
@@ -146,7 +146,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -176,7 +176,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -207,7 +207,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             int length;
             if (version >= ApiVersion.Version6)
             {
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
             }
             else
             {
@@ -230,7 +230,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             if (version >= ApiVersion.Version6)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Members was serialized as null");
@@ -293,12 +293,12 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
         }
@@ -306,7 +306,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (version >= ApiVersion.Version7)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
@@ -317,7 +317,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -329,7 +329,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(Leader);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -352,7 +352,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             var stringBytes = Encoding.UTF8.GetBytes(MemberId);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
             }
             else
             {
@@ -362,7 +362,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         }
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarInt32(Members.Count + 1);
+            writer.WriteVarUInt32(Members.Count + 1);
             foreach (var element in Members)
             {
                 element?.Write(ref writer, version);
@@ -380,7 +380,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version6)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
         else
@@ -573,7 +573,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -597,7 +597,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -624,7 +624,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 int length;
                 if (version >= ApiVersion.Version6)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -665,7 +665,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 var stringBytes = Encoding.UTF8.GetBytes(MemberId);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarInt32(stringBytes.Length + 1);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
                 }
                 else
                 {
@@ -679,7 +679,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 {
                     if (version >= ApiVersion.Version6)
                     {
-                        writer.WriteVarInt32(0);
+                        writer.WriteVarUInt32(0);
                     }
                     else
                     {
@@ -691,7 +691,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                     var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                     if (version >= ApiVersion.Version6)
                     {
-                        writer.WriteVarInt32(stringBytes.Length + 1);
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
                     }
                     else
                     {
@@ -702,7 +702,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             }
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(Metadata.Length + 1);
+                writer.WriteVarUInt32(Metadata.Length + 1);
             }
             else
             {
@@ -713,7 +713,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else

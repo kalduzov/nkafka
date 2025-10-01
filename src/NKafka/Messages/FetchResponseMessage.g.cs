@@ -1,4 +1,4 @@
-﻿//C6-CF-53-E2-5F-22-9F-75-07-A7-36-85-1D-F9-BB-AB-40-7A-5A-44-94-3E-61-81-7C-3A-59-DD-E0-94-CD-64
+﻿//9B-17-F8-DE-39-80-92-A2-D4-29-28-CA-29-0F-DF-DE-D9-D5-5F-FD-26-C9-1E-B4-E1-54-58-1C-CA-74-92-2E
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -119,7 +119,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             if (version >= ApiVersion.Version12)
             {
                 int arrayLength;
-                arrayLength = reader.ReadVarInt32() - 1;
+                arrayLength = reader.ReadVarUInt32() - 1;
                 if (arrayLength < 0)
                 {
                     throw new Exception("non-nullable field Responses was serialized as null");
@@ -171,7 +171,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                         if (version >= ApiVersion.Version16)
                         {
                             int arrayLength;
-                            arrayLength = reader.ReadVarInt32() - 1;
+                            arrayLength = reader.ReadVarUInt32() - 1;
                             if (arrayLength < 0)
                             {
                                 throw new Exception("non-nullable field NodeEndpoints was serialized as null");
@@ -222,7 +222,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         }
         if (version >= ApiVersion.Version12)
         {
-            writer.WriteVarInt32(Responses.Count + 1);
+            writer.WriteVarUInt32(Responses.Count + 1);
             foreach (var element in Responses)
             {
                 element?.Write(ref writer, version);
@@ -254,12 +254,12 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version12)
         {
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             {
                 if (NodeEndpoints.Count != 0)
                 {
-                    writer.WriteVarInt32(0);
-                    writer.WriteVarInt32(NodeEndpoints.Count + 1);
+                    writer.WriteVarUInt32(0);
+                    writer.WriteVarUInt32(NodeEndpoints.Count + 1);
                     foreach (var element in NodeEndpoints)
                     {
                         element?.Write(ref writer, version);
@@ -408,7 +408,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                 int length;
                 if (version >= ApiVersion.Version12)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -443,7 +443,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                 if (version >= ApiVersion.Version12)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         throw new Exception("non-nullable field Partitions was serialized as null");
@@ -505,7 +505,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                     var stringBytes = Encoding.UTF8.GetBytes(Topic);
                     if (version >= ApiVersion.Version12)
                     {
-                        writer.WriteVarInt32(stringBytes.Length + 1);
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
                     }
                     else
                     {
@@ -520,7 +520,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             }
             if (version >= ApiVersion.Version12)
             {
-                writer.WriteVarInt32(Partitions.Count + 1);
+                writer.WriteVarUInt32(Partitions.Count + 1);
                 foreach (var element in Partitions)
                 {
                     element?.Write(ref writer, version);
@@ -538,7 +538,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version12)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -735,7 +735,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                 if (version >= ApiVersion.Version12)
                 {
                     int arrayLength;
-                    arrayLength = reader.ReadVarInt32() - 1;
+                    arrayLength = reader.ReadVarUInt32() - 1;
                     if (arrayLength < 0)
                     {
                         AbortedTransactions = null;
@@ -781,7 +781,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                 int length;
                 if (version >= ApiVersion.Version12)
                 {
-                    length = reader.ReadVarInt32() - 1;
+                    length = reader.ReadVarUInt32() - 1;
                 }
                 else
                 {
@@ -887,11 +887,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             {
                 if (AbortedTransactions is null)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
-                    writer.WriteVarInt32(AbortedTransactions.Count + 1);
+                    writer.WriteVarUInt32(AbortedTransactions.Count + 1);
                     foreach (var element in AbortedTransactions)
                     {
                         element?.Write(ref writer, version);
@@ -928,7 +928,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             {
                 if (version >= ApiVersion.Version12)
                 {
-                    writer.WriteVarInt32(0);
+                    writer.WriteVarUInt32(0);
                 }
                 else
                 {
@@ -939,7 +939,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             {
                 if (version >= ApiVersion.Version12)
                 {
-                    writer.WriteVarInt32((Records?.SizeInBytes ?? 0) + 1);
+                    writer.WriteVarUInt32((Records?.SizeInBytes ?? 0) + 1);
                 }
                 else
                 {
@@ -951,25 +951,25 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version12)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 {
                     if (!DivergingEpoch.Equals(new ()))
                     {
-                        writer.WriteVarInt32(0);
+                        writer.WriteVarUInt32(0);
                         DivergingEpoch?.Write(ref writer, version);
                     }
                 }
                 {
                     if (!CurrentLeader.Equals(new ()))
                     {
-                        writer.WriteVarInt32(1);
+                        writer.WriteVarUInt32(1);
                         CurrentLeader?.Write(ref writer, version);
                     }
                 }
                 {
                     if (!SnapshotId.Equals(new ()))
                     {
-                        writer.WriteVarInt32(2);
+                        writer.WriteVarUInt32(2);
                         SnapshotId?.Write(ref writer, version);
                     }
                 }
@@ -1186,7 +1186,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteLong(EndOffset);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -1306,7 +1306,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(LeaderEpoch);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -1426,7 +1426,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(Epoch);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 
@@ -1547,7 +1547,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version12)
             {
-                writer.WriteVarInt32(numTaggedFields);
+                writer.WriteVarUInt32(numTaggedFields);
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
             }
             else
@@ -1659,7 +1659,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             NodeId = reader.ReadInt();
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     throw new Exception("non-nullable field Host was serialized as null");
@@ -1676,7 +1676,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             Port = reader.ReadInt();
             {
                 int length;
-                length = reader.ReadVarInt32() - 1;
+                length = reader.ReadVarUInt32() - 1;
                 if (length < 0)
                 {
                     Rack = null;
@@ -1716,23 +1716,23 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(NodeId);
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
             if (Rack is null)
             {
-                writer.WriteVarInt32(0);
+                writer.WriteVarUInt32(0);
             }
             else
             {
                 var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                writer.WriteVarInt32(stringBytes.Length + 1);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
                 writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
-            writer.WriteVarInt32(numTaggedFields);
+            writer.WriteVarUInt32(numTaggedFields);
             rawWriter.WriteRawTags(ref writer, int.MaxValue);
         }
 

@@ -417,11 +417,12 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     {
         ConnectorState = State.Closing;
-        _stream.Dispose();
-        _socketProxy.Dispose();
 
         if (disposing)
         {
+            _stream.Dispose();
+            _socketProxy.Dispose();
+            _responseProcessingTokenSource.Dispose();
         }
 
         ConnectorState = State.Closed;
@@ -442,7 +443,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         Closed
     }
 
-    private class ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
+    private sealed class ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)
         : TaskCompletionSource<IResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously)
     {
         public ApiKeys ApiKey { get; } = apiKey;

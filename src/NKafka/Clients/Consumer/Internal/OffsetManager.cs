@@ -45,6 +45,7 @@ internal class OffsetManager: IOffsetManager
         _readingOffsets.AddOrUpdate(topicPartitionOffset.TopicPartition, _ => topicPartitionOffset.Offset, (_, _) => topicPartitionOffset.Offset);
     }
 
+    /// <inheritdoc />
     public void UpdateLastWroteOffset(TopicPartitionOffset topicPartitionOffset)
     {
         _currentState

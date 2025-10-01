@@ -26,6 +26,7 @@ using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
 using NKafka.Connection;
+using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Serialization;
 
@@ -195,6 +196,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="message">Request to send to the broker</param>
     /// <param name="token"></param>
     /// <remarks>The broker for processing the request will be selected the least loaded. If the request requires a controller, it will be selected</remarks>
+    /// <exception cref="ProtocolKafkaException"></exception>
     internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         CancellationToken token)

@@ -29,11 +29,11 @@ internal interface IRecordAccumulator
     /// <summary>
     /// Flushes all pending changes asynchronously.
     /// </summary>
-    /// <param name="token">The cancellation token.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>
     /// A task that represents the asynchronous flush operation.
     /// </returns>
-    Task FlushAllAsync(CancellationToken token);
+    Task FlushAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size.
@@ -48,13 +48,13 @@ internal interface IRecordAccumulator
     /// Adds a new record to the accumulator
     /// </summary>
     /// <param name="topicPartition">Topic partition for which the entry is added</param>
-    /// <param name="timestampUnixTimestampMs">Timestamp for adding an entry</param>
+    /// <param name="timestamp">Timestamp for adding an entry</param>
     /// <param name="serializedKey">Serialized uncompressed representation of the key</param>
     /// <param name="serializedValue">Serialized uncompressed representation of the value</param>
     /// <param name="headers">Record headers</param>
     /// <returns>The status of the add record operation</returns>
     RecordAppendResult Append(TopicPartition topicPartition,
-        long timestampUnixTimestampMs,
+        long timestamp,
         byte[] serializedKey,
         byte[] serializedValue,
         Headers headers);

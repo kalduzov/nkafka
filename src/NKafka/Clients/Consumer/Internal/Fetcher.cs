@@ -135,7 +135,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
          * Весь процесс длится до тех пор, пока не остановится извлечение данных
          *
          */
-        while (token.IsCancellationRequested is not true)
+        while (!token.IsCancellationRequested)
         {
             var messages = Array.Empty<ConsumerRecord<TKey, TValue>>();
 

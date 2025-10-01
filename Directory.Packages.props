@@ -31,6 +31,7 @@
     <PackageVersion Include="Serilog.Extensions.Logging" Version="9.0.0"/>
   </ItemGroup>
   <ItemGroup>
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.15.0.120848"/>
     <PackageVersion Include="FastEnum" Version="2.0.3"/>
     <PackageVersion Include="Snappier" Version="1.1.6"/>
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.14.0"/>

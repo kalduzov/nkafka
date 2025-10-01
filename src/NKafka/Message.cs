@@ -26,19 +26,21 @@ using NKafka.Serialization;
 namespace NKafka;
 
 /// <summary>
-///  Represents a (deserialized) Kafka message.
+///  Represents a raw Kafka message.
 /// </summary>
-public class Message
+/// <param name="key"></param>
+/// <param name="value"></param>
+public class Message(byte[] key, byte[] value)
 {
     /// <summary>
     ///  Gets the message key value (not null).
     /// </summary>
-    public byte[] Key { get; set; }
+    public byte[] Key { get; set; } = key;
 
     /// <summary>
     /// Gets the message value (not null).
     /// </summary>
-    public byte[] Value { get; set; }
+    public byte[] Value { get; set; } = value;
 
     /// <summary>
     /// The collection of message headers (default Empty). 
@@ -53,16 +55,7 @@ public class Message
     public Timestamp Timestamp { get; set; } = Timestamp.Default;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="T:System.Object" /> class.
-    /// </summary>
-    public Message(byte[] key, byte[] value)
-    {
-        Key = key;
-        Value = value;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="T:System.Object" /> class.
+    /// Initializes a new instance of the <see cref="T:NKafka.Message" /> class.
     /// </summary>
     public Message(byte[] value)
         : this(Serializers.Null.Serialize(default), value)

@@ -27,6 +27,7 @@ NKafka.Clients.Admin.CreateTopicsOptions.RetryOnQuotaViolation.get -> bool
 NKafka.Clients.Admin.CreateTopicsOptions.RetryOnQuotaViolation.init -> void
 NKafka.Clients.Admin.CreateTopicsOptions.ValidateOnly.get -> bool
 NKafka.Clients.Admin.CreateTopicsOptions.ValidateOnly.init -> void
+NKafka.Clients.Admin.IAdminClient
 NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.IsPartitionEof.get -> bool
 NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.IsPartitionEof.set -> void
 NKafka.Clients.Consumer.ConsumerRecord<TKey, TValue>.Message.get -> NKafka.Message<TKey, TValue>!
@@ -188,15 +189,17 @@ NKafka.IKafkaCluster.GetPartitions(string! topic, System.Threading.CancellationT
 NKafka.IKafkaCluster.GetTopicPartitions(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.TopicPartition!>!>
 NKafka.IKafkaCluster.RefreshMetadata(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.KafkaClusterExtensions
-NKafka.Message<TKey, TValue>
-NKafka.Message<TKey, TValue>.Headers.set -> void
-NKafka.Message<TKey, TValue>.Key.get -> TKey
-NKafka.Message<TKey, TValue>.Key.set -> void
-NKafka.Message<TKey, TValue>.Message(TKey key, TValue value) -> void
-NKafka.Message<TKey, TValue>.Timestamp.get -> NKafka.Timestamp
-NKafka.Message<TKey, TValue>.Timestamp.set -> void
-NKafka.Message<TKey, TValue>.Value.get -> TValue
-NKafka.Message<TKey, TValue>.Value.set -> void
+NKafka.Message
+NKafka.Message.Headers.get -> NKafka.Headers!
+NKafka.Message.Headers.set -> void
+NKafka.Message.Key.get -> byte[]!
+NKafka.Message.Key.set -> void
+NKafka.Message.Message(byte[]! key, byte[]! value) -> void
+NKafka.Message.Message(byte[]! value) -> void
+NKafka.Message.Timestamp.get -> NKafka.Timestamp
+NKafka.Message.Timestamp.set -> void
+NKafka.Message.Value.get -> byte[]!
+NKafka.Message.Value.set -> void
 NKafka.Node
 NKafka.Node.EndPoint.get -> System.Net.EndPoint!
 NKafka.Node.Host.get -> string!
@@ -403,6 +406,7 @@ NKafka.TopicPartition.Topic.get -> string!
 NKafka.TopicPartition.TopicId.get -> System.Guid
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition) -> void
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition, System.Guid topicId) -> void
+override NKafka.Message.ToString() -> string!
 override NKafka.Offset.Equals(object? obj) -> bool
 override NKafka.Offset.GetHashCode() -> int
 override NKafka.Offset.ToString() -> string!

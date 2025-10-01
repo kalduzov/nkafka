@@ -51,63 +51,84 @@ public enum ErrorCodes: short
     CorruptMessage = 0x2,
 
     /// <summary>
-    /// 
+    /// This server does not host this topic-partition.
     /// </summary>
     UnknownTopicOrPartition = 0x3,
 
     /// <summary>
-    /// 
+    /// The requested fetch size is invalid.
     /// </summary>
     InvalidFetchSize = 0x4,
 
     /// <summary>
-    /// 
+    /// There is no leader for this topic-partition as we are in the middle of a leadership election.
     /// </summary>
     LeaderNotAvailable = 0x5,
 
     /// <summary>
-    /// 
+    /// For requests intended only for the leader, this error indicates that the broker is not the current leader. For requests intended for any replica, this error indicates that the broker is not a replica of the topic partition.
     /// </summary>
     NotLeaderOrFollower = 0x6,
 
     /// <summary>
-    /// 
+    /// The request timed out.
     /// </summary>
     RequestTimedOut = 0x7,
 
     /// <summary>
-    /// 
+    /// The broker is not available.
     /// </summary>
     BrokerNotAvailable = 0x8,
 
     /// <summary>
-    /// 
+    /// The replica is not available for the requested topic-partition. Produce/Fetch requests and other requests intended only for the leader or
+    /// follower return NotLeaderOrFollower if the broker is not a replica of the topic-partition.
     /// </summary>
     ReplicaNotAvailable = 0x9,
 
     /// <summary>
-    /// 
+    /// The request included a message larger than the max message size the server will accept.
     /// </summary>
     MessageTooLarge = 10,
 
     /// <summary>
-    /// 
+    /// The controller moved to another broker.
     /// </summary>
     StaleControllerEpoch = 11,
 
     /// <summary>
-    /// 
+    /// The metadata field of the offset request was too large.
     /// </summary>
     OffsetMetadataTooLarge = 12,
 
     /// <summary>
-    /// 
+    /// The server disconnected before a response was received.
     /// </summary>
     NetworkException = 13,
+
+    /// <summary>
+    /// 
+    /// </summary>
     CoordinatorLoadInProgress = 14,
+
+    /// <summary>
+    /// 
+    /// </summary>
     CoordinatorNotAvailable = 15,
+
+    /// <summary>
+    /// 
+    /// </summary>
     NotCoordinator = 16,
+
+    /// <summary>
+    /// 
+    /// </summary>
     InvalidTopicException = 17,
+
+    /// <summary>
+    /// 
+    /// </summary>
     RecordListTooLarge = 18,
     NotEnoughReplicas = 19,
     NotEnoughReplicasAfterAppend = 20,

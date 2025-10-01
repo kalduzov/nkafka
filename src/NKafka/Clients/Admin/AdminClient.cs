@@ -30,6 +30,7 @@ using NKafka.Protocol;
 
 namespace NKafka.Clients.Admin;
 
+/// <inheritdoc/>
 internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logger): IAdminClient
 {
     private readonly int _defaultTimeout = kafkaCluster.Config.RequestTimeoutMs;
@@ -63,7 +64,7 @@ internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logg
             {
                 if (string.IsNullOrWhiteSpace(topic.Name))
                 {
-                    throw new InvalidTopicException($"Некорректное имя топика '{topic.Name}'");
+                    throw new InvalidTopicException($"Incorrect topic name '{topic.Name}'");
                 }
                 topicCollection.Add(
                     new CreateTopicsRequestMessage.CreatableTopicMessage

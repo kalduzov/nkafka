@@ -42,7 +42,7 @@ internal interface IOffsetManager
     /// <summary>
     /// Обновляет offset партиции последнего записанного сообщения в канал 
     /// </summary>
-    void UpdateLastWroteOffset(TopicPartitionOffset itemTopicPartitionOffset);
+    void UpdateLastWroteOffset(TopicPartitionOffset topicPartitionOffset);
 
     /// <summary>
     /// Инициирует новое состояние смещениями для указанных разделов топиков

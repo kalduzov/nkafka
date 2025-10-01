@@ -21,6 +21,7 @@
 
 using System.Net;
 
+using NKafka.Exceptions;
 using NKafka.Protocol;
 
 namespace NKafka.Connection;
@@ -63,6 +64,7 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
     /// <summary>
     /// Sends a request to the broker
     /// </summary>
+    /// <exception cref="ProtocolKafkaException"></exception>
     internal Task<TResponseMessage> SendAsync<TRequestMessage, TResponseMessage>(
         TRequestMessage message,
         bool isInternalRequest,

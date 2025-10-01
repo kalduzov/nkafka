@@ -98,7 +98,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         ConsumerInstanceId = Interlocked.Increment(ref _consumerInstanceId);
         _subscribeSyncBlock = new SemaphoreSlim(1, 1);
         GroupId = config.GroupId;
-        config.EventListeners.ToImmutableList();
+        //config.EventListeners.ToImmutableList();
         _logger = LoggerFactory.CreateLogger(GetType());
         _metrics = metrics ?? new DefaultConsumerMetrics();
 

@@ -23,6 +23,7 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Benchmarks;
 
@@ -42,22 +43,22 @@ public class ReaderBenchmarks
     public int BufferReaderReadVarInt()
     {
         var br = new BufferReader(_buffer);
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        var value = br.ReadVarInt();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        var value = br.ReadVarInt32();
 
         return value;
     }
@@ -67,22 +68,22 @@ public class ReaderBenchmarks
     {
         var br = new BufferReader(_buffer);
 
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        _ = br.ReadVarInt();
-        var value = br.ReadVarInt();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        _ = br.ReadVarInt32();
+        var value = br.ReadVarInt32();
 
         return value;
 

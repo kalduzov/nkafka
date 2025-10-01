@@ -103,5 +103,20 @@ public enum ApiKeys: short
     ConsumerGroupDescribe = 69,
     GetTelemetrySubscriptions = 71,
     PushTelemetry = 72,
-    ListClientMetricsResources = 74
+    ListClientMetricsResources = 74,
+    DescribeTopicPartitions = 75,
+    ShareGroupHeartbeat = 76,
+    ShareGroupDescribe = 77,
+    ShareFetch = 78,
+    ShareAcknowledge = 79,
+    AddRaftVoter = 80,
+    RemoveRaftVoter = 81,
+    InitializeShareGroupState = 83,
+    ReadShareGroupState = 84,
+    WriteShareGroupState = 85,
+    DeleteShareGroupState = 86,
+    ReadShareGroupStateSummary = 87,
+    DescribeShareGroupOffsets = 90,
+    AlterShareGroupOffsets = 91,
+    DeleteShareGroupOffsets = 92
 }

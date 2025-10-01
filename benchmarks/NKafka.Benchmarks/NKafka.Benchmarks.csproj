@@ -13,8 +13,6 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet"/>
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows"/>
-    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream"/>
-    <!--    <PackageReference Include="System.IO.Hashing"/>-->
   </ItemGroup>
 
   <ItemGroup>

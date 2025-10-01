@@ -110,14 +110,14 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     /// <param name="topicPartition">The topic partition to append the record to.</param>
     /// <param name="timestamp">The timestamp of the record.</param>
     /// <param name="key">The key of the record.</param>
-    /// <param name="value">The value of the record.</param>
+    /// <param name="serializedValue">The value of the record.</param>
     /// <param name="headers">The headers of the record.</param>
     /// <returns>A <see cref="RecordAppendResult"/> object representing the result of the append operation.</returns>
     public RecordAppendResult Append(
         TopicPartition topicPartition,
         long timestamp,
-        byte[] key,
-        byte[] value,
+        byte[] serializedKey,
+        byte[] serializedValue,
         Headers headers)
     {
         Interlocked.Increment(ref _appendsInProgress);
@@ -138,7 +138,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
                 lock (deque) // only one thread can add data to the queue
                 {
-                    if (TryAppend(timestamp, key, value, headers, deque, out var appendResult))
+                    if (TryAppend(timestamp, serializedKey, serializedValue, headers, deque, out var appendResult))
                     {
                         // the data could be added because a suitable batch already existed
                         return appendResult;
@@ -150,7 +150,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                 if (buffer is null)
                 {
                     // We calculate what buffer size we need and try to get it 
-                    var size = Math.Max(_batchSize, RecordBatch.EstimateSizeInBytesUpperBound(key, value, headers));
+                    var size = Math.Max(_batchSize, RecordBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers));
                     buffer = ArrayBufferPool.Rent(size);
                 }
 
@@ -160,8 +160,8 @@ internal sealed class RecordAccumulator: IRecordAccumulator
                         effectivePartition,
                         deque,
                         timestamp,
-                        key,
-                        value,
+                        serializedKey,
+                        serializedValue,
                         headers,
                         buffer);
 

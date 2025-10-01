@@ -65,7 +65,7 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
             ProducerEpoch = -1
         };
 
-        return null;
+        return Task.CompletedTask;
     }
 
     public void Begin()
@@ -77,19 +77,19 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
         ConsumerGroupMetadata groupMetadata,
         CancellationToken token)
     {
-        return null;
+        return Task.CompletedTask;
     }
 
     public Task Commit(CancellationToken token)
     {
         TransitionTo(State.CommittingTransaction);
 
-        return null;
+        return Task.CompletedTask;
     }
 
     public Task Abort(CancellationToken token)
     {
-        return null;
+        return Task.CompletedTask;
     }
 
     public void TryAddPartition(TopicPartition topicPartition)

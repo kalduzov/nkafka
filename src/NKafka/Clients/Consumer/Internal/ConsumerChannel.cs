@@ -77,32 +77,24 @@ internal sealed class ConsumerChannel<TKey, TValue>: Channel<ConsumerRecord<TKey
 
     }
 
-    private sealed class ConsumerChannelWriter: ChannelWriter<ConsumerRecord<TKey, TValue>>
+    private sealed class ConsumerChannelWriter(ChannelWriter<ConsumerRecord<TKey, TValue>> innerChannelWriter, Subscription subscription)
+        : ChannelWriter<ConsumerRecord<TKey, TValue>>
     {
-        private readonly ChannelWriter<ConsumerRecord<TKey, TValue>> _innerChannelWriter;
-        private readonly Subscription _subscription;
-
-        public ConsumerChannelWriter(ChannelWriter<ConsumerRecord<TKey, TValue>> innerChannelWriter, Subscription subscription)
-        {
-            _innerChannelWriter = innerChannelWriter;
-            _subscription = subscription;
-        }
-
         public override bool TryWrite(ConsumerRecord<TKey, TValue> item)
         {
-            var wasMessageWritten = _innerChannelWriter.TryWrite(item);
+            var wasMessageWritten = innerChannelWriter.TryWrite(item);
 
             if (wasMessageWritten) // yes
             {
-                _subscription.OffsetManager.UpdateLastWroteOffset(item.TopicPartitionOffset);
+                subscription.OffsetManager.UpdateLastWroteOffset(item.TopicPartitionOffset);
             }
 
             return wasMessageWritten;
         }
 
-        public override ValueTask<bool> WaitToWriteAsync(CancellationToken token)
+        public override ValueTask<bool> WaitToWriteAsync(CancellationToken cancellationToken = default)
         {
-            return _innerChannelWriter.WaitToWriteAsync(token);
+            return innerChannelWriter.WaitToWriteAsync(cancellationToken);
         }
     }
 
@@ -128,9 +120,9 @@ internal sealed class ConsumerChannel<TKey, TValue>: Channel<ConsumerRecord<TKey
             return true;
         }
 
-        public override ValueTask<bool> WaitToReadAsync(CancellationToken token)
+        public override ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default)
         {
-            return _innerChannelReader.WaitToReadAsync(token);
+            return _innerChannelReader.WaitToReadAsync(cancellationToken);
         }
     }
 }

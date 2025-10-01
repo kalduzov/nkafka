@@ -203,6 +203,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         {
             _senderTask.Dispose();
         }
+
     }
 
     private static int LingerMs(ProducerConfig config)

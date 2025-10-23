@@ -33,7 +33,7 @@ internal interface IRecordAccumulator
     /// <returns>
     /// A task that represents the asynchronous flush operation.
     /// </returns>
-    Task FlushAllAsync(CancellationToken cancellationToken);
+    internal Task FlushAllAsync(CancellationToken cancellationToken);
 
     /// <summary>
     /// Retrieves a set of batches ready to be sent, with a total size not exceeding the maximum request size.
@@ -42,7 +42,7 @@ internal interface IRecordAccumulator
     /// <returns>
     /// An enumerable collection of ProducerBatch objects that are ready to be sent.
     /// </returns>
-    IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize);
+    internal IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize);
 
     /// <summary>
     /// Adds a new record to the accumulator
@@ -53,7 +53,7 @@ internal interface IRecordAccumulator
     /// <param name="serializedValue">Serialized uncompressed representation of the value</param>
     /// <param name="headers">Record headers</param>
     /// <returns>The status of the add record operation</returns>
-    RecordAppendResult Append(TopicPartition topicPartition,
+    internal RecordAppendResult Append(TopicPartition topicPartition,
         long timestamp,
         byte[] serializedKey,
         byte[] serializedValue,

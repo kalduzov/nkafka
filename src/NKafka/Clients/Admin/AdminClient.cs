@@ -142,7 +142,7 @@ internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logg
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await kafkaCluster.RefreshMetadata(null!, cts.Token);
+        await kafkaCluster.RefreshMetadataAsync(null!, cts.Token);
 
         return kafkaCluster.Topics.Values
             .Where(t => t.IsInternal is false || t.IsInternal == options.IncludeInternal)
@@ -163,7 +163,7 @@ internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logg
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await kafkaCluster.RefreshMetadata(topics, cts.Token);
+        await kafkaCluster.RefreshMetadataAsync(topics, cts.Token);
 
         var result = new Dictionary<string, TopicDescription>(topics.Count);
 
@@ -188,7 +188,7 @@ internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logg
 
         var timeout = GetTimeout(options.TimeoutMs);
         cts.CancelAfter(timeout);
-        await kafkaCluster.RefreshMetadata(Array.Empty<string>(), cts.Token);
+        await kafkaCluster.RefreshMetadataAsync(Array.Empty<string>(), cts.Token);
         var result = new DescribeClusterResult(kafkaCluster.Brokers, kafkaCluster.Controller, kafkaCluster.ClusterId);
 
         return result;

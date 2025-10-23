@@ -62,7 +62,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
     private const int _ATTRIBUTES_OFFSET = 17;
 
-    private readonly TaskCompletionSource _produceRequestResult = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _produceRequestResult = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private int _maxRecordSize;
     private int _recordsCount;
     private readonly List<SendResultTask> _recordTasks = [];
@@ -115,11 +115,11 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
     public long MaxTimestamp { get; set; }
 
-    internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestamp)
+    internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestampNow)
         : this(topicPartition, buffer, loggerFactory)
     {
-        BaseTimestamp = timestamp;
-        MaxTimestamp = timestamp;
+        BaseTimestamp = timestampNow;
+        MaxTimestamp = timestampNow;
     }
 
     /// <summary>

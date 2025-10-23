@@ -31,7 +31,7 @@ namespace NKafka.Tests.Clients.Producer;
 public class ProduceBathSerializationTests
 {
     private byte[] _testSerialization =
-    {
+    [
         0x00,
         0x00,
         0x00,
@@ -104,7 +104,7 @@ public class ProduceBathSerializationTests
         0x73,
         0x74,
         0x00
-    };
+    ];
 
     [Fact]
     public void ProduceBatchSerializeTest()

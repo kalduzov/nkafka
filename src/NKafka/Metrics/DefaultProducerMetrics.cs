@@ -19,13 +19,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
 namespace NKafka.Metrics;
 
 internal class DefaultProducerMetrics: IProducerMetrics
 {
+    private const string _PREFIX = "producer-";
+
     private Histogram<long>? _flushDuration;
+    private Histogram<int>? _appendBytes;
     private readonly Meter _producerMetrics = new("NKafka.Metrics.Producer");
 
     internal DefaultProducerMetrics()
@@ -43,9 +47,13 @@ internal class DefaultProducerMetrics: IProducerMetrics
     private void RegisterMetrics()
     {
         _flushDuration = _producerMetrics.CreateHistogram<long>(
-            name: "producer-flush-duration",
+            name: $"{_PREFIX}flush-duration",
             unit: "ms",
             description: "Total time producer has spent in flush in milliseconds.");
+
+        _appendBytes = _producerMetrics.CreateHistogram<int>(
+            name: $"{_PREFIX}append-bytes",
+            description: "");
     }
 
     /// <inheritdoc />
@@ -54,6 +62,24 @@ internal class DefaultProducerMetrics: IProducerMetrics
         if (_flushDuration?.Enabled ?? false)
         {
             _flushDuration.Record(duration);
+        }
+    }
+
+    /// <inheritdoc />
+    public void AppendBytes(TopicPartition topicPartition, int appendBytes)
+    {
+        if (_appendBytes?.Enabled ?? false)
+        {
+            _appendBytes.Record(appendBytes,
+                new TagList
+                {
+                    {
+                        "topic", topicPartition.Topic
+                    },
+                    {
+                        "partition", topicPartition.Partition
+                    }
+                });
         }
     }
 

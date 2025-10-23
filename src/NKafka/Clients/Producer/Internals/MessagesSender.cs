@@ -173,7 +173,7 @@ internal class MessagesSender(
             topicPartition.Topic
         };
 
-        await kafkaCluster.RefreshMetadata(topics, token);
+        await kafkaCluster.RefreshMetadataAsync(topics, token);
 
         node = kafkaCluster.LeaderFor(topicPartition);
 

@@ -31,7 +31,7 @@ internal interface IProducerMetrics
     /// </summary>
     /// <param name="topicPartition"></param>
     /// <param name="appendBytes"></param>
-    void AppendBytes(TopicPartition topicPartition, int appendBytes)
+    internal void AppendBytes(TopicPartition topicPartition, int appendBytes)
     {
     }
 
@@ -40,7 +40,7 @@ internal interface IProducerMetrics
     /// </summary>
     /// <param name="topicPartition"></param>
     /// <param name="sentBytes"></param>
-    void SentBytes(TopicPartition topicPartition, int sentBytes)
+    internal void SentBytes(TopicPartition topicPartition, int sentBytes)
     {
     }
 
@@ -48,27 +48,27 @@ internal interface IProducerMetrics
     /// 
     /// </summary>
     /// <param name="duration"></param>
-    void Flush(long duration)
+    internal void Flush(long duration)
     {
     }
 
-    void TransactionInit(long duration)
+    internal void TransactionInit(long duration)
     {
     }
 
-    void BeginTxn(long duration)
+    internal void BeginTxn(long duration)
     {
     }
 
-    void SendOffsets(long duration)
+    internal void SendOffsets(long duration)
     {
     }
 
-    void CommitTxn(long duration)
+    internal void CommitTxn(long duration)
     {
     }
 
-    void AbortTxn(long duration)
+    internal void AbortTxn(long duration)
     {
     }
 }

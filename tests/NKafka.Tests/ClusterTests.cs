@@ -66,11 +66,10 @@ public partial class ClusterTests
             });
 
         _connectorPool.GetAllOpenedConnectors()
-            .Returns(new[]
-            {
+            .Returns([
                 connector1,
                 connector2
-            });
+            ]);
     }
 
     [Fact(DisplayName = "Create new cluster when timeout must be throw ClusterKafkaException")]

@@ -31,7 +31,7 @@ public partial class ClusterTests
 {
     //https://cwiki.apache.org/confluence/display/KAFKA/KIP-35+-+Retrieving+protocol+version
     private static readonly Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)>[] _apiVersions =
-    {
+    [
         new()
         {
             [ApiKeys.Produce] = (ApiVersion.Version0, ApiVersion.Version3),
@@ -43,7 +43,7 @@ public partial class ClusterTests
             [ApiKeys.Fetch] = (ApiVersion.Version0, ApiVersion.Version3),
             [ApiKeys.ListOffsets] = (ApiVersion.Version0, ApiVersion.Version0),
         }
-    };
+    ];
 
     [Fact(DisplayName = "Create new cluster and version check")]
     public async Task CreateNewClusterAndVersionCheckAsync_BrokerUpdated()

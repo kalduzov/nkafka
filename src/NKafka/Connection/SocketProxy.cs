@@ -24,7 +24,7 @@ using System.Net.Sockets;
 
 namespace NKafka.Connection;
 
-internal class SocketProxy: ISocketProxy
+internal sealed class SocketProxy: ISocketProxy
 {
     public bool Connected => Socket.Connected;
 

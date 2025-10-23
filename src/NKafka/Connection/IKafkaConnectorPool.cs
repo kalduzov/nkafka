@@ -29,16 +29,16 @@ internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
     /// <summary>
     /// Возвращает все рабочие соединения
     /// </summary>
-    IEnumerable<IKafkaConnector> GetAllOpenedConnectors();
+    internal IEnumerable<IKafkaConnector> GetAllOpenedConnectors();
 
     /// <summary>
     ///     Returns a connection to a specific broker
     /// </summary>
     /// <param name="nodeId">Broker id</param>
-    /// <param name="isDedicate">Create a dedicated connection or use an existing one</param>
+    /// <param name="isDedicated">Create a dedicated connection or use an existing one</param>
     /// <param name="connector">Created or existing connection</param>
     /// <returns>true if the connection was successfully obtained or false otherwise</returns>
-    bool TryGetConnector(int nodeId, bool isDedicate, out IKafkaConnector connector);
+    internal bool TryGetConnector(int nodeId, bool isDedicated, out IKafkaConnector connector);
 
     /// <summary>
     ///     Returns a connection
@@ -50,12 +50,12 @@ internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
     ///     If information about the broker is in the pool, then the least loaded connection to a randomly
     ///     selected broker will be returned.
     /// </remarks>
-    IKafkaConnector GetConnector();
+    internal IKafkaConnector GetConnector();
 
     /// <summary>
     /// </summary>
     /// <param name="nodes"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token);
+    internal ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token);
 }

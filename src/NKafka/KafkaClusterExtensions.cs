@@ -73,7 +73,7 @@ public static class KafkaClusterExtensions
     /// <param name="clusterConfigFactory">Configuration factory for cluster</param>
     /// <param name="loggerFactory">Logging factory instance</param>
     /// <param name="token"></param>
-    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.Open"/>OpenAsync method.</param>
+    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
     /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
     public static Task<IKafkaCluster> CreateCluster(
         this IClusterConfigFactory clusterConfigFactory,
@@ -122,7 +122,7 @@ public static class KafkaClusterExtensions
 
         try
         {
-            await cluster.Open(linkedTokenSource.Token);
+            await cluster.OpenAsync(linkedTokenSource.Token);
         }
         catch (OperationCanceledException exc)
         {

@@ -48,7 +48,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     private readonly ConcurrentDictionary<ulong, IConsumer> _consumers = new();
     private readonly ILogger<KafkaCluster> _logger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly Timer _metadataUpdaterTimer;
+
+    private Task _metadataUpdaterTask;
+
     private readonly ClusterMetadata _clusterMetadata;
 
     // Минимально поддерживаемая версия кафки 
@@ -72,6 +74,14 @@ internal sealed class KafkaCluster: IKafkaCluster
     private readonly SemaphoreSlim _syncMetadataRequest = new(1, 1);
     private readonly ConcurrentDictionary<string, TaskCompletionSource> _inflightTopics = new();
 
+#if NET9_0_OR_GREATER
+    private readonly Lock _lockObject = new();
+#else
+    private readonly object _lockObject = new();
+#endif
+
+    private readonly CancellationTokenSource _closeClusterTokenSource = new();
+
     /// <summary>
     ///     Create a new kafka cluster
     /// </summary>
@@ -85,7 +95,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         _loggerFactory = loggerFactory;
         _logger = _loggerFactory.CreateLogger<KafkaCluster>();
         _clusterMetadata = clusterMetadata ?? new ClusterMetadata();
-        _metadataUpdaterTimer = new Timer(UpdateMetadataCallback, _clusterMetadata, Timeout.Infinite, Timeout.Infinite);
+        _metadataUpdaterTask = Task.CompletedTask;
         _topics = new ConcurrentDictionary<string, TopicMetadata>();
         _topicsById = new ConcurrentDictionary<Guid, string>();
         var seedBrokers = SeedBrokers(Config);
@@ -161,6 +171,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             else
             {
                 tcs = new TaskCompletionSource();
+
                 _inflightTopics.TryAdd(topic, tcs);
 
                 string[] topics =
@@ -189,7 +200,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     public async ValueTask<IReadOnlyCollection<TopicPartition>> GetTopicPartitions(IReadOnlyCollection<string> topics,
         CancellationToken token)
     {
-        //Всегда забираем самые свежие данные из кластера
+        // We always fetch the latest data about topics from the cluster 
 
         await InternalRefreshMetadataAsync(
             topics,
@@ -261,13 +272,13 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
-    public Task RefreshMetadata(IReadOnlyCollection<string> topics, CancellationToken token)
+    public Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token)
     {
         return InternalRefreshMetadataAsync(topics, false, token);
     }
 
     /// <inheritdoc />
-    public Task Open(CancellationToken token)
+    public Task OpenAsync(CancellationToken token)
     {
         return OpenInternalAsync(token);
     }
@@ -397,15 +408,19 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public void Dispose()
     {
-        _metadataUpdaterTimer.Dispose();
+        _closeClusterTokenSource.Cancel();
+        _metadataUpdaterTask.Dispose();
         _connectorPool.Dispose();
+        _closeClusterTokenSource.Dispose();
     }
 
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
-        await _metadataUpdaterTimer.DisposeAsync();
+        await _closeClusterTokenSource.CancelAsync();
+        await _metadataUpdaterTask;
         await _connectorPool.DisposeAsync();
+        _closeClusterTokenSource.Dispose();
     }
 
     private async Task InternalRefreshMetadataAsync(
@@ -416,6 +431,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         await _syncMetadataRequest.WaitAsync(token);
 
         var localTopics = topics?.ToArray();
+
         using var activity = KafkaDiagnosticsSource.RefreshMetadata(localTopics);
 
         try
@@ -540,7 +556,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     {
         token.ThrowIfCancellationRequested();
 
-        lock (_nodes) //Т.к. обновления могут идти из разных мест, то требуется блокировка
+        lock (_lockObject) //Т.к. обновления могут идти из разных мест, то требуется блокировка
         {
             _nodes = nodes;
             Brokers = _nodes.Values.ToArray();
@@ -592,61 +608,73 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <summary>
     /// Periodically updates metadata for the topics that are currently being worked on.
     /// </summary>
-    /// <param name="state">The state passed to the method after the time interval has elapsed.</param>
-    private async void UpdateMetadataCallback(object? state)
+    /// <param name="metadataUpdateTimeoutMs"></param>
+    private async Task UpdateMetadataTask(int metadataUpdateTimeoutMs)
     {
-        ThrowExceptionIfClusterClosed();
-
-        using var activity = KafkaDiagnosticsSource.UpdateMetadataActivity();
-
-        var counter = Interlocked.Increment(ref _metadataUpdatingCounter);
-
-        var metadataUpdating = Interlocked.CompareExchange(ref _metadataUpdating, 1, 0);
-
-        if (metadataUpdating == _metadataUpdating)
-        {
-            _logger.WarningMetadataMaxAge(Config.MetadataUpdateTimeoutMs);
-
-            return;
-        }
-
-        var stopWatch = Stopwatch.StartNew();
-
-        _logger.UpdateMetadataStart(counter);
-
-        using var tokenSource = new CancellationTokenSource();
+        var periodicTimer = new PeriodicTimer(TimeSpan.FromMilliseconds(metadataUpdateTimeoutMs));
 
         try
         {
-            tokenSource.CancelAfter(Config.RequestTimeoutMs);
-            await InternalRefreshMetadataAsync(_topics.Keys, false, tokenSource.Token);
-
-            if (_logger.IsEnabled(LogLevel.Trace))
+            while (await periodicTimer.WaitForNextTickAsync(_closeClusterTokenSource.Token))
             {
-                activity?.AddEvent(
-                    new ActivityEvent(
-                        "Metadata updated",
-                        DateTimeOffset.UtcNow,
-                        new ActivityTagsCollection
-                        {
-                            {
-                                "brokers", JsonSerializer.Serialize(_nodes.Values)
-                            },
-                            {
-                                "topics_partitions", JsonSerializer.Serialize(_partitionsMetadata)
-                            }
-                        }));
+                ThrowExceptionIfClusterClosed();
+
+                using var activity = KafkaDiagnosticsSource.UpdateMetadataActivity();
+
+                var counter = Interlocked.Increment(ref _metadataUpdatingCounter);
+
+                var metadataUpdating = Interlocked.CompareExchange(ref _metadataUpdating, 1, 0);
+
+                if (metadataUpdating == _metadataUpdating)
+                {
+                    _logger.WarningMetadataMaxAge(Config.MetadataUpdateTimeoutMs);
+
+                    return;
+                }
+
+                var stopWatch = Stopwatch.StartNew();
+
+                _logger.UpdateMetadataStart(counter);
+
+                using var tokenSource = new CancellationTokenSource();
+
+                try
+                {
+                    tokenSource.CancelAfter(Config.RequestTimeoutMs);
+                    await InternalRefreshMetadataAsync(_topics.Keys, false, tokenSource.Token);
+
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        activity?.AddEvent(
+                            new ActivityEvent(
+                                "Metadata updated",
+                                DateTimeOffset.UtcNow,
+                                new ActivityTagsCollection
+                                {
+                                    {
+                                        "brokers", JsonSerializer.Serialize(_nodes.Values)
+                                    },
+                                    {
+                                        "topics_partitions", JsonSerializer.Serialize(_partitionsMetadata)
+                                    }
+                                }));
+                    }
+                }
+                catch (Exception exc)
+                {
+                    activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
+                    _logger.UpdateMetadataError(exc, counter);
+                }
+                finally
+                {
+                    _logger.UpdateMetadataEnd(counter, stopWatch.Elapsed);
+                    Interlocked.CompareExchange(ref _metadataUpdating, 0, 1);
+                }
             }
         }
-        catch (Exception exc)
+        catch (OperationCanceledException exc)
         {
-            activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
-            _logger.UpdateMetadataError(exc, counter);
-        }
-        finally
-        {
-            _logger.UpdateMetadataEnd(counter, stopWatch.Elapsed);
-            Interlocked.CompareExchange(ref _metadataUpdating, 0, 1);
+            _logger.LogTrace(exc, "UpdateMetadataTask has terminated because cluster operations were completed");
         }
     }
 
@@ -664,17 +692,16 @@ internal sealed class KafkaCluster: IKafkaCluster
             return;
         }
 
-        if (Config.IsFullUpdateMetadata) //Надо вернуть полные данные (брокеры + топики) по кластеру сразу
+        if (Config.IsFullUpdateMetadata) // Fetch full cluster details (brokers + topics) immediately
         {
             await InternalRefreshMetadataAsync(topics: null, skipException: true, token: token);
         }
-        else //В противном случае нам на самом деле нужны только данные по брокерам
+        else // else, we only require broker information
         {
             await InternalRefreshMetadataAsync(topics: _topics.Keys, skipException: true, token: token);
         }
 
-        // после этого периодическое обновление данных по брокерам 
-        _metadataUpdaterTimer.Change(Config.MetadataUpdateTimeoutMs, Config.MetadataUpdateTimeoutMs);
+        _metadataUpdaterTask = UpdateMetadataTask(Config.MetadataUpdateTimeoutMs);
 
         MergeAllVersions();
 

@@ -31,5 +31,5 @@ public interface IDeserializer<out T>
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    T Deserialize(ReadOnlySpan<byte> data);
+    public T Deserialize(ReadOnlySpan<byte> data);
 }

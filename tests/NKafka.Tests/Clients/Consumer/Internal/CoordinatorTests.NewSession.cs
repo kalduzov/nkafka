@@ -32,7 +32,7 @@ public partial class CoordinatorTests
     public async Task NewSession_StartAsLeader_Successful()
     {
         var kafkaCluster = CreateKafkaClusterForTests();
-        await kafkaCluster.Open(CancellationToken.None);
+        await kafkaCluster.OpenAsync(CancellationToken.None);
         var consumerConfig = ConsumerConfig.BaseFrom(kafkaCluster.Config);
         consumerConfig.GroupId = "good_test";
 

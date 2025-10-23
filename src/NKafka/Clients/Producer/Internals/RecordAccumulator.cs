@@ -109,7 +109,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     /// </summary>
     /// <param name="topicPartition">The topic partition to append the record to.</param>
     /// <param name="timestamp">The timestamp of the record.</param>
-    /// <param name="key">The key of the record.</param>
+    /// <param name="serializedKey">The key of the record.</param>
     /// <param name="serializedValue">The value of the record.</param>
     /// <param name="headers">The headers of the record.</param>
     /// <returns>A <see cref="RecordAppendResult"/> object representing the result of the append operation.</returns>

@@ -40,14 +40,14 @@ public interface IProducer: IDisposable, IAsyncDisposable
     /// Sends all pending accumulated messages and waits for a response to confirm their delivery
     /// </summary>
     /// <param name="token"></param>
-    public Task Flush(CancellationToken token);
+    public Task FlushAsync(CancellationToken token);
 
     /// <summary>
     /// Closes the asynchronous operation.
     /// </summary>
-    /// <param name="token">The cancellation token.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public ValueTask Close(CancellationToken token);
+    public ValueTask CloseAsync(CancellationToken cancellationToken);
 
     #region Produce
 
@@ -68,12 +68,12 @@ public interface IProducer: IDisposable, IAsyncDisposable
     /// </summary>
     /// <param name="topicPartition"></param>
     /// <param name="message"></param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <param name="callback"></param>
     public void Produce(TopicPartition topicPartition,
         Message message,
-        CancellationToken token,
-        Action<MessageDeliveryResult, Exception?> callback);
+        Action<MessageDeliveryResult, Exception?> callback,
+        CancellationToken cancellationToken);
 
     #endregion Produce
 
@@ -83,22 +83,22 @@ public interface IProducer: IDisposable, IAsyncDisposable
     /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.
     /// </summary>
     /// <param name="token"></param>
-    Task InitTransactions(CancellationToken token);
+    public Task InitTransactionsAsync(CancellationToken token);
 
     /// <summary>
     /// Should be called before the start of each new transaction.
     /// </summary>
-    void BeginTransaction();
+    public void BeginTransaction();
 
     /// <summary>
     /// Commits the ongoing transaction
     /// </summary>
-    Task CommitTransaction(CancellationToken token);
+    public Task CommitTransactionAsync(CancellationToken token);
 
     /// <summary>
     /// Aborts the ongoing transaction
     /// </summary>
-    Task AbortTransaction(CancellationToken token);
+    public Task AbortTransactionAsync(CancellationToken token);
 
     /// <summary>
     /// Sends a list of specified offsets to the consumer group coordinator, and also marks those offsets as part of the current transaction.
@@ -106,7 +106,9 @@ public interface IProducer: IDisposable, IAsyncDisposable
     /// <param name="offsets"></param>
     /// <param name="groupMetadata"></param>
     /// <param name="token"></param>
-    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
+    public Task SendOffsetsToTransactionAsync(IReadOnlyCollection<TopicPartitionOffset> offsets,
+        ConsumerGroupMetadata groupMetadata,
+        CancellationToken token);
 
     #endregion
 }

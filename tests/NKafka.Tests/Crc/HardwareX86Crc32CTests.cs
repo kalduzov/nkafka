@@ -27,7 +27,9 @@ namespace NKafka.Tests.Crc;
 
 public class HardwareX86Crc32CTests
 {
-    [SkippableTheory]
+    public static bool IsNotSse42Support { get; } = System.Runtime.Intrinsics.X86.Sse42.IsSupported;
+
+    [Theory(SkipUnless = nameof(IsNotSse42Support), Skip = "Sse42 on x86 is not support")]
     [InlineData("test", 0x86A072C0)]
     [InlineData("Lorem Ipsum is simply dummy text of the printing and typesetting industry.", 0xC4DD7DD6)]
     [InlineData(
@@ -40,7 +42,6 @@ public class HardwareX86Crc32CTests
     [InlineData("123456789", 0xE3069283)]
     public void CalculateTest(string text, uint crc)
     {
-        Skip.IfNot(System.Runtime.Intrinsics.X86.Sse42.IsSupported, "Sse42 on x86 is not support");
 
         var data = Encoding.UTF8.GetBytes(text);
 

@@ -528,12 +528,10 @@ internal static partial class SupportVersionsExtensions
             return ApiVersion.Version0;
         }
 
-        if (!supportVersions.TryGetValue(apiKey, out var versions))
-        {
-            throw new ProtocolKafkaException(ErrorCodes.UnsupportedVersion);
-        }
+        return !supportVersions.TryGetValue(apiKey, out var versions)
+            ? throw new ProtocolKafkaException(ErrorCodes.UnsupportedVersion)
+            : versions.MaxVersion;
 
-        return versions.MaxVersion;
     }
 
     internal readonly struct ApiKeysVersion(ApiKeys apiKey, ApiVersion minApiVersion, ApiVersion maxApiVersion): IEquatable<ApiKeysVersion>
@@ -549,11 +547,6 @@ internal static partial class SupportVersionsExtensions
             return HashCode.Combine(ApiKey, MinApiVersion, MaxApiVersion);
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ApiKeysVersion other && Equals(other);
-        }
-
         public override string ToString()
         {
             return $"ApiKeysVersion(ApiKey={ApiKey}, MaxApiVersion={MaxApiVersion})";
@@ -564,6 +557,11 @@ internal static partial class SupportVersionsExtensions
             apiKey = ApiKey;
             maxApiVersion = MaxApiVersion;
             minApiVersion = MinApiVersion;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ApiKeysVersion other && Equals(other);
         }
 
         /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>

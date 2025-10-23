@@ -148,14 +148,14 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="token"></param>
     /// <param name="topics">List of topics for which you need to get information from brokers</param>
     /// <remarks>If no topics are specified, information on all cluster topics will be returned</remarks>
-    public Task RefreshMetadata(IReadOnlyCollection<string> topics, CancellationToken token);
+    public Task RefreshMetadataAsync(IReadOnlyCollection<string> topics, CancellationToken token);
 
     /// <summary>
     /// Opens a network connection to a kafka broker and initializes metadata for the entire kafka cluster
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    Task Open(CancellationToken token);
+    public Task OpenAsync(CancellationToken token);
 
     /// <summary>
     /// Returns a list of available partitions for a topic.
@@ -170,25 +170,25 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <returns>
     /// List of available partitions or an empty collection if such sections are not yet available
     /// </returns>
-    IReadOnlyList<Partition> GetAvailablePartitions(string topic);
+    public IReadOnlyList<Partition> GetAvailablePartitions(string topic);
 
     /// <summary>
     /// Returns the leader for the specified partition in the topic
     /// </summary>
     /// <returns>A valid node for the specified partition, or NoNode if the node was not found</returns>
-    Node LeaderFor(TopicPartition topicPartition);
+    public Node LeaderFor(TopicPartition topicPartition);
 
     /// <summary>
     /// Returns partitions metadata information for the specified topic
     /// </summary>
-    IReadOnlyCollection<PartitionMetadata> PartitionsForTopic(string topic);
+    public IReadOnlyCollection<PartitionMetadata> PartitionsForTopic(string topic);
 
     /// <summary>
     /// Retrieves metadata for a specific topic.
     /// </summary>
     /// <param name="name">The name of the topic.</param>
     /// <returns>The metadata associated with the topic.</returns>
-    TopicMetadata GetTopicMetadata(string name);
+    public TopicMetadata GetTopicMetadata(string name);
 
     /// <summary>
     /// Sends a request to the cluster

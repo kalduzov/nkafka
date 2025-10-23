@@ -123,13 +123,13 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     /// <inheritdoc/>
     public void Produce(TopicPartition topicPartition,
         Message message,
-        CancellationToken token,
-        Action<MessageDeliveryResult, Exception?> callback)
+        Action<MessageDeliveryResult, Exception?> callback,
+        CancellationToken cancellationToken)
     {
         var tp = topicPartition;
         var m = message;
 
-        _ = InternalProduceAsync(topicPartition, message, true, token)
+        _ = InternalProduceAsync(topicPartition, message, true, cancellationToken)
             .ContinueWith(task =>
                 {
                     if (task.IsCompletedSuccessfully)
@@ -157,11 +157,11 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                     _logger.ProduceMessageError(task.Exception!, tp);
 
                 },
-                token);
+                cancellationToken);
     }
 
     /// <inheritdoc/>
-    public async Task Flush(CancellationToken token)
+    public async Task FlushAsync(CancellationToken token)
     {
         _logger.FlushingRecordsTrace();
 
@@ -188,7 +188,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     }
 
     /// <inheritdoc/>
-    public ValueTask Close(CancellationToken token)
+    public ValueTask CloseAsync(CancellationToken cancellationToken)
     {
         _closed = true;
 
@@ -267,11 +267,20 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="topicPartition"></param>
+    /// <param name="message"></param>
+    /// <param name="isFireAndForget"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    /// <exception cref="ProducerException"></exception>
     private async Task<MessageDeliveryResult> InternalProduceAsync(
         TopicPartition topicPartition,
         Message message,
         bool isFireAndForget,
-        CancellationToken token)
+        CancellationToken cancellationToken)
     {
         ThrowIfProducerClosed();
 
@@ -287,7 +296,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         try
         {
             // We request data on topic partitions, for the case when the user has disabled the full update of metadata.  
-            var partitions = await KafkaCluster.GetPartitions(actualTopicPartition.Topic, token);
+            var partitions = await KafkaCluster.GetPartitions(actualTopicPartition.Topic, cancellationToken);
 
             if (partitions.Count == 0)
             {
@@ -307,7 +316,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                     message.Key,
                     message.Value,
                     KafkaCluster,
-                    token);
+                    cancellationToken);
 
                 actualTopicPartition = actualTopicPartition with
                 {
@@ -338,7 +347,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
             {
                 var sendResult = await appendResult
                     .SendResult!
-                    .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), token);
+                    .Task.WaitAsync(TimeSpan.FromMilliseconds(_deliveryTimeoutMs), cancellationToken);
 
                 var topicPartitionOffset = new TopicPartitionOffset(actualTopicPartition, sendResult.Offset);
 
@@ -405,5 +414,12 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
             throw new ProducerException(message);
         }
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    public override void Dispose()
+    {
+        _tokenSource.Dispose();
+        base.Dispose();
     }
 }

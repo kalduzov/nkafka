@@ -35,6 +35,7 @@ using NKafka.Serialization;
 
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -77,6 +78,17 @@ using var tracerProvider = Sdk.CreateTracerProviderBuilder()
     .AddSource("NKafka")
     .AddOtlpExporter()
     //.AddConsoleExporter()
+    .Build();
+
+using var metricsProvider = Sdk.CreateMeterProviderBuilder()
+    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
+    .AddMeter("NKafka.Metrics.Producer")
+    .AddView(instrumentName: "*",
+        new ExplicitBucketHistogramConfiguration
+        {
+            Boundaries = [0, 100, 1000, 10_000, 50_000, 100_000, 1_000_000, 10_000_000]
+        })
+    .AddOtlpExporter()
     .Build();
 
 Log.Logger = new LoggerConfiguration()
@@ -137,7 +149,7 @@ foreach (var val in Enumerable.Range(0, count))
     producer.Produce("test", message, CancellationToken.None);
 }
 
-await producer.Close(CancellationToken.None);
+await producer.CloseAsync(CancellationToken.None);
 
 // var group = Guid.NewGuid().ToString();
 //

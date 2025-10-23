@@ -105,7 +105,7 @@ public static class ProducerExtensions
         CancellationToken cancellationToken)
     {
         var topicPartition = new TopicPartition(topicName, Partition.Any);
-        producer.Produce(topicPartition, message, cancellationToken, (_, _) => { });
+        producer.Produce(topicPartition, message, (_, _) => { }, cancellationToken);
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public static class ProducerExtensions
     {
         foreach (var message in messages)
         {
-            producer.Produce(topicPartition, message, cancellationToken, (_, _) => { });
+            producer.Produce(topicPartition, message, (_, _) => { }, cancellationToken);
         }
     }
 }

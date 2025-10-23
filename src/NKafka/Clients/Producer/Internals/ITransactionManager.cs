@@ -27,7 +27,7 @@ internal interface ITransactionManager
 {
     bool IsTransactional { get; }
 
-    Task Init(CancellationToken token);
+    Task InitAsync(CancellationToken token);
 
     void Begin();
 

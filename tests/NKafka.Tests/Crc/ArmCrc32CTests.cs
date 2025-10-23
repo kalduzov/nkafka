@@ -27,7 +27,9 @@ namespace NKafka.Tests.Crc;
 
 public class ArmCrc32CTests
 {
-    [SkippableTheory]
+    public static bool IsNotArmSupport { get; } = System.Runtime.Intrinsics.Arm.Crc32.IsSupported;
+
+    [Theory(SkipUnless = nameof(IsNotArmSupport), Skip = "Arm is not support")]
     [InlineData("test", 0x86A072C0)]
     [InlineData("Lorem Ipsum is simply dummy text of the printing and typesetting industry.", 0xC4DD7DD6)]
     [InlineData(
@@ -40,8 +42,6 @@ public class ArmCrc32CTests
     [InlineData("123456789", 0xE3069283)]
     public void CalculateTest(string text, uint crc)
     {
-        Skip.IfNot(System.Runtime.Intrinsics.Arm.Crc32.IsSupported, "Arm is not support");
-
         var data = Encoding.UTF8.GetBytes(text);
 
         var crc32C = new ArmCrc32C();

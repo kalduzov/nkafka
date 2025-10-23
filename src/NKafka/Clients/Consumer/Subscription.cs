@@ -21,10 +21,7 @@
 
 using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
-using NKafka.Messages;
 using NKafka.Protocol;
-using NKafka.Protocol.Buffers;
-using NKafka.Serialization;
 
 namespace NKafka.Clients.Consumer;
 
@@ -36,7 +33,12 @@ public class Subscription
     private readonly SubscriptionSerializer _serializer;
     private static readonly SubscriptionDeserializer _deserializer = new();
 
+#if NET9_0_OR_GREATER
+    private readonly Lock _lockObject = new();
+#else
     private readonly object _lockObject = new();
+#endif
+
     private volatile int _generationId;
 
     private HashSet<TopicPartition> _assignedTopicPartitions = [];
@@ -139,53 +141,5 @@ public class Subscription
         var topicPartitions = new TopicPartition(topic, partition);
 
         return _assignedTopicPartitions.Contains(topicPartitions);
-    }
-
-    private class SubscriptionSerializer(ApiVersion apiVersion): ISerializer<Subscription>
-    {
-        /// <inheritdoc />
-        public byte[] Serialize(Subscription data)
-        {
-            var cps = new ConsumerProtocolSubscription
-            {
-                Topics = [..data.Topics],
-                GenerationId = data.GenerationId,
-            };
-            var arrayBuffer = ArrayBufferPool.Rent(10000);
-
-            try
-            {
-                var writer = new BufferWriter(ref arrayBuffer);
-                writer.WriteShort((short)apiVersion);
-                cps.Write(ref writer, apiVersion);
-                var result = arrayBuffer.ToArrayAndReset();
-
-                return result;
-            }
-            finally
-            {
-                ArrayBufferPool.Return(arrayBuffer);
-            }
-        }
-    }
-
-    private class SubscriptionDeserializer: IDeserializer<Subscription>
-    {
-        /// <inheritdoc />
-        public Subscription Deserialize(ReadOnlySpan<byte> data)
-        {
-            var bufferReader = new BufferReader(data);
-            try
-            {
-                var version = bufferReader.ReadShort();
-                var cps = new ConsumerProtocolSubscription(ref bufferReader, (ApiVersion)version);
-
-                return new Subscription(cps.Topics, AutoOffsetReset.None, []);
-            }
-            finally
-            {
-                bufferReader.Dispose();
-            }
-        }
     }
 }

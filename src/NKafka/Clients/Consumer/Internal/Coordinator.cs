@@ -118,14 +118,14 @@ internal class Coordinator: ICoordinator
         try
         {
             await TryFindCoordinatorForGroupAsync(token);
-            await _kafkaCluster.RefreshMetadata(subscription.Topics, token);
+            await _kafkaCluster.RefreshMetadataAsync(subscription.Topics, token);
             await JoinToGroupAsync(subscription, token);
 
             _heartbeatRequest = null;
             _activeSessionAwaiter.SetResult();
 
             await FetchOffsetsAsync(subscription, token);
-            await _kafkaCluster.RefreshMetadata(subscription.Topics, token);
+            await _kafkaCluster.RefreshMetadataAsync(subscription.Topics, token);
 
         }
         catch (ProtocolKafkaException exc)

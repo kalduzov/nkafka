@@ -232,10 +232,10 @@ public class SpanReaderTests
             }
         }
 
-        return new byte[]
-        {
+        return
+        [
             0
-        };
+        ];
     }
 
     #endregion

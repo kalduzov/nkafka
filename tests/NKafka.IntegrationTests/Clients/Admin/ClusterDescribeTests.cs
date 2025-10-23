@@ -43,10 +43,10 @@ public class ClusterDescribeTests
     {
         var clusterConfig = new ClusterConfig
         {
-            BootstrapServers = new[]
-            {
+            BootstrapServers =
+            [
                 "localhost:29091"
-            }
+            ]
         };
 
         var loggerFactory = NullLoggerFactory.Instance;

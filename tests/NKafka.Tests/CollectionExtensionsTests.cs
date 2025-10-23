@@ -24,7 +24,7 @@ namespace NKafka.Tests;
 public class CollectionExtensionsTests
 {
     private static readonly int[] _data =
-    {
+    [
         1,
         2,
         3,
@@ -35,7 +35,7 @@ public class CollectionExtensionsTests
         8,
         9,
         10
-    };
+    ];
 
     private readonly IReadOnlyCollection<int> _data2 = _data;
     private readonly ICollection<int> _data3 = _data;

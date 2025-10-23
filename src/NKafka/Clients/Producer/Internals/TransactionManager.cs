@@ -55,7 +55,7 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
 
     public bool IsTransactional => !string.IsNullOrEmpty(_transactionalId);
 
-    public Task Init(CancellationToken token)
+    public Task InitAsync(CancellationToken token)
     {
         var request = new InitProducerIdRequestMessage
         {

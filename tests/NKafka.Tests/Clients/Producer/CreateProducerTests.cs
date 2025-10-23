@@ -21,12 +21,10 @@
 
 using Microsoft.Extensions.Logging.Abstractions;
 
-using NKafka.Clients.Producer;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Metrics;
-using NKafka.Serialization;
 
 namespace NKafka.Tests.Clients.Producer;
 
@@ -37,7 +35,7 @@ public sealed class CreateProducerTests: ClientTests
     {
         await using var cluster = CreateKafkaClusterForTests();
 
-        await cluster.Open(CancellationToken.None);
+        await cluster.OpenAsync(CancellationToken.None);
 
         await using var producer = cluster.BuildProducer();
         producer.Should().NotBeNull();

@@ -134,7 +134,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
 
         foreach (var connector in seedConnectors)
         {
-            if (_seedConnectors.TryAdd(connector.Endpoint, connector) is not true)
+            if (!_seedConnectors.TryAdd(connector.Endpoint, connector))
             {
                 throw new ArgumentException("Коллекция не может содержать элементы, которые относятся к одному и тому же адресу",
                     nameof(seedConnectors));
@@ -160,10 +160,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
             foreach (var connector in groupByNodeId.Select(c => c))
             {
                 _brokersConnectors.AddOrUpdate(node,
-                    _ => new List<IKafkaConnector>
-                    {
-                        connector
-                    },
+                    _ => [connector],
                     (_, nodes) =>
                     {
                         nodes.Add(connector);

@@ -89,7 +89,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private Stream _stream = Stream.Null;
 
     /// <inheritdoc/>
-    public Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; private set; } = new(0);
+    public Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)> SupportVersions { get; private set; } = [];
 
     /// <summary>
     /// Можно ли писать в текущий поток?
@@ -176,7 +176,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         {
             throw new ProtocolKafkaException(
                 ErrorCodes.None,
-                $"Количество ожидающих ответов запросов к брокеру превысило ограничение в '{_maxInflightRequests}' единиц");
+                $"Too many pending broker requests: '{_maxInflightRequests}' limit reached");
         }
 
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер

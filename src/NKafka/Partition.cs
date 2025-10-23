@@ -24,19 +24,15 @@
 namespace NKafka;
 
 /// <summary>
-///     Represents a Kafka partition.
+///  Represents a Kafka partition.
 /// </summary>
 /// <remarks>
-///     This structure is the same size as an int -
-///     its purpose is to add some syntactical sugar
-///     related to special values.
+/// This structure is the same size as an int -
+/// its purpose is to add some syntactical sugar
+/// related to special values.
 /// </remarks>
-/// <remarks>
-///     Initializes a new instance of the Partition structure.
-/// </remarks>
-/// <param name="partition">
-///     The partition value
-/// </param>
+/// <remarks>Initializes a new instance of the Partition structure.</remarks>
+/// <param name="partition">The partition value</param>
 public readonly struct Partition(int partition): IEquatable<Partition>, IComparable<Partition>
 {
     private const int _UNASSIGN_PARTITION_INDEX = -1;

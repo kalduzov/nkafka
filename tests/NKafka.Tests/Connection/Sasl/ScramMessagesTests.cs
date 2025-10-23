@@ -26,75 +26,62 @@ using NKafka.Connection.Sasl.Messages;
 
 namespace NKafka.Tests.Connection.Sasl;
 
-public class ScramMessagesTests: IDisposable
+public sealed class ScramMessagesTests: IDisposable
 {
-    public static readonly IEnumerable<object[]> ValidExtensions = new[]
-    {
-        new[]
-        {
+    public static readonly IEnumerable<object[]> ValidExtensions =
+    [
+        [
             "ext=val1"
-        },
-        new[]
-        {
+        ],
+        [
             "anotherext=name1=value1 name2=another test value \"\'!$[]()"
-        },
-        new[]
-        {
+        ],
+        [
             "first=val1,second=name1 = value ,third=123"
-        }
-    };
+        ]
+    ];
 
-    public static readonly IEnumerable<object[]> InvalidExtensions = new[]
-    {
-        new[]
-        {
+    public static readonly IEnumerable<object[]> InvalidExtensions =
+    [
+        [
             "ext1=value"
-        },
-        new[]
-        {
+        ],
+        [
             "ext"
-        },
-        new[]
-        {
+        ],
+        [
             "ext=value1,value2"
-        },
-        new[]
-        {
+        ],
+        [
             "ext=,"
-        },
-        new[]
-        {
+        ],
+        [
             "ext =value"
-        }
-    };
+        ]
+    ];
 
-    public static readonly IEnumerable<object[]> ValidReserved = new[]
-    {
-        new[]
-        {
+    public static readonly IEnumerable<object[]> ValidReserved =
+    [
+        [
             "m=reserved-value"
-        },
-        new[]
-        {
+        ],
+        [
             "m=name1=value1 name2=another test value \"\'!$[]()"
-        }
-    };
+        ]
+    ];
 
-    public static readonly IEnumerable<object[]> InvalidReserved = new[]
-    {
-        new[]
-        {
+    public static readonly IEnumerable<object[]> InvalidReserved =
+    [
+        [
             "m"
-        },
-        new[]
-        {
+        ],
+        [
             "m=name,value"
-        },
-        new[]
-        {
+        ],
+        [
             "m=,"
-        }
-    };
+        ]
+    ];
 
     private readonly ScramFormatter _formatter;
 
@@ -164,10 +151,12 @@ public class ScramMessagesTests: IDisposable
         var nonce = _formatter.SecureRandomString;
         var str = $"n,,{reserved},n=testuser,r={nonce}";
 
+        FluentActions.Invoking(CreateClientFirstMessage).Should().Throw<SaslException>();
+
+        return;
+
         void CreateClientFirstMessage()
             => _ = new ClientFirstMessage(Encoding.UTF8.GetBytes(str));
-
-        FluentActions.Invoking(CreateClientFirstMessage).Should().Throw<SaslException>();
     }
 
     [Theory]
@@ -200,6 +189,5 @@ public class ScramMessagesTests: IDisposable
     void IDisposable.Dispose()
     {
         _formatter.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

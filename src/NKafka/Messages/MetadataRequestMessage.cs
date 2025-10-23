@@ -26,7 +26,6 @@ internal sealed partial class MetadataRequestMessage
     /// <summary>
     /// 
     /// </summary>
-    /// <returns></returns>
     public static MetadataRequestMessage Build(bool allowAutoTopicCreation, IEnumerable<string>? topics)
     {
         var request = new MetadataRequestMessage

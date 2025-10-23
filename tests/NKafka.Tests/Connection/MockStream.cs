@@ -34,7 +34,12 @@ internal class MockStream: Stream
     private readonly ConcurrentQueue<byte[]> _sendQueue = new();
     private readonly ConcurrentDictionary<IRequestMessage, (int CorrelactionId, ApiVersion ApiVersion)> _correlationIds = new();
     private readonly Task _processTask;
+
+#if NET9_0_OR_GREATER
+    private readonly Lock _lockObject = new();
+#else
     private readonly object _lockObject = new();
+#endif
 
     private readonly CancellationTokenSource _tokenSource = new();
 
@@ -106,19 +111,19 @@ internal class MockStream: Stream
 
     /// <summary>Asynchronously reads a sequence of bytes from the current stream, advances the position within the stream by the number of bytes read, and monitors cancellation requests.</summary>
     /// <param name="buffer">The region of memory to write the data into.</param>
-    /// <param name="token">The token to monitor for cancellation requests. The default value is <see cref="P:System.Threading.CancellationToken.None" />.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is <see cref="P:System.Threading.CancellationToken.None" />.</param>
     /// <returns>A task that represents the asynchronous read operation. The value of its <see cref="P:System.Threading.Tasks.ValueTask`1.Result" /> property contains the total number of bytes read into the buffer. The result value can be less than the number of bytes allocated in the buffer if that many bytes are not currently available, or it can be 0 (zero) if the end of the stream has been reached.</returns>
-    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken token = new())
+    public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = new())
     {
         byte[]? buf;
 
         // ReSharper disable once InconsistentlySynchronizedField
-        while (!_sendQueue.TryDequeue(out buf) && !token.IsCancellationRequested)
+        while (!_sendQueue.TryDequeue(out buf) && !cancellationToken.IsCancellationRequested)
         {
-            await Task.Delay(25, token);
+            await Task.Delay(25, cancellationToken);
         }
 
-        if (token.IsCancellationRequested)
+        if (cancellationToken.IsCancellationRequested)
         {
             return 0;
         }
@@ -149,8 +154,8 @@ internal class MockStream: Stream
 
     public override void Write(byte[] buffer, int offset, int count)
     {
-        var reader = new BufferReader(buffer);
-        var _ = reader.ReadInt();
+        using var reader = new BufferReader(buffer);
+        _ = reader.ReadInt();
         var apiKey = (ApiKeys)reader.ReadShort();
         var requestApiVersion = (ApiVersion)reader.ReadShort();
         var correlationId = reader.ReadInt();

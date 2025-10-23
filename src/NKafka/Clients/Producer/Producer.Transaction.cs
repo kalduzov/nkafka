@@ -35,7 +35,7 @@ internal sealed partial class Producer
     /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.
     /// </summary>
     /// <param name="token"></param>
-    public async Task InitTransactions(CancellationToken token)
+    public async Task InitTransactionsAsync(CancellationToken token)
     {
         ThrowIfNotTransactional();
         ThrowIfProducerClosed();
@@ -44,7 +44,8 @@ internal sealed partial class Producer
 
         try
         {
-            await _transactionManager.Init(token);
+            await _transactionManager.InitAsync(token);
+            _messagesSender.Wakeup();
         }
         catch (Exception exc)
         {
@@ -89,7 +90,7 @@ internal sealed partial class Producer
     /// <summary>
     /// Commits the ongoing transaction
     /// </summary>
-    public async Task CommitTransaction(CancellationToken token)
+    public async Task CommitTransactionAsync(CancellationToken token)
     {
         ThrowIfNotTransactional();
         ThrowIfProducerClosed();
@@ -115,7 +116,7 @@ internal sealed partial class Producer
     /// <summary>
     /// Aborts the ongoing transaction
     /// </summary>
-    public async Task AbortTransaction(CancellationToken token)
+    public async Task AbortTransactionAsync(CancellationToken token)
     {
         ThrowIfNotTransactional();
         ThrowIfProducerClosed();
@@ -138,7 +139,7 @@ internal sealed partial class Producer
     }
 
     /// <inheritdoc />
-    public async Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets,
+    public async Task SendOffsetsToTransactionAsync(IReadOnlyCollection<TopicPartitionOffset> offsets,
         ConsumerGroupMetadata groupMetadata,
         CancellationToken token)
     {

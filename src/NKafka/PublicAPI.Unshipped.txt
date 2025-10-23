@@ -37,18 +37,28 @@ NKafka.Clients.Consumer.IConsumerEventListener
 NKafka.Clients.Consumer.IConsumerEventListener.OffsetsCommittedEventHandler() -> System.Threading.Tasks.Task!
 NKafka.Clients.Consumer.IConsumerEventListener.PartitionsAssignedEventHandler() -> System.Threading.Tasks.Task!
 NKafka.Clients.Consumer.IConsumerEventListener.PartitionsRevokedEventHandler() -> System.Threading.Tasks.Task!
+NKafka.Clients.Consumer.Subscription
+NKafka.Clients.Consumer.Subscription.Assign(System.Collections.Generic.IReadOnlyCollection<NKafka.TopicPartition!>! topicPartitions) -> void
+NKafka.Clients.Consumer.Subscription.AssignedPartitionsByTopic.get -> System.Collections.Generic.IReadOnlyDictionary<string!, NKafka.Partition[]!>!
+NKafka.Clients.Consumer.Subscription.AssignedTopicPartitions.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.TopicPartition!>!
+NKafka.Clients.Consumer.Subscription.GenerationId.get -> int
+NKafka.Clients.Consumer.Subscription.GenerationId.set -> void
+NKafka.Clients.Consumer.Subscription.IsAssignedTopicPartitions(string! topic, NKafka.Partition partition) -> bool
+NKafka.Clients.Consumer.Subscription.SerializeAsMetadata() -> byte[]!
+NKafka.Clients.Consumer.Subscription.SupportPartitionAssignors.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Consumer.IPartitionAssignor!>!
+NKafka.Clients.Consumer.Subscription.Topics.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition<TKey, TValue>(string! topic, TKey key, byte[]! keyBytes, TValue value, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer
-NKafka.Clients.Producer.IProducer.AbortTransaction(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer.AbortTransactionAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer.BeginTransaction() -> void
-NKafka.Clients.Producer.IProducer.Close(System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask
-NKafka.Clients.Producer.IProducer.CommitTransaction(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.IProducer.Flush(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.IProducer.InitTransactions(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.IProducer.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Threading.CancellationToken token, System.Action<NKafka.Clients.Producer.MessageDeliveryResult!>! callback) -> void
+NKafka.Clients.Producer.IProducer.CloseAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+NKafka.Clients.Producer.IProducer.CommitTransactionAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer.FlushAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer.InitTransactionsAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Action<NKafka.Clients.Producer.MessageDeliveryResult!, System.Exception?>! callback, System.Threading.CancellationToken cancellationToken) -> void
 NKafka.Clients.Producer.IProducer.ProduceAsync(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
-NKafka.Clients.Producer.IProducer.SendOffsetsToTransaction(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducer.SendOffsetsToTransactionAsync(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer<TKey, TValue>
 NKafka.Clients.Producer.IProducer<TKey, TValue>.AbortTransaction(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer<TKey, TValue>.BeginTransaction() -> void
@@ -179,15 +189,23 @@ NKafka.Exceptions.ProducerException.ProducerException(string! message, System.Ex
 NKafka.IKafkaCluster
 NKafka.IKafkaCluster.AdminClient.get -> NKafka.Clients.Admin.IAdminClient!
 NKafka.IKafkaCluster.Brokers.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Node!>!
+NKafka.IKafkaCluster.BuildConsumer<TKey, TValue>(NKafka.Config.ConsumerConfig! consumerConfig, NKafka.Serialization.IDeserializer<TKey>! keyDeserializer, NKafka.Serialization.IDeserializer<TValue>! valueDeserializer) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
 NKafka.IKafkaCluster.BuildProducer(string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer!
 NKafka.IKafkaCluster.Closed.get -> bool
 NKafka.IKafkaCluster.ClusterId.get -> string?
 NKafka.IKafkaCluster.Config.get -> NKafka.Config.ClusterConfig!
 NKafka.IKafkaCluster.Controller.get -> NKafka.Node!
+NKafka.IKafkaCluster.GetAvailablePartitions(string! topic) -> System.Collections.Generic.IReadOnlyList<NKafka.Partition>!
 NKafka.IKafkaCluster.GetOffset(string! topic, NKafka.Partition partition, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<NKafka.Offset>
 NKafka.IKafkaCluster.GetPartitions(string! topic, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.Partition>!>
+NKafka.IKafkaCluster.GetTopicMetadata(string! name) -> NKafka.TopicMetadata!
 NKafka.IKafkaCluster.GetTopicPartitions(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyCollection<NKafka.TopicPartition!>!>
-NKafka.IKafkaCluster.RefreshMetadata(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.IKafkaCluster.LeaderFor(NKafka.TopicPartition! topicPartition) -> NKafka.Node!
+NKafka.IKafkaCluster.OpenAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.IKafkaCluster.PartitionsForTopic(string! topic) -> System.Collections.Generic.IReadOnlyCollection<NKafka.PartitionMetadata>!
+NKafka.IKafkaCluster.RefreshMetadataAsync(System.Collections.Generic.IReadOnlyCollection<string!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
+NKafka.IKafkaCluster.Topics.get -> System.Collections.Generic.IReadOnlyDictionary<string!, NKafka.TopicMetadata!>!
+NKafka.IKafkaCluster.TopicsById.get -> System.Collections.Generic.IReadOnlyDictionary<System.Guid, string!>!
 NKafka.KafkaClusterExtensions
 NKafka.Message
 NKafka.Message.Headers.get -> NKafka.Headers!
@@ -415,15 +433,17 @@ override NKafka.Partition.GetHashCode() -> int
 override NKafka.Partition.ToString() -> string!
 override NKafka.PartitionMetadata.Equals(object? obj) -> bool
 override NKafka.PartitionMetadata.GetHashCode() -> int
+override NKafka.TopicPartition.Equals(object? obj) -> bool
 override NKafka.TopicPartition.GetHashCode() -> int
 override NKafka.TopicPartition.ToString() -> string!
 static NKafka.Clients.Admin.AdminClientExtensions.CreateTopicsAsync(this NKafka.Clients.Admin.IAdminClient! client, System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Admin.TopicDetail!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string!, NKafka.Clients.Admin.CreateTopicResult!>!>!
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, NKafka.TopicPartition! topicPartition, System.Collections.Generic.IEnumerable<NKafka.Message<TKey, TValue>!>! messages) -> void
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, NKafka.TopicPartition! topicPartition, System.Collections.Generic.IReadOnlyCollection<NKafka.Message<TKey, TValue>!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, NKafka.Message<TKey, TValue>! message) -> void
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, NKafka.Message<TKey, TValue>! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message<TKey, TValue>!>! messages) -> void
-static NKafka.Clients.Producer.ProducerExtensions.Produce<TKey, TValue>(this NKafka.Clients.Producer.IProducer<TKey, TValue>! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message<TKey, TValue>!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
+static NKafka.Clients.Consumer.Subscription.Deserialize(byte[]! data) -> NKafka.Clients.Consumer.Subscription!
+static NKafka.Clients.Producer.ProducerExtensions.Produce(this NKafka.Clients.Producer.IProducer! producer, NKafka.TopicPartition! topicPartition, System.Collections.Generic.IEnumerable<NKafka.Message!>! messages, System.Threading.CancellationToken cancellationToken) -> void
+static NKafka.Clients.Producer.ProducerExtensions.Produce(this NKafka.Clients.Producer.IProducer! producer, string! topicName, NKafka.Message! message, System.Threading.CancellationToken cancellationToken) -> void
+static NKafka.Clients.Producer.ProducerExtensions.Produce(this NKafka.Clients.Producer.IProducer! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message!>! messages, System.Threading.CancellationToken cancellationToken) -> void
+static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, NKafka.TopicPartition! topicPartition, System.Collections.Generic.IReadOnlyCollection<NKafka.Message!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
+static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, string! topicName, NKafka.Message! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
+static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
 static NKafka.Config.CommonConfig.MaxInflightRequests.get -> int
 static NKafka.ConsumerExtensions.BuildConsumer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ConsumerConfig! consumerConfig) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
@@ -456,7 +476,10 @@ static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaC
 static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
 static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
 static NKafka.Serialization.SerializationExtensions.ToKafkaBytes<T>(this T? value) -> byte[]!
+static NKafka.TopicPartition.operator !=(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
+static NKafka.TopicPartition.operator ==(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
 static readonly NKafka.Null.Instance -> NKafka.Null
 static readonly NKafka.Offset.Unset -> NKafka.Offset
+static readonly NKafka.Partition.Any -> NKafka.Partition
 static readonly NKafka.TopicPartition.Null -> NKafka.TopicPartition!
 virtual NKafka.Clients.Producer.MessageDeliveryResult.EqualityContract.get -> System.Type!

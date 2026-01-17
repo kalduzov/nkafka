@@ -24,26 +24,26 @@ namespace NKafka.Clients.Producer.Internals;
 /// <summary>
 /// Provides a manager interface for sending messages to a kafka cluster
 /// </summary>
-internal interface IMessagesSender
+internal interface IMessagesSender: IAsyncDisposable, IDisposable
 {
     /// <summary>
     /// The process of sending batches with messages starts.
     /// </summary>
-    Task StartAsync(CancellationToken stoppingToken);
+    internal Task StartAsync(CancellationToken stoppingToken);
 
     /// <summary>
     /// Stops the process of sending messages until the Wakeup method is called 
     /// </summary>
-    void Sleep();
+    internal void Sleep();
 
     /// <summary>
     /// Completely stops all sending batches with messages
     /// </summary>
     /// <param name="timeout"></param>
-    void Stop(TimeSpan timeout);
+    internal void Stop(TimeSpan timeout);
 
     /// <summary>
     /// Wakes up the manager for further sending batches with messages
     /// </summary>
-    void Wakeup();
+    internal void Wakeup();
 }

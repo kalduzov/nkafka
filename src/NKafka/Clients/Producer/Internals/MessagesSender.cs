@@ -33,9 +33,10 @@ namespace NKafka.Clients.Producer.Internals;
 /// <summary>
 /// Implementation of a manager interface for sending messages in a kafka cluster
 /// </summary>
-internal class MessagesSender(
+internal sealed class MessagesSender(
     ProducerConfig config,
     IRecordAccumulator recordAccumulator,
+    ITransactionManager transactionManager,
     IKafkaCluster kafkaCluster,
     IProducerMetrics metrics,
     ILoggerFactory loggerFactory)
@@ -51,7 +52,7 @@ internal class MessagesSender(
     {
         _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
-        return RunAsync(this);
+        return RunAsync();
     }
 
     /// <inheritdoc/>
@@ -71,28 +72,26 @@ internal class MessagesSender(
     {
     }
 
-    private async Task RunAsync(object? messageSender)
+    private async Task RunAsync()
     {
+        var delay = TimeSpan.FromMilliseconds(config.RetryBackoffMs);
+
         try
         {
             _logger.StartMessageSenderTrace();
 
-            if (messageSender is not MessagesSender sender)
-            {
-                throw new ArgumentException(ExceptionMessages.MessagesSenderInvalidType, nameof(messageSender));
-            }
-            var token = sender._tokenSource.Token;
+            var token = _tokenSource.Token;
 
             while (!token.IsCancellationRequested)
             {
                 _resetEvent.Wait(token);
                 await RunOnceAsync(token);
-                await Task.Delay(TimeSpan.FromMilliseconds(config.RetryBackoffMs), token);
+                await Task.Delay(delay, token);
             }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException exc)
         {
-
+            _logger.LogTrace(exc, "Operation cancelled");
         }
         catch (Exception exc)
         {
@@ -101,9 +100,14 @@ internal class MessagesSender(
 
     }
 
-    private async Task RunOnceAsync(CancellationToken token)
+    private async Task RunOnceAsync(CancellationToken cancellationToken)
     {
-        await SendProducerDataAsync(token);
+
+        if (transactionManager.IsTransactional)
+        {
+            await transactionManager.BumpIdempotentEpochAndResetIdIfNeededAsync(cancellationToken);
+        }
+        await SendProducerDataAsync(cancellationToken);
     }
 
     private async Task SendProducerDataAsync(CancellationToken token)
@@ -147,7 +151,7 @@ internal class MessagesSender(
                     }
                     else
                     {
-                        _logger.ErrorTrace(partitionResponse.Code);
+                        _logger.Error(partitionResponse.Code);
                         batch.Fail(partitionResponse.Code);
                     }
                 }
@@ -184,5 +188,40 @@ internal class MessagesSender(
         }
 
         return node;
+    }
+
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or
+    /// resetting unmanaged resources asynchronously.</summary>
+    /// <returns>A task that represents the asynchronous dispose operation.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        await CastAndDispose(_tokenSource);
+        await CastAndDispose(_resetEvent);
+        await kafkaCluster.DisposeAsync();
+        await CastAndDispose(loggerFactory);
+
+        return;
+
+        static async ValueTask CastAndDispose(IDisposable resource)
+        {
+            if (resource is IAsyncDisposable resourceAsyncDisposable)
+            {
+                await resourceAsyncDisposable.DisposeAsync();
+            }
+            else
+            {
+                resource.Dispose();
+            }
+        }
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    public void Dispose()
+    {
+        _tokenSource.Dispose();
+        _resetEvent.Dispose();
+        kafkaCluster.Dispose();
+        loggerFactory.Dispose();
     }
 }

@@ -66,7 +66,7 @@ internal static partial class ProducerLogExtensions
     [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 6,
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Error: {ErrorCode}")]
-    public static partial void ErrorTrace(this ILogger<MessagesSender> logger, ErrorCodes errorCode);
+    public static partial void Error(this ILogger<MessagesSender> logger, ErrorCodes errorCode);
 
     [LoggerMessage(EventId = LogExtensions.PRODUCER_EVENT_BASE_ID + 7,
         Level = LogLevel.Trace,

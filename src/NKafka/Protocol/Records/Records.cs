@@ -21,9 +21,6 @@
  * limitations under the License.
  */
 
-using System.Collections;
-using System.Diagnostics;
-
 using NKafka.Protocol.Buffers;
 
 namespace NKafka.Protocol.Records;

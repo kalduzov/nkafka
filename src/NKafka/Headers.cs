@@ -60,7 +60,7 @@ public class Headers: IEnumerable<Header>
     /// <param name="headers">The initial collection of headers.</param>
     public Headers(IEnumerable<Header>? headers)
     {
-        _headers = headers is null ? new() : new List<Header>(headers);
+        _headers = headers is null ? [] : [..headers];
     }
 
     /// <summary>
@@ -134,20 +134,13 @@ public class Headers: IEnumerable<Header>
         _headers.RemoveAll(a => a.Key == key);
     }
 
-    private class HeadersEnumerator: IEnumerator<Header>
+    private sealed class HeadersEnumerator(Headers headers): IEnumerator<Header>
     {
-        private readonly Headers _headers;
-
         private int _location = -1;
-
-        public HeadersEnumerator(Headers headers)
-        {
-            _headers = headers;
-        }
 
         public object Current => ((IEnumerator<Header>)this).Current;
 
-        Header IEnumerator<Header>.Current => _headers._headers[_location];
+        Header IEnumerator<Header>.Current => headers._headers[_location];
 
         public void Dispose()
         {
@@ -157,12 +150,8 @@ public class Headers: IEnumerable<Header>
         {
             _location += 1;
 
-            if (_location >= _headers._headers.Count)
-            {
-                return false;
-            }
+            return _location < headers._headers.Count;
 
-            return true;
         }
 
         public void Reset()

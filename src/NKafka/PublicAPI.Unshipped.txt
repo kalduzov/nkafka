@@ -337,14 +337,23 @@ NKafka.Config.CommonConfig.Ssl.set -> void
 NKafka.Config.CommonConfig.UseMinimalSupportVersion.get -> bool
 NKafka.Config.CommonConfig.UseMinimalSupportVersion.set -> void
 NKafka.Config.CompressionConfig
+NKafka.Config.CompressionConfig.CompressionConfig(NKafka.Config.CompressionConfig! original) -> void
 NKafka.Config.CompressionConfig.CompressionConfig(NKafka.Config.CompressionType CompressionType = NKafka.Config.CompressionType.None) -> void
 NKafka.Config.CompressionConfig.CompressionType.get -> NKafka.Config.CompressionType
 NKafka.Config.CompressionConfig.CompressionType.init -> void
+NKafka.Config.CompressionConfig.Deconstruct(out NKafka.Config.CompressionType CompressionType) -> void
+NKafka.Config.CompressionConfig.GzipLevel.get -> System.IO.Compression.CompressionLevel
+NKafka.Config.CompressionConfig.GzipLevel.init -> void
+NKafka.Config.CompressionConfig.LZ4Level.get -> int
+NKafka.Config.CompressionConfig.LZ4Level.init -> void
+NKafka.Config.CompressionConfig.ZstdLevel.get -> int
+NKafka.Config.CompressionConfig.ZstdLevel.init -> void
 NKafka.Config.CompressionType
 NKafka.Config.CompressionType.Gzip = 1 -> NKafka.Config.CompressionType
 NKafka.Config.CompressionType.Lz4 = 3 -> NKafka.Config.CompressionType
 NKafka.Config.CompressionType.None = 0 -> NKafka.Config.CompressionType
 NKafka.Config.CompressionType.Snappy = 2 -> NKafka.Config.CompressionType
+NKafka.Config.CompressionType.ZStd = 4 -> NKafka.Config.CompressionType
 NKafka.Config.ConsumerConfig
 NKafka.Config.ConsumerConfig.AutoCommitIntervalMs.get -> int
 NKafka.Config.ConsumerConfig.AutoCommitIntervalMs.set -> void
@@ -488,9 +497,50 @@ NKafka.Exceptions.ConnectionKafkaException.ConnectionKafkaException(string! mess
 NKafka.Exceptions.ConnectionKafkaException.ConnectionKafkaException(string! message, System.Exception! innerException) -> void
 NKafka.Exceptions.ConnectorNotFoundException
 NKafka.Exceptions.ConnectorNotFoundException.ConnectorNotFoundException(string! message) -> void
+NKafka.Exceptions.ConsumerException
+NKafka.Exceptions.ConsumerException.ConsumerException(string! message) -> void
+NKafka.Exceptions.ConsumerException.ConsumerException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.InvalidCompressionTypeException
+NKafka.Exceptions.InvalidCompressionTypeException.InvalidCompressionTypeException(string! message) -> void
+NKafka.Exceptions.InvalidCompressionTypeException.InvalidCompressionTypeException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.InvalidTopicException
+NKafka.Exceptions.InvalidTopicException.InvalidTopicException(string! message) -> void
+NKafka.Exceptions.InvalidTopicException.InvalidTopicException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.KafkaConfigException
+NKafka.Exceptions.KafkaConfigException.KafkaConfigException(string! optionName, object! value, string? message = null) -> void
+NKafka.Exceptions.KafkaConfigException.OptionName.get -> string!
+NKafka.Exceptions.KafkaException
+NKafka.Exceptions.KafkaException.KafkaException(string! message) -> void
+NKafka.Exceptions.KafkaException.KafkaException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.ProduceException
+NKafka.Exceptions.ProduceException.ProduceException(string! message) -> void
+NKafka.Exceptions.ProduceException.ProduceException(System.Exception! exc) -> void
 NKafka.Exceptions.ProducerException
 NKafka.Exceptions.ProducerException.ProducerException(string! message) -> void
 NKafka.Exceptions.ProducerException.ProducerException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.ProtocolKafkaException
+NKafka.Exceptions.ProtocolKafkaException.InternalError.get -> NKafka.Protocol.ErrorCodes
+NKafka.Exceptions.SerializeDataException
+NKafka.Exceptions.SerializeDataException.SerializeDataException(string! message) -> void
+NKafka.Exceptions.SerializeDataException.SerializeDataException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.TransactionException
+NKafka.Exceptions.TransactionException.TransactionException(string! message) -> void
+NKafka.Exceptions.TransactionException.TransactionException(string! message, System.Exception! innerException) -> void
+NKafka.Exceptions.UnsupportedVersionException
+NKafka.Exceptions.UnsupportedVersionException.UnsupportedVersionException(string! message) -> void
+NKafka.Exceptions.UnsupportedVersionException.UnsupportedVersionException(string! message, System.Exception! innerException) -> void
+NKafka.Header
+NKafka.Header.Equals(NKafka.Header? other) -> bool
+NKafka.Header.Header(string! key, byte[]? value) -> void
+NKafka.Header.Key.get -> string!
+NKafka.Header.Value.get -> byte[]?
+NKafka.Headers
+NKafka.Headers.Count.get -> int
+NKafka.Headers.GetEnumerator() -> System.Collections.Generic.IEnumerator<NKafka.Header!>!
+NKafka.Headers.Headers(System.Collections.Generic.IEnumerable<NKafka.Header!>? headers) -> void
+NKafka.Headers.this[int index].get -> NKafka.Header!
+NKafka.IClusterConfigFactory
+NKafka.IClusterConfigFactory.Build() -> NKafka.Config.ClusterConfig!
 NKafka.IKafkaCluster
 NKafka.IKafkaCluster.AdminClient.get -> NKafka.Clients.Admin.IAdminClient!
 NKafka.IKafkaCluster.Brokers.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Node!>!
@@ -523,14 +573,18 @@ NKafka.Message.Timestamp.get -> NKafka.Timestamp
 NKafka.Message.Timestamp.set -> void
 NKafka.Message.Value.get -> byte[]!
 NKafka.Message.Value.set -> void
+NKafka.Metrics.NullConsumerMetrics
+NKafka.Metrics.NullConsumerMetrics.NullConsumerMetrics() -> void
 NKafka.Node
 NKafka.Node.EndPoint.get -> System.Net.EndPoint!
 NKafka.Node.Host.get -> string!
 NKafka.Node.Id.get -> int
 NKafka.Node.Node(int id, string! host, int port, string? rack = null) -> void
+NKafka.Node.Node(NKafka.Node! original) -> void
 NKafka.Node.Port.get -> int
 NKafka.Node.Rack.get -> string?
 NKafka.Null
+NKafka.Null.Equals(NKafka.Null other) -> bool
 NKafka.Null.Null() -> void
 NKafka.Offset
 NKafka.Offset.Equals(NKafka.Offset other) -> bool
@@ -803,34 +857,69 @@ NKafka.Protocol.ErrorCodes.UnsupportedForMessageFormat = 43 -> NKafka.Protocol.E
 NKafka.Protocol.ErrorCodes.UnsupportedSaslMechanism = 33 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.ErrorCodes.UnsupportedVersion = 35 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.ErrorCodes.VoterNotFound = 127 -> NKafka.Protocol.ErrorCodes
+NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit0 = 1 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit1 = 2 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit2 = 4 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit3 = 8 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit6 = 64 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Bit7 = 128 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.ControlBit = 32 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.TransactionalBit = 16 -> NKafka.Protocol.Records.BitMask
+NKafka.Protocol.Records.BitMask.Zero = 0 -> NKafka.Protocol.Records.BitMask
 NKafka.Protocol.TaggedField
 NKafka.Protocol.TaggedField.Data.get -> byte[]!
 NKafka.Protocol.TaggedField.Data.init -> void
+NKafka.Protocol.TaggedField.Deconstruct(out int Tag, out byte[]! Data) -> void
 NKafka.Protocol.TaggedField.Tag.get -> int
 NKafka.Protocol.TaggedField.Tag.init -> void
 NKafka.Protocol.TaggedField.TaggedField(int Tag, byte[]! Data) -> void
+NKafka.Protocol.TaggedField.TaggedField(NKafka.Protocol.TaggedField! original) -> void
+NKafka.Serialization.Deserializers
 NKafka.Serialization.IDeserializer<T>
 NKafka.Serialization.IDeserializer<T>.Deserialize(System.ReadOnlySpan<byte> data) -> T
 NKafka.Serialization.ISerializer<T>
 NKafka.Serialization.ISerializer<T>.Serialize(T data) -> byte[]!
+NKafka.Serialization.NoneDeserializer<T>
+NKafka.Serialization.NoneDeserializer<T>.Deserialize(System.ReadOnlySpan<byte> data) -> T
+NKafka.Serialization.NoneDeserializer<T>.DeserializeAsync(System.ReadOnlySpan<byte> data) -> System.Threading.Tasks.Task<T>!
+NKafka.Serialization.NoneDeserializer<T>.PreferAsync.get -> bool
+NKafka.Serialization.NoneSerializer<T>
+NKafka.Serialization.NoneSerializer<T>.Serialize(T data) -> byte[]!
 NKafka.Serialization.SerializationExtensions
+NKafka.Serialization.Serializers
+NKafka.Timestamp
+NKafka.Timestamp.Equals(NKafka.Timestamp other) -> bool
+NKafka.Timestamp.Timestamp() -> void
+NKafka.Timestamp.Timestamp(long unixTimestampMs, NKafka.TimestampType type) -> void
+NKafka.Timestamp.Timestamp(System.DateTime dateTime) -> void
+NKafka.Timestamp.Timestamp(System.DateTime dateTime, NKafka.TimestampType type) -> void
+NKafka.Timestamp.Timestamp(System.DateTimeOffset dateTimeOffset) -> void
+NKafka.Timestamp.Type.get -> NKafka.TimestampType
+NKafka.Timestamp.UnixTimestampMs.get -> long
+NKafka.Timestamp.UtcDateTime.get -> System.DateTime
 NKafka.TimestampType
 NKafka.TimestampType.CreateTime = 1 -> NKafka.TimestampType
 NKafka.TimestampType.LogAppendTime = 2 -> NKafka.TimestampType
 NKafka.TimestampType.NotAvailable = 0 -> NKafka.TimestampType
 NKafka.TopicDescription
+NKafka.TopicDescription.Deconstruct(out string! Name, out System.Guid TopicId, out bool IsInternal, out System.Collections.Generic.IReadOnlyCollection<NKafka.PartitionMetadata>! Partitions) -> void
+NKafka.TopicDescription.Equals(NKafka.TopicDescription? other) -> bool
 NKafka.TopicDescription.Partitions.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.PartitionMetadata>!
 NKafka.TopicDescription.Partitions.init -> void
 NKafka.TopicDescription.TopicDescription(string! Name, System.Guid TopicId, bool IsInternal, System.Collections.Generic.IReadOnlyCollection<NKafka.PartitionMetadata>! Partitions) -> void
 NKafka.TopicMetadata
+NKafka.TopicMetadata.Deconstruct(out string! Name, out System.Guid TopicId, out bool IsInternal) -> void
 NKafka.TopicMetadata.IsInternal.get -> bool
 NKafka.TopicMetadata.IsInternal.init -> void
 NKafka.TopicMetadata.Name.get -> string!
 NKafka.TopicMetadata.Name.init -> void
 NKafka.TopicMetadata.TopicId.get -> System.Guid
 NKafka.TopicMetadata.TopicId.init -> void
+NKafka.TopicMetadata.TopicMetadata(NKafka.TopicMetadata! original) -> void
 NKafka.TopicMetadata.TopicMetadata(string! Name, System.Guid TopicId, bool IsInternal) -> void
 NKafka.TopicPartition
+NKafka.TopicPartition.<Clone>$() -> NKafka.TopicPartition!
 NKafka.TopicPartition.CompareTo(NKafka.TopicPartition? other) -> int
 NKafka.TopicPartition.Equals(NKafka.TopicPartition? other) -> bool
 NKafka.TopicPartition.Partition.get -> NKafka.Partition
@@ -839,6 +928,102 @@ NKafka.TopicPartition.Topic.get -> string!
 NKafka.TopicPartition.TopicId.get -> System.Guid
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition) -> void
 NKafka.TopicPartition.TopicPartition(string! topic, NKafka.Partition partition, System.Guid topicId) -> void
+override NKafka.Clients.Admin.AclBinding.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.AclBinding.GetHashCode() -> int
+override NKafka.Clients.Admin.AclBinding.ToString() -> string!
+override NKafka.Clients.Admin.AclBindingFilter.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.AclBindingFilter.GetHashCode() -> int
+override NKafka.Clients.Admin.AclBindingFilter.ToString() -> string!
+override NKafka.Clients.Admin.AdminOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.AdminOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.AdminOptions.ToString() -> string!
+override NKafka.Clients.Admin.AlterConfigsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.AlterConfigsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.AlterConfigsOptions.ToString() -> string!
+override NKafka.Clients.Admin.AlterConfigsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.AlterConfigsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.AlterConfigsResult.ToString() -> string!
+override NKafka.Clients.Admin.ConfigEntry.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.ConfigEntry.GetHashCode() -> int
+override NKafka.Clients.Admin.ConfigEntry.ToString() -> string!
+override NKafka.Clients.Admin.ConfigResource.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.ConfigResource.GetHashCode() -> int
+override NKafka.Clients.Admin.ConfigResource.ToString() -> string!
+override NKafka.Clients.Admin.CreateAclsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.CreateAclsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.CreateAclsOptions.ToString() -> string!
+override NKafka.Clients.Admin.CreateAclsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.CreateAclsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.CreateAclsResult.ToString() -> string!
+override NKafka.Clients.Admin.CreateTopicResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.CreateTopicResult.GetHashCode() -> int
+override NKafka.Clients.Admin.CreateTopicResult.ToString() -> string!
+override NKafka.Clients.Admin.CreateTopicsOptions.<Clone>$() -> NKafka.Clients.Admin.CreateTopicsOptions!
+override NKafka.Clients.Admin.CreateTopicsOptions.EqualityContract.get -> System.Type!
+override NKafka.Clients.Admin.CreateTopicsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.CreateTopicsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.CreateTopicsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Clients.Admin.CreateTopicsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DeleteAclsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DeleteAclsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DeleteAclsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DeleteAclsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DeleteAclsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DeleteAclsResult.ToString() -> string!
+override NKafka.Clients.Admin.DeleteTopicsOptions.<Clone>$() -> NKafka.Clients.Admin.DeleteTopicsOptions!
+override NKafka.Clients.Admin.DeleteTopicsOptions.EqualityContract.get -> System.Type!
+override NKafka.Clients.Admin.DeleteTopicsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DeleteTopicsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DeleteTopicsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Clients.Admin.DeleteTopicsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DeleteTopicsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DeleteTopicsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DeleteTopicsResult.ToString() -> string!
+override NKafka.Clients.Admin.DescribeAclsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeAclsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeAclsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DescribeAclsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeAclsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeAclsResult.ToString() -> string!
+override NKafka.Clients.Admin.DescribeClusterOptions.<Clone>$() -> NKafka.Clients.Admin.DescribeClusterOptions!
+override NKafka.Clients.Admin.DescribeClusterOptions.EqualityContract.get -> System.Type!
+override NKafka.Clients.Admin.DescribeClusterOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeClusterOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeClusterOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Clients.Admin.DescribeClusterOptions.ToString() -> string!
+override NKafka.Clients.Admin.DescribeClusterResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeClusterResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeClusterResult.ToString() -> string!
+override NKafka.Clients.Admin.DescribeConfigsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeConfigsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeConfigsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DescribeConfigsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeConfigsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeConfigsResult.ToString() -> string!
+override NKafka.Clients.Admin.DescribeTopicsOptions.<Clone>$() -> NKafka.Clients.Admin.DescribeTopicsOptions!
+override NKafka.Clients.Admin.DescribeTopicsOptions.EqualityContract.get -> System.Type!
+override NKafka.Clients.Admin.DescribeTopicsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeTopicsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeTopicsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Clients.Admin.DescribeTopicsOptions.ToString() -> string!
+override NKafka.Clients.Admin.DescribeTopicsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.DescribeTopicsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.DescribeTopicsResult.ToString() -> string!
+override NKafka.Clients.Admin.IncrementalAlterConfigsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.IncrementalAlterConfigsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.IncrementalAlterConfigsOptions.ToString() -> string!
+override NKafka.Clients.Admin.IncrementalAlterConfigsResult.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.IncrementalAlterConfigsResult.GetHashCode() -> int
+override NKafka.Clients.Admin.IncrementalAlterConfigsResult.ToString() -> string!
+override NKafka.Clients.Admin.ListTopicsOptions.<Clone>$() -> NKafka.Clients.Admin.ListTopicsOptions!
+override NKafka.Clients.Admin.ListTopicsOptions.EqualityContract.get -> System.Type!
+override NKafka.Clients.Admin.ListTopicsOptions.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.ListTopicsOptions.GetHashCode() -> int
+override NKafka.Clients.Admin.ListTopicsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Clients.Admin.ListTopicsOptions.ToString() -> string!
+override NKafka.Clients.Admin.TopicDetail.Equals(object? obj) -> bool
+override NKafka.Clients.Admin.TopicDetail.GetHashCode() -> int
+override NKafka.Clients.Admin.TopicDetail.ToString() -> string!
 override NKafka.Clients.Consumer.ConsumerGroupMetadata.Equals(object? obj) -> bool
 override NKafka.Clients.Consumer.ConsumerGroupMetadata.GetHashCode() -> int
 override NKafka.Clients.Consumer.ConsumerGroupMetadata.ToString() -> string!
@@ -851,6 +1036,31 @@ override NKafka.Clients.Producer.RecordMetadata.ToString() -> string!
 override NKafka.Clients.Producer.TopicPartitionOffset.Equals(object? obj) -> bool
 override NKafka.Clients.Producer.TopicPartitionOffset.GetHashCode() -> int
 override NKafka.Clients.Producer.TopicPartitionOffset.ToString() -> string!
+override NKafka.Config.ClusterConfig.<Clone>$() -> NKafka.Config.ClusterConfig!
+override NKafka.Config.ClusterConfig.EqualityContract.get -> System.Type!
+override NKafka.Config.ClusterConfig.Equals(object? obj) -> bool
+override NKafka.Config.ClusterConfig.GetHashCode() -> int
+override NKafka.Config.ClusterConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Config.ClusterConfig.ToString() -> string!
+override NKafka.Config.CommonConfig.Equals(object? obj) -> bool
+override NKafka.Config.CommonConfig.GetHashCode() -> int
+override NKafka.Config.CommonConfig.ToString() -> string!
+override NKafka.Config.CompressionConfig.Equals(object? obj) -> bool
+override NKafka.Config.CompressionConfig.GetHashCode() -> int
+override NKafka.Config.CompressionConfig.ToString() -> string!
+override NKafka.Config.ConsumerConfig.<Clone>$() -> NKafka.Config.ConsumerConfig!
+override NKafka.Config.ConsumerConfig.EqualityContract.get -> System.Type!
+override NKafka.Config.ConsumerConfig.Equals(object? obj) -> bool
+override NKafka.Config.ConsumerConfig.GetHashCode() -> int
+override NKafka.Config.ConsumerConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Config.ConsumerConfig.ToString() -> string!
+override NKafka.Config.HeartbeatSettings.Equals(object? obj) -> bool
+override NKafka.Config.HeartbeatSettings.GetHashCode() -> int
+override NKafka.Config.HeartbeatSettings.ToString() -> string!
+override NKafka.Config.ProducerConfig.<Clone>$() -> NKafka.Config.ProducerConfig!
+override NKafka.Config.ProducerConfig.EqualityContract.get -> System.Type!
+override NKafka.Config.ProducerConfig.Equals(object? obj) -> bool
+override NKafka.Config.ProducerConfig.GetHashCode() -> int
 override NKafka.Config.ProducerConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
 override NKafka.Config.ProducerConfig.ToString() -> string!
 override NKafka.Config.SaslSettings.Equals(object? obj) -> bool
@@ -859,7 +1069,14 @@ override NKafka.Config.SaslSettings.ToString() -> string!
 override NKafka.Config.SslSettings.Equals(object? obj) -> bool
 override NKafka.Config.SslSettings.GetHashCode() -> int
 override NKafka.Config.SslSettings.ToString() -> string!
+override NKafka.Header.Equals(object? obj) -> bool
+override NKafka.Header.GetHashCode() -> int
+override NKafka.Header.ToString() -> string!
 override NKafka.Message.ToString() -> string!
+override NKafka.Node.Equals(object? obj) -> bool
+override NKafka.Node.GetHashCode() -> int
+override NKafka.Node.ToString() -> string!
+override NKafka.Null.GetHashCode() -> int
 override NKafka.Offset.Equals(object? obj) -> bool
 override NKafka.Offset.GetHashCode() -> int
 override NKafka.Offset.ToString() -> string!
@@ -868,10 +1085,82 @@ override NKafka.Partition.GetHashCode() -> int
 override NKafka.Partition.ToString() -> string!
 override NKafka.PartitionMetadata.Equals(object? obj) -> bool
 override NKafka.PartitionMetadata.GetHashCode() -> int
-override NKafka.TopicPartition.Equals(object? obj) -> bool
+override NKafka.Protocol.TaggedField.Equals(object? obj) -> bool
+override NKafka.Protocol.TaggedField.GetHashCode() -> int
+override NKafka.Protocol.TaggedField.ToString() -> string!
+override NKafka.Timestamp.Equals(object? obj) -> bool
+override NKafka.Timestamp.GetHashCode() -> int
+override NKafka.TopicDescription.<Clone>$() -> NKafka.TopicDescription!
+override NKafka.TopicDescription.Equals(object? obj) -> bool
+override NKafka.TopicDescription.GetHashCode() -> int
+override NKafka.TopicDescription.ToString() -> string!
+override NKafka.TopicMetadata.Equals(object? obj) -> bool
+override NKafka.TopicMetadata.GetHashCode() -> int
+override NKafka.TopicMetadata.ToString() -> string!
 override NKafka.TopicPartition.GetHashCode() -> int
 override NKafka.TopicPartition.ToString() -> string!
+override sealed NKafka.Clients.Admin.CreateTopicsOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+override sealed NKafka.Clients.Admin.DeleteTopicsOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+override sealed NKafka.Clients.Admin.DescribeClusterOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+override sealed NKafka.Clients.Admin.DescribeTopicsOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+override sealed NKafka.Clients.Admin.ListTopicsOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+override sealed NKafka.Config.ClusterConfig.Equals(NKafka.Config.CommonConfig? other) -> bool
+override sealed NKafka.Config.ConsumerConfig.Equals(NKafka.Config.CommonConfig? other) -> bool
+override sealed NKafka.Config.ProducerConfig.Equals(NKafka.Config.CommonConfig? other) -> bool
+override sealed NKafka.TopicDescription.Equals(NKafka.TopicMetadata? other) -> bool
+static NKafka.Clients.Admin.AclBinding.operator !=(NKafka.Clients.Admin.AclBinding? left, NKafka.Clients.Admin.AclBinding? right) -> bool
+static NKafka.Clients.Admin.AclBinding.operator ==(NKafka.Clients.Admin.AclBinding? left, NKafka.Clients.Admin.AclBinding? right) -> bool
+static NKafka.Clients.Admin.AclBindingFilter.operator !=(NKafka.Clients.Admin.AclBindingFilter? left, NKafka.Clients.Admin.AclBindingFilter? right) -> bool
+static NKafka.Clients.Admin.AclBindingFilter.operator ==(NKafka.Clients.Admin.AclBindingFilter? left, NKafka.Clients.Admin.AclBindingFilter? right) -> bool
 static NKafka.Clients.Admin.AdminClientExtensions.CreateTopicsAsync(this NKafka.Clients.Admin.IAdminClient! client, System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Admin.TopicDetail!>! topics, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<System.Collections.Generic.Dictionary<string!, NKafka.Clients.Admin.CreateTopicResult!>!>!
+static NKafka.Clients.Admin.AdminOptions.operator !=(NKafka.Clients.Admin.AdminOptions? left, NKafka.Clients.Admin.AdminOptions? right) -> bool
+static NKafka.Clients.Admin.AdminOptions.operator ==(NKafka.Clients.Admin.AdminOptions? left, NKafka.Clients.Admin.AdminOptions? right) -> bool
+static NKafka.Clients.Admin.AlterConfigsOptions.operator !=(NKafka.Clients.Admin.AlterConfigsOptions? left, NKafka.Clients.Admin.AlterConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.AlterConfigsOptions.operator ==(NKafka.Clients.Admin.AlterConfigsOptions? left, NKafka.Clients.Admin.AlterConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.AlterConfigsResult.operator !=(NKafka.Clients.Admin.AlterConfigsResult? left, NKafka.Clients.Admin.AlterConfigsResult? right) -> bool
+static NKafka.Clients.Admin.AlterConfigsResult.operator ==(NKafka.Clients.Admin.AlterConfigsResult? left, NKafka.Clients.Admin.AlterConfigsResult? right) -> bool
+static NKafka.Clients.Admin.ConfigEntry.operator !=(NKafka.Clients.Admin.ConfigEntry? left, NKafka.Clients.Admin.ConfigEntry? right) -> bool
+static NKafka.Clients.Admin.ConfigEntry.operator ==(NKafka.Clients.Admin.ConfigEntry? left, NKafka.Clients.Admin.ConfigEntry? right) -> bool
+static NKafka.Clients.Admin.ConfigResource.operator !=(NKafka.Clients.Admin.ConfigResource? left, NKafka.Clients.Admin.ConfigResource? right) -> bool
+static NKafka.Clients.Admin.ConfigResource.operator ==(NKafka.Clients.Admin.ConfigResource? left, NKafka.Clients.Admin.ConfigResource? right) -> bool
+static NKafka.Clients.Admin.CreateAclsOptions.operator !=(NKafka.Clients.Admin.CreateAclsOptions? left, NKafka.Clients.Admin.CreateAclsOptions? right) -> bool
+static NKafka.Clients.Admin.CreateAclsOptions.operator ==(NKafka.Clients.Admin.CreateAclsOptions? left, NKafka.Clients.Admin.CreateAclsOptions? right) -> bool
+static NKafka.Clients.Admin.CreateAclsResult.operator !=(NKafka.Clients.Admin.CreateAclsResult? left, NKafka.Clients.Admin.CreateAclsResult? right) -> bool
+static NKafka.Clients.Admin.CreateAclsResult.operator ==(NKafka.Clients.Admin.CreateAclsResult? left, NKafka.Clients.Admin.CreateAclsResult? right) -> bool
+static NKafka.Clients.Admin.CreateTopicResult.operator !=(NKafka.Clients.Admin.CreateTopicResult? left, NKafka.Clients.Admin.CreateTopicResult? right) -> bool
+static NKafka.Clients.Admin.CreateTopicResult.operator ==(NKafka.Clients.Admin.CreateTopicResult? left, NKafka.Clients.Admin.CreateTopicResult? right) -> bool
+static NKafka.Clients.Admin.CreateTopicsOptions.operator !=(NKafka.Clients.Admin.CreateTopicsOptions? left, NKafka.Clients.Admin.CreateTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.CreateTopicsOptions.operator ==(NKafka.Clients.Admin.CreateTopicsOptions? left, NKafka.Clients.Admin.CreateTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.DeleteAclsOptions.operator !=(NKafka.Clients.Admin.DeleteAclsOptions? left, NKafka.Clients.Admin.DeleteAclsOptions? right) -> bool
+static NKafka.Clients.Admin.DeleteAclsOptions.operator ==(NKafka.Clients.Admin.DeleteAclsOptions? left, NKafka.Clients.Admin.DeleteAclsOptions? right) -> bool
+static NKafka.Clients.Admin.DeleteAclsResult.operator !=(NKafka.Clients.Admin.DeleteAclsResult? left, NKafka.Clients.Admin.DeleteAclsResult? right) -> bool
+static NKafka.Clients.Admin.DeleteAclsResult.operator ==(NKafka.Clients.Admin.DeleteAclsResult? left, NKafka.Clients.Admin.DeleteAclsResult? right) -> bool
+static NKafka.Clients.Admin.DeleteTopicsOptions.operator !=(NKafka.Clients.Admin.DeleteTopicsOptions? left, NKafka.Clients.Admin.DeleteTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.DeleteTopicsOptions.operator ==(NKafka.Clients.Admin.DeleteTopicsOptions? left, NKafka.Clients.Admin.DeleteTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.DeleteTopicsResult.operator !=(NKafka.Clients.Admin.DeleteTopicsResult? left, NKafka.Clients.Admin.DeleteTopicsResult? right) -> bool
+static NKafka.Clients.Admin.DeleteTopicsResult.operator ==(NKafka.Clients.Admin.DeleteTopicsResult? left, NKafka.Clients.Admin.DeleteTopicsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeAclsOptions.operator !=(NKafka.Clients.Admin.DescribeAclsOptions? left, NKafka.Clients.Admin.DescribeAclsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeAclsOptions.operator ==(NKafka.Clients.Admin.DescribeAclsOptions? left, NKafka.Clients.Admin.DescribeAclsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeAclsResult.operator !=(NKafka.Clients.Admin.DescribeAclsResult? left, NKafka.Clients.Admin.DescribeAclsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeAclsResult.operator ==(NKafka.Clients.Admin.DescribeAclsResult? left, NKafka.Clients.Admin.DescribeAclsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeClusterOptions.operator !=(NKafka.Clients.Admin.DescribeClusterOptions? left, NKafka.Clients.Admin.DescribeClusterOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeClusterOptions.operator ==(NKafka.Clients.Admin.DescribeClusterOptions? left, NKafka.Clients.Admin.DescribeClusterOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeClusterResult.operator !=(NKafka.Clients.Admin.DescribeClusterResult? left, NKafka.Clients.Admin.DescribeClusterResult? right) -> bool
+static NKafka.Clients.Admin.DescribeClusterResult.operator ==(NKafka.Clients.Admin.DescribeClusterResult? left, NKafka.Clients.Admin.DescribeClusterResult? right) -> bool
+static NKafka.Clients.Admin.DescribeConfigsOptions.operator !=(NKafka.Clients.Admin.DescribeConfigsOptions? left, NKafka.Clients.Admin.DescribeConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeConfigsOptions.operator ==(NKafka.Clients.Admin.DescribeConfigsOptions? left, NKafka.Clients.Admin.DescribeConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeConfigsResult.operator !=(NKafka.Clients.Admin.DescribeConfigsResult? left, NKafka.Clients.Admin.DescribeConfigsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeConfigsResult.operator ==(NKafka.Clients.Admin.DescribeConfigsResult? left, NKafka.Clients.Admin.DescribeConfigsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeTopicsOptions.operator !=(NKafka.Clients.Admin.DescribeTopicsOptions? left, NKafka.Clients.Admin.DescribeTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeTopicsOptions.operator ==(NKafka.Clients.Admin.DescribeTopicsOptions? left, NKafka.Clients.Admin.DescribeTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.DescribeTopicsResult.operator !=(NKafka.Clients.Admin.DescribeTopicsResult? left, NKafka.Clients.Admin.DescribeTopicsResult? right) -> bool
+static NKafka.Clients.Admin.DescribeTopicsResult.operator ==(NKafka.Clients.Admin.DescribeTopicsResult? left, NKafka.Clients.Admin.DescribeTopicsResult? right) -> bool
+static NKafka.Clients.Admin.IncrementalAlterConfigsOptions.operator !=(NKafka.Clients.Admin.IncrementalAlterConfigsOptions? left, NKafka.Clients.Admin.IncrementalAlterConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.IncrementalAlterConfigsOptions.operator ==(NKafka.Clients.Admin.IncrementalAlterConfigsOptions? left, NKafka.Clients.Admin.IncrementalAlterConfigsOptions? right) -> bool
+static NKafka.Clients.Admin.IncrementalAlterConfigsResult.operator !=(NKafka.Clients.Admin.IncrementalAlterConfigsResult? left, NKafka.Clients.Admin.IncrementalAlterConfigsResult? right) -> bool
+static NKafka.Clients.Admin.IncrementalAlterConfigsResult.operator ==(NKafka.Clients.Admin.IncrementalAlterConfigsResult? left, NKafka.Clients.Admin.IncrementalAlterConfigsResult? right) -> bool
+static NKafka.Clients.Admin.ListTopicsOptions.operator !=(NKafka.Clients.Admin.ListTopicsOptions? left, NKafka.Clients.Admin.ListTopicsOptions? right) -> bool
+static NKafka.Clients.Admin.ListTopicsOptions.operator ==(NKafka.Clients.Admin.ListTopicsOptions? left, NKafka.Clients.Admin.ListTopicsOptions? right) -> bool
 static NKafka.Clients.Admin.TopicDetail.operator !=(NKafka.Clients.Admin.TopicDetail? left, NKafka.Clients.Admin.TopicDetail? right) -> bool
 static NKafka.Clients.Admin.TopicDetail.operator ==(NKafka.Clients.Admin.TopicDetail? left, NKafka.Clients.Admin.TopicDetail? right) -> bool
 static NKafka.Clients.Consumer.ConsumerGroupMetadata.operator !=(NKafka.Clients.Consumer.ConsumerGroupMetadata? left, NKafka.Clients.Consumer.ConsumerGroupMetadata? right) -> bool
@@ -889,13 +1178,36 @@ static NKafka.Clients.Producer.RecordMetadata.operator !=(NKafka.Clients.Produce
 static NKafka.Clients.Producer.RecordMetadata.operator ==(NKafka.Clients.Producer.RecordMetadata? left, NKafka.Clients.Producer.RecordMetadata? right) -> bool
 static NKafka.Clients.Producer.TopicPartitionOffset.operator !=(NKafka.Clients.Producer.TopicPartitionOffset! a, NKafka.Clients.Producer.TopicPartitionOffset! b) -> bool
 static NKafka.Clients.Producer.TopicPartitionOffset.operator ==(NKafka.Clients.Producer.TopicPartitionOffset! a, NKafka.Clients.Producer.TopicPartitionOffset! b) -> bool
+static NKafka.Config.ClusterConfig.operator !=(NKafka.Config.ClusterConfig? left, NKafka.Config.ClusterConfig? right) -> bool
+static NKafka.Config.ClusterConfig.operator ==(NKafka.Config.ClusterConfig? left, NKafka.Config.ClusterConfig? right) -> bool
 static NKafka.Config.CommonConfig.MaxInflightRequests.get -> int
+static NKafka.Config.CommonConfig.operator !=(NKafka.Config.CommonConfig? left, NKafka.Config.CommonConfig? right) -> bool
+static NKafka.Config.CommonConfig.operator ==(NKafka.Config.CommonConfig? left, NKafka.Config.CommonConfig? right) -> bool
+static NKafka.Config.CompressionConfig.operator !=(NKafka.Config.CompressionConfig? left, NKafka.Config.CompressionConfig? right) -> bool
+static NKafka.Config.CompressionConfig.operator ==(NKafka.Config.CompressionConfig? left, NKafka.Config.CompressionConfig? right) -> bool
+static NKafka.Config.ConsumerConfig.BaseFrom(NKafka.Config.CommonConfig! config) -> NKafka.Config.ConsumerConfig!
+static NKafka.Config.ConsumerConfig.operator !=(NKafka.Config.ConsumerConfig? left, NKafka.Config.ConsumerConfig? right) -> bool
+static NKafka.Config.ConsumerConfig.operator ==(NKafka.Config.ConsumerConfig? left, NKafka.Config.ConsumerConfig? right) -> bool
+static NKafka.Config.HeartbeatSettings.operator !=(NKafka.Config.HeartbeatSettings? left, NKafka.Config.HeartbeatSettings? right) -> bool
+static NKafka.Config.HeartbeatSettings.operator ==(NKafka.Config.HeartbeatSettings? left, NKafka.Config.HeartbeatSettings? right) -> bool
+static NKafka.Config.ProducerConfig.BaseFrom(NKafka.Config.CommonConfig! config) -> NKafka.Config.ProducerConfig!
+static NKafka.Config.ProducerConfig.operator !=(NKafka.Config.ProducerConfig? left, NKafka.Config.ProducerConfig? right) -> bool
+static NKafka.Config.ProducerConfig.operator ==(NKafka.Config.ProducerConfig? left, NKafka.Config.ProducerConfig? right) -> bool
+static NKafka.Config.SaslSettings.MechanismAsString(NKafka.Config.SaslMechanism mechanism) -> string!
+static NKafka.Config.SaslSettings.operator !=(NKafka.Config.SaslSettings? left, NKafka.Config.SaslSettings? right) -> bool
+static NKafka.Config.SaslSettings.operator ==(NKafka.Config.SaslSettings? left, NKafka.Config.SaslSettings? right) -> bool
+static NKafka.Config.SslSettings.operator !=(NKafka.Config.SslSettings? left, NKafka.Config.SslSettings? right) -> bool
+static NKafka.Config.SslSettings.operator ==(NKafka.Config.SslSettings? left, NKafka.Config.SslSettings? right) -> bool
 static NKafka.ConsumerExtensions.BuildConsumer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ConsumerConfig! consumerConfig) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.Node.NoNode.get -> NKafka.Node!
+static NKafka.Node.operator !=(NKafka.Node? left, NKafka.Node? right) -> bool
+static NKafka.Node.operator ==(NKafka.Node? left, NKafka.Node? right) -> bool
+static NKafka.Null.operator !=(NKafka.Null left, NKafka.Null right) -> bool
+static NKafka.Null.operator ==(NKafka.Null left, NKafka.Null right) -> bool
 static NKafka.Offset.implicit operator long(NKafka.Offset o) -> long
 static NKafka.Offset.implicit operator NKafka.Offset(long v) -> NKafka.Offset
 static NKafka.Offset.operator !=(NKafka.Offset a, NKafka.Offset b) -> bool
@@ -916,18 +1228,144 @@ static NKafka.Partition.operator >(NKafka.Partition a, NKafka.Partition b) -> bo
 static NKafka.Partition.operator >=(NKafka.Partition a, NKafka.Partition b) -> bool
 static NKafka.PartitionMetadata.operator !=(NKafka.PartitionMetadata left, NKafka.PartitionMetadata right) -> bool
 static NKafka.PartitionMetadata.operator ==(NKafka.PartitionMetadata left, NKafka.PartitionMetadata right) -> bool
-static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
-static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
-static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
-static NKafka.ProducerExtensions.BuildProducer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer<TKey, TValue>!
+static NKafka.ProducerExtensions.BuildProducer(this NKafka.IKafkaCluster! kafkaCluster) -> NKafka.Clients.Producer.IProducer!
+static NKafka.ProducerExtensions.BuildProducer(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer!
+static NKafka.ProducerExtensions.BuildProducer(this NKafka.IKafkaCluster! kafkaCluster, string! name) -> NKafka.Clients.Producer.IProducer!
+static NKafka.ProducerExtensions.BuildProducer(this NKafka.IKafkaCluster! kafkaCluster, string! name, NKafka.Config.ProducerConfig! producerConfig) -> NKafka.Clients.Producer.IProducer!
+static NKafka.Protocol.TaggedField.operator !=(NKafka.Protocol.TaggedField? left, NKafka.Protocol.TaggedField? right) -> bool
+static NKafka.Protocol.TaggedField.operator ==(NKafka.Protocol.TaggedField? left, NKafka.Protocol.TaggedField? right) -> bool
 static NKafka.Serialization.SerializationExtensions.ToKafkaBytes<T>(this T? value) -> byte[]!
-static NKafka.TopicPartition.operator !=(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
-static NKafka.TopicPartition.operator ==(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
+static NKafka.Timestamp.DateTimeToUnixTimestampMs(System.DateTime dateTime) -> long
+static NKafka.Timestamp.Default.get -> NKafka.Timestamp
+static NKafka.Timestamp.operator !=(NKafka.Timestamp a, NKafka.Timestamp b) -> bool
+static NKafka.Timestamp.operator <(NKafka.Timestamp a, NKafka.Timestamp b) -> bool
+static NKafka.Timestamp.operator ==(NKafka.Timestamp a, NKafka.Timestamp b) -> bool
+static NKafka.Timestamp.operator >(NKafka.Timestamp a, NKafka.Timestamp b) -> bool
+static NKafka.Timestamp.UnixTimestampMsToDateTime(long unixMillisecondsTimestamp) -> System.DateTime
+static NKafka.TopicDescription.operator !=(NKafka.TopicDescription? left, NKafka.TopicDescription? right) -> bool
+static NKafka.TopicDescription.operator ==(NKafka.TopicDescription? left, NKafka.TopicDescription? right) -> bool
+static NKafka.TopicMetadata.operator !=(NKafka.TopicMetadata? left, NKafka.TopicMetadata? right) -> bool
+static NKafka.TopicMetadata.operator ==(NKafka.TopicMetadata? left, NKafka.TopicMetadata? right) -> bool
+static readonly NKafka.Config.ConsumerConfig.EmptyConsumerConfig -> NKafka.Config.ConsumerConfig!
+static readonly NKafka.Config.ProducerConfig.EmptyProducerConfig -> NKafka.Config.ProducerConfig!
+static readonly NKafka.Headers.Empty -> NKafka.Headers!
 static readonly NKafka.Null.Instance -> NKafka.Null
 static readonly NKafka.Offset.Unset -> NKafka.Offset
 static readonly NKafka.Partition.Any -> NKafka.Partition
+static readonly NKafka.Serialization.Deserializers.ByteArray -> NKafka.Serialization.IDeserializer<byte[]!>!
+static readonly NKafka.Serialization.Deserializers.Double -> NKafka.Serialization.IDeserializer<double>!
+static readonly NKafka.Serialization.Deserializers.Float -> NKafka.Serialization.IDeserializer<float>!
+static readonly NKafka.Serialization.Deserializers.Guid -> NKafka.Serialization.IDeserializer<System.Guid>!
+static readonly NKafka.Serialization.Deserializers.Int -> NKafka.Serialization.IDeserializer<int>!
+static readonly NKafka.Serialization.Deserializers.Long -> NKafka.Serialization.IDeserializer<long>!
+static readonly NKafka.Serialization.Deserializers.Null -> NKafka.Serialization.IDeserializer<NKafka.Null>!
+static readonly NKafka.Serialization.Deserializers.Short -> NKafka.Serialization.IDeserializer<short>!
+static readonly NKafka.Serialization.Deserializers.String -> NKafka.Serialization.IDeserializer<string!>!
+static readonly NKafka.Serialization.NoneDeserializer<T>.Instance -> NKafka.Serialization.IDeserializer<T>!
+static readonly NKafka.Serialization.NoneSerializer<T>.Instance -> NKafka.Serialization.ISerializer<T>!
+static readonly NKafka.Serialization.Serializers.ByteArray -> NKafka.Serialization.ISerializer<byte[]!>!
+static readonly NKafka.Serialization.Serializers.Double -> NKafka.Serialization.ISerializer<double>!
+static readonly NKafka.Serialization.Serializers.Float -> NKafka.Serialization.ISerializer<float>!
+static readonly NKafka.Serialization.Serializers.Guid -> NKafka.Serialization.ISerializer<System.Guid>!
+static readonly NKafka.Serialization.Serializers.Int -> NKafka.Serialization.ISerializer<int>!
+static readonly NKafka.Serialization.Serializers.Long -> NKafka.Serialization.ISerializer<long>!
+static readonly NKafka.Serialization.Serializers.Null -> NKafka.Serialization.ISerializer<NKafka.Null>!
+static readonly NKafka.Serialization.Serializers.Short -> NKafka.Serialization.ISerializer<short>!
+static readonly NKafka.Serialization.Serializers.String -> NKafka.Serialization.ISerializer<string!>!
+static readonly NKafka.Timestamp.UnixTimeEpoch -> System.DateTime
 static readonly NKafka.TopicPartition.Null -> NKafka.TopicPartition!
-virtual NKafka.Clients.Producer.MessageDeliveryResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AclBinding.<Clone>$() -> NKafka.Clients.Admin.AclBinding!
+virtual NKafka.Clients.Admin.AclBinding.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AclBinding.Equals(NKafka.Clients.Admin.AclBinding? other) -> bool
+virtual NKafka.Clients.Admin.AclBinding.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.AclBindingFilter.<Clone>$() -> NKafka.Clients.Admin.AclBindingFilter!
+virtual NKafka.Clients.Admin.AclBindingFilter.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AclBindingFilter.Equals(NKafka.Clients.Admin.AclBindingFilter? other) -> bool
+virtual NKafka.Clients.Admin.AclBindingFilter.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.AdminOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AdminOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
+virtual NKafka.Clients.Admin.AdminOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.AlterConfigsOptions.<Clone>$() -> NKafka.Clients.Admin.AlterConfigsOptions!
+virtual NKafka.Clients.Admin.AlterConfigsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AlterConfigsOptions.Equals(NKafka.Clients.Admin.AlterConfigsOptions? other) -> bool
+virtual NKafka.Clients.Admin.AlterConfigsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.AlterConfigsResult.<Clone>$() -> NKafka.Clients.Admin.AlterConfigsResult!
+virtual NKafka.Clients.Admin.AlterConfigsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.AlterConfigsResult.Equals(NKafka.Clients.Admin.AlterConfigsResult? other) -> bool
+virtual NKafka.Clients.Admin.AlterConfigsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.ConfigEntry.<Clone>$() -> NKafka.Clients.Admin.ConfigEntry!
+virtual NKafka.Clients.Admin.ConfigEntry.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.ConfigEntry.Equals(NKafka.Clients.Admin.ConfigEntry? other) -> bool
+virtual NKafka.Clients.Admin.ConfigEntry.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.ConfigResource.<Clone>$() -> NKafka.Clients.Admin.ConfigResource!
+virtual NKafka.Clients.Admin.ConfigResource.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.ConfigResource.Equals(NKafka.Clients.Admin.ConfigResource? other) -> bool
+virtual NKafka.Clients.Admin.ConfigResource.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.CreateAclsOptions.<Clone>$() -> NKafka.Clients.Admin.CreateAclsOptions!
+virtual NKafka.Clients.Admin.CreateAclsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.CreateAclsOptions.Equals(NKafka.Clients.Admin.CreateAclsOptions? other) -> bool
+virtual NKafka.Clients.Admin.CreateAclsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.CreateAclsResult.<Clone>$() -> NKafka.Clients.Admin.CreateAclsResult!
+virtual NKafka.Clients.Admin.CreateAclsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.CreateAclsResult.Equals(NKafka.Clients.Admin.CreateAclsResult? other) -> bool
+virtual NKafka.Clients.Admin.CreateAclsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.CreateTopicResult.<Clone>$() -> NKafka.Clients.Admin.CreateTopicResult!
+virtual NKafka.Clients.Admin.CreateTopicResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.CreateTopicResult.Equals(NKafka.Clients.Admin.CreateTopicResult? other) -> bool
+virtual NKafka.Clients.Admin.CreateTopicResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.CreateTopicsOptions.Equals(NKafka.Clients.Admin.CreateTopicsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DeleteAclsOptions.<Clone>$() -> NKafka.Clients.Admin.DeleteAclsOptions!
+virtual NKafka.Clients.Admin.DeleteAclsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DeleteAclsOptions.Equals(NKafka.Clients.Admin.DeleteAclsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DeleteAclsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DeleteAclsResult.<Clone>$() -> NKafka.Clients.Admin.DeleteAclsResult!
+virtual NKafka.Clients.Admin.DeleteAclsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DeleteAclsResult.Equals(NKafka.Clients.Admin.DeleteAclsResult? other) -> bool
+virtual NKafka.Clients.Admin.DeleteAclsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DeleteTopicsOptions.Equals(NKafka.Clients.Admin.DeleteTopicsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DeleteTopicsResult.<Clone>$() -> NKafka.Clients.Admin.DeleteTopicsResult!
+virtual NKafka.Clients.Admin.DeleteTopicsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DeleteTopicsResult.Equals(NKafka.Clients.Admin.DeleteTopicsResult? other) -> bool
+virtual NKafka.Clients.Admin.DeleteTopicsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeAclsOptions.<Clone>$() -> NKafka.Clients.Admin.DescribeAclsOptions!
+virtual NKafka.Clients.Admin.DescribeAclsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeAclsOptions.Equals(NKafka.Clients.Admin.DescribeAclsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DescribeAclsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeAclsResult.<Clone>$() -> NKafka.Clients.Admin.DescribeAclsResult!
+virtual NKafka.Clients.Admin.DescribeAclsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeAclsResult.Equals(NKafka.Clients.Admin.DescribeAclsResult? other) -> bool
+virtual NKafka.Clients.Admin.DescribeAclsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeClusterOptions.Equals(NKafka.Clients.Admin.DescribeClusterOptions? other) -> bool
+virtual NKafka.Clients.Admin.DescribeClusterResult.<Clone>$() -> NKafka.Clients.Admin.DescribeClusterResult!
+virtual NKafka.Clients.Admin.DescribeClusterResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeClusterResult.Equals(NKafka.Clients.Admin.DescribeClusterResult? other) -> bool
+virtual NKafka.Clients.Admin.DescribeClusterResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeConfigsOptions.<Clone>$() -> NKafka.Clients.Admin.DescribeConfigsOptions!
+virtual NKafka.Clients.Admin.DescribeConfigsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeConfigsOptions.Equals(NKafka.Clients.Admin.DescribeConfigsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DescribeConfigsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeConfigsResult.<Clone>$() -> NKafka.Clients.Admin.DescribeConfigsResult!
+virtual NKafka.Clients.Admin.DescribeConfigsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeConfigsResult.Equals(NKafka.Clients.Admin.DescribeConfigsResult? other) -> bool
+virtual NKafka.Clients.Admin.DescribeConfigsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.DescribeTopicsOptions.Equals(NKafka.Clients.Admin.DescribeTopicsOptions? other) -> bool
+virtual NKafka.Clients.Admin.DescribeTopicsResult.<Clone>$() -> NKafka.Clients.Admin.DescribeTopicsResult!
+virtual NKafka.Clients.Admin.DescribeTopicsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.DescribeTopicsResult.Equals(NKafka.Clients.Admin.DescribeTopicsResult? other) -> bool
+virtual NKafka.Clients.Admin.DescribeTopicsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsOptions.<Clone>$() -> NKafka.Clients.Admin.IncrementalAlterConfigsOptions!
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsOptions.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsOptions.Equals(NKafka.Clients.Admin.IncrementalAlterConfigsOptions? other) -> bool
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsOptions.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsResult.<Clone>$() -> NKafka.Clients.Admin.IncrementalAlterConfigsResult!
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsResult.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsResult.Equals(NKafka.Clients.Admin.IncrementalAlterConfigsResult? other) -> bool
+virtual NKafka.Clients.Admin.IncrementalAlterConfigsResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Clients.Admin.ListTopicsOptions.Equals(NKafka.Clients.Admin.ListTopicsOptions? other) -> bool
+virtual NKafka.Clients.Admin.TopicDetail.<Clone>$() -> NKafka.Clients.Admin.TopicDetail!
+virtual NKafka.Clients.Admin.TopicDetail.EqualityContract.get -> System.Type!
+virtual NKafka.Clients.Admin.TopicDetail.Equals(NKafka.Clients.Admin.TopicDetail? other) -> bool
+virtual NKafka.Clients.Admin.TopicDetail.PrintMembers(System.Text.StringBuilder! builder) -> bool
 virtual NKafka.Clients.Consumer.ConsumerGroupMetadata.<Clone>$() -> NKafka.Clients.Consumer.ConsumerGroupMetadata!
 virtual NKafka.Clients.Consumer.ConsumerGroupMetadata.EqualityContract.get -> System.Type!
 virtual NKafka.Clients.Consumer.ConsumerGroupMetadata.Equals(NKafka.Clients.Consumer.ConsumerGroupMetadata? other) -> bool
@@ -944,3 +1382,38 @@ virtual NKafka.Config.ClusterConfig.Equals(NKafka.Config.ClusterConfig? other) -
 virtual NKafka.Config.CommonConfig.EqualityContract.get -> System.Type!
 virtual NKafka.Config.CommonConfig.Equals(NKafka.Config.CommonConfig? other) -> bool
 virtual NKafka.Config.CommonConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Config.CompressionConfig.<Clone>$() -> NKafka.Config.CompressionConfig!
+virtual NKafka.Config.CompressionConfig.EqualityContract.get -> System.Type!
+virtual NKafka.Config.CompressionConfig.Equals(NKafka.Config.CompressionConfig? other) -> bool
+virtual NKafka.Config.CompressionConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Config.ConsumerConfig.Equals(NKafka.Config.ConsumerConfig? other) -> bool
+virtual NKafka.Config.HeartbeatSettings.<Clone>$() -> NKafka.Config.HeartbeatSettings!
+virtual NKafka.Config.HeartbeatSettings.EqualityContract.get -> System.Type!
+virtual NKafka.Config.HeartbeatSettings.Equals(NKafka.Config.HeartbeatSettings? other) -> bool
+virtual NKafka.Config.HeartbeatSettings.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Config.ProducerConfig.Equals(NKafka.Config.ProducerConfig? other) -> bool
+virtual NKafka.Config.SaslSettings.<Clone>$() -> NKafka.Config.SaslSettings!
+virtual NKafka.Config.SaslSettings.EqualityContract.get -> System.Type!
+virtual NKafka.Config.SaslSettings.Equals(NKafka.Config.SaslSettings? other) -> bool
+virtual NKafka.Config.SaslSettings.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Config.SslSettings.<Clone>$() -> NKafka.Config.SslSettings!
+virtual NKafka.Config.SslSettings.EqualityContract.get -> System.Type!
+virtual NKafka.Config.SslSettings.Equals(NKafka.Config.SslSettings? other) -> bool
+virtual NKafka.Config.SslSettings.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Headers.Add(NKafka.Header! header) -> void
+virtual NKafka.Headers.Add(string! key, byte[]! val) -> void
+virtual NKafka.Headers.Remove(string! key) -> void
+virtual NKafka.Node.<Clone>$() -> NKafka.Node!
+virtual NKafka.Node.EqualityContract.get -> System.Type!
+virtual NKafka.Node.Equals(NKafka.Node? other) -> bool
+virtual NKafka.Node.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.Protocol.TaggedField.<Clone>$() -> NKafka.Protocol.TaggedField!
+virtual NKafka.Protocol.TaggedField.EqualityContract.get -> System.Type!
+virtual NKafka.Protocol.TaggedField.Equals(NKafka.Protocol.TaggedField? other) -> bool
+virtual NKafka.Protocol.TaggedField.PrintMembers(System.Text.StringBuilder! builder) -> bool
+virtual NKafka.TopicMetadata.<Clone>$() -> NKafka.TopicMetadata!
+virtual NKafka.TopicMetadata.EqualityContract.get -> System.Type!
+virtual NKafka.TopicMetadata.Equals(NKafka.TopicMetadata? other) -> bool
+virtual NKafka.TopicMetadata.PrintMembers(System.Text.StringBuilder! builder) -> bool
+~override NKafka.Null.Equals(object obj) -> bool
+~override NKafka.Null.ToString() -> string

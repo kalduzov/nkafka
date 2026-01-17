@@ -24,6 +24,15 @@ using NKafka.Exceptions;
 namespace NKafka.Clients.Admin;
 
 /// <summary>
-/// 
+/// Represents the result of a delete topics operation.
 /// </summary>
+/// <remarks>
+/// The result contains information about whether the deletion encountered an error and, if so, the associated exception.
+/// </remarks>
+/// <param name="IsError">
+/// Indicates whether an error occurred during the delete operation. A value of <c>true</c> means an error occurred.
+/// </param>
+/// <param name="Exception">
+/// The exception associated with the error, if any. This is set to <c>null</c> if <paramref name="IsError"/> is <c>false</c>.
+/// </param>
 public record DeleteTopicsResult(bool IsError, KafkaException? Exception = null);

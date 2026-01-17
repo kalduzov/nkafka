@@ -266,7 +266,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
         }
         _arrayPool.Return(response, true);
 
-        return Array.Empty<ConsumerRecord<TKey, TValue>>();
+        return [];
 
     }
 

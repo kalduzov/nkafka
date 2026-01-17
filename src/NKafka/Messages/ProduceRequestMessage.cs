@@ -23,10 +23,4 @@ namespace NKafka.Messages;
 
 internal sealed partial class ProduceRequestMessage
 {
-    // /// <summary>
-    // /// Создает корректный запрос с учетом версии API
-    // /// </summary>
-    // public static ProduceRequestMessage Build()
-    // {
-    // }
 }

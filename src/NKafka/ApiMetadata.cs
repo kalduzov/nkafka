@@ -23,25 +23,9 @@ using NKafka.Protocol;
 
 namespace NKafka;
 
-/// <summary>
-/// 
-/// </summary>
-internal readonly struct ApiMetadata
+internal readonly record struct ApiMetadata
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public ApiVersion MinVersion { get; init; }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public ApiVersion MaxVersion { get; init; }
-
-    /// <summary>Returns the hash code for this instance.</summary>
-    /// <returns>A 32-bit signed integer that is the hash code for this instance.</returns>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(MinVersion, MaxVersion);
-    }
 }

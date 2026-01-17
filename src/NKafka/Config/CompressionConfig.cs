@@ -24,23 +24,47 @@ using System.IO.Compression;
 namespace NKafka.Config;
 
 /// <summary>
-/// 
+/// Represents the configuration settings for compression in the Kafka client.
 /// </summary>
-/// <param name="CompressionType"></param>
+/// <remarks>
+/// This class defines the compression type and optional levels for different compression algorithms.
+/// It is used to configure the behavior of message compression for the producer.
+/// </remarks>
 public record CompressionConfig(CompressionType CompressionType = CompressionType.None)
 {
     /// <summary>
-    /// 
+    /// Gets the compression level to be used when the Gzip compression type is selected.
     /// </summary>
+    /// <remarks>
+    /// The level determines the trade-off between compression ratio and performance for Gzip.
+    /// It is an optional setting that is applicable only if the <c>CompressionType</c> is set to <c>Gzip</c>.
+    /// </remarks>
+    /// <value>
+    /// A <see cref="System.IO.Compression.CompressionLevel"/> representing the desired Gzip compression level.
+    /// </value>
     public CompressionLevel GzipLevel { get; init; }
 
     /// <summary>
-    /// 
+    /// Gets the compression level to be used when the LZ4 compression type is selected.
     /// </summary>
+    /// <remarks>
+    /// The level determines the trade-off between compression performance and efficiency for LZ4.
+    /// It is an optional setting that is applicable only if the <c>CompressionType</c> is set to <c>Lz4</c>.
+    /// </remarks>
+    /// <value>
+    /// An <see cref="int"/> representing the desired LZ4 compression level.
+    /// </value>
     public int LZ4Level { get; init; }
 
     /// <summary>
-    /// 
+    /// Gets the compression level to be used when the Zstandard (ZStd) compression type is selected.
     /// </summary>
+    /// <remarks>
+    /// The level determines the trade-off between compression ratio and performance for Zstandard.
+    /// It is an optional setting that is applicable only if the <c>CompressionType</c> is set to <c>ZStd</c>.
+    /// </remarks>
+    /// <value>
+    /// An <see cref="int"/> representing the desired Zstandard compression level.
+    /// </value>
     public int ZstdLevel { get; init; }
 }

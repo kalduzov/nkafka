@@ -25,17 +25,31 @@ namespace NKafka.Clients.Producer.Internals;
 
 internal interface ITransactionManager
 {
-    bool IsTransactional { get; }
+    internal bool IsTransactional { get; }
 
-    Task InitAsync(CancellationToken token);
+    internal Task InitializeTransactionsAsync(ProducerIdAndEpoch producerIdAndEpoch, bool keepPreparedTxn, CancellationToken cancellationToken);
 
-    void Begin();
+    internal Task InitializeTransactionsAsync(bool keepPreparedTxn, CancellationToken cancellationToken)
+    {
+        return InitializeTransactionsAsync(ProducerIdAndEpoch.None, keepPreparedTxn, cancellationToken);
+    }
 
-    Task SendOffsetsToTransaction(IReadOnlyCollection<TopicPartitionOffset> offsets, ConsumerGroupMetadata groupMetadata, CancellationToken token);
+    internal Task InitializeTransactionsAsync(ProducerIdAndEpoch producerIdAndEpoch, CancellationToken cancellationToken)
+    {
+        return InitializeTransactionsAsync(producerIdAndEpoch, false, cancellationToken);
+    }
 
-    Task Commit(CancellationToken token);
+    internal void Begin();
 
-    Task Abort(CancellationToken token);
+    internal Task SendOffsetsToTransactionAsync(IReadOnlyCollection<TopicPartitionOffset> offsets,
+        ConsumerGroupMetadata groupMetadata,
+        CancellationToken token);
 
-    void TryAddPartition(TopicPartition topicPartition);
+    internal Task CommitAsync(CancellationToken token);
+
+    internal Task AbortAsync(CancellationToken token);
+
+    internal void TryAddPartition(TopicPartition topicPartition);
+
+    internal Task BumpIdempotentEpochAndResetIdIfNeededAsync(CancellationToken cancellationToken);
 };

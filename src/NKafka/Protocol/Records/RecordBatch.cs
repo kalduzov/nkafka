@@ -35,10 +35,10 @@ internal class RecordBatch: IRecordsBatch
 
     private const int _MAX_RECORD_OVERHEAD = 21;
     internal const long NO_TIMESTAMP = -1;
-    private const long _NO_PRODUCER_ID = -1;
+    internal const long NO_PRODUCER_ID = -1;
     private const int _NO_SEQUENCE = -1;
     private const int _NO_PARTITION_LEADER_EPOCH = -1;
-    private const short _NO_PRODUCER_EPOCH = -1;
+    internal const short NO_PRODUCER_EPOCH = -1;
 
     /// <summary>
     /// The size of these records in bytes.
@@ -95,8 +95,8 @@ internal class RecordBatch: IRecordsBatch
     private RecordBatch()
     {
         Length = RECORD_BATCH_OVERHEAD;
-        ProducerEpoch = _NO_PRODUCER_EPOCH;
-        ProducerId = _NO_PRODUCER_ID;
+        ProducerEpoch = NO_PRODUCER_EPOCH;
+        ProducerId = NO_PRODUCER_ID;
         BaseSequence = _NO_SEQUENCE;
     }
 

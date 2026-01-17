@@ -97,14 +97,14 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             var request = new ListOffsetsRequestMessage
             {
                 IsolationLevel = (sbyte)_isolationLevel,
-                Topics = new List<ListOffsetsRequestMessage.ListOffsetsTopicMessage>
-                {
-                    new()
+                Topics =
+                [
+                    new ListOffsetsRequestMessage.ListOffsetsTopicMessage
                     {
                         Name = topicPartition.Topic,
-                        Partitions = new List<ListOffsetsRequestMessage.ListOffsetsPartitionMessage>
-                        {
-                            new()
+                        Partitions =
+                        [
+                            new ListOffsetsRequestMessage.ListOffsetsPartitionMessage
                             {
                                 Timestamp = subscription.OffsetManager.AutoOffsetReset == AutoOffsetReset.Earliest
                                     ? ListOffsetsRequestMessage.EARLIEST_TIMESTAMP
@@ -112,15 +112,15 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
                                 CurrentLeaderEpoch = -1,
                                 PartitionIndex = topicPartition.Partition.Value
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             };
 
             var leader = _kafkaCluster.LeaderFor(topicPartition);
             var response = await _kafkaCluster.SendAsync<ListOffsetsRequestMessage, ListOffsetsResponseMessage>(request, leader.Id, ctsToken);
 
-            var offset = response.Topics.First().Partitions.First().Offset;
+            var offset = response.Topics[0].Partitions[0].Offset;
             subscription.OffsetManager.UpdateOffsetForTopicPartition(topicPartition, new Offset(offset));
         }
     }
@@ -187,7 +187,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
         if (requests.Count == 0)
         {
-            return Array.Empty<ConsumerRecord<TKey, TValue>>();
+            return [];
         }
 
         //todo запрос fetch должен всегда считываться динамически - нельзя его парсить сразу
@@ -233,7 +233,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             {
                 if (!CheckSubscriptionAssigned(subscription, topicName, partition))
                 {
-                    _logger.LogDebug("Извлеченные данные более не нужны. Текущая подписка лишилась привязки к {Topic} {Partiton}",
+                    _logger.LogDebug("Извлеченные данные более не нужны. Текущая подписка лишилась привязки к {Topic} {Partition}",
                         topicName,
                         partition.PartitionIndex);
 
@@ -242,7 +242,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
                 if (partition.Code != ErrorCodes.None)
                 {
-                    _logger.LogError("В ответе для {Topic} {Partiton} код ошибки не совпадает с успешным {Code}",
+                    _logger.LogError("В ответе для {Topic} {Partition} код ошибки не совпадает с успешным {Code}",
                         topicName,
                         partition.PartitionIndex,
                         partition.Code);
@@ -252,7 +252,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
                 if (partition.Records is null)
                 {
-                    _logger.LogDebug("В ответе для {Topic} {Partiton} отсутствуют какие либо записи", topicName, partition.PartitionIndex);
+                    _logger.LogDebug("В ответе для {Topic} {Partition} отсутствуют какие либо записи", topicName, partition.PartitionIndex);
 
                     continue;
                 }
@@ -264,7 +264,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
         {
             return response;
         }
-        _arrayPool.Return(response);
+        _arrayPool.Return(response, true);
 
         return Array.Empty<ConsumerRecord<TKey, TValue>>();
 
@@ -414,5 +414,13 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
         }
 
         return result;
+    }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    public void Dispose()
+    {
+        _kafkaCluster.Dispose();
+        _cts.Dispose();
+        _currentFetcherTask.Dispose();
     }
 }

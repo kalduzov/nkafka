@@ -72,11 +72,7 @@ public class TopicsManipulationTests
         };
         _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
-        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
-            {
-                IncludeInternal = true
-            },
-            CancellationToken.None);
+        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions(true), CancellationToken.None);
 
         listTopics.Count.Should().BeGreaterThan(1);
         listTopics.Should().Contain(x => x.Name == topicName);
@@ -103,11 +99,7 @@ public class TopicsManipulationTests
         };
         _ = await kafkaCluster.AdminClient.CreateTopicsAsync(topics, new CreateTopicsOptions(), CancellationToken.None);
 
-        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions
-            {
-                IncludeInternal = false
-            },
-            CancellationToken.None);
+        var listTopics = await kafkaCluster.AdminClient.ListTopicsAsync(new ListTopicsOptions(false), CancellationToken.None);
 
         listTopics.Count.Should().BeGreaterThan(1);
         listTopics.Should().Contain(x => x.Name == topicName);

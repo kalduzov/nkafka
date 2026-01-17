@@ -37,15 +37,13 @@ public partial class CoordinatorTests
         consumerConfig.GroupId = "good_test";
 
         var coordinator = BuildCorrectCoordinator(kafkaCluster, consumerConfig);
-        var subscription = new Subscription(new[]
-            {
+        var subscription = new Subscription([
                 "test"
-            },
+            ],
             AutoOffsetReset.Latest,
-            new[]
-            {
+            [
                 new RoundRobinAssignor()
-            });
+            ]);
 
         var result = await coordinator.NewSessionAsync(subscription, CancellationToken.None);
 

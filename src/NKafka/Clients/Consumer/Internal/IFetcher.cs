@@ -28,7 +28,7 @@ namespace NKafka.Clients.Consumer.Internal;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-internal interface IFetcher<TKey, TValue>
+internal interface IFetcher<TKey, TValue>: IDisposable
     where TKey : notnull
     where TValue : notnull
 {

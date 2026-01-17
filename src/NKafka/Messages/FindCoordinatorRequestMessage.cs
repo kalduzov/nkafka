@@ -28,18 +28,17 @@ namespace NKafka.Messages;
 
 internal sealed partial class FindCoordinatorRequestMessage
 {
-    private const int _KEY_TYPE_GROUP = 0;
-
     /// <summary>
     /// Создает корректный запрос с учетом версии API
     /// </summary>
     /// <param name="version"></param>
+    /// <param name="coordinatorType"></param>
     /// <param name="groupIds"></param>
-    public static FindCoordinatorRequestMessage Build(ApiVersion version, string[] groupIds)
+    public static FindCoordinatorRequestMessage Build(ApiVersion version, CoordinatorType coordinatorType, string[] groupIds)
     {
         var findCoordinatorRequestMessage = new FindCoordinatorRequestMessage
         {
-            KeyType = _KEY_TYPE_GROUP,
+            KeyType = (sbyte)coordinatorType,
         };
 
         if (version <= ApiVersion.Version3) // начиная с 4 версии Api FindCoordinator может быть осуществлен сразу для нескольких групп
@@ -57,5 +56,12 @@ internal sealed partial class FindCoordinatorRequestMessage
         }
 
         return findCoordinatorRequestMessage;
+    }
+
+    public enum CoordinatorType: sbyte
+    {
+        Group = 0,
+        Transaction = 1,
+        Share = 3
     }
 }

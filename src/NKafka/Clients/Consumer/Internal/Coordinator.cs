@@ -583,7 +583,8 @@ internal class Coordinator: ICoordinator
             _groupId
         };
 
-        var findCoordinatorRequestMessage = FindCoordinatorRequestMessage.Build(currentApiVersion, groups);
+        var findCoordinatorRequestMessage =
+            FindCoordinatorRequestMessage.Build(currentApiVersion, FindCoordinatorRequestMessage.CoordinatorType.Group, groups);
 
         try
         {

@@ -38,7 +38,7 @@ public partial class FindCoordinatorRequestMessageTests
         {
             group
         };
-        var request = FindCoordinatorRequestMessage.Build(apiVersion, groups);
+        var request = FindCoordinatorRequestMessage.Build(apiVersion, FindCoordinatorRequestMessage.CoordinatorType.Group, groups);
 
         request.Key.Should().Be(group);
         request.CoordinatorKeys.Should().BeEmpty();
@@ -58,7 +58,7 @@ public partial class FindCoordinatorRequestMessageTests
             group1,
             group2
         };
-        var requestAction = () => FindCoordinatorRequestMessage.Build(apiVersion, groups);
+        var requestAction = () => FindCoordinatorRequestMessage.Build(apiVersion, FindCoordinatorRequestMessage.CoordinatorType.Group, groups);
 
         requestAction.Should().Throw<ArgumentOutOfRangeException>();
     }
@@ -74,7 +74,7 @@ public partial class FindCoordinatorRequestMessageTests
             group1,
             group2,
         };
-        var request = FindCoordinatorRequestMessage.Build(apiVersion, groups);
+        var request = FindCoordinatorRequestMessage.Build(apiVersion, FindCoordinatorRequestMessage.CoordinatorType.Group, groups);
 
         request.Key.Should().BeEmpty();
         request.CoordinatorKeys.Should().HaveCount(2);

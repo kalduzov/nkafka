@@ -22,25 +22,20 @@
  */
 
 using System.Diagnostics;
-using System.Security.Authentication;
-using System.Threading.Channels;
 
 using Microsoft.Extensions.Logging;
 
 using NKafka;
-using NKafka.Clients.Consumer;
 using NKafka.Clients.Producer;
 using NKafka.Config;
 using NKafka.Serialization;
 
 using OpenTelemetry;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
+using ZLogger;
 
 var stopwatch = Stopwatch.StartNew();
 
@@ -91,16 +86,9 @@ using var metricsProvider = Sdk.CreateMeterProviderBuilder()
     .AddOtlpExporter()
     .Build();
 
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Scope} {Message:lj} {SourceContext} {NewLine}{Exception}",
-        theme: AnsiConsoleTheme.Code)
-    .MinimumLevel.Verbose()
-    .CreateLogger();
-
 var loggerFactory = LoggerFactory.Create(builder =>
 {
-    builder.AddSerilog();
+    builder.AddZLoggerConsole();
     builder.SetMinimumLevel(LogLevel.Trace);
 });
 

@@ -15,9 +15,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Console"/>
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol"/>
     <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore"/>
-    <PackageReference Include="Serilog"/>
-    <PackageReference Include="Serilog.Extensions.Logging"/>
-    <PackageReference Include="Serilog.Sinks.Console"/>
+    <PackageReference Include="ZLogger"/>
   </ItemGroup>
 
 </Project>

@@ -44,8 +44,9 @@ internal sealed partial class Producer
 
         try
         {
-            await _transactionManager.InitAsync(token);
+            await _transactionManager.InitializeTransactionsAsync(false, token);
             _messagesSender.Wakeup();
+//            _transactionManager.
         }
         catch (Exception exc)
         {
@@ -99,7 +100,7 @@ internal sealed partial class Producer
 
         try
         {
-            await _transactionManager.Commit(token);
+            await _transactionManager.CommitAsync(token);
         }
         catch (Exception exc)
         {
@@ -124,7 +125,7 @@ internal sealed partial class Producer
 
         try
         {
-            await _transactionManager.Abort(token);
+            await _transactionManager.AbortAsync(token);
         }
         catch (Exception exc)
         {
@@ -156,7 +157,7 @@ internal sealed partial class Producer
 
         try
         {
-            await _transactionManager.SendOffsetsToTransaction(offsets, groupMetadata, token);
+            await _transactionManager.SendOffsetsToTransactionAsync(offsets, groupMetadata, token);
         }
         catch (Exception exc)
         {

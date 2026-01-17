@@ -24,10 +24,9 @@ using NKafka.Clients.Producer;
 namespace NKafka.Clients.Consumer;
 
 /// <summary>
-/// 
+/// Represents a record consumed from a Kafka topic. A consumer record contains metadata about the topic,
+/// partition, and offset from which the record was consumed, as well as the actual message payload.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TValue"></typeparam>
 public class ConsumerRecord<TKey, TValue>
     where TKey : notnull
     where TValue : notnull

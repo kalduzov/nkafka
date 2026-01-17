@@ -101,10 +101,11 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         {
             _partitioner = InitPartitioner(config.PartitionerConfig);
             _deliveryTimeoutMs = ConfigureDeliveryTimeout();
-            _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory);
+            _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory, kafkaCluster);
             _accumulator = recordAccumulator
                            ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, _producerMetrics, loggerFactory);
-            _messagesSender = messagesSender ?? new MessagesSender(config, _accumulator, KafkaCluster, _producerMetrics, loggerFactory);
+            _messagesSender = messagesSender
+                              ?? new MessagesSender(config, _accumulator, _transactionManager, KafkaCluster, _producerMetrics, loggerFactory);
             _senderTask = _messagesSender.StartAsync(_tokenSource.Token);
 
             _logger.StartedProducer(_name);

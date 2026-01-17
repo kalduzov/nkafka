@@ -22,10 +22,8 @@
 namespace NKafka.Clients.Consumer;
 
 /// <summary>
-/// 
+/// Represents metadata for a Kafka consumer group.
+/// This includes information that identifies the group,
+/// such as group ID, generation ID, member ID, and an optional group instance ID.
 /// </summary>
-/// <param name="GroupId"></param>
-/// <param name="GenerationId"></param>
-/// <param name="MemberId"></param>
-/// <param name="GroupInstanceId"></param>
 public record ConsumerGroupMetadata(string GroupId, int GenerationId, string MemberId, string? GroupInstanceId);

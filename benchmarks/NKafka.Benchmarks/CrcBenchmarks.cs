@@ -30,6 +30,7 @@ namespace NKafka.Benchmarks;
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net80)]
 [SimpleJob(RuntimeMoniker.Net90)]
+[SimpleJob(RuntimeMoniker.Net10_0)]
 public class CrcBenchmarks
 {
     private static readonly uint[] _lookupTable =

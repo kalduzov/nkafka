@@ -20,6 +20,7 @@
   <Folder Name="/docs/">
     <File Path="docs/for_developers.md"/>
     <File Path="docs/index.md"/>
+    <File Path="docs/nkafka.md"/>
   </Folder>
   <Folder Name="/docs/consumer/">
     <File Path="docs/consumer/index.md"/>

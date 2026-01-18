@@ -213,6 +213,24 @@ namespace NKafka.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ssl is enabled in the settings, but the Protocols property is set to SslProtocols.None.
+        /// </summary>
+        internal static string SslProtocolInvalid {
+            get {
+                return ResourceManager.GetString("SslProtocolInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must specify a root certificate or set TrustServerCertificate to true.
+        /// </summary>
+        internal static string SslRootCertificateRequired {
+            get {
+                return ResourceManager.GetString("SslRootCertificateRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Stream must be writable.
         /// </summary>
         internal static string StreamMustBeWritable {

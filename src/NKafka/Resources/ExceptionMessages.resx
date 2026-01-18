@@ -77,4 +77,10 @@
   <data name="StreamMustBeWritable" xml:space="preserve">
     <value>Stream must be writable</value>
   </data>
+  <data name="SslProtocolInvalid" xml:space="preserve">
+    <value>Ssl is enabled in the settings, but the Protocols property is set to SslProtocols.None</value>
+  </data>
+  <data name="SslRootCertificateRequired" xml:space="preserve">
+    <value>You must specify a root certificate or set TrustServerCertificate to true</value> 
+  </data>
 </root>

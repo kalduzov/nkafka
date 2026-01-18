@@ -22,6 +22,8 @@
 using System.Net.Security;
 using System.Security.Authentication;
 
+using NKafka.Resources;
+
 namespace NKafka.Config;
 
 /// <summary>
@@ -32,7 +34,7 @@ public record SslSettings
     /// <summary/>
     internal static readonly SslSettings None = new(false);
 
-    internal bool IsSet { get; }
+    private readonly bool _isSet;
 
     /// <summary>
     /// The support SSL protocols 
@@ -45,30 +47,9 @@ public record SslSettings
     /// </summary>
     public bool CheckCertificateRevocation { get; set; } = true;
 
-#pragma warning disable CS1574, CS1584, CS1581, CS1580
     /// <summary>
     /// Gets or sets the callback used to validate the remote certificate in an SSL/TLS connection.
     /// </summary>
-    /// <remarks>
-    /// The RemoteCertificateValidationCallback is called during the SSL/TLS handshake process to
-    /// validate the remote server's certificate. It is responsible for determining whether the
-    /// certificate is trusted or not. The callback should return true if the certificate is trusted,
-    /// and false otherwise.
-    /// The signature of the RemoteCertificateValidationCallback delegate is as follows:
-    /// <code>
-    /// bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate,
-    /// X509Chain chain, SslPolicyErrors sslPolicyErrors)
-    /// </code>
-    /// The <paramref name="sender"/> parameter is the object that triggered the validation request,
-    /// typically a TcpClient or HttpClient object.
-    /// The <paramref name="certificate"/> parameter is the remote server's certificate.
-    /// The <paramref name="chain"/> parameter is the chain of certificate authorities that vouch for
-    /// the authenticity of the certificate.
-    /// The <paramref name="sslPolicyErrors"/> parameter indicates if any SSL/TLS policy errors
-    /// were encountered during the validation. This can include errors such as the certificate not
-    /// being trusted, or the common name not matching the host name.
-    /// </remarks>
-#pragma warning restore CS1574, CS1584, CS1581, CS1580
     public RemoteCertificateValidationCallback? RemoteCertificateValidationCallback { get; set; } = null;
 
     /// <summary>
@@ -80,7 +61,7 @@ public record SslSettings
     /// .
     /// Trusting an invalid or self-signed certificate may introduce security risks as the server may not be the expected entity.
     /// </remarks>
-    public bool TrustServerCertificate { get; set; }
+    public bool TrustServerCertificate { get; set; } = false;
 
     /// <summary>
     /// Location of a CA certificate for validate the server certificate
@@ -89,7 +70,7 @@ public record SslSettings
 
     private SslSettings(bool isSet)
     {
-        IsSet = isSet;
+        _isSet = isSet;
     }
 
     /// <summary>
@@ -105,9 +86,20 @@ public record SslSettings
     /// </summary>
     internal void Validate()
     {
-        if (this == None)
+
+        if (!_isSet)
         {
             return;
+        }
+
+        if (Protocols == SslProtocols.None)
+        {
+            throw new ArgumentException(ExceptionMessages.SslProtocolInvalid);
+        }
+
+        if (RootCertificate == null && !TrustServerCertificate)
+        {
+            throw new ArgumentException(ExceptionMessages.SslRootCertificateRequired);
         }
     }
 }

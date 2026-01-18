@@ -24,39 +24,41 @@
 namespace NKafka.Compressions;
 
 /// <summary>
-/// 
+/// Defines the contract for data compression and decompression functionality.
+/// Implementations of this interface provide specific compression algorithms for processing both
+/// byte arrays and streams.
 /// </summary>
 public interface ICompression
 {
     /// <summary>
-    /// 
+    /// Decodes the provided compressed byte array into its original, uncompressed form.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    byte[] Decode(byte[] data)
+    /// <param name="data">The compressed byte array to be decoded.</param>
+    /// <returns>A byte array representing the original, uncompressed data.</returns>
+    public byte[] Decode(byte[] data)
         => data;
 
     /// <summary>
-    /// 
+    /// Decodes the provided compressed stream into its original, uncompressed form.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
-    Stream Decode(Stream stream)
+    /// <param name="stream">The compressed stream to be decoded.</param>
+    /// <returns>A stream representing the original, uncompressed data.</returns>
+    public Stream Decode(Stream stream)
         => stream;
 
     /// <summary>
-    /// 
+    /// Encodes the provided byte array into a compressed form.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    byte[] Encode(byte[] data)
+    /// <param name="data">The byte array to be compressed.</param>
+    /// <returns>A byte array representing the compressed data.</returns>
+    public byte[] Encode(byte[] data)
         => data;
 
     /// <summary>
-    /// 
+    /// Encodes the provided stream into a compressed form.
     /// </summary>
-    /// <param name="stream"></param>
-    /// <returns></returns>
-    Stream Encode(Stream stream)
+    /// <param name="stream">The stream to be compressed.</param>
+    /// <returns>A stream representing the compressed data.</returns>
+    public Stream Encode(Stream stream)
         => stream;
 }

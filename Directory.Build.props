@@ -6,12 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <!--    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>-->
+    <CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <Nullable>enable</Nullable>
     <!--    <AnalysisLevel>8</AnalysisLevel>-->
     <AnalysisLevelPerformance>latest</AnalysisLevelPerformance>
     <!--    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
+    <NoWarn>$(NoWarn);SYSLIB1012</NoWarn>
   </PropertyGroup>
 
   <Target Name="CustomVersion" AfterTargets="MinVer">

@@ -43,7 +43,6 @@ protocol without relying on native librdkafka.
 ### Static Analysis and Quality
 
 - The project uses **PVS-Studio** for static analysis. Include the PVS-Studio header in new manual files.
-- **SonarAnalyzer.CSharp** and **PublicApiAnalyzers** are also used to maintain code quality and API stability.
 - **Nullable Reference Types** are enabled and should be strictly followed.
 
 ### Centralized Package Management

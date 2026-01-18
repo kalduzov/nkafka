@@ -64,12 +64,12 @@ public interface IProducer: IDisposable, IAsyncDisposable
         CancellationToken token);
 
     /// <summary>
-    ///  
+    /// Sends a message to the specified topic and partition, invoking a callback upon delivery or failure.
     /// </summary>
-    /// <param name="topicPartition"></param>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
-    /// <param name="callback"></param>
+    /// <param name="topicPartition">The target topic and partition to produce the message to.</param>
+    /// <param name="message">The message to be produced.</param>
+    /// <param name="callback">The callback to invoke with the delivery result or exception.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
     public void Produce(TopicPartition topicPartition,
         Message message,
         Action<MessageDeliveryResult, Exception?> callback,

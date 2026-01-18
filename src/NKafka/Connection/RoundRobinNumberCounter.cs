@@ -21,16 +21,9 @@
 
 namespace NKafka.Connection;
 
-internal class RoundRobinNumberCounter: INumberCounter
+internal class RoundRobinNumberCounter(int maxNumber)
 {
-    private readonly int _maxNumber;
-    private int _lastNumber;
-
-    public RoundRobinNumberCounter(int maxNumber)
-    {
-        _maxNumber = maxNumber;
-        _lastNumber = -1;
-    }
+    private int _lastNumber = -1;
 
     public int GetNextNumber(int initIndex = -1)
     {
@@ -42,7 +35,7 @@ internal class RoundRobinNumberCounter: INumberCounter
             computed = initial + 1;
             // ReSharper disable once RedundantAssignment
 #pragma warning disable IDE0059
-            computed = computed >= _maxNumber ? computed = 0 : computed;
+            computed = computed >= maxNumber ? computed = 0 : computed;
 #pragma warning restore IDE0059
         } while (Interlocked.CompareExchange(ref _lastNumber, computed, initial) != initial);
 

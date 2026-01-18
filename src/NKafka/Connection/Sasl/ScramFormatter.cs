@@ -28,27 +28,18 @@ using NKafka.Connection.Sasl.Messages;
 
 namespace NKafka.Connection.Sasl;
 
-internal class ScramFormatter: IDisposable
+internal class ScramFormatter(ScramMechanism mechanism): IDisposable
 {
     private static readonly Regex _equal = new("=", RegexOptions.Compiled);
     private static readonly Regex _comma = new(",", RegexOptions.Compiled);
     private static readonly Regex _equalTwoC = new("=2C", RegexOptions.Compiled);
     private static readonly Regex _equalThreeD = new("=3D", RegexOptions.Compiled);
-    private readonly KeyedHashAlgorithm _mac;
-    private readonly ScramMechanism _mechanism;
+    private readonly KeyedHashAlgorithm _mac = mechanism.GetMacAlgorithm();
 
-    private readonly HashAlgorithm _messageDigest;
-    private readonly RandomNumberGenerator _random;
+    private readonly HashAlgorithm _messageDigest = mechanism.GetHashAlgorithm();
+    private readonly RandomNumberGenerator _random = RandomNumberGenerator.Create();
 
     public string SecureRandomString => GetSecureRandomString(_random);
-
-    public ScramFormatter(ScramMechanism mechanism)
-    {
-        _mechanism = mechanism;
-        _messageDigest = mechanism.GetHashAlgorithm();
-        _mac = mechanism.GetMacAlgorithm();
-        _random = RandomNumberGenerator.Create();
-    }
 
     /// <summary>
     /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -106,7 +97,7 @@ internal class ScramFormatter: IDisposable
 
     public byte[] SaltedPassword(string password, byte[] salt, int iterations)
     {
-        var hashAlgorithmName = _mechanism.GetHashAlgorithmName();
+        var hashAlgorithmName = mechanism.GetHashAlgorithmName();
 
         var pwd = password.Normalize(NormalizationForm.FormKC);
 

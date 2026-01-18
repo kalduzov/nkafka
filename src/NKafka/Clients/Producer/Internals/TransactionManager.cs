@@ -30,10 +30,9 @@ using NKafka.Protocol;
 namespace NKafka.Clients.Producer.Internals;
 
 /// <inheritdoc />
-internal class TransactionManager: ITransactionManager
+internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFactory, IKafkaCluster kafkaCluster)
+    : ITransactionManager
 {
-    private readonly IKafkaCluster _kafkaCluster;
-
     private enum State
     {
         Uninitialized,
@@ -46,10 +45,10 @@ internal class TransactionManager: ITransactionManager
         FatalError
     }
 
-    private readonly string _transactionalId;
-    private readonly int _transactionTimeoutMs;
-    private readonly bool _enableIdempotence;
-    private readonly ILogger<TransactionManager> _logger;
+    private readonly string _transactionalId = config.TransactionalId;
+    private readonly int _transactionTimeoutMs = config.TransactionTimeoutMs;
+    private readonly bool _enableIdempotence = config.EnableIdempotence;
+    private readonly ILogger<TransactionManager> _logger = loggerFactory.CreateLogger<TransactionManager>();
 
     private volatile State _currentState = State.Uninitialized;
     private volatile Exception? _lastError;
@@ -57,19 +56,8 @@ internal class TransactionManager: ITransactionManager
     private readonly HashSet<TopicPartition> _partitionsInTransaction = [];
     private readonly HashSet<TopicPartition> _pendingPartitionsInTransaction = [];
     private bool _clientSideEpochBumpRequired;
-    private ProducerIdAndEpoch _producerIdAndEpoch;
+    private ProducerIdAndEpoch _producerIdAndEpoch = ProducerIdAndEpoch.None;
     private bool _isEpochBump;
-
-    public TransactionManager(ProducerConfig config, ILoggerFactory loggerFactory, IKafkaCluster kafkaCluster)
-    {
-        _kafkaCluster = kafkaCluster;
-        _transactionalId = config.TransactionalId;
-        _transactionTimeoutMs = config.TransactionTimeoutMs;
-        _enableIdempotence = config.EnableIdempotence;
-        _logger = loggerFactory.CreateLogger<TransactionManager>();
-        _producerIdAndEpoch = ProducerIdAndEpoch.None;
-
-    }
 
     public bool IsTransactional => !string.IsNullOrEmpty(_transactionalId);
 
@@ -102,7 +90,7 @@ internal class TransactionManager: ITransactionManager
             ProducerEpoch = producerIdAndEpoch.Epoch
         };
 
-        var result = await _kafkaCluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(request, cancellationToken);
+        var result = await kafkaCluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(request, cancellationToken);
 
         switch (result.Code)
         {
@@ -176,7 +164,7 @@ internal class TransactionManager: ITransactionManager
                 TransactionalId = null!,
                 TransactionTimeoutMs = int.MaxValue
             };
-            var response = await _kafkaCluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(request, cancellationToken);
+            var response = await kafkaCluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(request, cancellationToken);
 
             switch (response.Code)
             {

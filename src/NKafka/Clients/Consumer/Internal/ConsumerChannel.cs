@@ -98,31 +98,23 @@ internal sealed class ConsumerChannel<TKey, TValue>: Channel<ConsumerRecord<TKey
         }
     }
 
-    private sealed class ConsumerChannelReader: ChannelReader<ConsumerRecord<TKey, TValue>>
+    private sealed class ConsumerChannelReader(ChannelReader<ConsumerRecord<TKey, TValue>> innerChannelReader, Subscription subscription)
+        : ChannelReader<ConsumerRecord<TKey, TValue>>
     {
-        private readonly ChannelReader<ConsumerRecord<TKey, TValue>> _innerChannelReader;
-        private readonly Subscription _subscription;
-
-        public ConsumerChannelReader(ChannelReader<ConsumerRecord<TKey, TValue>> innerChannelReader, Subscription subscription)
-        {
-            _innerChannelReader = innerChannelReader;
-            _subscription = subscription;
-        }
-
         public override bool TryRead([MaybeNullWhen(false)] out ConsumerRecord<TKey, TValue> item)
         {
-            if (!_innerChannelReader.TryRead(out item))
+            if (!innerChannelReader.TryRead(out item))
             {
                 return false;
             }
-            _subscription.OffsetManager.UpdateLastReadingOffset(item.TopicPartitionOffset);
+            subscription.OffsetManager.UpdateLastReadingOffset(item.TopicPartitionOffset);
 
             return true;
         }
 
         public override ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = default)
         {
-            return _innerChannelReader.WaitToReadAsync(cancellationToken);
+            return innerChannelReader.WaitToReadAsync(cancellationToken);
         }
     }
 }

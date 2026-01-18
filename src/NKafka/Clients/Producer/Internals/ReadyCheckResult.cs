@@ -21,15 +21,9 @@
 
 namespace NKafka.Clients.Producer.Internals;
 
-internal class ReadyCheckResult
+internal class ReadyCheckResult(HashSet<Node> readyNodes, HashSet<string> unknownLeaderTopics)
 {
-    public HashSet<Node> ReadyNodes { get; }
+    public HashSet<Node> ReadyNodes { get; } = readyNodes;
 
-    public HashSet<string> UnknownLeaderTopics { get; }
-
-    public ReadyCheckResult(HashSet<Node> readyNodes, HashSet<string> unknownLeaderTopics)
-    {
-        ReadyNodes = readyNodes;
-        UnknownLeaderTopics = unknownLeaderTopics;
-    }
+    public HashSet<string> UnknownLeaderTopics { get; } = unknownLeaderTopics;
 }

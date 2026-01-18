@@ -42,7 +42,13 @@ namespace NKafka.Clients.Producer.Internals;
 /// <remarks>
 /// The main implementation is borrowed from the Java client
 /// </remarks>
-internal sealed class RecordAccumulator: IRecordAccumulator
+internal sealed class RecordAccumulator(
+    ProducerConfig config,
+    ITransactionManager transactionManager,
+    int deliveryTimeoutMs,
+    IProducerMetrics metrics,
+    ILoggerFactory loggerFactory)
+    : IRecordAccumulator
 {
     /// <summary>
     /// Коллекция пакетов в виде двухсторонней очереди
@@ -55,41 +61,19 @@ internal sealed class RecordAccumulator: IRecordAccumulator
     private class PartitionedBatchCollection: ConcurrentDictionary<Partition, ProducerBatchesDeque>;
 
     //Пачки распределенные по топикам
-    private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics;
+    private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics = new();
 
-    private readonly int _batchSize;
-    private readonly bool _closed;
-    private readonly ICompression _compression;
-    private readonly int _deliveryTimeoutMs;
-    private readonly double _lingerMs;
-    private readonly ILogger _logger;
-    private readonly long _retryBackoffMs;
-    private readonly ITransactionManager _transactionManager;
+    private readonly int _batchSize = Math.Max(1, config.BatchSize);
+    private readonly bool _closed = false;
+    private readonly ICompression _compression = GetCompression(config.Compression);
+    private readonly int _deliveryTimeoutMs = deliveryTimeoutMs;
+    private readonly double _lingerMs = config.LingerMs;
+    private readonly ILogger _logger = loggerFactory.CreateLogger<RecordAccumulator>();
+    private readonly long _retryBackoffMs = config.RetryBackoffMs;
+    private readonly ITransactionManager _transactionManager = transactionManager;
     private volatile int _appendsInProgress;
     private volatile int _flushesInProgress = 0;
-    private readonly IProducerMetrics _metrics;
-    private readonly ILoggerFactory _loggerFactory;
-
-    public RecordAccumulator(
-        ProducerConfig config,
-        ITransactionManager transactionManager,
-        int deliveryTimeoutMs,
-        IProducerMetrics metrics,
-        ILoggerFactory loggerFactory)
-    {
-        _batchesByTopics = new ConcurrentDictionary<string, PartitionedBatchCollection>();
-        _metrics = metrics;
-        _loggerFactory = loggerFactory;
-        _transactionManager = transactionManager;
-        _deliveryTimeoutMs = deliveryTimeoutMs;
-        _logger = loggerFactory.CreateLogger<RecordAccumulator>();
-        _closed = false;
-        _batchSize = Math.Max(1, config.BatchSize);
-        _compression = GetCompression(config.Compression);
-        _retryBackoffMs = config.RetryBackoffMs;
-        _lingerMs = config.LingerMs;
-
-    }
+    private readonly IProducerMetrics _metrics = metrics;
 
     private static ICompression GetCompression(CompressionConfig compression)
     {
@@ -201,7 +185,7 @@ internal sealed class RecordAccumulator: IRecordAccumulator
 
         var topicPartition = new TopicPartition(topic, partition);
 
-        var batch = new ProducerBatch(topicPartition, buffer, _loggerFactory);
+        var batch = new ProducerBatch(topicPartition, buffer, loggerFactory);
 
         _logger.AddNewBatchTrace(topicPartition);
 

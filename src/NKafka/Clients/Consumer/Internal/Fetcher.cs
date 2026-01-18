@@ -32,44 +32,28 @@ using NKafka.Serialization;
 
 namespace NKafka.Clients.Consumer.Internal;
 
-internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
+internal class Fetcher<TKey, TValue>(
+    IKafkaCluster kafkaCluster,
+    IDeserializer<TKey> keyDeserializer,
+    IDeserializer<TValue> valueDeserializer,
+    int minBytes,
+    int maxBytes,
+    int maxWaitTimeMs,
+    bool checkCrc,
+    IsolationLevel isolationLevel,
+    ILoggerFactory loggerFactory)
+    : IFetcher<TKey, TValue>
     where TValue : notnull
     where TKey : notnull
 {
     private readonly ArrayPool<ConsumerRecord<TKey, TValue>> _arrayPool = ArrayPool<ConsumerRecord<TKey, TValue>>.Shared;
-    private readonly bool _checkCrc;
-    private readonly IsolationLevel _isolationLevel;
-    private readonly IKafkaCluster _kafkaCluster;
-    private readonly IDeserializer<TKey> _keyDeserializer;
-    private readonly ILogger<Fetcher<TKey, TValue>> _logger;
-    private readonly int _maxBytes;
-    private readonly int _maxWaitTimeMs;
-    private readonly int _minBytes;
-    private readonly IDeserializer<TValue> _valueDeserializer;
+    private readonly bool _checkCrc = checkCrc;
+    private readonly IDeserializer<TKey> _keyDeserializer = keyDeserializer;
+    private readonly ILogger<Fetcher<TKey, TValue>> _logger = loggerFactory.CreateLogger<Fetcher<TKey, TValue>>();
+    private readonly IDeserializer<TValue> _valueDeserializer = valueDeserializer;
 
     private CancellationTokenSource _cts = new();
     private Task _currentFetcherTask = Task.CompletedTask;
-
-    public Fetcher(IKafkaCluster kafkaCluster,
-        IDeserializer<TKey> keyDeserializer,
-        IDeserializer<TValue> valueDeserializer,
-        int minBytes,
-        int maxBytes,
-        int maxWaitTimeMs,
-        bool checkCrc,
-        IsolationLevel isolationLevel,
-        ILoggerFactory loggerFactory)
-    {
-        _kafkaCluster = kafkaCluster;
-        _keyDeserializer = keyDeserializer;
-        _valueDeserializer = valueDeserializer;
-        _minBytes = minBytes;
-        _maxBytes = maxBytes;
-        _maxWaitTimeMs = maxWaitTimeMs;
-        _checkCrc = checkCrc;
-        _isolationLevel = isolationLevel;
-        _logger = loggerFactory.CreateLogger<Fetcher<TKey, TValue>>();
-    }
 
     /// <inheritdoc />
     public async Task StartAsync(Subscription subscription, ChannelWriter<ConsumerRecord<TKey, TValue>> channelWriter, CancellationToken token)
@@ -96,7 +80,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
             var request = new ListOffsetsRequestMessage
             {
-                IsolationLevel = (sbyte)_isolationLevel,
+                IsolationLevel = (sbyte)isolationLevel,
                 Topics =
                 [
                     new ListOffsetsRequestMessage.ListOffsetsTopicMessage
@@ -117,8 +101,8 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
                 ]
             };
 
-            var leader = _kafkaCluster.LeaderFor(topicPartition);
-            var response = await _kafkaCluster.SendAsync<ListOffsetsRequestMessage, ListOffsetsResponseMessage>(request, leader.Id, ctsToken);
+            var leader = kafkaCluster.LeaderFor(topicPartition);
+            var response = await kafkaCluster.SendAsync<ListOffsetsRequestMessage, ListOffsetsResponseMessage>(request, leader.Id, ctsToken);
 
             var offset = response.Topics[0].Partitions[0].Offset;
             subscription.OffsetManager.UpdateOffsetForTopicPartition(topicPartition, new Offset(offset));
@@ -192,7 +176,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
         //todo запрос fetch должен всегда считываться динамически - нельзя его парсить сразу
         var responseTasks = requests
-            .Select(r => _kafkaCluster.SendAsync<FetchRequestMessage, FetchResponseMessage>(r.Value, r.Key, token))
+            .Select(r => kafkaCluster.SendAsync<FetchRequestMessage, FetchResponseMessage>(r.Value, r.Key, token))
             .ToArray();
 
         await Task.WhenAll(responseTasks);
@@ -277,7 +261,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
     private string GetTopicName(string name, Guid topicId)
     {
-        var topicName = string.IsNullOrWhiteSpace(name) ? _kafkaCluster.TopicsById[topicId] : name;
+        var topicName = string.IsNullOrWhiteSpace(name) ? kafkaCluster.TopicsById[topicId] : name;
 
         return topicName;
     }
@@ -326,7 +310,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
 
         var groupsAssignedTopicPartitionsByNode = subscription
             .AssignedTopicPartitions
-            .GroupBy(tp => _kafkaCluster.LeaderFor(tp).Id);
+            .GroupBy(tp => kafkaCluster.LeaderFor(tp).Id);
 
         var result = new Dictionary<int, FetchRequestMessage>();
 
@@ -352,10 +336,10 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
     {
         var request = new FetchRequestMessage
         {
-            IsolationLevel = (sbyte)_isolationLevel,
-            MaxBytes = _maxBytes,
-            MinBytes = _minBytes,
-            MaxWaitMs = _maxWaitTimeMs,
+            IsolationLevel = (sbyte)isolationLevel,
+            MaxBytes = maxBytes,
+            MinBytes = minBytes,
+            MaxWaitMs = maxWaitTimeMs,
             ReplicaId = -1,
             SessionEpoch = -1,
             SessionId = 0
@@ -397,7 +381,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
     {
         var result = new List<FetchRequestMessage.FetchPartitionMessage>(partitions.Count);
 
-        var partitionsForTopic = _kafkaCluster.PartitionsForTopic(partitions.First().Topic);
+        var partitionsForTopic = kafkaCluster.PartitionsForTopic(partitions.First().Topic);
 
         foreach (var topicPartition in partitions)
         {
@@ -406,7 +390,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
             {
                 Partition = topicPartition.Partition.Value,
                 FetchOffset = offsetData,
-                PartitionMaxBytes = _maxBytes,
+                PartitionMaxBytes = maxBytes,
                 LogStartOffset = -1,
                 CurrentLeaderEpoch = partitionsForTopic.First(x => x.Partition.Value == topicPartition.Partition.Value).LeaderEpoch,
             };
@@ -419,7 +403,7 @@ internal class Fetcher<TKey, TValue>: IFetcher<TKey, TValue>
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public void Dispose()
     {
-        _kafkaCluster.Dispose();
+        kafkaCluster.Dispose();
         _cts.Dispose();
         _currentFetcherTask.Dispose();
     }

@@ -27,17 +27,12 @@ using NKafka.Config;
 namespace NKafka.Clients.Consumer.Internal;
 
 /// <inheritdoc />
-internal class OffsetManager: IOffsetManager
+internal class OffsetManager(AutoOffsetReset autoOffsetReset): IOffsetManager
 {
-    public AutoOffsetReset AutoOffsetReset { get; }
+    public AutoOffsetReset AutoOffsetReset { get; } = autoOffsetReset;
 
     private readonly ConcurrentDictionary<TopicPartition, Offset> _readingOffsets = new();
     private volatile ConcurrentDictionary<TopicPartition, Offset> _currentState = new();
-
-    public OffsetManager(AutoOffsetReset autoOffsetReset)
-    {
-        AutoOffsetReset = autoOffsetReset;
-    }
 
     /// <inheritdoc />
     public void UpdateLastReadingOffset(TopicPartitionOffset topicPartitionOffset)

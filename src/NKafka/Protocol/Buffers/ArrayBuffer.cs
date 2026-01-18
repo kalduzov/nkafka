@@ -209,20 +209,11 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
         ResetCore();
     }
 
-    public struct Enumerator: IEnumerator<Memory<byte>>
+    public struct Enumerator(ArrayBuffer parent): IEnumerator<Memory<byte>>
     {
-        private ArrayBuffer _parent;
-        private State _state;
-        private Memory<byte> _current;
-        private List<BufferSegment>.Enumerator _buffersEnumerator;
-
-        public Enumerator(ArrayBuffer parent)
-        {
-            _parent = parent;
-            _state = default;
-            _current = default;
-            _buffersEnumerator = default;
-        }
+        private State _state = default;
+        private Memory<byte> _current = default;
+        private List<BufferSegment>.Enumerator _buffersEnumerator = default;
 
         public Memory<byte> Current => _current;
 
@@ -238,9 +229,9 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
             {
                 _state = State.BuffersInit;
 
-                if (_parent.UseFirstBuffer)
+                if (parent.UseFirstBuffer)
                 {
-                    _current = _parent._firstBuffer.AsMemory(0, _parent._firstBufferWritten);
+                    _current = parent._firstBuffer.AsMemory(0, parent._firstBufferWritten);
 
                     return true;
                 }
@@ -250,7 +241,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
             {
                 _state = State.BuffersIterate;
 
-                _buffersEnumerator = _parent._buffers.GetEnumerator();
+                _buffersEnumerator = parent._buffers.GetEnumerator();
             }
 
             if (_state == State.BuffersIterate)
@@ -270,7 +261,7 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
             {
                 _state = State.End;
 
-                _current = _parent._current.WrittenMemory;
+                _current = parent._current.WrittenMemory;
 
                 return true;
             }

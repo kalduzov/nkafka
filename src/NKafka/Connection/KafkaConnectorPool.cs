@@ -57,8 +57,8 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
     private readonly SocketFactory _socketFactory;
     private readonly SslSettings _sslSettings;
 
-    private readonly INumberCounter _seedConnectorsNumberCounter;
-    private readonly INumberCounter _brokersNumberCounter;
+    private readonly RoundRobinNumberCounter _seedConnectorsNumberCounter;
+    private readonly RandomNumberCounter _brokersNumberCounter;
 
     public KafkaConnectorPool(
         IReadOnlyCollection<Node> seedBrokers,

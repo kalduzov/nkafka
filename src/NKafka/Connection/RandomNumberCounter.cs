@@ -21,11 +21,10 @@
 
 namespace NKafka.Connection;
 
-internal class RandomNumberCounter: INumberCounter
+internal class RandomNumberCounter
 {
     private readonly Random _random = Random.Shared;
 
-    /// <inheritdoc />
     public int GetNextNumber(int initIndex = -1)
     {
         return _random.Next(initIndex);

@@ -28,6 +28,57 @@ namespace NKafka.MessageGenerator.Tests;
 public class JsonParseTests
 {
     [Fact]
+    public void ParseFieldSpecification_AllowsFlexibleVersionsOverrideForBytes()
+    {
+        const string json = """
+                            {
+                              "name": "Value",
+                              "versions": "0+",
+                              "type": "bytes",
+                              "nullableVersions": "0+",
+                              "flexibleVersions": "1+",
+                              "default": "null",
+                              "ignorable": false,
+                              "entityType": "unknown",
+                              "about": "test",
+                              "taggedVersions": "",
+                              "fields": []
+                            }
+                            """;
+
+        var field = JsonConvert.DeserializeObject<FieldSpecification>(json);
+
+        field.Should().NotBeNull();
+        field!.FlexibleVersions.Should().NotBeNull();
+        field.FlexibleVersions!.Lowest.Should().Be(1);
+    }
+
+    [Fact]
+    public void ParseFieldSpecification_RejectsFlexibleVersionsOverrideForNonStringAndNonBytes()
+    {
+        const string json = """
+                            {
+                              "name": "Value",
+                              "versions": "0+",
+                              "type": "int32",
+                              "nullableVersions": "",
+                              "flexibleVersions": "1+",
+                              "default": "0",
+                              "ignorable": false,
+                              "entityType": "unknown",
+                              "about": "test",
+                              "taggedVersions": "",
+                              "fields": []
+                            }
+                            """;
+
+        var act = () => JsonConvert.DeserializeObject<FieldSpecification>(json);
+
+        act.Should().Throw<ArgumentException>()
+            .WithMessage("Invalid flexibleVersions override for Value*");
+    }
+
+    [Fact]
     public async Task ParseRequestType_Successful()
     {
         var request = await GetMessageSpecification("data/MetadataRequest.json");

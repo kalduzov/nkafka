@@ -60,6 +60,11 @@ public class FieldSpecification
 
     public int? Tag { get; }
 
+    // Kafka specs may mark bytes fields as zeroCopy. We keep parsing and preserving the flag,
+    // but intentionally do not change generated runtime contracts yet: a real zero-copy path
+    // would require different field types and explicit buffer lifetime ownership semantics.
+    // For now, correctness and bringing the client to a stable working state take priority,
+    // and deeper zero-copy optimizations are deferred to a later iteration.
     public bool ZeroCopy { get; }
 
     public IReadOnlyCollection<FieldSpecification> Fields { get; }
@@ -128,7 +133,7 @@ public class FieldSpecification
         {
             FlexibleVersions = Versions.Parse(flexibleVersions, null!);
 
-            if (!(Type.IsString || !Type.IsBytes))
+            if (!(Type.IsString || Type.IsBytes))
             {
                 throw new ArgumentException(
                     $"Invalid flexibleVersions override for {name}. Only fields of type string or bytes can specify a flexibleVersions override.");

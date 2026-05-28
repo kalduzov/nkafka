@@ -1,4 +1,4 @@
-﻿//2F-9C-30-60-CB-D2-DF-13-B9-36-49-E6-F1-54-FB-6E-F1-0A-AF-32-0E-AE-ED-59-3B-FC-25-38-EE-84-1D-E1
+﻿//22-B2-23-3C-56-95-70-69-7D-AC-E8-CB-DD-96-EF-18-5A-A5-82-2F-4C-9D-2B-37-69-97-BF-FE-22-24-27-57
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -93,7 +93,6 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         RequestApiKey = reader.ReadShort();
         RequestApiVersion = reader.ReadShort();
         CorrelationId = reader.ReadInt();
-        if (version >= ApiVersion.Version1)
         {
             int length;
             length = reader.ReadShort();
@@ -109,10 +108,6 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
             {
                 ClientId = reader.ReadString(length);
             }
-        }
-        else
-        {
-            ClientId = string.Empty;
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
@@ -139,18 +134,15 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         writer.WriteShort(RequestApiKey);
         writer.WriteShort(RequestApiVersion);
         writer.WriteInt(CorrelationId);
-        if (version >= ApiVersion.Version1)
+        if (ClientId is null)
         {
-            if (ClientId is null)
-            {
-                writer.WriteShort(-1);
-            }
-            else
-            {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientId);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
-            }
+            writer.WriteShort(-1);
+        }
+        else
+        {
+            var stringBytes = Encoding.UTF8.GetBytes(ClientId);
+            writer.WriteShort((short)stringBytes.Length);
+            writer.WriteBytes(stringBytes);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

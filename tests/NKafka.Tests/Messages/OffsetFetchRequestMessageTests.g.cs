@@ -1,4 +1,4 @@
-﻿//B7-DA-12-B2-27-7E-29-E4-95-5E-18-03-99-60-FE-17-E3-73-78-69-27-A8-E8-30-2F-36-1F-A4-3B-2B-77-CD
+﻿//02-05-AF-88-55-26-7F-E9-9C-D7-55-91-EF-C3-03-A5-9C-7E-45-E1-23-56-24-E0-82-A7-00-C8-07-07-3F-EF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -137,5 +137,16 @@ public sealed partial class OffsetFetchRequestMessageTests
             RequireStable = true,
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchRequestMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new OffsetFetchRequestMessage
+        {
+            Groups = new (),
+            RequireStable = true,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
 }

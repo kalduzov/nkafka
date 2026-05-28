@@ -161,6 +161,8 @@ Transport layer открывает TCP socket к broker endpoint.
 - `ApiVersionsRequest` используется как основной механизм negotiation
 - полученные support versions валидны для конкретного connection
 - после reconnect/connection reset они должны считаться устаревшими
+- fallback matrix in [src/NKafka/Protocol/SupportVersionsExtensions.cs](K:\nkafka\src\NKafka\Protocol\SupportVersionsExtensions.cs) must be kept in sync with the Kafka version baselines supported by the library
+- when a new Kafka baseline is added, its fallback API ranges are taken from the `validVersions` values of the corresponding Kafka branch request JSON specs
 
 ### 4. Steady-state request processing
 

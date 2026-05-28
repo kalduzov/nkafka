@@ -104,6 +104,7 @@ public enum ApiKeys: short
     GetTelemetrySubscriptions = 71,
     PushTelemetry = 72,
     ListClientMetricsResources = 74,
+    ListConfigResources = 74,
     DescribeTopicPartitions = 75,
     ShareGroupHeartbeat = 76,
     ShareGroupDescribe = 77,

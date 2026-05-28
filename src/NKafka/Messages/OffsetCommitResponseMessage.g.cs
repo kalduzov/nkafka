@@ -1,4 +1,4 @@
-﻿//9E-DC-D5-6E-E0-C8-B4-34-14-98-60-A2-87-6B-06-B7-F8-82-4A-62-FD-B2-7D-F2-8A-1C-78-D8-5C-89-B6-76
+﻿//69-00-41-7A-59-40-EE-99-31-6A-75-B6-C5-A1-8E-5B-AA-D7-21-89-89-E5-0B-9B-DF-9A-FD-3F-D7-C1-7B-18
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -252,6 +252,11 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// The topic ID.
+        /// </summary>
+        public Guid TopicId { get; set; } = Guid.Empty;
+
+        /// <summary>
         /// The responses for each partition in the topic.
         /// </summary>
         public List<OffsetCommitResponsePartitionMessage> Partitions { get; set; } = new ();
@@ -276,10 +281,11 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponseTopicMessage");
             }
+            if (version <= ApiVersion.Version9)
             {
                 int length;
                 if (version >= ApiVersion.Version8)
@@ -302,6 +308,18 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
                 {
                     Name = reader.ReadString(length);
                 }
+            }
+            else
+            {
+                Name = string.Empty;
+            }
+            if (version >= ApiVersion.Version10)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
             }
             {
                 if (version >= ApiVersion.Version8)
@@ -363,17 +381,24 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
+            if (version <= ApiVersion.Version9)
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersion.Version8)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    var stringBytes = Encoding.UTF8.GetBytes(Name);
+                    if (version >= ApiVersion.Version8)
+                    {
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
                 }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersion.Version10)
+            {
+                writer.WriteGuid(TopicId);
             }
             if (version >= ApiVersion.Version8)
             {
@@ -434,6 +459,10 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
                     return false;
                 }
             }
+            if (!TopicId.Equals(other.TopicId))
+            {
+                return false;
+            }
             if (Partitions is null)
             {
                 if (other.Partitions is not null)
@@ -455,7 +484,7 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Name, Partitions);
+            hashCode = HashCode.Combine(hashCode, Name, TopicId, Partitions);
             return hashCode;
         }
 
@@ -464,6 +493,7 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         {
             return "OffsetCommitResponseTopicMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
+                + ", TopicId=" + TopicId
                 + ", Partitions=" + Partitions.DeepToString()
                 + ")";
         }
@@ -513,7 +543,7 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version2 || version > ApiVersion.Version9)
+            if (version < ApiVersion.Version2 || version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetCommitResponsePartitionMessage");
             }

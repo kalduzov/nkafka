@@ -1,4 +1,4 @@
-﻿//74-46-46-73-3D-68-8C-8B-13-EA-60-94-25-9C-9D-84-49-8C-EC-7F-D2-9D-49-95-FB-2A-23-3F-27-0B-12-91
+﻿//EB-1B-3B-FA-E5-09-C2-A6-E1-44-3C-D2-D8-61-19-12-41-92-E3-F1-6C-96-2B-48-C6-F7-C8-70-3A-7E-6E-67
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,6 +38,56 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class MetadataResponseMessageTests
 {
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataResponseMessage' message by Version0")]
+    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
+    {
+        var message = new MetadataResponseMessage
+        {
+            Brokers = new (),
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataResponseMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new MetadataResponseMessage
+        {
+            Brokers = new (),
+            ControllerId = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataResponseMessage' message by Version2")]
+    public void SerializeAndDeserializeMessage_ApiVersion2_Success()
+    {
+        var message = new MetadataResponseMessage
+        {
+            Brokers = new (),
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ControllerId = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataResponseMessage' message by Version3")]
+    public void SerializeAndDeserializeMessage_ApiVersion3_Success()
+    {
+        var message = new MetadataResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Brokers = new (),
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ControllerId = -420004200,
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
+    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataResponseMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()

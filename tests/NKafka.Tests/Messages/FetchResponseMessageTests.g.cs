@@ -1,4 +1,4 @@
-﻿//C6-CF-53-E2-5F-22-9F-75-07-A7-36-85-1D-F9-BB-AB-40-7A-5A-44-94-3E-61-81-7C-3A-59-DD-E0-94-CD-64
+﻿//5F-60-96-25-73-64-A3-D6-0A-63-13-DF-92-37-1E-81-A3-82-1C-63-68-DD-12-30-0B-F8-FD-E6-D8-05-24-30
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -215,5 +215,19 @@ public sealed partial class FetchResponseMessageTests
             NodeEndpoints = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version17);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchResponseMessage' message by Version18")]
+    public void SerializeAndDeserializeMessage_ApiVersion18_Success()
+    {
+        var message = new FetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            ErrorCode = -4242,
+            SessionId = -420004200,
+            Responses = new (),
+            NodeEndpoints = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version18);
     }
 }

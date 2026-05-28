@@ -1,4 +1,4 @@
-﻿//D9-71-49-16-9A-31-91-26-CC-69-B5-A8-84-6C-CD-99-F3-9A-CD-88-9F-1F-50-56-4A-2E-8A-73-42-C7-EF-5F
+﻿//FA-76-55-30-0D-38-83-09-DD-D9-5B-B9-AD-47-2A-0E-8B-D8-72-28-67-92-CA-0E-65-FE-84-91-5F-DE-8E-EF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com

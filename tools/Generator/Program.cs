@@ -71,7 +71,11 @@ string[] clientMessagesPattern =
     "OffsetDelete",
     "DescribeUserScramCredentials",
     "AlterUserScramCredentials",
-    "ConsumerGroupHeartbeat"
+    "ConsumerGroupHeartbeat",
+    "AlterShareGroupOffsets",
+    "DeleteShareGroupOffsets",
+    "DescribeShareGroupOffsets",
+    "ListConfigResources"
 ];
 
 Console.WriteLine("Kafka classes generator");

@@ -1,4 +1,4 @@
-﻿//92-2A-A9-42-73-43-F5-CC-B9-20-BD-82-AE-40-78-FF-8B-63-22-23-8D-94-98-D2-E6-D3-10-0F-AC-FF-84-AE
+﻿//A8-D3-B4-AA-42-ED-D6-FD-2F-DF-AD-9C-EE-6E-32-6E-DC-B5-FB-F9-0A-2D-CB-D2-57-0A-A4-3F-6A-07-D8-27
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -332,6 +332,11 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// The unique topic ID
+        /// </summary>
+        public Guid TopicId { get; set; } = Guid.Empty;
+
+        /// <summary>
         /// Each partition to produce to.
         /// </summary>
         public List<PartitionProduceDataMessage> PartitionData { get; set; } = new ();
@@ -356,10 +361,11 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceDataMessage");
             }
+            if (version <= ApiVersion.Version12)
             {
                 int length;
                 if (version >= ApiVersion.Version9)
@@ -382,6 +388,18 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
                 {
                     Name = reader.ReadString(length);
                 }
+            }
+            else
+            {
+                Name = string.Empty;
+            }
+            if (version >= ApiVersion.Version13)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
             }
             {
                 if (version >= ApiVersion.Version9)
@@ -443,17 +461,24 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
+            if (version <= ApiVersion.Version12)
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    var stringBytes = Encoding.UTF8.GetBytes(Name);
+                    if (version >= ApiVersion.Version9)
+                    {
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
                 }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersion.Version13)
+            {
+                writer.WriteGuid(TopicId);
             }
             if (version >= ApiVersion.Version9)
             {
@@ -514,6 +539,10 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
                     return false;
                 }
             }
+            if (!TopicId.Equals(other.TopicId))
+            {
+                return false;
+            }
             if (PartitionData is null)
             {
                 if (other.PartitionData is not null)
@@ -535,7 +564,7 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Name);
+            hashCode = HashCode.Combine(hashCode, Name, TopicId);
             return hashCode;
         }
 
@@ -544,6 +573,7 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         {
             return "TopicProduceDataMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
+                + ", TopicId=" + TopicId
                 + ", PartitionData=" + PartitionData.DeepToString()
                 + ")";
         }
@@ -590,7 +620,7 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceDataMessage");
             }

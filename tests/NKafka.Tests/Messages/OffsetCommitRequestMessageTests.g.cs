@@ -1,4 +1,4 @@
-﻿//EC-73-65-0D-0A-48-57-92-32-89-D3-8F-A1-59-3B-71-03-BF-55-75-F0-62-4E-68-3B-90-B5-B8-5B-E8-9F-52
+﻿//18-90-E9-3E-9A-1C-A7-8D-00-57-AC-12-86-31-05-92-73-0D-A4-B1-21-E3-69-A4-04-F5-70-27-94-1B-90-2D
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -147,5 +147,19 @@ public sealed partial class OffsetCommitRequestMessageTests
             Topics = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetCommitRequestMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new OffsetCommitRequestMessage
+        {
+            GroupId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GenerationIdOrMemberEpoch = -420004200,
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            GroupInstanceId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
 }

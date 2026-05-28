@@ -39,6 +39,9 @@ protocol without relying on native librdkafka.
 - Changes to generated message contracts should follow the reference Java/Kafka definitions first, and only then be adapted to the NKafka generator model.
 - Any divergence from the reference contract-generation behavior must be intentional, documented, and justified.
 - The reference-aligned generation baseline should be reviewed and updated separately when Kafka protocol specs, message definitions, or generation assumptions evolve.
+- When Kafka message specs are synced from a new Kafka branch or release baseline, the manual fallback compatibility matrix in [src/NKafka/Protocol/SupportVersionsExtensions.cs](K:\nkafka\src\NKafka\Protocol\SupportVersionsExtensions.cs) must be updated for that Kafka version as well.
+- The source of truth for those fallback API ranges is the `validVersions` range from the corresponding Kafka branch JSON request specifications.
+- `SupportVersionsExtensions.cs` is a manual compatibility artifact and must be reviewed together with generated contracts whenever supported Kafka baselines change.
 
 ### C# Language Features
 

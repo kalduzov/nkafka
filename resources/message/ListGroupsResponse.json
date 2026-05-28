@@ -41,15 +41,9 @@
       { "name": "ProtocolType", "type": "string", "versions": "0+",
         "about": "The group protocol type." },
       { "name": "GroupState", "type": "string", "versions": "4+", "ignorable": true,
-        "about": "The group state name."
-      },
-      {
-        "name": "GroupType",
-        "type": "string",
-        "versions": "5+",
-        "ignorable": true,
-        "about": "The group type name."
-      }
+        "about": "The group state name." },
+      { "name": "GroupType", "type": "string", "versions": "5+", "ignorable": true,
+        "about": "The group type name." }
     ]}
   ]
 }

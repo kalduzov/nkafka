@@ -1,4 +1,4 @@
-﻿//5E-61-C9-42-3B-75-6B-5A-4E-83-A4-45-BE-86-CC-51-63-EF-32-8E-5E-9D-15-86-F6-0F-09-89-B7-0B-B8-23
+﻿//77-1F-D4-B1-3D-5E-63-BB-85-F3-2C-9D-FA-8A-73-51-5F-C8-F2-C5-92-AF-B6-A7-7D-53-E5-D0-C2-75-4D-0A
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -293,5 +293,25 @@ public sealed partial class FetchRequestMessageTests
             RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version17);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'FetchRequestMessage' message by Version18")]
+    public void SerializeAndDeserializeMessage_ApiVersion18_Success()
+    {
+        var message = new FetchRequestMessage
+        {
+            ClusterId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            ReplicaState = new (),
+            MaxWaitMs = -420004200,
+            MinBytes = -420004200,
+            MaxBytes = -420004200,
+            IsolationLevel = 42,
+            SessionId = -420004200,
+            SessionEpoch = -420004200,
+            Topics = new (),
+            ForgottenTopicsData = new (),
+            RackId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version18);
     }
 }

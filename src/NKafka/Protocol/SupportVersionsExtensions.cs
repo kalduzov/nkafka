@@ -47,6 +47,8 @@ internal static partial class SupportVersionsExtensions
     internal static readonly Version Version39 = new(3, 9);
     internal static readonly Version Version40 = new(4, 0);
     internal static readonly Version Version41 = new(4, 1);
+    internal static readonly Version Version42 = new(4, 2);
+    internal static readonly Version Version43 = new(4, 3);
 
     private static readonly SortedDictionary<Version, HashSet<ApiKeysVersion>> _supportSetOfKafkaVersions = new()
     {
@@ -495,6 +497,50 @@ internal static partial class SupportVersionsExtensions
             new ApiKeysVersion(ApiKeys.JoinGroup, ApiVersion.Version0, ApiVersion.Version9),
             new ApiKeysVersion(ApiKeys.LeaveGroup, ApiVersion.Version0, ApiVersion.Version5),
             new ApiKeysVersion(ApiKeys.ListOffsets, ApiVersion.Version1, ApiVersion.Version10),
+            new ApiKeysVersion(ApiKeys.Metadata, ApiVersion.Version0, ApiVersion.Version13),
+            new ApiKeysVersion(ApiKeys.OffsetCommit, ApiVersion.Version2, ApiVersion.Version10),
+            new ApiKeysVersion(ApiKeys.OffsetFetch, ApiVersion.Version1, ApiVersion.Version10),
+            new ApiKeysVersion(ApiKeys.Produce, ApiVersion.Version3, ApiVersion.Version13),
+            new ApiKeysVersion(ApiKeys.SaslAuthenticate, ApiVersion.Version0, ApiVersion.Version2),
+            new ApiKeysVersion(ApiKeys.SaslHandshake, ApiVersion.Version0, ApiVersion.Version1),
+            new ApiKeysVersion(ApiKeys.SyncGroup, ApiVersion.Version0, ApiVersion.Version5)
+        ],
+        [Version42] =
+        [
+            new ApiKeysVersion(ApiKeys.AddOffsetsToTxn, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.AddPartitionsToTxn, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ApiVersions, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.CreateTopics, ApiVersion.Version2, ApiVersion.Version7),
+            new ApiKeysVersion(ApiKeys.EndTxn, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.Fetch, ApiVersion.Version4, ApiVersion.Version18),
+            new ApiKeysVersion(ApiKeys.FetchSnapshot, ApiVersion.Version0, ApiVersion.Version1),
+            new ApiKeysVersion(ApiKeys.FindCoordinator, ApiVersion.Version0, ApiVersion.Version6),
+            new ApiKeysVersion(ApiKeys.Heartbeat, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.JoinGroup, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.LeaveGroup, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ListOffsets, ApiVersion.Version1, ApiVersion.Version11),
+            new ApiKeysVersion(ApiKeys.Metadata, ApiVersion.Version0, ApiVersion.Version13),
+            new ApiKeysVersion(ApiKeys.OffsetCommit, ApiVersion.Version2, ApiVersion.Version10),
+            new ApiKeysVersion(ApiKeys.OffsetFetch, ApiVersion.Version1, ApiVersion.Version10),
+            new ApiKeysVersion(ApiKeys.Produce, ApiVersion.Version3, ApiVersion.Version13),
+            new ApiKeysVersion(ApiKeys.SaslAuthenticate, ApiVersion.Version0, ApiVersion.Version2),
+            new ApiKeysVersion(ApiKeys.SaslHandshake, ApiVersion.Version0, ApiVersion.Version1),
+            new ApiKeysVersion(ApiKeys.SyncGroup, ApiVersion.Version0, ApiVersion.Version5)
+        ],
+        [Version43] =
+        [
+            new ApiKeysVersion(ApiKeys.AddOffsetsToTxn, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.AddPartitionsToTxn, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ApiVersions, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.CreateTopics, ApiVersion.Version2, ApiVersion.Version7),
+            new ApiKeysVersion(ApiKeys.EndTxn, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.Fetch, ApiVersion.Version4, ApiVersion.Version18),
+            new ApiKeysVersion(ApiKeys.FetchSnapshot, ApiVersion.Version0, ApiVersion.Version1),
+            new ApiKeysVersion(ApiKeys.FindCoordinator, ApiVersion.Version0, ApiVersion.Version6),
+            new ApiKeysVersion(ApiKeys.Heartbeat, ApiVersion.Version0, ApiVersion.Version4),
+            new ApiKeysVersion(ApiKeys.JoinGroup, ApiVersion.Version0, ApiVersion.Version9),
+            new ApiKeysVersion(ApiKeys.LeaveGroup, ApiVersion.Version0, ApiVersion.Version5),
+            new ApiKeysVersion(ApiKeys.ListOffsets, ApiVersion.Version1, ApiVersion.Version11),
             new ApiKeysVersion(ApiKeys.Metadata, ApiVersion.Version0, ApiVersion.Version13),
             new ApiKeysVersion(ApiKeys.OffsetCommit, ApiVersion.Version2, ApiVersion.Version10),
             new ApiKeysVersion(ApiKeys.OffsetFetch, ApiVersion.Version1, ApiVersion.Version10),

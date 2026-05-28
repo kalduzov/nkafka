@@ -64,6 +64,8 @@ public sealed class SupportVersionsExtensionsTests
         [Version38],
         [Version39],
         [Version40],
-        [Version41]
+        [Version41],
+        [Version42],
+        [Version43]
     ];
 }

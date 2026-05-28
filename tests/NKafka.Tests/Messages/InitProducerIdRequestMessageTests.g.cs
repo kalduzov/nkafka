@@ -1,4 +1,4 @@
-﻿//F0-C2-A6-6A-4A-49-17-09-F9-D5-5A-D9-94-B6-36-C8-AC-87-83-71-97-81-43-A7-7F-7B-6A-F8-41-EC-C8-2B
+﻿//E7-29-7A-1A-49-98-78-EC-EC-BA-13-30-38-F8-FA-1B-49-4D-DE-A3-C5-FC-C6-E1-F9-20-AE-60-FC-68-92-C4
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -109,5 +109,20 @@ public sealed partial class InitProducerIdRequestMessageTests
             ProducerEpoch = -4242,
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version5);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'InitProducerIdRequestMessage' message by Version6")]
+    public void SerializeAndDeserializeMessage_ApiVersion6_Success()
+    {
+        var message = new InitProducerIdRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            TransactionTimeoutMs = -420004200,
+            ProducerId = -9223372036854775808,
+            ProducerEpoch = -4242,
+            Enable2Pc = true,
+            KeepPreparedTxn = true,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version6);
     }
 }

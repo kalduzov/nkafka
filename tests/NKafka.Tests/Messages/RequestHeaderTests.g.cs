@@ -1,4 +1,4 @@
-﻿//2F-9C-30-60-CB-D2-DF-13-B9-36-49-E6-F1-54-FB-6E-F1-0A-AF-32-0E-AE-ED-59-3B-FC-25-38-EE-84-1D-E1
+﻿//22-B2-23-3C-56-95-70-69-7D-AC-E8-CB-DD-96-EF-18-5A-A5-82-2F-4C-9D-2B-37-69-97-BF-FE-22-24-27-57
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,18 +38,6 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class RequestHeaderTests
 {
-
-    [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version0")]
-    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
-    {
-        var message = new RequestHeader
-        {
-            RequestApiKey = -4242,
-            RequestApiVersion = -4242,
-            CorrelationId = -420004200,
-        };
-        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
-    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'RequestHeader' message by Version1")]
     public void SerializeAndDeserializeMessage_ApiVersion1_Success()

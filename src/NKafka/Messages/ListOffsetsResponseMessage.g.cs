@@ -1,4 +1,4 @@
-﻿//4B-4C-20-93-09-D1-BD-8C-A1-A3-62-F7-26-B0-08-86-41-9E-D4-D6-98-1F-62-57-E0-65-21-E2-E2-18-77-CF
+﻿//1C-67-20-0E-B1-72-B5-D8-AC-D3-B1-7D-C3-6F-69-E6-F9-47-A4-39-BF-62-BF-35-23-0E-07-F5-FF-5A-72-39
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -276,7 +276,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsTopicResponseMessage");
             }
@@ -528,7 +528,7 @@ internal sealed partial class ListOffsetsResponseMessage: IResponseMessage, IEqu
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version1 || version > ApiVersion.Version10)
+            if (version < ApiVersion.Version1 || version > ApiVersion.Version11)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ListOffsetsPartitionResponseMessage");
             }

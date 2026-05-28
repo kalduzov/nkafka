@@ -1,4 +1,4 @@
-﻿//9B-17-F8-DE-39-80-92-A2-D4-29-28-CA-29-0F-DF-DE-D9-D5-5F-FD-26-C9-1E-B4-E1-54-58-1C-CA-74-92-2E
+﻿//5F-60-96-25-73-64-A3-D6-0A-63-13-DF-92-37-1E-81-A3-82-1C-63-68-DD-12-30-0B-F8-FD-E6-D8-05-24-30
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -399,7 +399,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchableTopicResponseMessage");
             }
@@ -706,7 +706,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionDataMessage");
             }
@@ -1153,7 +1153,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of EpochEndOffsetMessage");
             }
@@ -1273,7 +1273,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
@@ -1393,7 +1393,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of SnapshotIdMessage");
             }
@@ -1513,7 +1513,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of AbortedTransactionMessage");
             }
@@ -1652,7 +1652,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of NodeEndpointMessage");
             }

@@ -1,4 +1,4 @@
-﻿//87-7E-3C-88-19-B8-6A-77-0E-8E-13-AD-7B-B8-BD-D6-AF-C7-5B-7C-5F-0B-E5-C8-25-C3-76-EB-D6-8A-FD-C7
+﻿//09-07-34-C2-DF-40-87-42-5D-1A-3E-53-F6-67-05-BD-46-6D-A0-E3-7C-E0-3D-0B-45-4D-65-FD-15-A5-4D-1A
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -150,5 +150,17 @@ public sealed partial class ProduceResponseMessageTests
             NodeEndpoints = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceResponseMessage' message by Version13")]
+    public void SerializeAndDeserializeMessage_ApiVersion13_Success()
+    {
+        var message = new ProduceResponseMessage
+        {
+            Responses = new (),
+            ThrottleTimeMs = -420004200,
+            NodeEndpoints = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version13);
     }
 }

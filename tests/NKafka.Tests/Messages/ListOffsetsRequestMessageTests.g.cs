@@ -1,4 +1,4 @@
-﻿//DB-5B-56-E9-91-C5-64-3A-A4-DF-81-06-10-BD-84-20-9F-EA-81-97-A8-48-9F-BA-14-38-08-22-9E-96-3A-6F
+﻿//DF-75-C5-53-59-D1-25-47-67-51-43-A3-E1-9C-45-5C-F7-EF-59-CD-33-A6-0D-EE-82-DD-1D-03-AA-DB-6D-64
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -157,5 +157,18 @@ public sealed partial class ListOffsetsRequestMessageTests
             TimeoutMs = -420004200,
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ListOffsetsRequestMessage' message by Version11")]
+    public void SerializeAndDeserializeMessage_ApiVersion11_Success()
+    {
+        var message = new ListOffsetsRequestMessage
+        {
+            ReplicaId = -420004200,
+            IsolationLevel = 42,
+            Topics = new (),
+            TimeoutMs = -420004200,
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version11);
     }
 }

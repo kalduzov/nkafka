@@ -1,4 +1,4 @@
-﻿//FF-1D-C8-71-89-A0-58-71-1E-77-30-A6-52-FA-4B-58-E7-90-0F-30-47-06-1E-C9-2B-18-C2-2C-3E-BF-40-CD
+﻿//45-A4-7A-01-DB-8E-51-B2-70-4D-89-5C-C1-6A-F2-B6-FE-9C-71-C3-B8-B0-8F-CD-EC-3B-D0-D4-AD-E8-33-31
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -74,6 +74,16 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
     public short ProducerEpoch { get; set; } = 0;
 
     /// <summary>
+    /// The producer id for ongoing transaction when KeepPreparedTxn is used, -1 if there is no transaction ongoing.
+    /// </summary>
+    public long OngoingTxnProducerId { get; set; } = -1;
+
+    /// <summary>
+    /// The epoch associated with the  producer id for ongoing transaction when KeepPreparedTxn is used, -1 if there is no transaction ongoing.
+    /// </summary>
+    public short OngoingTxnProducerEpoch { get; set; } = -1;
+
+    /// <summary>
     /// The basic constructor of the message InitProducerIdResponseMessage
     /// </summary>
     public InitProducerIdResponseMessage()
@@ -97,6 +107,22 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
         ErrorCode = reader.ReadShort();
         ProducerId = reader.ReadLong();
         ProducerEpoch = reader.ReadShort();
+        if (version >= ApiVersion.Version6)
+        {
+            OngoingTxnProducerId = reader.ReadLong();
+        }
+        else
+        {
+            OngoingTxnProducerId = -1;
+        }
+        if (version >= ApiVersion.Version6)
+        {
+            OngoingTxnProducerEpoch = reader.ReadShort();
+        }
+        else
+        {
+            OngoingTxnProducerEpoch = -1;
+        }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
@@ -123,6 +149,28 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
         writer.WriteShort((short)ErrorCode);
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
+        if (version >= ApiVersion.Version6)
+        {
+            writer.WriteLong(OngoingTxnProducerId);
+        }
+        else
+        {
+            if (OngoingTxnProducerId != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default OngoingTxnProducerId at version {version}");
+            }
+        }
+        if (version >= ApiVersion.Version6)
+        {
+            writer.WriteShort(OngoingTxnProducerEpoch);
+        }
+        else
+        {
+            if (OngoingTxnProducerEpoch != -1)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default OngoingTxnProducerEpoch at version {version}");
+            }
+        }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
@@ -168,6 +216,14 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
         {
             return false;
         }
+        if (OngoingTxnProducerId != other.OngoingTxnProducerId)
+        {
+            return false;
+        }
+        if (OngoingTxnProducerEpoch != other.OngoingTxnProducerEpoch)
+        {
+            return false;
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -175,7 +231,7 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerId, ProducerEpoch);
+        hashCode = HashCode.Combine(hashCode, ThrottleTimeMs, ErrorCode, ProducerId, ProducerEpoch, OngoingTxnProducerId, OngoingTxnProducerEpoch);
         return hashCode;
     }
 
@@ -187,6 +243,8 @@ internal sealed partial class InitProducerIdResponseMessage: IResponseMessage, I
             + ", ErrorCode=" + ErrorCode
             + ", ProducerId=" + ProducerId
             + ", ProducerEpoch=" + ProducerEpoch
+            + ", OngoingTxnProducerId=" + OngoingTxnProducerId
+            + ", OngoingTxnProducerEpoch=" + OngoingTxnProducerEpoch
             + ")";
     }
 }

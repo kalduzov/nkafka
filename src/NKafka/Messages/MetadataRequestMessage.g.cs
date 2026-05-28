@@ -1,4 +1,4 @@
-﻿//B4-DE-85-C2-50-28-A8-73-D7-D2-89-14-9F-09-19-CE-E9-E9-1A-C0-0E-68-EF-B8-7E-39-15-1B-62-48-27-88
+﻿//57-C2-A0-0A-C6-AF-B9-4F-1C-D7-EA-CD-BF-28-04-6D-CD-92-77-39-5F-7B-04-F5-B9-14-79-04-64-BA-02-77
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -126,7 +126,14 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 arrayLength = reader.ReadInt();
                 if (arrayLength < 0)
                 {
-                    Topics = null;
+                    if (version >= ApiVersion.Version1)
+                    {
+                        Topics = null;
+                    }
+                    else
+                    {
+                        throw new Exception("non-nullable field Topics was serialized as null");
+                    }
                 }
                 else
                 {
@@ -139,7 +146,14 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 }
             }
         }
-        AllowAutoTopicCreation = reader.ReadByte() != 0;
+        if (version >= ApiVersion.Version4)
+        {
+            AllowAutoTopicCreation = reader.ReadByte() != 0;
+        }
+        else
+        {
+            AllowAutoTopicCreation = true;
+        }
         if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             IncludeClusterAuthorizedOperations = reader.ReadByte() != 0;
@@ -197,7 +211,13 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         {
             if (Topics is null)
             {
-                writer.WriteInt(-1);
+                if (version >= ApiVersion.Version1)
+                {
+                    writer.WriteInt(-1);
+                }
+                else
+                {
+                    throw new NullReferenceException();                }
             }
             else
             {
@@ -208,7 +228,17 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
                 }
             }
         }
-        writer.WriteBool(AllowAutoTopicCreation);
+        if (version >= ApiVersion.Version4)
+        {
+            writer.WriteBool(AllowAutoTopicCreation);
+        }
+        else
+        {
+            if (!AllowAutoTopicCreation)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default AllowAutoTopicCreation at version {version}");
+            }
+        }
         if (version >= ApiVersion.Version8 && version <= ApiVersion.Version10)
         {
             writer.WriteBool(IncludeClusterAuthorizedOperations);
@@ -349,7 +379,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version4 || version > ApiVersion.Version13)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of MetadataRequestTopicMessage");
             }

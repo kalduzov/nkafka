@@ -14,20 +14,19 @@
 // limitations under the License.
 
 {
-  "apiKey": 74,
-  "type": "response",
-  "name": "ListClientMetricsResourcesResponse",
+  "apiKey": 92,
+  "type": "request",
+  "listeners": ["broker"],
+  "name": "DeleteShareGroupOffsetsRequest",
   "validVersions": "0",
   "flexibleVersions": "0+",
   "fields": [
-      { "name": "ThrottleTimeMs", "type": "int32", "versions": "0+",
-        "about": "The duration in milliseconds for which the request was throttled due to a quota violation, or zero if the request did not violate any quota." },
-      { "name": "ErrorCode", "type": "int16", "versions": "0+",
-        "about": "The error code, or 0 if there was no error." },
-      { "name": "ClientMetricsResources", "type": "[]ClientMetricsResource", "versions": "0+",
-        "about": "Each client metrics resource in the response.", "fields": [
-        { "name": "Name", "type": "string", "versions": "0+",
-          "about": "The resource name." }
+    { "name": "GroupId", "type": "string", "versions": "0+", "entityType": "groupId",
+      "about": "The group identifier." },
+    { "name": "Topics", "type": "[]DeleteShareGroupOffsetsRequestTopic", "versions": "0+",
+      "about": "The topics to delete offsets for.",  "fields": [
+      { "name": "TopicName", "type": "string", "versions": "0+", "entityType": "topicName",
+        "about": "The topic name." }
     ]}
   ]
 }

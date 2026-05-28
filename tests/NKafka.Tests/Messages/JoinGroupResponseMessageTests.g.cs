@@ -1,4 +1,4 @@
-﻿//84-38-9D-93-E4-62-2F-59-F2-77-05-56-47-21-C5-97-15-4E-F1-0D-72-56-2B-3B-63-71-AB-51-E4-95-48-8C
+﻿//14-7A-4E-04-51-F4-9B-F4-AB-13-9D-09-D5-DF-6B-66-EE-1B-D4-7F-63-EA-67-6B-3D-D9-1D-73-18-18-A3-07
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,6 +38,36 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class JoinGroupResponseMessageTests
 {
+
+    [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupResponseMessage' message by Version0")]
+    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
+    {
+        var message = new JoinGroupResponseMessage
+        {
+            ErrorCode = -4242,
+            GenerationId = -420004200,
+            ProtocolName = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Leader = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Members = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupResponseMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new JoinGroupResponseMessage
+        {
+            ErrorCode = -4242,
+            GenerationId = -420004200,
+            ProtocolName = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Leader = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            MemberId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Members = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
+    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'JoinGroupResponseMessage' message by Version2")]
     public void SerializeAndDeserializeMessage_ApiVersion2_Success()

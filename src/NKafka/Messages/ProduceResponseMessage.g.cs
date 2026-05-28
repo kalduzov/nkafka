@@ -1,4 +1,4 @@
-﻿//06-52-98-5F-D3-F4-87-60-66-94-CA-C9-5A-9B-80-E6-3B-6C-B4-47-3B-DF-74-23-6D-EF-8F-DD-30-5D-8E-B5
+﻿//09-07-34-C2-DF-40-87-42-5D-1A-3E-53-F6-67-05-BD-46-6D-A0-E3-7C-E0-3D-0B-45-4D-65-FD-15-A5-4D-1A
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -316,6 +316,11 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// The unique topic ID
+        /// </summary>
+        public Guid TopicId { get; set; } = Guid.Empty;
+
+        /// <summary>
         /// Each partition that we produced to within the topic.
         /// </summary>
         public List<PartitionProduceResponseMessage> PartitionResponses { get; set; } = new ();
@@ -340,10 +345,11 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of TopicProduceResponseMessage");
             }
+            if (version <= ApiVersion.Version12)
             {
                 int length;
                 if (version >= ApiVersion.Version9)
@@ -366,6 +372,18 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                 {
                     Name = reader.ReadString(length);
                 }
+            }
+            else
+            {
+                Name = string.Empty;
+            }
+            if (version >= ApiVersion.Version13)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
             }
             {
                 if (version >= ApiVersion.Version9)
@@ -427,17 +445,24 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
+            if (version <= ApiVersion.Version12)
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    var stringBytes = Encoding.UTF8.GetBytes(Name);
+                    if (version >= ApiVersion.Version9)
+                    {
+                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                    }
+                    else
+                    {
+                        writer.WriteShort((short)stringBytes.Length);
+                    }
+                    writer.WriteBytes(stringBytes);
                 }
-                else
-                {
-                    writer.WriteShort((short)stringBytes.Length);
-                }
-                writer.WriteBytes(stringBytes);
+            }
+            if (version >= ApiVersion.Version13)
+            {
+                writer.WriteGuid(TopicId);
             }
             if (version >= ApiVersion.Version9)
             {
@@ -498,6 +523,10 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                     return false;
                 }
             }
+            if (!TopicId.Equals(other.TopicId))
+            {
+                return false;
+            }
             if (PartitionResponses is null)
             {
                 if (other.PartitionResponses is not null)
@@ -519,7 +548,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Name);
+            hashCode = HashCode.Combine(hashCode, Name, TopicId);
             return hashCode;
         }
 
@@ -528,6 +557,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         {
             return "TopicProduceResponseMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
+                + ", TopicId=" + TopicId
                 + ", PartitionResponses=" + PartitionResponses.DeepToString()
                 + ")";
         }
@@ -607,7 +637,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version3 || version > ApiVersion.Version12)
+            if (version < ApiVersion.Version3 || version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of PartitionProduceResponseMessage");
             }
@@ -966,7 +996,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of BatchIndexAndErrorMessageMessage");
             }
@@ -1154,7 +1184,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of LeaderIdAndEpochMessage");
             }
@@ -1310,7 +1340,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version12)
+            if (version > ApiVersion.Version13)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of NodeEndpointMessage");
             }

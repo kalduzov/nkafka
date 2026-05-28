@@ -1,4 +1,4 @@
-﻿//F0-C2-A6-6A-4A-49-17-09-F9-D5-5A-D9-94-B6-36-C8-AC-87-83-71-97-81-43-A7-7F-7B-6A-F8-41-EC-C8-2B
+﻿//E7-29-7A-1A-49-98-78-EC-EC-BA-13-30-38-F8-FA-1B-49-4D-DE-A3-C5-FC-C6-E1-F9-20-AE-60-FC-68-92-C4
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -82,6 +82,16 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
     public short ProducerEpoch { get; set; } = -1;
 
     /// <summary>
+    /// True if the client wants to enable two-phase commit (2PC) protocol for transactions.
+    /// </summary>
+    public bool Enable2Pc { get; set; } = false;
+
+    /// <summary>
+    /// True if the client wants to keep the currently ongoing transaction instead of aborting it.
+    /// </summary>
+    public bool KeepPreparedTxn { get; set; } = false;
+
+    /// <summary>
     /// The basic constructor of the message InitProducerIdRequestMessage
     /// </summary>
     public InitProducerIdRequestMessage()
@@ -140,6 +150,22 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
         else
         {
             ProducerEpoch = -1;
+        }
+        if (version >= ApiVersion.Version6)
+        {
+            Enable2Pc = reader.ReadByte() != 0;
+        }
+        else
+        {
+            Enable2Pc = false;
+        }
+        if (version >= ApiVersion.Version6)
+        {
+            KeepPreparedTxn = reader.ReadByte() != 0;
+        }
+        else
+        {
+            KeepPreparedTxn = false;
         }
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
@@ -210,6 +236,28 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
                 throw new UnsupportedVersionException($"Attempted to write a non-default ProducerEpoch at version {version}");
             }
         }
+        if (version >= ApiVersion.Version6)
+        {
+            writer.WriteBool(Enable2Pc);
+        }
+        else
+        {
+            if (Enable2Pc)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default Enable2Pc at version {version}");
+            }
+        }
+        if (version >= ApiVersion.Version6)
+        {
+            writer.WriteBool(KeepPreparedTxn);
+        }
+        else
+        {
+            if (KeepPreparedTxn)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default KeepPreparedTxn at version {version}");
+            }
+        }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         if (version >= ApiVersion.Version2)
@@ -265,6 +313,14 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
         {
             return false;
         }
+        if (Enable2Pc != other.Enable2Pc)
+        {
+            return false;
+        }
+        if (KeepPreparedTxn != other.KeepPreparedTxn)
+        {
+            return false;
+        }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
 
@@ -272,7 +328,7 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, TransactionalId, TransactionTimeoutMs, ProducerId, ProducerEpoch);
+        hashCode = HashCode.Combine(hashCode, TransactionalId, TransactionTimeoutMs, ProducerId, ProducerEpoch, Enable2Pc, KeepPreparedTxn);
         return hashCode;
     }
 
@@ -284,6 +340,8 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
             + ", TransactionTimeoutMs=" + TransactionTimeoutMs
             + ", ProducerId=" + ProducerId
             + ", ProducerEpoch=" + ProducerEpoch
+            + ", Enable2Pc=" + (Enable2Pc ? "true" : "false")
+            + ", KeepPreparedTxn=" + (KeepPreparedTxn ? "true" : "false")
             + ")";
     }
 }

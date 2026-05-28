@@ -7,7 +7,7 @@ This is necessary to get the description of the contracts that are saved in the 
 
 Based on these files, the built-in tool generates message contracts and serialization/deserialization methods for the protocol.
 
-The base branch and version of the Java client for this repository is the **3.9** branch.
+The base branch and version of the Java client for this repository is the **4.3** branch.
 
 > If changes are made to the contract generation algorithms, it is necessary to regenerate all messages and, if necessary, tests for these messages.
 

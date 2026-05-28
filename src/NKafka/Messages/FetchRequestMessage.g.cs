@@ -1,4 +1,4 @@
-﻿//91-DD-D1-DC-73-6A-3F-EF-21-2F-68-0D-CD-B9-A9-7F-D4-DC-4E-30-63-FF-76-F9-3D-0A-66-62-B7-A5-31-B7
+﻿//77-1F-D4-B1-3D-5E-63-BB-85-F3-2C-9D-FA-8A-73-51-5F-C8-F2-C5-92-AF-B6-A7-7D-53-E5-D0-C2-75-4D-0A
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -651,7 +651,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ReplicaStateMessage");
             }
@@ -776,7 +776,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchTopicMessage");
             }
@@ -1041,6 +1041,11 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         public Guid ReplicaDirectoryId { get; set; } = Guid.Empty;
 
         /// <summary>
+        /// The high-watermark known by the replica. -1 if the high-watermark is not known and 9223372036854775807 if the feature is not supported.
+        /// </summary>
+        public long HighWatermark { get; set; } = 9223372036854775807;
+
+        /// <summary>
         /// The basic constructor of the message FetchPartitionMessage
         /// </summary>
         public FetchPartitionMessage()
@@ -1060,7 +1065,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version < ApiVersion.Version4 || version > ApiVersion.Version17)
+            if (version < ApiVersion.Version4 || version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of FetchPartitionMessage");
             }
@@ -1092,6 +1097,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
             }
             PartitionMaxBytes = reader.ReadInt();
             ReplicaDirectoryId = Guid.Empty;
+            HighWatermark = 9223372036854775807;
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version12)
             {
@@ -1112,6 +1118,18 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                             else
                             {
                                 throw new Exception($"Tag 0 is not valid for version {version}");
+                            }
+                        }
+                        case 1:
+                        {
+                            if (version >= ApiVersion.Version18)
+                            {
+                                HighWatermark = reader.ReadLong();
+                                break;
+                            }
+                            else
+                            {
+                                throw new Exception($"Tag 1 is not valid for version {version}");
                             }
                         }
                         default:
@@ -1155,6 +1173,13 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                     numTaggedFields++;
                 }
             }
+            if (version >= ApiVersion.Version18)
+            {
+                if (HighWatermark != 9223372036854775807)
+                {
+                    numTaggedFields++;
+                }
+            }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
             if (version >= ApiVersion.Version12)
@@ -1166,6 +1191,14 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                         writer.WriteVarUInt32(0);
                         writer.WriteVarUInt32(16);
                         writer.WriteGuid(ReplicaDirectoryId);
+                    }
+                }
+                {
+                    if (HighWatermark != 9223372036854775807)
+                    {
+                        writer.WriteVarUInt32(1);
+                        writer.WriteVarUInt32(8);
+                        writer.WriteLong(HighWatermark);
                     }
                 }
                 rawWriter.WriteRawTags(ref writer, int.MaxValue);
@@ -1220,6 +1253,10 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
             {
                 return false;
             }
+            if (HighWatermark != other.HighWatermark)
+            {
+                return false;
+            }
             return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
         }
 
@@ -1228,6 +1265,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         {
             var hashCode = 0;
             hashCode = HashCode.Combine(hashCode, Partition, CurrentLeaderEpoch, FetchOffset, LastFetchedEpoch, LogStartOffset, PartitionMaxBytes, ReplicaDirectoryId);
+            hashCode = HashCode.Combine(hashCode, HighWatermark);
             return hashCode;
         }
 
@@ -1242,6 +1280,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
                 + ", LogStartOffset=" + LogStartOffset
                 + ", PartitionMaxBytes=" + PartitionMaxBytes
                 + ", ReplicaDirectoryId=" + ReplicaDirectoryId
+                + ", HighWatermark=" + HighWatermark
                 + ")";
         }
     }
@@ -1292,7 +1331,7 @@ internal sealed partial class FetchRequestMessage: IRequestMessage, IEquatable<F
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version17)
+            if (version > ApiVersion.Version18)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of ForgottenTopicMessage");
             }

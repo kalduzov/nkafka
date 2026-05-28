@@ -1,4 +1,4 @@
-﻿//48-2F-D2-09-7E-09-EE-CD-8F-1B-4F-BA-A2-39-95-79-13-F8-CA-2D-40-51-66-5A-B1-E1-2F-90-06-7F-78-24
+﻿//F6-DA-DA-48-42-19-44-31-C1-EC-9B-A9-1E-2A-D7-C1-25-E7-5E-7B-13-FC-38-9E-84-06-3E-EB-5A-17-CB-4D
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -140,5 +140,16 @@ public sealed partial class OffsetFetchResponseMessageTests
             Groups = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version9);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'OffsetFetchResponseMessage' message by Version10")]
+    public void SerializeAndDeserializeMessage_ApiVersion10_Success()
+    {
+        var message = new OffsetFetchResponseMessage
+        {
+            ThrottleTimeMs = -420004200,
+            Groups = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version10);
     }
 }

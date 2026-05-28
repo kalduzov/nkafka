@@ -1,4 +1,4 @@
-﻿//EA-FF-4C-BC-4D-95-F7-08-17-D5-CE-68-9D-2D-F5-90-28-5B-89-92-58-F0-96-7D-E5-47-78-BE-2B-DD-1D-10
+﻿//64-6C-F3-89-05-6D-6D-CF-7E-C5-72-9D-F0-C9-37-3D-1B-84-3E-25-CE-96-6F-96-32-FF-2F-BF-97-F7-04-C9
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -241,7 +241,7 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
         public sbyte ResourceTypeFilter { get; set; } = 0;
 
         /// <summary>
-        /// The resource name.
+        /// The resource name, or null to match any resource name.
         /// </summary>
         public string ResourceNameFilter { get; set; } = string.Empty;
 

@@ -1,4 +1,4 @@
-﻿//92-2A-A9-42-73-43-F5-CC-B9-20-BD-82-AE-40-78-FF-8B-63-22-23-8D-94-98-D2-E6-D3-10-0F-AC-FF-84-AE
+﻿//A8-D3-B4-AA-42-ED-D6-FD-2F-DF-AD-9C-EE-6E-32-6E-DC-B5-FB-F9-0A-2D-CB-D2-57-0A-A4-3F-6A-07-D8-27
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -167,5 +167,18 @@ public sealed partial class ProduceRequestMessageTests
             TopicData = new (),
         };
         message.SerializeAndDeserializeMessageTest(ApiVersion.Version12);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'ProduceRequestMessage' message by Version13")]
+    public void SerializeAndDeserializeMessage_ApiVersion13_Success()
+    {
+        var message = new ProduceRequestMessage
+        {
+            TransactionalId = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            Acks = -4242,
+            TimeoutMs = -420004200,
+            TopicData = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version13);
     }
 }

@@ -1,4 +1,4 @@
-﻿//B4-DE-85-C2-50-28-A8-73-D7-D2-89-14-9F-09-19-CE-E9-E9-1A-C0-0E-68-EF-B8-7E-39-15-1B-62-48-27-88
+﻿//57-C2-A0-0A-C6-AF-B9-4F-1C-D7-EA-CD-BF-28-04-6D-CD-92-77-39-5F-7B-04-F5-B9-14-79-04-64-BA-02-77
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -38,6 +38,46 @@ namespace NKafka.Tests.Messages;
 
 public sealed partial class MetadataRequestMessageTests
 {
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version0")]
+    public void SerializeAndDeserializeMessage_ApiVersion0_Success()
+    {
+        var message = new MetadataRequestMessage
+        {
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version0);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version1")]
+    public void SerializeAndDeserializeMessage_ApiVersion1_Success()
+    {
+        var message = new MetadataRequestMessage
+        {
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version1);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version2")]
+    public void SerializeAndDeserializeMessage_ApiVersion2_Success()
+    {
+        var message = new MetadataRequestMessage
+        {
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version2);
+    }
+
+    [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version3")]
+    public void SerializeAndDeserializeMessage_ApiVersion3_Success()
+    {
+        var message = new MetadataRequestMessage
+        {
+            Topics = new (),
+        };
+        message.SerializeAndDeserializeMessageTest(ApiVersion.Version3);
+    }
 
     [Fact(DisplayName = "Check serialize and deserialize 'MetadataRequestMessage' message by Version4")]
     public void SerializeAndDeserializeMessage_ApiVersion4_Success()

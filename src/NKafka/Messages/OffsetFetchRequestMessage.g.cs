@@ -1,4 +1,4 @@
-﻿//B7-B0-2D-7C-39-A6-35-61-7B-1A-2A-75-BF-04-EB-E5-63-9E-CB-A0-B8-FE-9F-2B-DF-B1-74-15-DB-07-68-6E
+﻿//02-05-AF-88-55-26-7F-E9-9C-D7-55-91-EF-C3-03-A5-9C-7E-45-E1-23-56-24-E0-82-A7-00-C8-07-07-3F-EF
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -693,7 +693,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestGroupMessage");
             }
@@ -921,6 +921,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         public string Name { get; set; } = string.Empty;
 
         /// <summary>
+        /// The topic ID.
+        /// </summary>
+        public Guid TopicId { get; set; } = Guid.Empty;
+
+        /// <summary>
         /// The partition indexes we would like to fetch offsets for.
         /// </summary>
         public List<int> PartitionIndexes { get; set; } = new ();
@@ -945,10 +950,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         /// <inheritdoc />
         public void Read(ref BufferReader reader, ApiVersion version)
         {
-            if (version > ApiVersion.Version9)
+            if (version > ApiVersion.Version10)
             {
                 throw new UnsupportedVersionException($"Can't read version {version} of OffsetFetchRequestTopicsMessage");
             }
+            if (version <= ApiVersion.Version9)
             {
                 int length;
                 length = reader.ReadVarUInt32() - 1;
@@ -964,6 +970,18 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
                 {
                     Name = reader.ReadString(length);
                 }
+            }
+            else
+            {
+                Name = string.Empty;
+            }
+            if (version >= ApiVersion.Version10)
+            {
+                TopicId = reader.ReadGuid();
+            }
+            else
+            {
+                TopicId = Guid.Empty;
             }
             {
                 int arrayLength;
@@ -1001,10 +1019,17 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         public void Write(ref BufferWriter writer, ApiVersion version)
         {
             var numTaggedFields = 0;
+            if (version <= ApiVersion.Version9)
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                {
+                    var stringBytes = Encoding.UTF8.GetBytes(Name);
+                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteBytes(stringBytes);
+                }
+            }
+            if (version >= ApiVersion.Version10)
+            {
+                writer.WriteGuid(TopicId);
             }
             writer.WriteVarUInt32(PartitionIndexes.Count + 1);
             foreach (var element in PartitionIndexes)
@@ -1044,6 +1069,10 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
                     return false;
                 }
             }
+            if (!TopicId.Equals(other.TopicId))
+            {
+                return false;
+            }
             if (PartitionIndexes is null)
             {
                 if (other.PartitionIndexes is not null)
@@ -1065,7 +1094,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         public override int GetHashCode()
         {
             var hashCode = 0;
-            hashCode = HashCode.Combine(hashCode, Name, PartitionIndexes);
+            hashCode = HashCode.Combine(hashCode, Name, TopicId, PartitionIndexes);
             return hashCode;
         }
 
@@ -1074,6 +1103,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         {
             return "OffsetFetchRequestTopicsMessage("
                 + "Name=" + (string.IsNullOrWhiteSpace(Name) ? "null" : Name)
+                + ", TopicId=" + TopicId
                 + ", PartitionIndexes=" + PartitionIndexes.DeepToString()
                 + ")";
         }

@@ -201,6 +201,7 @@ KIP должен попадать в roadmap клиента только есл�
 Связанные документы:
 
 - [Technical requirements](K:\nkafka\spec\technical-requirements.md)
+- [Protocol interaction spec](K:\nkafka\spec\protocol-interaction.md)
 - [Code map](K:\nkafka\spec\code-map.md)
 - [Code gaps](K:\nkafka\spec\code-gaps.md)
 - [Client-side KIPs overview](K:\nkafka\spec\KIP\client-side-kips.md)

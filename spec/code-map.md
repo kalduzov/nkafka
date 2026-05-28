@@ -562,6 +562,7 @@
 - [Protocol](K:\nkafka\src\NKafka\Protocol)
 - [Messages](K:\nkafka\src\NKafka\Messages)
 - [src/NKafka.MessageGenerator](K:\nkafka\src\NKafka.MessageGenerator)
+- [Protocol interaction spec](K:\nkafka\spec\protocol-interaction.md)
 
 Если задача про безопасность:
 

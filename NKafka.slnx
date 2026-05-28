@@ -190,6 +190,7 @@
   <Folder Name="/spec/">
     <File Path="spec/code-gaps.md" />
     <File Path="spec/code-map.md" />
+    <File Path="spec/consumer-rebalance-notes-ozontech-2025-05.md" />
     <File Path="spec/index.md" />
     <File Path="spec/protocol-api-addition-plan.md" />
     <File Path="spec/protocol-interaction.md" />

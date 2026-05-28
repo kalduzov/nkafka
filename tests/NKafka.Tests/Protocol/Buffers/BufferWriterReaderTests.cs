@@ -123,4 +123,81 @@ public class BufferWriterReaderTests
 
         actual.Should().Be(original);
     }
+
+    [Fact]
+    public void WriteInt16String_WritesKafkaStringPayload()
+    {
+        const string value = "test";
+        var buffer = new ArrayBuffer(true, false, 32);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteInt16String(value);
+        writer.Flush();
+
+        buffer.DangerousGetFirstBuffer()
+            .Take(6)
+            .Should()
+            .Equal(0x00, 0x04, 0x74, 0x65, 0x73, 0x74);
+    }
+
+    [Fact]
+    public void WriteInt16String_WritesUtf8ByteLengthInsteadOfCharLength()
+    {
+        const string value = "Привет";
+        var buffer = new ArrayBuffer(true, false, 64);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteInt16String(value);
+        writer.Flush();
+
+        var reader = new BufferReader(buffer.DangerousGetFirstBuffer().AsSpan(0, 14));
+        var length = reader.ReadShort();
+        var actual = reader.ReadString(length);
+
+        length.Should().Be(12);
+        actual.Should().Be(value);
+    }
+
+    [Fact]
+    public void WriteNullableInt16String_WritesMinusOneForNull()
+    {
+        var buffer = new ArrayBuffer(true, false, 8);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteNullableInt16String(null);
+        writer.Flush();
+
+        buffer.DangerousGetFirstBuffer()
+            .Take(2)
+            .Should()
+            .Equal(0xff, 0xff);
+    }
+
+    [Fact]
+    public void WriteCompactString_WritesKafkaCompactStringPayload()
+    {
+        const string value = "test";
+        var buffer = new ArrayBuffer(true, false, 32);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteCompactString(value);
+        writer.Flush();
+
+        buffer.DangerousGetFirstBuffer()
+            .Take(5)
+            .Should()
+            .Equal(0x05, 0x74, 0x65, 0x73, 0x74);
+    }
+
+    [Fact]
+    public void WriteNullableCompactString_WritesZeroForNull()
+    {
+        var buffer = new ArrayBuffer(true, false, 8);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteNullableCompactString(null);
+        writer.Flush();
+
+        buffer.DangerousGetFirstBuffer()[0].Should().Be(0);
+    }
 }

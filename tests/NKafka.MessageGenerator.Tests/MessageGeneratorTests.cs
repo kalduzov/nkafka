@@ -44,6 +44,20 @@ public class MessageGeneratorTests
         result.ToString().Should().NotBeEmpty();
     }
 
+    [Theory]
+    [InlineData("data/RequestHeader.json", "writer.WriteInt16String(ClientId);")]
+    [InlineData("data/MetadataRequest.json", "writer.WriteCompactString(Name);")]
+    public async Task GenerateTest_UsesKafkaStringWriterMethods(string fileName, string expectedSnippet)
+    {
+        var specification = await JsonParseTests.GetMessageSpecification(fileName);
+
+        var messageGenerator = new MessageGenerator("test");
+        var result = messageGenerator.Generate(specification).ToString();
+
+        result.Should().Contain(expectedSnippet);
+        result.Should().NotContain("Encoding.UTF8.GetBytes");
+    }
+
     [Fact]
     public void GenerateTest()
     {

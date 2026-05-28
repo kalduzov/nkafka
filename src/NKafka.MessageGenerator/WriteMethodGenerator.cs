@@ -159,11 +159,10 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                                     if (field.Type.IsString)
                                     {
-                                        _codeGenerator.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({field.Name});");
+                                        _codeGenerator.AppendLine($"var stringBytesCount = Encoding.UTF8.GetByteCount({field.Name});");
                                         _codeGenerator.AppendLine(
-                                            "writer.WriteVarUInt32(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());");
-                                        _codeGenerator.AppendLine("writer.WriteVarUInt32(stringBytes.Length + 1);");
-                                        _codeGenerator.AppendLine("writer.WriteBytes(stringBytes);");
+                                            "writer.WriteVarUInt32(stringBytesCount + (stringBytesCount + 1).SizeOfVarUInt());");
+                                        _codeGenerator.AppendLine($"writer.WriteCompactString({field.Name});");
                                     }
                                     else if (field.Type.IsBytes)
                                     {
@@ -291,8 +290,8 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                 if (type.IsString)
                 {
-                    _codeGenerator.AppendLine($"var stringBytes = Encoding.UTF8.GetBytes({name});");
-                    lengthExpression = "stringBytes.Length";
+                    _codeGenerator.AppendLine($"var stringBytesCount = Encoding.UTF8.GetByteCount({name});");
+                    lengthExpression = "stringBytesCount";
                 }
                 else if (type.IsBytes)
                 {
@@ -311,29 +310,34 @@ internal class WriteMethodGenerator: IMethodGenerator
                     throw new Exception($"Unhandled type {type}");
                 }
 
-                VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
-                    .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarUInt32({lengthExpression} + 1);"); })
-                    .IfNotMember(_ =>
-                    {
-                        _codeGenerator.AppendLine(
-                            type.IsString ? $"writer.WriteShort((short){lengthExpression});" : $"writer.WriteInt({lengthExpression});");
-                    })
-                    .Generate(_codeGenerator);
-
                 if (type.IsString)
                 {
-                    _codeGenerator.AppendLine("writer.WriteBytes(stringBytes);");
+                    VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
+                        .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteCompactString({name});"); })
+                        .IfNotMember(_ => { _codeGenerator.AppendLine($"writer.WriteInt16String({name});"); })
+                        .Generate(_codeGenerator);
                 }
-                else if (type.IsBytes)
+                else
                 {
-                    _codeGenerator.AppendLine($"writer.WriteBytes({name});");
-                }
-                else if (type.IsRecords)
-                {
-                    _codeGenerator.AppendLine($"writer.WriteRecords({name});");
-                }
-                else if (type is IFieldType.ArrayType arrayType)
-                {
+                    VersionConditional.ForVersions(fieldFlexibleVersions, possibleVersions)
+                        .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteVarUInt32({lengthExpression} + 1);"); })
+                        .IfNotMember(_ =>
+                        {
+                            _codeGenerator.AppendLine(
+                                type.IsString ? $"writer.WriteShort((short){lengthExpression});" : $"writer.WriteInt({lengthExpression});");
+                        })
+                        .Generate(_codeGenerator);
+
+                    if (type.IsBytes)
+                    {
+                        _codeGenerator.AppendLine($"writer.WriteBytes({name});");
+                    }
+                    else if (type.IsRecords)
+                    {
+                        _codeGenerator.AppendLine($"writer.WriteRecords({name});");
+                    }
+                    else if (type is IFieldType.ArrayType arrayType)
+                    {
                     var elementType = arrayType.ElementType;
                     _codeGenerator.AppendLine($"foreach (var element in {name})");
                     _codeGenerator.AppendLeftBrace();
@@ -355,6 +359,7 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                     _codeGenerator.DecrementIndent();
                     _codeGenerator.AppendRightBrace();
+                    }
                 }
             })
             .Generate(_codeGenerator);

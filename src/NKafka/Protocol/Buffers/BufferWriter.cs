@@ -21,8 +21,10 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using NKafka.Exceptions;
+using NKafka.Protocol.Extensions;
 
 namespace NKafka.Protocol.Buffers;
 
@@ -143,6 +145,70 @@ internal ref partial struct BufferWriter
         WriteBytes(bytes);
     }
 
+    /// <summary>
+    /// Writes a Kafka string encoded as Int16 length followed by UTF-8 bytes.
+    /// This is the non-flexible wire format used by classic protocol versions.
+    /// </summary>
+    public void WriteInt16String(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var byteCount = Encoding.UTF8.GetByteCount(value);
+
+        if (byteCount > short.MaxValue)
+        {
+            throw new SerializeDataException($"String length '{byteCount}' exceeds Int16.MaxValue.");
+        }
+
+        WriteShort((short)byteCount);
+        WriteUtf8String(value, byteCount);
+    }
+
+    /// <summary>
+    /// Writes a nullable Kafka string encoded as Int16 length followed by UTF-8 bytes.
+    /// A null value is represented using the Kafka sentinel length <c>-1</c>.
+    /// </summary>
+    public void WriteNullableInt16String(string? value)
+    {
+        if (value is null)
+        {
+            WriteShort(-1);
+
+            return;
+        }
+
+        WriteInt16String(value);
+    }
+
+    /// <summary>
+    /// Writes a Kafka compact string encoded as VarUInt(length + 1) followed by UTF-8 bytes.
+    /// This is the flexible-version wire format used by modern protocol versions.
+    /// </summary>
+    public void WriteCompactString(string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var byteCount = Encoding.UTF8.GetByteCount(value);
+        this.WriteVarUInt32(byteCount + 1);
+        WriteUtf8String(value, byteCount);
+    }
+
+    /// <summary>
+    /// Writes a nullable Kafka compact string encoded as VarUInt(length + 1) followed by UTF-8 bytes.
+    /// A null value is represented using the Kafka compact sentinel length <c>0</c>.
+    /// </summary>
+    public void WriteNullableCompactString(string? value)
+    {
+        if (value is null)
+        {
+            this.WriteVarUInt32(0);
+
+            return;
+        }
+
+        WriteCompactString(value);
+    }
+
     public void WriteRecords(Records.Records? records)
     {
         if (records is null)
@@ -172,5 +238,24 @@ internal ref partial struct BufferWriter
         Unsafe.WriteUnaligned(ref spanRef, value1);
         Unsafe.WriteUnaligned(ref Unsafe.Add(ref spanRef, Unsafe.SizeOf<T1>()), value2);
         Advance(size);
+    }
+
+    private void WriteUtf8String(string value, int byteCount)
+    {
+        if (byteCount == 0)
+        {
+            return;
+        }
+
+        var span = MemoryMarshal.CreateSpan(ref GetSpanReference(byteCount), byteCount);
+        var bytesWritten = Encoding.UTF8.GetBytes(value.AsSpan(), span);
+
+        if (bytesWritten != byteCount)
+        {
+            throw new SerializeDataException(
+                $"Expected to write '{byteCount}' UTF-8 bytes but wrote '{bytesWritten}'.");
+        }
+
+        Advance(bytesWritten);
     }
 }

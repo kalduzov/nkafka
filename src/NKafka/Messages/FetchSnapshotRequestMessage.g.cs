@@ -177,8 +177,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         if (ClusterId is not null)
         {
             writer.WriteVarUInt32(0);
-            var stringBytesCount = Encoding.UTF8.GetByteCount(ClusterId);
-            writer.WriteVarUInt32(stringBytesCount + (stringBytesCount + 1).SizeOfVarUInt());
+            writer.WriteVarUInt32(ClusterId.SizeOfCompactString());
             writer.WriteCompactString(ClusterId);
         }
         rawWriter.WriteRawTags(ref writer, int.MaxValue);

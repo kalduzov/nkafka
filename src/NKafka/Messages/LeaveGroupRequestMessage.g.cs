@@ -503,11 +503,11 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(GroupInstanceId);
                 }
             }
             else
@@ -525,7 +525,7 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
             {
                 if (Reason is null)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Reason);
                 }
                 else
                 {

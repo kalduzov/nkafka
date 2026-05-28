@@ -607,11 +607,11 @@ internal sealed partial class AlterConfigsRequestMessage: IRequestMessage, IEqua
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Value);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(Value);
                 }
             }
             else

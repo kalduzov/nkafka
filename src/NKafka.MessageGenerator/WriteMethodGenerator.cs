@@ -159,9 +159,8 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                                     if (field.Type.IsString)
                                     {
-                                        _codeGenerator.AppendLine($"var stringBytesCount = Encoding.UTF8.GetByteCount({field.Name});");
                                         _codeGenerator.AppendLine(
-                                            "writer.WriteVarUInt32(stringBytesCount + (stringBytesCount + 1).SizeOfVarUInt());");
+                                            $"writer.WriteVarUInt32({field.Name}.SizeOfCompactString());");
                                         _codeGenerator.AppendLine($"writer.WriteCompactString({field.Name});");
                                     }
                                     else if (field.Type.IsBytes)
@@ -209,8 +208,18 @@ internal class WriteMethodGenerator: IMethodGenerator
                                 cond.IfNull(() =>
                                 {
                                     _codeGenerator.AppendLine($"writer.WriteVarUInt32({field.Tag});");
-                                    _codeGenerator.AppendLine("writer.WriteVarUInt32(1);");
-                                    _codeGenerator.AppendLine("writer.WriteVarUInt32(0);");
+
+                                    if (field.Type.IsString)
+                                    {
+                                        _codeGenerator.AppendLine(
+                                            $"writer.WriteVarUInt32({field.Name}.SizeOfNullableCompactString());");
+                                        _codeGenerator.AppendLine($"writer.WriteNullableCompactString({field.Name});");
+                                    }
+                                    else
+                                    {
+                                        _codeGenerator.AppendLine("writer.WriteVarUInt32(1);");
+                                        _codeGenerator.AppendLine("writer.WriteVarUInt32(0);");
+                                    }
                                 });
                             }
 
@@ -276,10 +285,20 @@ internal class WriteMethodGenerator: IMethodGenerator
                 VersionConditional.ForVersions(nullableVersions, possibleVersions)
                     .IfMember(presentVersions =>
                     {
-                        VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
-                            .IfMember(_ => { _codeGenerator.AppendLine("writer.WriteVarUInt32(0);"); })
-                            .IfNotMember(_ => { _codeGenerator.AppendLine(type.IsString ? "writer.WriteShort(-1);" : "writer.WriteInt(-1);"); })
-                            .Generate(_codeGenerator);
+                        if (type.IsString)
+                        {
+                            VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
+                                .IfMember(_ => { _codeGenerator.AppendLine($"writer.WriteNullableCompactString({name});"); })
+                                .IfNotMember(_ => { _codeGenerator.AppendLine($"writer.WriteNullableInt16String({name});"); })
+                                .Generate(_codeGenerator);
+                        }
+                        else
+                        {
+                            VersionConditional.ForVersions(fieldFlexibleVersions, presentVersions)
+                                .IfMember(_ => { _codeGenerator.AppendLine("writer.WriteVarUInt32(0);"); })
+                                .IfNotMember(_ => { _codeGenerator.AppendLine("writer.WriteInt(-1);"); })
+                                .Generate(_codeGenerator);
+                        }
                     })
                     .IfNotMember(_ => { _codeGenerator.Append("throw new NullReferenceException();"); })
                     .Generate(_codeGenerator);

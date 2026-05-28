@@ -292,11 +292,11 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             {
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ClusterId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ClusterId);
                 }
             }
             else
@@ -606,11 +606,11 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 {
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(0);
+                        writer.WriteNullableCompactString(Rack);
                     }
                     else
                     {
-                        writer.WriteShort(-1);
+                        writer.WriteNullableInt16String(Rack);
                     }
                 }
                 else
@@ -927,7 +927,7 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             {
                 if (version >= ApiVersion.Version12)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Name);
                 }
                 else
                 {

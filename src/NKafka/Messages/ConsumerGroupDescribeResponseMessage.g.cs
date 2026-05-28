@@ -370,7 +370,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {
@@ -782,7 +782,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             if (InstanceId is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(InstanceId);
             }
             else
             {
@@ -790,7 +790,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             if (RackId is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(RackId);
             }
             else
             {
@@ -812,7 +812,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             if (SubscribedTopicRegex is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(SubscribedTopicRegex);
             }
             else
             {

@@ -22,6 +22,7 @@
  */
 
 using System.Numerics;
+using System.Text;
 
 using NKafka.Protocol.Buffers;
 
@@ -212,6 +213,29 @@ internal static class VarIntExtensions
         var leadingZerosBelow70DividedBy7 = (70 - leadingZeros) * 0b10010010010010011 >> 19;
 
         return leadingZerosBelow70DividedBy7 + (leadingZeros >> 6);
+    }
+
+    /// <summary>
+    /// Returns the size of a Kafka compact string encoded as VarUInt(length + 1) followed by UTF-8 bytes.
+    /// This matches the payload written by <see cref="BufferWriter.WriteCompactString"/>.
+    /// </summary>
+    internal static int SizeOfCompactString(this string value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        var byteCount = Encoding.UTF8.GetByteCount(value);
+
+        return (byteCount + 1).SizeOfVarUInt() + byteCount;
+    }
+
+    /// <summary>
+    /// Returns the size of a nullable Kafka compact string encoded as VarUInt(length + 1) followed by UTF-8 bytes.
+    /// A null value is represented by the Kafka compact-string sentinel length <c>0</c>.
+    /// This matches the payload written by <see cref="BufferWriter.WriteNullableCompactString"/>.
+    /// </summary>
+    internal static int SizeOfNullableCompactString(this string? value)
+    {
+        return value is null ? 1 : value.SizeOfCompactString();
     }
 
     #endregion

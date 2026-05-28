@@ -151,7 +151,7 @@ internal sealed partial class AlterShareGroupOffsetsResponseMessage: IResponseMe
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ErrorMessage);
         }
         else
         {
@@ -518,7 +518,7 @@ internal sealed partial class AlterShareGroupOffsetsResponseMessage: IResponseMe
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

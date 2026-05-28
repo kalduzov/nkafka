@@ -170,7 +170,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ErrorMessage);
         }
         else
         {
@@ -178,7 +178,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         if (MemberId is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(MemberId);
         }
         else
         {

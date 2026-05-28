@@ -197,7 +197,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ErrorMessage);
         }
         else
         {
@@ -460,7 +460,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
             writer.WriteInt(Port);
             if (Rack is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Rack);
             }
             else
             {

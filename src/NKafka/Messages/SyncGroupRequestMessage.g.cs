@@ -320,11 +320,11 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(GroupInstanceId);
                 }
             }
             else
@@ -350,7 +350,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolType);
             }
             else
             {
@@ -361,7 +361,7 @@ internal sealed partial class SyncGroupRequestMessage: IRequestMessage, IEquatab
         {
             if (ProtocolName is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolName);
             }
             else
             {

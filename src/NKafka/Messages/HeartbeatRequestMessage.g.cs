@@ -225,11 +225,11 @@ internal sealed partial class HeartbeatRequestMessage: IRequestMessage, IEquatab
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(GroupInstanceId);
                 }
             }
             else

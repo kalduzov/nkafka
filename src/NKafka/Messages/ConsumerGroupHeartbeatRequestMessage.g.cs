@@ -309,7 +309,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         writer.WriteInt(MemberEpoch);
         if (InstanceId is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(InstanceId);
         }
         else
         {
@@ -317,7 +317,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         if (RackId is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(RackId);
         }
         else
         {
@@ -342,7 +342,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         {
             if (SubscribedTopicRegex is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(SubscribedTopicRegex);
             }
             else
             {
@@ -358,7 +358,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         if (ServerAssignor is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ServerAssignor);
         }
         else
         {

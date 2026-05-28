@@ -394,11 +394,11 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ResourceNameFilter);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ResourceNameFilter);
                 }
             }
             else
@@ -417,11 +417,11 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(PrincipalFilter);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(PrincipalFilter);
                 }
             }
             else
@@ -439,11 +439,11 @@ internal sealed partial class DeleteAclsRequestMessage: IRequestMessage, IEquata
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(HostFilter);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(HostFilter);
                 }
             }
             else

@@ -227,7 +227,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
         {
             if (RackId is null)
             {
-                writer.WriteShort(-1);
+                writer.WriteNullableInt16String(RackId);
             }
             else
             {

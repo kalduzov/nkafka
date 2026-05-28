@@ -369,7 +369,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
             {
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Name);
                 }
                 else
                 {
@@ -395,7 +395,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
             {
                 if (ErrorMessage is null)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {

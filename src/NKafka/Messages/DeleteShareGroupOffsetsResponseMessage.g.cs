@@ -151,7 +151,7 @@ internal sealed partial class DeleteShareGroupOffsetsResponseMessage: IResponseM
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ErrorMessage);
         }
         else
         {
@@ -357,7 +357,7 @@ internal sealed partial class DeleteShareGroupOffsetsResponseMessage: IResponseM
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

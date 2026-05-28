@@ -443,11 +443,11 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             {
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else
@@ -740,7 +740,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             if (Value is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Value);
             }
             else
             {

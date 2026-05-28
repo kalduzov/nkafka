@@ -697,11 +697,11 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             {
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Metadata);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(Metadata);
                 }
             }
             else
@@ -1301,7 +1301,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             writer.WriteInt(CommittedLeaderEpoch);
             if (Metadata is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Metadata);
             }
             else
             {

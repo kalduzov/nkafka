@@ -174,11 +174,11 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {
-                writer.WriteShort(-1);
+                writer.WriteNullableInt16String(ErrorMessage);
             }
         }
         else

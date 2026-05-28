@@ -339,11 +339,11 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             {
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(GroupInstanceId);
                 }
             }
             else
@@ -395,7 +395,7 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
         {
             if (Reason is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Reason);
             }
             else
             {

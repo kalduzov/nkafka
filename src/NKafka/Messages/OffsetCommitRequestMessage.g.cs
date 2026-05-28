@@ -281,11 +281,11 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             {
                 if (version >= ApiVersion.Version8)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(GroupInstanceId);
                 }
             }
             else
@@ -826,11 +826,11 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             {
                 if (version >= ApiVersion.Version8)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(CommittedMetadata);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(CommittedMetadata);
                 }
             }
             else

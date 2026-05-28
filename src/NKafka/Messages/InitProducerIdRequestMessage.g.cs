@@ -193,11 +193,11 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
         {
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort(-1);
+                writer.WriteNullableInt16String(TransactionalId);
             }
         }
         else

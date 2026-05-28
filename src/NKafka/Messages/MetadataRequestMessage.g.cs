@@ -451,7 +451,7 @@ internal sealed partial class MetadataRequestMessage: IRequestMessage, IEquatabl
             {
                 if (version >= ApiVersion.Version10)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Name);
                 }
                 else
                 {

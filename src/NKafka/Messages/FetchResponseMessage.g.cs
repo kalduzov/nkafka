@@ -1718,7 +1718,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             writer.WriteInt(Port);
             if (Rack is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Rack);
             }
             else
             {

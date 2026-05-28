@@ -329,7 +329,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         {
             if (GroupInstanceId is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(GroupInstanceId);
             }
             else
             {
@@ -849,11 +849,11 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             {
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(CommittedMetadata);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(CommittedMetadata);
                 }
             }
             else

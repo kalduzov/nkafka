@@ -358,11 +358,11 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             {
                 if (version >= ApiVersion.Version1)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else

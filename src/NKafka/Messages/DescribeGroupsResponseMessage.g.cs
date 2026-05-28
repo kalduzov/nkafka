@@ -500,7 +500,7 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
             {
                 if (ErrorMessage is null)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
@@ -968,11 +968,11 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
                 {
                     if (version >= ApiVersion.Version5)
                     {
-                        writer.WriteVarUInt32(0);
+                        writer.WriteNullableCompactString(GroupInstanceId);
                     }
                     else
                     {
-                        writer.WriteShort(-1);
+                        writer.WriteNullableInt16String(GroupInstanceId);
                     }
                 }
                 else

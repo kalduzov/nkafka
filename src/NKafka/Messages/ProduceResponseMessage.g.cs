@@ -792,11 +792,11 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                 {
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(0);
+                        writer.WriteNullableCompactString(ErrorMessage);
                     }
                     else
                     {
-                        writer.WriteShort(-1);
+                        writer.WriteNullableInt16String(ErrorMessage);
                     }
                 }
                 else
@@ -1051,11 +1051,11 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             {
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(BatchIndexErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(BatchIndexErrorMessage);
                 }
             }
             else
@@ -1402,7 +1402,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             writer.WriteInt(Port);
             if (Rack is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Rack);
             }
             else
             {

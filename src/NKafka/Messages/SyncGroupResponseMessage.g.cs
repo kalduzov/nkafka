@@ -199,7 +199,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolType);
             }
             else
             {
@@ -210,7 +210,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolName is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolName);
             }
             else
             {

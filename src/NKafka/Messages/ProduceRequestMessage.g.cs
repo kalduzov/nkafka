@@ -190,11 +190,11 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         {
             if (version >= ApiVersion.Version9)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort(-1);
+                writer.WriteNullableInt16String(TransactionalId);
             }
         }
         else

@@ -614,11 +614,11 @@ internal sealed partial class IncrementalAlterConfigsRequestMessage: IRequestMes
             {
                 if (version >= ApiVersion.Version1)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Value);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(Value);
                 }
             }
             else

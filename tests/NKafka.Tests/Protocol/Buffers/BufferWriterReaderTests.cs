@@ -200,4 +200,24 @@ public class BufferWriterReaderTests
 
         buffer.DangerousGetFirstBuffer()[0].Should().Be(0);
     }
+
+    [Fact]
+    public void SizeOfCompactString_MatchesWrittenPayloadSize()
+    {
+        const string value = "Привет";
+        var buffer = new ArrayBuffer(true, false, 64);
+        var writer = new BufferWriter(ref buffer);
+
+        writer.WriteCompactString(value);
+
+        writer.WrittenCount.Should().Be(value.SizeOfCompactString());
+    }
+
+    [Fact]
+    public void SizeOfNullableCompactString_ReturnsKafkaNullSentinelSize()
+    {
+        string? value = null;
+
+        value.SizeOfNullableCompactString().Should().Be(1);
+    }
 }

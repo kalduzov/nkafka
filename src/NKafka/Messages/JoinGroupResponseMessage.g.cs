@@ -303,7 +303,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (ProtocolType is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolType);
             }
             else
             {
@@ -314,7 +314,7 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
         {
             if (version >= ApiVersion.Version7)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ProtocolName);
             }
             else
             {
@@ -679,11 +679,11 @@ internal sealed partial class JoinGroupResponseMessage: IResponseMessage, IEquat
                 {
                     if (version >= ApiVersion.Version6)
                     {
-                        writer.WriteVarUInt32(0);
+                        writer.WriteNullableCompactString(GroupInstanceId);
                     }
                     else
                     {
-                        writer.WriteShort(-1);
+                        writer.WriteNullableInt16String(GroupInstanceId);
                     }
                 }
                 else

@@ -418,7 +418,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
             var numTaggedFields = 0;
             if (Name is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(Name);
             }
             else
             {

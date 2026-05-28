@@ -318,7 +318,7 @@ internal sealed partial class DescribeShareGroupOffsetsResponseMessage: IRespons
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {
@@ -722,7 +722,7 @@ internal sealed partial class DescribeShareGroupOffsetsResponseMessage: IRespons
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

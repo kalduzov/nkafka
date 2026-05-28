@@ -291,7 +291,7 @@ internal sealed partial class AlterUserScramCredentialsResponseMessage: IRespons
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

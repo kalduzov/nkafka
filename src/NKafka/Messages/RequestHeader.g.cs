@@ -136,7 +136,7 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         writer.WriteInt(CorrelationId);
         if (ClientId is null)
         {
-            writer.WriteShort(-1);
+            writer.WriteNullableInt16String(ClientId);
         }
         else
         {

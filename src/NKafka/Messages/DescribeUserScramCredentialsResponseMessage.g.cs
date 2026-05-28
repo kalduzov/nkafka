@@ -151,7 +151,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         writer.WriteShort((short)ErrorCode);
         if (ErrorMessage is null)
         {
-            writer.WriteVarUInt32(0);
+            writer.WriteNullableCompactString(ErrorMessage);
         }
         else
         {
@@ -372,7 +372,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

@@ -261,11 +261,11 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else
@@ -602,7 +602,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
             {
-                writer.WriteVarUInt32(0);
+                writer.WriteNullableCompactString(ErrorMessage);
             }
             else
             {

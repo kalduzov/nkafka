@@ -58,6 +58,31 @@ public class MessageGeneratorTests
         result.Should().NotContain("Encoding.UTF8.GetBytes");
     }
 
+    [Theory]
+    [InlineData("data/RequestHeader.json", "writer.WriteNullableInt16String(ClientId);")]
+    [InlineData("data/MetadataResponse.json", "writer.WriteNullableCompactString(ClusterId);")]
+    public async Task GenerateTest_UsesKafkaNullableStringWriterMethods(string fileName, string expectedSnippet)
+    {
+        var specification = await JsonParseTests.GetMessageSpecification(fileName);
+
+        var messageGenerator = new MessageGenerator("test");
+        var result = messageGenerator.Generate(specification).ToString();
+
+        result.Should().Contain(expectedSnippet);
+    }
+
+    [Fact]
+    public async Task GenerateTest_UsesCompactStringSizeHelperForTaggedStrings()
+    {
+        var specification = await JsonParseTests.GetMessageSpecification("data/FetchRequest.json");
+
+        var messageGenerator = new MessageGenerator("test");
+        var result = messageGenerator.Generate(specification).ToString();
+
+        result.Should().Contain("writer.WriteVarUInt32(ClusterId.SizeOfCompactString());");
+        result.Should().NotContain("var stringBytesCount = Encoding.UTF8.GetByteCount(ClusterId);");
+    }
+
     [Fact]
     public void GenerateTest()
     {

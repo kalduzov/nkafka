@@ -785,7 +785,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
             {
                 if (MemberId is null)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(MemberId);
                 }
                 else
                 {

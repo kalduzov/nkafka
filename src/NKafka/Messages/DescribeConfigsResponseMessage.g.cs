@@ -401,11 +401,11 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else
@@ -783,11 +783,11 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Value);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(Value);
                 }
             }
             else
@@ -830,11 +830,11 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
                 {
                     if (version >= ApiVersion.Version4)
                     {
-                        writer.WriteVarUInt32(0);
+                        writer.WriteNullableCompactString(Documentation);
                     }
                     else
                     {
-                        writer.WriteShort(-1);
+                        writer.WriteNullableInt16String(Documentation);
                     }
                 }
                 else
@@ -1111,11 +1111,11 @@ internal sealed partial class DescribeConfigsResponseMessage: IResponseMessage, 
             {
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(Value);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(Value);
                 }
             }
             else

@@ -367,11 +367,11 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else
@@ -691,11 +691,11 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             {
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(0);
+                    writer.WriteNullableCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort(-1);
+                    writer.WriteNullableInt16String(ErrorMessage);
                 }
             }
             else

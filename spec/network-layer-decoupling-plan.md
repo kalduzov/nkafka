@@ -1338,6 +1338,16 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 - код компилируется
 - новые методы доступны для поэтапного перевода call sites
 
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- новые explicit methods уже добавлены в `IKafkaConnectorPool`
+- `KafkaConnectorPool` реализует их как thin wrappers над текущей логикой
+- старые ambiguous methods пока сохранены для безопасной миграции
+
 ### Step 3. Migrate `KafkaCluster` to explicit routing methods
 
 Цель:
@@ -1356,6 +1366,17 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 - cluster layer больше не зависит от `GetConnector()`
 - routing intent читается из кода явно
 
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- broker-targeted routing переведён на `TryGetSharedConnector`
+- service routing now uses explicit `controller -> any shared broker -> bootstrap` path
+- `MergeAllVersions()` uses `GetOpenedSharedConnectors()`
+- dedicated acquisition in `KafkaCluster` migrated to `TryCreateDedicatedConnector`
+
 ### Step 4. Rename cluster dedicated-connector API
 
 Цель:
@@ -1370,6 +1391,15 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 Критерий завершения:
 
 - dedicated connector API naming согласовано в cluster layer
+
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- `ProvideDedicateConnector` renamed to `ProvideDedicatedConnector`
+- interface, implementation and consumer call site already updated
 
 ### Step 5. Update tests
 

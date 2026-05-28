@@ -594,7 +594,7 @@ internal class Coordinator: ICoordinator
 
             if (coordinator.Code == ErrorCodes.None)
             {
-                _coordinatorConnector = _kafkaCluster.ProvideDedicateConnector(coordinator.NodeId);
+                _coordinatorConnector = _kafkaCluster.ProvideDedicatedConnector(coordinator.NodeId);
                 await _coordinatorConnector.OpenAsync(token);
                 ChangeState(CoordinatorState.WaitJoinToGroup);
             }

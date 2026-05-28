@@ -227,7 +227,7 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="nodeId">The identifier of the node.</param>
     /// <returns>A dedicated connector is a separate physical channel to the broker.
     /// It is mainly used for multiple consumers of the same cluster in a single process address space.</returns>
-    internal IKafkaConnector ProvideDedicateConnector(int nodeId);
+    internal IKafkaConnector ProvideDedicatedConnector(int nodeId);
 
     /// <summary>
     /// Retrieve the metadata about a cluster.

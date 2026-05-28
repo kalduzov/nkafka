@@ -321,7 +321,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     Task<TResponseMessage> IKafkaCluster.SendAsync<TRequestMessage, TResponseMessage>(TRequestMessage message, int nodeId, CancellationToken token)
     {
-        if (_connectorPool.TryGetConnector(nodeId, false, out var connector))
+        if (_connectorPool.TryGetSharedConnector(nodeId, out var connector))
         {
             return connector.SendAsync<TRequestMessage, TResponseMessage>(message, false, token);
         }
@@ -344,9 +344,9 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <param name="nodeId">The ID of the Kafka node.</param>
     /// <returns>The dedicated Kafka connector for the specified node ID.</returns>
     /// <exception cref="ClusterKafkaException">Thrown when unable to create a dedicated connection.</exception>
-    public IKafkaConnector ProvideDedicateConnector(int nodeId)
+    public IKafkaConnector ProvideDedicatedConnector(int nodeId)
     {
-        if (_connectorPool.TryGetConnector(nodeId, true, out var connector))
+        if (_connectorPool.TryCreateDedicatedConnector(nodeId, out var connector))
         {
             return connector;
         }
@@ -592,7 +592,7 @@ internal sealed class KafkaCluster: IKafkaCluster
             throw new ClusterKafkaException(ExceptionMessages.NoController);
         }
 
-        if (_connectorPool.TryGetConnector(_controllerId, false, out var controllerConnector))
+        if (_connectorPool.TryGetSharedConnector(_controllerId, out var controllerConnector))
         {
             return controllerConnector;
         }
@@ -602,7 +602,17 @@ internal sealed class KafkaCluster: IKafkaCluster
             throw new ClusterKafkaException(ExceptionMessages.NoConnectionToController);
         }
 
-        return _connectorPool.GetConnector();
+        if (_connectorPool.TryGetAnySharedBrokerConnector(out var brokerConnector))
+        {
+            return brokerConnector;
+        }
+
+        if (_connectorPool.TryGetBootstrapConnector(out var bootstrapConnector))
+        {
+            return bootstrapConnector;
+        }
+
+        throw new ConnectorNotFoundException(ExceptionMessages.ConnectorPool_NoAvailableConnections);
     }
 
     /// <summary>
@@ -712,7 +722,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     {
         var isFirst = true;
 
-        foreach (var connector in _connectorPool.GetAllOpenedConnectors())
+        foreach (var connector in _connectorPool.GetOpenedSharedConnectors())
         {
             var added = new HashSet<ApiKeys>();
 

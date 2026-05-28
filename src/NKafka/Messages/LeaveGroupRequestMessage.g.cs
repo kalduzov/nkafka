@@ -206,23 +206,19 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version4)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(GroupId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(GroupId);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (version <= ApiVersion.Version2)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(MemberId);
             }
         }
         else
@@ -494,16 +490,14 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(MemberId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(MemberId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (GroupInstanceId is null)
             {
@@ -518,16 +512,14 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupInstanceId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version5)
             {
@@ -537,9 +529,7 @@ internal sealed partial class LeaveGroupRequestMessage: IRequestMessage, IEquata
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Reason);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(Reason);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

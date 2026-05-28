@@ -155,9 +155,7 @@ internal sealed partial class DeleteShareGroupOffsetsResponseMessage: IResponseM
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ErrorMessage);
         }
         writer.WriteVarUInt32(Responses.Count + 1);
         foreach (var element in Responses)
@@ -353,9 +351,7 @@ internal sealed partial class DeleteShareGroupOffsetsResponseMessage: IResponseM
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(TopicName);
             }
             writer.WriteGuid(TopicId);
             writer.WriteShort((short)ErrorCode);
@@ -365,9 +361,7 @@ internal sealed partial class DeleteShareGroupOffsetsResponseMessage: IResponseM
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ErrorMessage);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

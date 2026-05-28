@@ -504,9 +504,7 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(ErrorMessage);
                 }
             }
             else
@@ -517,52 +515,44 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
                 }
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupState);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupState);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupState);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ProtocolType);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ProtocolType);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ProtocolData);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ProtocolData);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ProtocolData);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version5)
             {
@@ -963,16 +953,14 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(MemberId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(MemberId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version4)
             {
@@ -989,41 +977,35 @@ internal sealed partial class DescribeGroupsResponseMessage: IResponseMessage, I
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                     if (version >= ApiVersion.Version5)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(GroupInstanceId);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(GroupInstanceId);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientId);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ClientId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ClientId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientHost);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ClientHost);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ClientHost);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version5)
             {

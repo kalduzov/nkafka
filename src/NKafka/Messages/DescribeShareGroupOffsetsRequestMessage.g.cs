@@ -277,9 +277,7 @@ internal sealed partial class DescribeShareGroupOffsetsRequestMessage: IRequestM
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupId);
             }
             if (Topics is null)
             {
@@ -459,9 +457,7 @@ internal sealed partial class DescribeShareGroupOffsetsRequestMessage: IRequestM
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(TopicName);
             }
             writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)

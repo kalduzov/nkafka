@@ -384,16 +384,14 @@ internal sealed partial class OffsetCommitResponseMessage: IResponseMessage, IEq
             if (version <= ApiVersion.Version9)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
                     if (version >= ApiVersion.Version8)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Name);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Name);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version10)

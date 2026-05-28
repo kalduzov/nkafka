@@ -255,29 +255,25 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version8)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(GroupId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(GroupId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(GenerationIdOrMemberEpoch);
         {
-            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
             if (version >= ApiVersion.Version8)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(MemberId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(MemberId);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (version >= ApiVersion.Version7)
         {
@@ -294,16 +290,14 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                 if (version >= ApiVersion.Version8)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupInstanceId);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -599,16 +593,14 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             if (version <= ApiVersion.Version9)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
                     if (version >= ApiVersion.Version8)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Name);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Name);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version10)
@@ -843,16 +835,14 @@ internal sealed partial class OffsetCommitRequestMessage: IRequestMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
                 if (version >= ApiVersion.Version8)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(CommittedMetadata);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(CommittedMetadata);
                 }
-                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

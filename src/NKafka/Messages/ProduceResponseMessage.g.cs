@@ -448,16 +448,14 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             if (version <= ApiVersion.Version12)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Name);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Name);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version13)
@@ -803,16 +801,14 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(ErrorMessage);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(ErrorMessage);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version10)
@@ -1064,16 +1060,14 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(BatchIndexErrorMessage);
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(BatchIndexErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(BatchIndexErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;
@@ -1403,9 +1397,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Host);
             }
             writer.WriteInt(Port);
             if (Rack is null)
@@ -1414,9 +1406,7 @@ internal sealed partial class ProduceResponseMessage: IResponseMessage, IEquatab
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Rack);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

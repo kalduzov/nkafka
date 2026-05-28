@@ -132,9 +132,7 @@ internal sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEqua
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            writer.WriteShort((short)stringBytes.Length);
-            writer.WriteBytes(stringBytes);
+            writer.WriteInt16String(GroupId);
         }
         writer.WriteInt(Topics.Count);
         foreach (var element in Topics)
@@ -296,9 +294,7 @@ internal sealed partial class OffsetDeleteRequestMessage: IRequestMessage, IEqua
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(Name);
             }
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)

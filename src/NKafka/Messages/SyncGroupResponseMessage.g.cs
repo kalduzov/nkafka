@@ -203,9 +203,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ProtocolType);
             }
         }
         if (version >= ApiVersion.Version5)
@@ -216,9 +214,7 @@ internal sealed partial class SyncGroupResponseMessage: IResponseMessage, IEquat
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ProtocolName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ProtocolName);
             }
         }
         if (version >= ApiVersion.Version4)

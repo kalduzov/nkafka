@@ -425,16 +425,14 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version7)
             {
@@ -454,16 +452,14 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version5)
             {
@@ -740,9 +736,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             if (Value is null)
             {
@@ -750,9 +744,7 @@ internal sealed partial class CreateTopicsResponseMessage: IResponseMessage, IEq
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Value);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Value);
             }
             writer.WriteBool(ReadOnly);
             writer.WriteSByte(ConfigSource);

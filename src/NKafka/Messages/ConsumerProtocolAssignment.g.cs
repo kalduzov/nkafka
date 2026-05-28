@@ -275,9 +275,7 @@ internal sealed partial class ConsumerProtocolAssignment: IMessage, IEquatable<C
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Topic);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(Topic);
             }
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)

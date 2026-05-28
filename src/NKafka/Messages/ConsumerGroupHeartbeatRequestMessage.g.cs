@@ -301,14 +301,10 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(GroupId);
         }
         {
-            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(MemberId);
         }
         writer.WriteInt(MemberEpoch);
         if (InstanceId is null)
@@ -317,9 +313,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(InstanceId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(InstanceId);
         }
         if (RackId is null)
         {
@@ -327,9 +321,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(RackId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(RackId);
         }
         writer.WriteInt(RebalanceTimeoutMs);
         if (SubscribedTopicNames is null)
@@ -342,9 +334,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
             foreach (var element in SubscribedTopicNames)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
         }
@@ -356,9 +346,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(SubscribedTopicRegex);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(SubscribedTopicRegex);
             }
         }
         else
@@ -374,9 +362,7 @@ internal sealed partial class ConsumerGroupHeartbeatRequestMessage: IRequestMess
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ServerAssignor);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ServerAssignor);
         }
         if (TopicPartitions is null)
         {

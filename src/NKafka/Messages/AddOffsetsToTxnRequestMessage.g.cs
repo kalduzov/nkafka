@@ -172,30 +172,26 @@ internal sealed partial class AddOffsetsToTxnRequestMessage: IRequestMessage, IE
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(TransactionalId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(GroupId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(GroupId);
             }
-            writer.WriteBytes(stringBytes);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

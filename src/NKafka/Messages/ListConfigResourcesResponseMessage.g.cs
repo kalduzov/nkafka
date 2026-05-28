@@ -284,9 +284,7 @@ internal sealed partial class ListConfigResourcesResponseMessage: IResponseMessa
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ResourceName);
             }
             if (version >= ApiVersion.Version1)
             {

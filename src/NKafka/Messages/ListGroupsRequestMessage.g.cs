@@ -189,9 +189,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
             foreach (var element in StatesFilter)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
         }
@@ -208,9 +206,7 @@ internal sealed partial class ListGroupsRequestMessage: IRequestMessage, IEquata
             foreach (var element in TypesFilter)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
         }

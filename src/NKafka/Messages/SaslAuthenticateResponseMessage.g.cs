@@ -183,16 +183,14 @@ internal sealed partial class SaslAuthenticateResponseMessage: IResponseMessage,
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(ErrorMessage);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(ErrorMessage);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (version >= ApiVersion.Version2)
         {

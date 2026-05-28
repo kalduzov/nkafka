@@ -110,9 +110,7 @@ internal sealed partial class SaslHandshakeRequestMessage: IRequestMessage, IEqu
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(Mechanism);
-            writer.WriteShort((short)stringBytes.Length);
-            writer.WriteBytes(stringBytes);
+            writer.WriteInt16String(Mechanism);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

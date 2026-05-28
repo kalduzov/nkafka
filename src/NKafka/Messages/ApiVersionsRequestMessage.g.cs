@@ -158,17 +158,13 @@ internal sealed partial class ApiVersionsRequestMessage: IRequestMessage, IEquat
         if (version >= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ClientSoftwareName);
             }
         }
         if (version >= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientSoftwareVersion);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ClientSoftwareVersion);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

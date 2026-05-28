@@ -374,26 +374,18 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ErrorMessage);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupId);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupState);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupState);
             }
             writer.WriteInt(GroupEpoch);
             writer.WriteInt(AssignmentEpoch);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(AssignorName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(AssignorName);
             }
             writer.WriteVarUInt32(Members.Count + 1);
             foreach (var element in Members)
@@ -786,9 +778,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(MemberId);
             }
             if (InstanceId is null)
             {
@@ -796,9 +786,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(InstanceId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(InstanceId);
             }
             if (RackId is null)
             {
@@ -806,28 +794,20 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(RackId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(RackId);
             }
             writer.WriteInt(MemberEpoch);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ClientId);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClientHost);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ClientHost);
             }
             writer.WriteVarUInt32(SubscribedTopicNames.Count + 1);
             foreach (var element in SubscribedTopicNames)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
             if (SubscribedTopicRegex is null)
@@ -836,9 +816,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(SubscribedTopicRegex);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(SubscribedTopicRegex);
             }
             Assignment?.Write(ref writer, version);
             TargetAssignment?.Write(ref writer, version);
@@ -1135,9 +1113,7 @@ internal sealed partial class ConsumerGroupDescribeResponseMessage: IResponseMes
             var numTaggedFields = 0;
             writer.WriteGuid(TopicId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(TopicName);
             }
             writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)

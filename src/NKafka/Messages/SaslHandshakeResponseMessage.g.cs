@@ -129,9 +129,7 @@ internal sealed partial class SaslHandshakeResponseMessage: IResponseMessage, IE
         foreach (var element in Mechanisms)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(element);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(element);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

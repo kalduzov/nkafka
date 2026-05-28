@@ -280,28 +280,24 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(TransactionalId);
             }
-            writer.WriteBytes(stringBytes);
         }
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(GroupId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(GroupId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);
@@ -319,9 +315,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         if (version >= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(MemberId);
             }
         }
         else
@@ -339,9 +333,7 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupInstanceId);
             }
         }
         else
@@ -634,16 +626,14 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version3)
             {
@@ -868,16 +858,14 @@ internal sealed partial class TxnOffsetCommitRequestMessage: IRequestMessage, IE
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(CommittedMetadata);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(CommittedMetadata);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(CommittedMetadata);
                 }
-                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

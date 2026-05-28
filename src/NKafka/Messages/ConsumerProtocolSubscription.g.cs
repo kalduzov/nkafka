@@ -199,9 +199,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
         foreach (var element in Topics)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(element);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(element);
             }
         }
         if (UserData is null)
@@ -233,9 +231,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(RackId);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(RackId);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -422,9 +418,7 @@ internal sealed partial class ConsumerProtocolSubscription: IMessage, IEquatable
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Topic);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(Topic);
             }
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)

@@ -144,9 +144,7 @@ internal sealed partial class DeleteShareGroupOffsetsRequestMessage: IRequestMes
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(GroupId);
         }
         writer.WriteVarUInt32(Topics.Count + 1);
         foreach (var element in Topics)
@@ -296,9 +294,7 @@ internal sealed partial class DeleteShareGroupOffsetsRequestMessage: IRequestMes
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TopicName);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(TopicName);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

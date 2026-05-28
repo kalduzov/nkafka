@@ -320,16 +320,14 @@ internal sealed partial class DeleteGroupsResponseMessage: IResponseMessage, IEq
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

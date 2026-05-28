@@ -502,16 +502,14 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             if (version <= ApiVersion.Version12)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Topic);
                     if (version >= ApiVersion.Version12)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Topic);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Topic);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version13)
@@ -1715,9 +1713,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Host);
             }
             writer.WriteInt(Port);
             if (Rack is null)
@@ -1726,9 +1722,7 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Rack);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

@@ -303,9 +303,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteSByte(Mechanism);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -488,9 +486,7 @@ internal sealed partial class AlterUserScramCredentialsRequestMessage: IRequestM
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteSByte(Mechanism);
             writer.WriteInt(Iterations);

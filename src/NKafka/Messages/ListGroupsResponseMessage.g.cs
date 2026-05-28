@@ -416,43 +416,35 @@ internal sealed partial class ListGroupsResponseMessage: IResponseMessage, IEqua
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ProtocolType);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ProtocolType);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version4)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(GroupState);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(GroupState);
                 }
             }
             if (version >= ApiVersion.Version5)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(GroupType);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(GroupType);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

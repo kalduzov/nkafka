@@ -201,9 +201,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ErrorMessage);
         }
         if (version >= ApiVersion.Version1)
         {
@@ -217,9 +215,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
             }
         }
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ClusterId);
         }
         writer.WriteInt(ControllerId);
         writer.WriteVarUInt32(Brokers.Count + 1);
@@ -459,9 +455,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
             var numTaggedFields = 0;
             writer.WriteInt(BrokerId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Host);
             }
             writer.WriteInt(Port);
             if (Rack is null)
@@ -470,9 +464,7 @@ internal sealed partial class DescribeClusterResponseMessage: IResponseMessage, 
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Rack);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Rack);
             }
             if (version >= ApiVersion.Version2)
             {

@@ -465,16 +465,14 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version6)
             {
@@ -708,16 +706,14 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Metadata);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Metadata);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Metadata);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -914,9 +910,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupId);
             }
             writer.WriteVarUInt32(Topics.Count + 1);
             foreach (var element in Topics)
@@ -1115,9 +1109,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             if (version <= ApiVersion.Version9)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(Name);
                 }
             }
             if (version >= ApiVersion.Version10)
@@ -1313,9 +1305,7 @@ internal sealed partial class OffsetFetchResponseMessage: IResponseMessage, IEqu
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Metadata);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Metadata);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

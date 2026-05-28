@@ -432,16 +432,14 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(NumPartitions);
             writer.WriteShort(ReplicationFactor);
@@ -893,16 +891,14 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (Value is null)
             {
@@ -917,16 +913,14 @@ internal sealed partial class CreateTopicsRequestMessage: IRequestMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Value);
                 if (version >= ApiVersion.Version5)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Value);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Value);
                 }
-                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

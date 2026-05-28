@@ -140,9 +140,7 @@ internal sealed partial class RequestHeader: IMessage, IEquatable<RequestHeader>
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ClientId);
-            writer.WriteShort((short)stringBytes.Length);
-            writer.WriteBytes(stringBytes);
+            writer.WriteInt16String(ClientId);
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;

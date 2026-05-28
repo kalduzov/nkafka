@@ -225,16 +225,14 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ResourceNameFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(ResourceNameFilter);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(ResourceNameFilter);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteSByte(PatternTypeFilter);
         if (PrincipalFilter is null)
@@ -250,16 +248,14 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(PrincipalFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(PrincipalFilter);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(PrincipalFilter);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (HostFilter is null)
         {
@@ -274,16 +270,14 @@ internal sealed partial class DescribeAclsRequestMessage: IRequestMessage, IEqua
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(HostFilter);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(HostFilter);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(HostFilter);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteSByte(Operation);
         writer.WriteSByte(PermissionType);

@@ -233,9 +233,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
                 foreach (var element in TopicNames)
                 {
                     {
-                        var stringBytes = Encoding.UTF8.GetBytes(element);
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
-                        writer.WriteBytes(stringBytes);
+                        writer.WriteCompactString(element);
                     }
                 }
             }
@@ -245,9 +243,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
                 foreach (var element in TopicNames)
                 {
                     {
-                        var stringBytes = Encoding.UTF8.GetBytes(element);
-                        writer.WriteShort((short)stringBytes.Length);
-                        writer.WriteBytes(stringBytes);
+                        writer.WriteInt16String(element);
                     }
                 }
             }
@@ -426,9 +422,7 @@ internal sealed partial class DeleteTopicsRequestMessage: IRequestMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteGuid(TopicId);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

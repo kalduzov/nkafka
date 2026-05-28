@@ -234,16 +234,14 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         if (version <= ApiVersion.Version7)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupId);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -541,16 +539,14 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version6)
             {
@@ -783,9 +779,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(GroupId);
             }
             if (version >= ApiVersion.Version9)
             {
@@ -795,9 +789,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(MemberId);
                 }
             }
             if (version >= ApiVersion.Version9)
@@ -1022,9 +1014,7 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
             if (version <= ApiVersion.Version9)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(Name);
                 }
             }
             if (version >= ApiVersion.Version10)

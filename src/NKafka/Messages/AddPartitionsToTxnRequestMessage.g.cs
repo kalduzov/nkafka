@@ -255,16 +255,14 @@ internal sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage,
         if (version <= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(V3AndBelowTransactionalId);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(V3AndBelowTransactionalId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(V3AndBelowTransactionalId);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -544,9 +542,7 @@ internal sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage,
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(TransactionalId);
             }
             writer.WriteLong(ProducerId);
             writer.WriteShort(ProducerEpoch);
@@ -780,16 +776,14 @@ internal sealed partial class AddPartitionsToTxnRequestMessage: IRequestMessage,
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version3)
             {

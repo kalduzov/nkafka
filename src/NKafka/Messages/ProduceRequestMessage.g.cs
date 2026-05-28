@@ -199,16 +199,14 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version9)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(TransactionalId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteShort(Acks);
         writer.WriteInt(TimeoutMs);
@@ -464,16 +462,14 @@ internal sealed partial class ProduceRequestMessage: IRequestMessage, IEquatable
             if (version <= ApiVersion.Version12)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Name);
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Name);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Name);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             if (version >= ApiVersion.Version13)

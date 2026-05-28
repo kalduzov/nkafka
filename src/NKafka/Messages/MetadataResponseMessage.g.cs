@@ -301,16 +301,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ClusterId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ClusterId);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         if (version >= ApiVersion.Version1)
@@ -592,16 +590,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Host);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Host);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteInt(Port);
             if (version >= ApiVersion.Version1)
@@ -619,16 +615,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(Rack);
                     if (version >= ApiVersion.Version9)
                     {
-                        writer.WriteVarUInt32(stringBytes.Length + 1);
+                        writer.WriteCompactString(Rack);
                     }
                     else
                     {
-                        writer.WriteShort((short)stringBytes.Length);
+                        writer.WriteInt16String(Rack);
                     }
-                    writer.WriteBytes(stringBytes);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -941,16 +935,14 @@ internal sealed partial class MetadataResponseMessage: IResponseMessage, IEquata
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version9)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version10)
             {

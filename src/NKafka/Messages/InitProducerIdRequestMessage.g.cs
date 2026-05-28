@@ -202,16 +202,14 @@ internal sealed partial class InitProducerIdRequestMessage: IRequestMessage, IEq
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version2)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(TransactionalId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(TransactionTimeoutMs);
         if (version >= ApiVersion.Version3)

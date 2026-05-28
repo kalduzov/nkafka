@@ -377,16 +377,14 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version6)
             {
@@ -401,9 +399,7 @@ internal sealed partial class DeleteTopicsResponseMessage: IResponseMessage, IEq
                 }
                 else
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(ErrorMessage);
                 }
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

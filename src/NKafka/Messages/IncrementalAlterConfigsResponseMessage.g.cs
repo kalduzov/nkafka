@@ -367,29 +367,25 @@ internal sealed partial class IncrementalAlterConfigsResponseMessage: IResponseM
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version1)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(ResourceType);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version1)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ResourceName);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ResourceName);
                 }
-                writer.WriteBytes(stringBytes);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

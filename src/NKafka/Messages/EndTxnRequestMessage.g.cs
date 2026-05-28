@@ -150,16 +150,14 @@ internal sealed partial class EndTxnRequestMessage: IRequestMessage, IEquatable<
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(TransactionalId);
             if (version >= ApiVersion.Version3)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(TransactionalId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(TransactionalId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteLong(ProducerId);
         writer.WriteShort(ProducerEpoch);

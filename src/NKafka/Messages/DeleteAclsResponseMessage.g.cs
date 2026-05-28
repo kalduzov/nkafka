@@ -376,16 +376,14 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version2)
             {
@@ -702,54 +700,46 @@ internal sealed partial class DeleteAclsResponseMessage: IResponseMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(ResourceType);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ResourceName);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ResourceName);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(PatternType);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Principal);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Principal);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Principal);
                 }
-                writer.WriteBytes(stringBytes);
             }
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
                 if (version >= ApiVersion.Version2)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Host);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Host);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteSByte(Operation);
             writer.WriteSByte(PermissionType);

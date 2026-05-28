@@ -155,9 +155,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ErrorMessage);
         }
         writer.WriteVarUInt32(Results.Count + 1);
         foreach (var element in Results)
@@ -369,9 +367,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(User);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(User);
             }
             writer.WriteShort((short)ErrorCode);
             if (ErrorMessage is null)
@@ -380,9 +376,7 @@ internal sealed partial class DescribeUserScramCredentialsResponseMessage: IResp
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ErrorMessage);
             }
             writer.WriteVarUInt32(CredentialInfos.Count + 1);
             foreach (var element in CredentialInfos)

@@ -177,10 +177,9 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         if (ClusterId is not null)
         {
             writer.WriteVarUInt32(0);
-            var stringBytes = Encoding.UTF8.GetBytes(ClusterId);
-            writer.WriteVarUInt32(stringBytes.Length + (stringBytes.Length + 1).SizeOfVarUInt());
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            var stringBytesCount = Encoding.UTF8.GetByteCount(ClusterId);
+            writer.WriteVarUInt32(stringBytesCount + (stringBytesCount + 1).SizeOfVarUInt());
+            writer.WriteCompactString(ClusterId);
         }
         rawWriter.WriteRawTags(ref writer, int.MaxValue);
     }
@@ -354,9 +353,7 @@ internal sealed partial class FetchSnapshotRequestMessage: IRequestMessage, IEqu
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)

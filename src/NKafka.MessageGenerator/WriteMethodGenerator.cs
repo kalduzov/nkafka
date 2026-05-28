@@ -290,8 +290,7 @@ internal class WriteMethodGenerator: IMethodGenerator
 
                 if (type.IsString)
                 {
-                    _codeGenerator.AppendLine($"var stringBytesCount = Encoding.UTF8.GetByteCount({name});");
-                    lengthExpression = "stringBytesCount";
+                    lengthExpression = string.Empty;
                 }
                 else if (type.IsBytes)
                 {

@@ -270,16 +270,14 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ErrorMessage);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ErrorMessage);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         if (version <= ApiVersion.Version3)
@@ -296,16 +294,14 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
         if (version <= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Host);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Host);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -596,15 +592,11 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Key);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Key);
             }
             writer.WriteInt(NodeId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Host);
             }
             writer.WriteInt(Port);
             writer.WriteShort((short)ErrorCode);
@@ -614,9 +606,7 @@ internal sealed partial class FindCoordinatorResponseMessage: IResponseMessage, 
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(ErrorMessage);
             }
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
             numTaggedFields += rawWriter.FieldsCount;

@@ -309,16 +309,14 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
     {
         var numTaggedFields = 0;
         {
-            var stringBytes = Encoding.UTF8.GetBytes(GroupId);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(GroupId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(GroupId);
             }
-            writer.WriteBytes(stringBytes);
         }
         writer.WriteInt(SessionTimeoutMs);
         if (version >= ApiVersion.Version1)
@@ -326,16 +324,14 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             writer.WriteInt(RebalanceTimeoutMs);
         }
         {
-            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(MemberId);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(MemberId);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (version >= ApiVersion.Version5)
         {
@@ -352,16 +348,14 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupInstanceId);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -372,16 +366,14 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             }
         }
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ProtocolType);
             if (version >= ApiVersion.Version6)
             {
-                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteCompactString(ProtocolType);
             }
             else
             {
-                writer.WriteShort((short)stringBytes.Length);
+                writer.WriteInt16String(ProtocolType);
             }
-            writer.WriteBytes(stringBytes);
         }
         if (version >= ApiVersion.Version6)
         {
@@ -407,9 +399,7 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Reason);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Reason);
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -670,16 +660,14 @@ internal sealed partial class JoinGroupRequestMessage: IRequestMessage, IEquatab
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
                 if (version >= ApiVersion.Version6)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Name);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Name);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version6)
             {

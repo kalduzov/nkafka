@@ -691,9 +691,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteShort(MinVersion);
             writer.WriteShort(MaxVersion);
@@ -878,9 +876,7 @@ internal sealed partial class ApiVersionsResponseMessage: IResponseMessage, IEqu
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteShort(MaxVersionLevel);
             writer.WriteShort(MinVersionLevel);

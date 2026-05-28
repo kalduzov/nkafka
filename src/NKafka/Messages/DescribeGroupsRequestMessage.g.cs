@@ -191,9 +191,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
             foreach (var element in Groups)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
         }
@@ -203,9 +201,7 @@ internal sealed partial class DescribeGroupsRequestMessage: IRequestMessage, IEq
             foreach (var element in Groups)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteShort((short)stringBytes.Length);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteInt16String(element);
                 }
             }
         }

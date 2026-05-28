@@ -174,9 +174,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(ErrorMessage);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(ErrorMessage);
         }
         if (MemberId is null)
         {
@@ -184,9 +182,7 @@ internal sealed partial class ConsumerGroupHeartbeatResponseMessage: IResponseMe
         }
         else
         {
-            var stringBytes = Encoding.UTF8.GetBytes(MemberId);
-            writer.WriteVarUInt32(stringBytes.Length + 1);
-            writer.WriteBytes(stringBytes);
+            writer.WriteCompactString(MemberId);
         }
         writer.WriteInt(MemberEpoch);
         writer.WriteInt(HeartbeatIntervalMs);

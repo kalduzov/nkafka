@@ -367,9 +367,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Name);
             }
             writer.WriteVarUInt32(Partitions.Count + 1);
             foreach (var element in Partitions)
@@ -999,9 +997,7 @@ internal sealed partial class FetchSnapshotResponseMessage: IResponseMessage, IE
             var numTaggedFields = 0;
             writer.WriteInt(NodeId);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Host);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(Host);
             }
             writer.WriteUShort(Port);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

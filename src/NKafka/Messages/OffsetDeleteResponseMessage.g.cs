@@ -271,9 +271,7 @@ internal sealed partial class OffsetDeleteResponseMessage: IResponseMessage, IEq
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Name);
-                writer.WriteShort((short)stringBytes.Length);
-                writer.WriteBytes(stringBytes);
+                writer.WriteInt16String(Name);
             }
             writer.WriteInt(Partitions.Count);
             foreach (var element in Partitions)

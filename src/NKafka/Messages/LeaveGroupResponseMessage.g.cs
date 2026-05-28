@@ -392,16 +392,14 @@ internal sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEqua
             }
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(MemberId);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(MemberId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(MemberId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (GroupInstanceId is null)
             {
@@ -416,16 +414,14 @@ internal sealed partial class LeaveGroupResponseMessage: IResponseMessage, IEqua
             }
             else
             {
-                var stringBytes = Encoding.UTF8.GetBytes(GroupInstanceId);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(GroupInstanceId);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(GroupInstanceId);
                 }
-                writer.WriteBytes(stringBytes);
             }
             writer.WriteShort((short)ErrorCode);
             var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);

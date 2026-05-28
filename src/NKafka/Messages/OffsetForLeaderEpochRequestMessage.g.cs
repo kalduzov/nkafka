@@ -375,16 +375,14 @@ internal sealed partial class OffsetForLeaderEpochRequestMessage: IRequestMessag
         {
             var numTaggedFields = 0;
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Topic);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Topic);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Topic);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version4)
             {

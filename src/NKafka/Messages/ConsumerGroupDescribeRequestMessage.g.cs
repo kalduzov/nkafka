@@ -145,9 +145,7 @@ internal sealed partial class ConsumerGroupDescribeRequestMessage: IRequestMessa
         foreach (var element in GroupIds)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(element);
-                writer.WriteVarUInt32(stringBytes.Length + 1);
-                writer.WriteBytes(stringBytes);
+                writer.WriteCompactString(element);
             }
         }
         writer.WriteBool(IncludeAuthorizedOperations);

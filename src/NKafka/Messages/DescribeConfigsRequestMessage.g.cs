@@ -427,16 +427,14 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
             var numTaggedFields = 0;
             writer.WriteSByte(ResourceType);
             {
-                var stringBytes = Encoding.UTF8.GetBytes(ResourceName);
                 if (version >= ApiVersion.Version4)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(ResourceName);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(ResourceName);
                 }
-                writer.WriteBytes(stringBytes);
             }
             if (version >= ApiVersion.Version4)
             {
@@ -450,9 +448,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                     foreach (var element in ConfigurationKeys)
                     {
                         {
-                            var stringBytes = Encoding.UTF8.GetBytes(element);
-                            writer.WriteVarUInt32(stringBytes.Length + 1);
-                            writer.WriteBytes(stringBytes);
+                            writer.WriteCompactString(element);
                         }
                     }
                 }
@@ -469,9 +465,7 @@ internal sealed partial class DescribeConfigsRequestMessage: IRequestMessage, IE
                     foreach (var element in ConfigurationKeys)
                     {
                         {
-                            var stringBytes = Encoding.UTF8.GetBytes(element);
-                            writer.WriteShort((short)stringBytes.Length);
-                            writer.WriteBytes(stringBytes);
+                            writer.WriteInt16String(element);
                         }
                     }
                 }

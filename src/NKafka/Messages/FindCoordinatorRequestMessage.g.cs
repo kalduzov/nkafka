@@ -192,16 +192,14 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
         if (version <= ApiVersion.Version3)
         {
             {
-                var stringBytes = Encoding.UTF8.GetBytes(Key);
                 if (version >= ApiVersion.Version3)
                 {
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
+                    writer.WriteCompactString(Key);
                 }
                 else
                 {
-                    writer.WriteShort((short)stringBytes.Length);
+                    writer.WriteInt16String(Key);
                 }
-                writer.WriteBytes(stringBytes);
             }
         }
         else
@@ -228,9 +226,7 @@ internal sealed partial class FindCoordinatorRequestMessage: IRequestMessage, IE
             foreach (var element in CoordinatorKeys)
             {
                 {
-                    var stringBytes = Encoding.UTF8.GetBytes(element);
-                    writer.WriteVarUInt32(stringBytes.Length + 1);
-                    writer.WriteBytes(stringBytes);
+                    writer.WriteCompactString(element);
                 }
             }
         }

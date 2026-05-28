@@ -68,7 +68,9 @@ var clusterConfig = new ClusterConfig
 };
 
 using var tracerProvider = Sdk.CreateTracerProviderBuilder()
-    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("NKafka.Samples"))
+    .SetResourceBuilder(ResourceBuilder
+        .CreateDefault()
+        .AddService("NKafka.Samples"))
     .AddSource("NKafka.Internal")
     .AddSource("NKafka")
     .AddOtlpExporter()
@@ -88,7 +90,11 @@ using var metricsProvider = Sdk.CreateMeterProviderBuilder()
 
 var loggerFactory = LoggerFactory.Create(builder =>
 {
-    builder.AddZLoggerConsole();
+    builder.AddZLoggerConsole(c =>
+    {
+        c.IncludeScopes = true;
+        c.FullMode = BackgroundBufferFullMode.Grow;
+    });
     builder.SetMinimumLevel(LogLevel.Trace);
 });
 

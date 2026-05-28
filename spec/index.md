@@ -202,6 +202,7 @@ KIP должен попадать в roadmap клиента только есл�
 
 - [Technical requirements](K:\nkafka\spec\technical-requirements.md)
 - [Protocol interaction spec](K:\nkafka\spec\protocol-interaction.md)
+- [Network interaction spec](K:\nkafka\spec\network-interaction.md)
 - [Protocol API addition plan](K:\nkafka\spec\protocol-api-addition-plan.md)
 - [Minimal client API matrix](K:\nkafka\spec\protocol-minimal-client-api-matrix.md)
 - [Consumer rebalance notes](K:\nkafka\spec\consumer-rebalance-notes-ozontech-2025-05.md)

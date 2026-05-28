@@ -15,6 +15,7 @@
 
 - [Base spec](K:\nkafka\spec\index.md)
 - [Technical requirements](K:\nkafka\spec\technical-requirements.md)
+- [Network interaction spec](K:\nkafka\spec\network-interaction.md)
 - [Code map](K:\nkafka\spec\code-map.md)
 - [Code gaps](K:\nkafka\spec\code-gaps.md)
 

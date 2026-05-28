@@ -21,9 +21,6 @@
  * limitations under the License.
  */
 
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
 using static System.Buffers.Binary.BinaryPrimitives;
 
 namespace NKafka.Protocol.Extensions;
@@ -32,25 +29,16 @@ internal static class ProtocolWriterExtensions
 {
     public static void WriteInt(this Stream writer, int value)
     {
-        writer.Write(value.ToBigEndian());
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        WriteInt32BigEndian(buffer, value);
+        writer.Write(buffer);
     }
 
-    [SkipLocalsInit]
     internal static ReadOnlySpan<byte> ToBigEndian(this int value)
     {
-        Span<byte> destination = stackalloc byte[sizeof(int)];
+        var buffer = new byte[sizeof(int)];
+        WriteInt32BigEndian(buffer, value);
 
-        if (BitConverter.IsLittleEndian)
-        {
-            value = ReverseEndianness(value);
-        }
-
-#if NET8_0_OR_GREATER
-        MemoryMarshal.Write(destination, in value);
-#else
-        MemoryMarshal.Write(destination, ref value);
-#endif
-
-        return destination.ToArray();
+        return buffer;
     }
 }

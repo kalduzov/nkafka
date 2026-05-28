@@ -159,11 +159,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version12)
         {
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     case 0:
@@ -480,11 +480,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version12)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         default:
@@ -797,11 +797,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version12)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         case 0:
@@ -1158,11 +1158,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             Epoch = reader.ReadInt();
             EndOffset = reader.ReadLong();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -1278,11 +1278,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             LeaderId = reader.ReadInt();
             LeaderEpoch = reader.ReadInt();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -1398,11 +1398,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             EndOffset = reader.ReadLong();
             Epoch = reader.ReadInt();
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -1520,11 +1520,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version12)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         default:
@@ -1689,11 +1689,11 @@ internal sealed partial class FetchResponseMessage: IResponseMessage, IEquatable
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:

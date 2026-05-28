@@ -139,11 +139,11 @@ internal sealed partial class CreatePartitionsRequestMessage: IRequestMessage, I
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version2)
         {
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -363,11 +363,11 @@ internal sealed partial class CreatePartitionsRequestMessage: IRequestMessage, I
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version2)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         default:
@@ -573,11 +573,11 @@ internal sealed partial class CreatePartitionsRequestMessage: IRequestMessage, I
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version2)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         default:

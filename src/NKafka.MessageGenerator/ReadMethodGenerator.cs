@@ -115,12 +115,12 @@ internal class ReadMethodGenerator: IMethodGenerator
             .ForVersions(messageFlexibleVersions, curVersions)
             .IfMember(curFlexibleVersions =>
             {
-                _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarInt32();");
+                _codeGenerator.AppendLine("var numTaggedFields = reader.ReadVarUInt32();");
                 _codeGenerator.AppendLine("for (var t = 0; t < numTaggedFields; t++)");
                 _codeGenerator.AppendLeftBrace();
                 _codeGenerator.IncrementIndent();
-                _codeGenerator.AppendLine("var tag = reader.ReadVarInt32();");
-                _codeGenerator.AppendLine("var size = reader.ReadVarInt32();");
+                _codeGenerator.AppendLine("var tag = reader.ReadVarUInt32();");
+                _codeGenerator.AppendLine("var size = reader.ReadVarUInt32();");
                 _codeGenerator.AppendLine("switch (tag)");
                 _codeGenerator.AppendLeftBrace();
                 _codeGenerator.IncrementIndent();

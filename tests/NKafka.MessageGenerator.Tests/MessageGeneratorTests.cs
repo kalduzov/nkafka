@@ -84,6 +84,20 @@ public class MessageGeneratorTests
     }
 
     [Fact]
+    public async Task GenerateTest_UsesUnsignedVarIntForTaggedFields()
+    {
+        var specification = await JsonParseTests.GetMessageSpecification("data/FetchRequest.json");
+
+        var messageGenerator = new MessageGenerator("test");
+        var result = messageGenerator.Generate(specification).ToString();
+
+        result.Should().Contain("var numTaggedFields = reader.ReadVarUInt32();");
+        result.Should().Contain("var tag = reader.ReadVarUInt32();");
+        result.Should().Contain("var size = reader.ReadVarUInt32();");
+        result.Should().NotContain("var numTaggedFields = reader.ReadVarInt32();");
+    }
+
+    [Fact]
     public void GenerateTest()
     {
         // var message = new MessageSpecification(

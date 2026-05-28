@@ -212,11 +212,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
         UnknownTaggedFields = null;
         if (version >= ApiVersion.Version6)
         {
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -515,11 +515,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
             UnknownTaggedFields = null;
             if (version >= ApiVersion.Version6)
             {
-                var numTaggedFields = reader.ReadVarInt32();
+                var numTaggedFields = reader.ReadVarUInt32();
                 for (var t = 0; t < numTaggedFields; t++)
                 {
-                    var tag = reader.ReadVarInt32();
-                    var size = reader.ReadVarInt32();
+                    var tag = reader.ReadVarUInt32();
+                    var size = reader.ReadVarUInt32();
                     switch (tag)
                     {
                         default:
@@ -756,11 +756,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:
@@ -993,11 +993,11 @@ internal sealed partial class OffsetFetchRequestMessage: IRequestMessage, IEquat
                 }
             }
             UnknownTaggedFields = null;
-            var numTaggedFields = reader.ReadVarInt32();
+            var numTaggedFields = reader.ReadVarUInt32();
             for (var t = 0; t < numTaggedFields; t++)
             {
-                var tag = reader.ReadVarInt32();
-                var size = reader.ReadVarInt32();
+                var tag = reader.ReadVarUInt32();
+                var size = reader.ReadVarUInt32();
                 switch (tag)
                 {
                     default:

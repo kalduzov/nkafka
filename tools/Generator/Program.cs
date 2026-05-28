@@ -72,6 +72,8 @@ string[] clientMessagesPattern =
     "DescribeUserScramCredentials",
     "AlterUserScramCredentials",
     "ConsumerGroupHeartbeat",
+    "ConsumerGroupDescribe",
+    "DescribeCluster",
     "AlterShareGroupOffsets",
     "DeleteShareGroupOffsets",
     "DescribeShareGroupOffsets",

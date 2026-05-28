@@ -1,4 +1,4 @@
-﻿//60-10-DF-A9-EB-0D-53-60-A3-02-6C-FD-DB-87-73-10-A2-69-5E-E5-C9-14-4A-BA-E2-18-31-DC-23-C3-09-AC
+﻿//40-D8-D8-14-C9-C8-49-42-A9-0B-CA-65-D6-D2-14-4A-27-25-B2-20-E6-4C-DD-0F-21-98-7C-B7-B2-03-4F-FC
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -40,12 +40,12 @@ using System.Text;
 namespace NKafka.Messages;
 
 /// <summary>
-/// Describes the contract for message ListConfigResourcesRequestMessage
+/// Describes the contract for message ConsumerGroupDescribeRequestMessage
 /// </summary>
-internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage, IEquatable<ListConfigResourcesRequestMessage>
+internal sealed partial class ConsumerGroupDescribeRequestMessage: IRequestMessage, IEquatable<ConsumerGroupDescribeRequestMessage>
 {
     /// <inheritdoc />
-    public ApiKeys ApiKey => ApiKeys.ListConfigResources;
+    public ApiKeys ApiKey => ApiKeys.ConsumerGroupDescribe;
 
     /// <summary>
     /// Indicates whether the request is accessed by any broker or only by the controller
@@ -62,21 +62,26 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The list of resource type. If the list is empty, it uses default supported config resource types.
+    /// The ids of the groups to describe.
     /// </summary>
-    public List<sbyte> ResourceTypes { get; set; } = new ();
+    public List<string> GroupIds { get; set; } = new ();
 
     /// <summary>
-    /// The basic constructor of the message ListConfigResourcesRequestMessage
+    /// Whether to include authorized operations.
     /// </summary>
-    public ListConfigResourcesRequestMessage()
+    public bool IncludeAuthorizedOperations { get; set; } = false;
+
+    /// <summary>
+    /// The basic constructor of the message ConsumerGroupDescribeRequestMessage
+    /// </summary>
+    public ConsumerGroupDescribeRequestMessage()
     {
     }
 
     /// <summary>
-    /// Base constructor for deserializing message ListConfigResourcesRequestMessage
+    /// Base constructor for deserializing message ConsumerGroupDescribeRequestMessage
     /// </summary>
-    public ListConfigResourcesRequestMessage(ref BufferReader reader, ApiVersion version)
+    public ConsumerGroupDescribeRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
         IncomingBufferLength = reader.Length;
@@ -86,28 +91,37 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
-        if (version >= ApiVersion.Version1)
         {
             int arrayLength;
             arrayLength = reader.ReadVarUInt32() - 1;
             if (arrayLength < 0)
             {
-                throw new Exception("non-nullable field ResourceTypes was serialized as null");
+                throw new Exception("non-nullable field GroupIds was serialized as null");
             }
             else
             {
-                var newCollection = new List<sbyte>(arrayLength);
+                var newCollection = new List<string>(arrayLength);
                 for (var i = 0; i < arrayLength; i++)
                 {
-                    newCollection.Add(reader.ReadSByte());
+                    int length;
+                    length = reader.ReadVarUInt32() - 1;
+                    if (length < 0)
+                    {
+                        throw new Exception("non-nullable field GroupIds element was serialized as null");
+                    }
+                    else if (length > 0x7fff)
+                    {
+                        throw new Exception($"string field GroupIds element had invalid length {length}");
+                    }
+                    else
+                    {
+                        newCollection.Add(reader.ReadString(length));
+                    }
                 }
-                ResourceTypes = newCollection;
+                GroupIds = newCollection;
             }
         }
-        else
-        {
-            ResourceTypes = new ();
-        }
+        IncludeAuthorizedOperations = reader.ReadByte() != 0;
         UnknownTaggedFields = null;
         var numTaggedFields = reader.ReadVarInt32();
         for (var t = 0; t < numTaggedFields; t++)
@@ -127,21 +141,16 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
-        if (version >= ApiVersion.Version1)
+        writer.WriteVarUInt32(GroupIds.Count + 1);
+        foreach (var element in GroupIds)
         {
-            writer.WriteVarUInt32(ResourceTypes.Count + 1);
-            foreach (var element in ResourceTypes)
             {
-                writer.WriteSByte(element);
+                var stringBytes = Encoding.UTF8.GetBytes(element);
+                writer.WriteVarUInt32(stringBytes.Length + 1);
+                writer.WriteBytes(stringBytes);
             }
         }
-        else
-        {
-            if (ResourceTypes.Count != 0)
-            {
-                throw new UnsupportedVersionException($"Attempted to write a non-default ResourceTypes at version {version}");
-            }
-        }
+        writer.WriteBool(IncludeAuthorizedOperations);
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
         numTaggedFields += rawWriter.FieldsCount;
         writer.WriteVarUInt32(numTaggedFields);
@@ -151,29 +160,33 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is ListConfigResourcesRequestMessage other && Equals(other);
+        return ReferenceEquals(this, obj) || obj is ConsumerGroupDescribeRequestMessage other && Equals(other);
     }
 
     /// <inheritdoc />
-    public bool Equals(ListConfigResourcesRequestMessage? other)
+    public bool Equals(ConsumerGroupDescribeRequestMessage? other)
     {
         if (other is null)
         {
             return false;
         }
-        if (ResourceTypes is null)
+        if (GroupIds is null)
         {
-            if (other.ResourceTypes is not null)
+            if (other.GroupIds is not null)
             {
                 return false;
             }
         }
         else
         {
-            if (!ResourceTypes.SequenceEqual(other.ResourceTypes))
+            if (!GroupIds.SequenceEqual(other.GroupIds))
             {
                 return false;
             }
+        }
+        if (IncludeAuthorizedOperations != other.IncludeAuthorizedOperations)
+        {
+            return false;
         }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
@@ -182,15 +195,16 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ResourceTypes);
+        hashCode = HashCode.Combine(hashCode, GroupIds, IncludeAuthorizedOperations);
         return hashCode;
     }
 
     /// <inheritdoc />
     public override string ToString()
     {
-        return "ListConfigResourcesRequestMessage("
-            + "ResourceTypes=" + ResourceTypes.DeepToString()
+        return "ConsumerGroupDescribeRequestMessage("
+            + "GroupIds=" + GroupIds.DeepToString()
+            + ", IncludeAuthorizedOperations=" + (IncludeAuthorizedOperations ? "true" : "false")
             + ")";
     }
 }

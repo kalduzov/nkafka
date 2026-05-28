@@ -1,4 +1,4 @@
-﻿//60-10-DF-A9-EB-0D-53-60-A3-02-6C-FD-DB-87-73-10-A2-69-5E-E5-C9-14-4A-BA-E2-18-31-DC-23-C3-09-AC
+﻿//4C-5D-C1-CD-14-2C-43-93-44-0E-49-41-93-22-1A-D8-34-B8-E7-8B-79-19-EC-7A-A1-DD-58-79-31-79-E8-E1
 //  This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 // 
 //  PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
@@ -40,12 +40,12 @@ using System.Text;
 namespace NKafka.Messages;
 
 /// <summary>
-/// Describes the contract for message ListConfigResourcesRequestMessage
+/// Describes the contract for message DescribeClusterRequestMessage
 /// </summary>
-internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage, IEquatable<ListConfigResourcesRequestMessage>
+internal sealed partial class DescribeClusterRequestMessage: IRequestMessage, IEquatable<DescribeClusterRequestMessage>
 {
     /// <inheritdoc />
-    public ApiKeys ApiKey => ApiKeys.ListConfigResources;
+    public ApiKeys ApiKey => ApiKeys.DescribeCluster;
 
     /// <summary>
     /// Indicates whether the request is accessed by any broker or only by the controller
@@ -62,21 +62,31 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public int IncomingBufferLength { get; private set; } = 0;
 
     /// <summary>
-    /// The list of resource type. If the list is empty, it uses default supported config resource types.
+    /// Whether to include cluster authorized operations.
     /// </summary>
-    public List<sbyte> ResourceTypes { get; set; } = new ();
+    public bool IncludeClusterAuthorizedOperations { get; set; } = false;
 
     /// <summary>
-    /// The basic constructor of the message ListConfigResourcesRequestMessage
+    /// The endpoint type to describe. 1=brokers, 2=controllers.
     /// </summary>
-    public ListConfigResourcesRequestMessage()
+    public sbyte EndpointType { get; set; } = 1;
+
+    /// <summary>
+    /// Whether to include fenced brokers when listing brokers.
+    /// </summary>
+    public bool IncludeFencedBrokers { get; set; } = false;
+
+    /// <summary>
+    /// The basic constructor of the message DescribeClusterRequestMessage
+    /// </summary>
+    public DescribeClusterRequestMessage()
     {
     }
 
     /// <summary>
-    /// Base constructor for deserializing message ListConfigResourcesRequestMessage
+    /// Base constructor for deserializing message DescribeClusterRequestMessage
     /// </summary>
-    public ListConfigResourcesRequestMessage(ref BufferReader reader, ApiVersion version)
+    public DescribeClusterRequestMessage(ref BufferReader reader, ApiVersion version)
         : this()
     {
         IncomingBufferLength = reader.Length;
@@ -86,27 +96,22 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     /// <inheritdoc />
     public void Read(ref BufferReader reader, ApiVersion version)
     {
+        IncludeClusterAuthorizedOperations = reader.ReadByte() != 0;
         if (version >= ApiVersion.Version1)
         {
-            int arrayLength;
-            arrayLength = reader.ReadVarUInt32() - 1;
-            if (arrayLength < 0)
-            {
-                throw new Exception("non-nullable field ResourceTypes was serialized as null");
-            }
-            else
-            {
-                var newCollection = new List<sbyte>(arrayLength);
-                for (var i = 0; i < arrayLength; i++)
-                {
-                    newCollection.Add(reader.ReadSByte());
-                }
-                ResourceTypes = newCollection;
-            }
+            EndpointType = reader.ReadSByte();
         }
         else
         {
-            ResourceTypes = new ();
+            EndpointType = 1;
+        }
+        if (version >= ApiVersion.Version2)
+        {
+            IncludeFencedBrokers = reader.ReadByte() != 0;
+        }
+        else
+        {
+            IncludeFencedBrokers = false;
         }
         UnknownTaggedFields = null;
         var numTaggedFields = reader.ReadVarInt32();
@@ -127,19 +132,27 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public void Write(ref BufferWriter writer, ApiVersion version)
     {
         var numTaggedFields = 0;
+        writer.WriteBool(IncludeClusterAuthorizedOperations);
         if (version >= ApiVersion.Version1)
         {
-            writer.WriteVarUInt32(ResourceTypes.Count + 1);
-            foreach (var element in ResourceTypes)
-            {
-                writer.WriteSByte(element);
-            }
+            writer.WriteSByte(EndpointType);
         }
         else
         {
-            if (ResourceTypes.Count != 0)
+            if (EndpointType != 1)
             {
-                throw new UnsupportedVersionException($"Attempted to write a non-default ResourceTypes at version {version}");
+                throw new UnsupportedVersionException($"Attempted to write a non-default EndpointType at version {version}");
+            }
+        }
+        if (version >= ApiVersion.Version2)
+        {
+            writer.WriteBool(IncludeFencedBrokers);
+        }
+        else
+        {
+            if (IncludeFencedBrokers)
+            {
+                throw new UnsupportedVersionException($"Attempted to write a non-default IncludeFencedBrokers at version {version}");
             }
         }
         var rawWriter = RawTaggedFieldWriter.ForFields(UnknownTaggedFields);
@@ -151,29 +164,27 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is ListConfigResourcesRequestMessage other && Equals(other);
+        return ReferenceEquals(this, obj) || obj is DescribeClusterRequestMessage other && Equals(other);
     }
 
     /// <inheritdoc />
-    public bool Equals(ListConfigResourcesRequestMessage? other)
+    public bool Equals(DescribeClusterRequestMessage? other)
     {
         if (other is null)
         {
             return false;
         }
-        if (ResourceTypes is null)
+        if (IncludeClusterAuthorizedOperations != other.IncludeClusterAuthorizedOperations)
         {
-            if (other.ResourceTypes is not null)
-            {
-                return false;
-            }
+            return false;
         }
-        else
+        if (EndpointType != other.EndpointType)
         {
-            if (!ResourceTypes.SequenceEqual(other.ResourceTypes))
-            {
-                return false;
-            }
+            return false;
+        }
+        if (IncludeFencedBrokers != other.IncludeFencedBrokers)
+        {
+            return false;
         }
         return UnknownTaggedFields.CompareRawTaggedFields(other.UnknownTaggedFields);
     }
@@ -182,15 +193,17 @@ internal sealed partial class ListConfigResourcesRequestMessage: IRequestMessage
     public override int GetHashCode()
     {
         var hashCode = 0;
-        hashCode = HashCode.Combine(hashCode, ResourceTypes);
+        hashCode = HashCode.Combine(hashCode, IncludeClusterAuthorizedOperations, EndpointType, IncludeFencedBrokers);
         return hashCode;
     }
 
     /// <inheritdoc />
     public override string ToString()
     {
-        return "ListConfigResourcesRequestMessage("
-            + "ResourceTypes=" + ResourceTypes.DeepToString()
+        return "DescribeClusterRequestMessage("
+            + "IncludeClusterAuthorizedOperations=" + (IncludeClusterAuthorizedOperations ? "true" : "false")
+            + ", EndpointType=" + EndpointType
+            + ", IncludeFencedBrokers=" + (IncludeFencedBrokers ? "true" : "false")
             + ")";
     }
 }

@@ -16,6 +16,7 @@
 
 - [Base spec](K:\nkafka\spec\index.md)
 - [Technical requirements](K:\nkafka\spec\technical-requirements.md)
+- [Network layer decoupling plan](K:\nkafka\spec\network-layer-decoupling-plan.md)
 - [Protocol interaction spec](K:\nkafka\spec\protocol-interaction.md)
 - [Code map](K:\nkafka\spec\code-map.md)
 - [Code gaps](K:\nkafka\spec\code-gaps.md)

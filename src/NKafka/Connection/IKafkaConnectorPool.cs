@@ -27,6 +27,31 @@ namespace NKafka.Connection;
 internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
 {
     /// <summary>
+    /// Returns all opened shared connectors.
+    /// </summary>
+    internal IEnumerable<IKafkaConnector> GetOpenedSharedConnectors();
+
+    /// <summary>
+    /// Returns a shared connector for the specified broker.
+    /// </summary>
+    internal bool TryGetSharedConnector(int nodeId, out IKafkaConnector connector);
+
+    /// <summary>
+    /// Creates a dedicated connector for the specified broker.
+    /// </summary>
+    internal bool TryCreateDedicatedConnector(int nodeId, out IKafkaConnector connector);
+
+    /// <summary>
+    /// Returns any shared connector for a known broker.
+    /// </summary>
+    internal bool TryGetAnySharedBrokerConnector(out IKafkaConnector connector);
+
+    /// <summary>
+    /// Returns a bootstrap connector from the seed list.
+    /// </summary>
+    internal bool TryGetBootstrapConnector(out IKafkaConnector connector);
+
+    /// <summary>
     /// Возвращает все рабочие соединения
     /// </summary>
     internal IEnumerable<IKafkaConnector> GetAllOpenedConnectors();

@@ -175,6 +175,25 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
     /// <summary>
     /// Возвращает все рабочие соединения
     /// </summary>
+    public IEnumerable<IKafkaConnector> GetOpenedSharedConnectors()
+    {
+        foreach (var connectors in _brokersConnectors.Values)
+        {
+            foreach (var connector in connectors)
+            {
+                if (connector.IsDedicated || connector.ConnectorState != KafkaConnector.State.Open)
+                {
+                    continue;
+                }
+
+                yield return connector;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Возвращает все рабочие соединения
+    /// </summary>
     public IEnumerable<IKafkaConnector> GetAllOpenedConnectors()
     {
         foreach (var connectors in _brokersConnectors.Values)
@@ -189,6 +208,57 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         }
     }
 
+    public bool TryGetSharedConnector(int nodeId, out IKafkaConnector connector)
+    {
+        if (_brokers.TryGetValue(nodeId, out var node)
+            && _brokersConnectors.TryGetValue(node, out var connectors))
+        {
+            if (TryTakeLeastLoadedShared(connectors, out connector))
+            {
+                return true;
+            }
+        }
+
+        connector = null!;
+
+        return false;
+    }
+
+    public bool TryCreateDedicatedConnector(int nodeId, out IKafkaConnector connector)
+    {
+        return TryDedicateConnector(nodeId, out connector);
+    }
+
+    public bool TryGetAnySharedBrokerConnector(out IKafkaConnector connector)
+    {
+        if (_brokers.IsEmpty)
+        {
+            connector = null!;
+
+            return false;
+        }
+
+        var node = GetBrokerAsRandom();
+        var listConnectors = _brokersConnectors[node];
+
+        return TryTakeLeastLoadedShared(listConnectors, out connector);
+    }
+
+    public bool TryGetBootstrapConnector(out IKafkaConnector connector)
+    {
+        if (_seedConnectors.Count == 0)
+        {
+            connector = null!;
+
+            return false;
+        }
+
+        var index = _seedConnectorsNumberCounter.GetNextNumber();
+        connector = _seedConnectors.ToArray()[index].Value;
+
+        return true;
+    }
+
     /// <inheritdoc />
     public bool TryGetConnector(int nodeId, bool isDedicated, out IKafkaConnector connector)
     {
@@ -197,19 +267,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
             return TryDedicateConnector(nodeId, out connector);
         }
 
-        if (_brokers.TryGetValue(nodeId, out var node))
-        {
-            if (_brokersConnectors.TryGetValue(node, out var connectors))
-            {
-                connector = connectors.Count == 1 ? connectors[0] : TakeLeastLoaded(connectors);
-
-                return true;
-            }
-        }
-
-        connector = null!;
-
-        return false;
+        return TryGetSharedConnector(nodeId, out connector);
     }
 
     private static IKafkaConnector TakeLeastLoaded(IReadOnlyList<IKafkaConnector> connectors)
@@ -250,6 +308,22 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         return connectors[selectedIndex];
     }
 
+    private static bool TryTakeLeastLoadedShared(IReadOnlyList<IKafkaConnector> connectors, out IKafkaConnector connector)
+    {
+        var sharedConnectors = connectors.Where(c => !c.IsDedicated).ToArray();
+
+        if (sharedConnectors.Length == 0)
+        {
+            connector = null!;
+
+            return false;
+        }
+
+        connector = sharedConnectors.Length == 1 ? sharedConnectors[0] : TakeLeastLoaded(sharedConnectors);
+
+        return true;
+    }
+
     private bool TryDedicateConnector(int nodeId, out IKafkaConnector connector)
     {
         if (_brokers.TryGetValue(nodeId, out var node))
@@ -265,15 +339,12 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
 
     public IKafkaConnector GetConnector()
     {
-        if (_brokers.IsEmpty)
+        if (TryGetAnySharedBrokerConnector(out var brokerConnector))
         {
-            return GetSeedConnectorAsRoundRobin();
+            return brokerConnector;
         }
 
-        var node = GetBrokerAsRandom();
-        var listConnectors = _brokersConnectors[node];
-
-        return TakeLeastLoaded(listConnectors);
+        return GetSeedConnectorAsRoundRobin();
     }
 
     private Node GetBrokerAsRandom()

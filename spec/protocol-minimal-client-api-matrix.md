@@ -33,29 +33,44 @@ Out of scope:
 
 ## Current baseline
 
-The current fallback matrix in [src/NKafka/Protocol/SupportVersionsExtensions.cs](K:\nkafka\src\NKafka\Protocol\SupportVersionsExtensions.cs:53) already includes the following core APIs:
+The current fallback matrix in [src/NKafka/Protocol/SupportVersionsExtensions.cs](K:\nkafka\src\NKafka\Protocol\SupportVersionsExtensions.cs:53) already includes the following core and stage APIs:
 
 - `AddOffsetsToTxn`
 - `AddPartitionsToTxn`
 - `ApiVersions`
 - `CreateTopics`
+- `CreateAcls`
+- `DeleteAcls`
+- `DeleteGroups`
+- `DeleteTopics`
+- `DescribeAcls`
+- `DescribeCluster`
+- `DescribeConfigs`
+- `DescribeGroups`
 - `EndTxn`
 - `Fetch`
 - `FetchSnapshot`
 - `FindCoordinator`
 - `Heartbeat`
+- `IncrementalAlterConfigs`
+- `InitProducerId`
 - `JoinGroup`
 - `LeaveGroup`
+- `ListGroups`
 - `ListOffsets`
 - `Metadata`
 - `OffsetCommit`
 - `OffsetFetch`
+- `OffsetForLeaderEpoch`
 - `Produce`
 - `SaslAuthenticate`
 - `SaslHandshake`
 - `SyncGroup`
+- `TxnOffsetCommit`
 
-That set covers the basic request path, classic consumer groups, and part of the transactional producer flow.
+The matrix also contains `AlterConfigs`, `ConsumerGroupHeartbeat`, and `ConsumerGroupDescribe` for broker baselines where those APIs exist.
+
+That set now covers the basic request path, classic consumer groups, part of the transactional producer flow, and the protocol/fallback awareness targeted by the current stage.
 
 ## Decision rules
 
@@ -76,22 +91,22 @@ An API may stay out of the minimal fallback matrix when:
 
 | API | Area | In current fallback matrix | Should be in minimal fallback matrix | Priority | Why it matters | Current status in repository |
 |---|---|---|---|---|---|---|
-| `InitProducerId` | Producer | No | Yes | P0 | Required for idempotent and transactional producer initialization | Runtime path exists in [Producer.Transaction.cs](K:\nkafka\src\NKafka\Clients\Producer\Producer.Transaction.cs:32) and [TransactionManager.cs](K:\nkafka\src\NKafka\Clients\Producer\Internals\TransactionManager.cs:72) |
-| `TxnOffsetCommit` | Producer/Transactions | No | Yes | P0 | Required for `SendOffsetsToTransactionAsync()` and full transactional offsets flow | Generated messages exist; flow is called out as missing in [code-gaps.md](K:\nkafka\spec\code-gaps.md:48) |
-| `OffsetForLeaderEpoch` | Consumer | No | Yes | P0 | Required for log truncation handling and modern fetch recovery semantics | Generated messages exist; needed for `KIP-320` class of behavior |
-| `DeleteTopics` | Admin | No | Yes | P0 | Already exposed as public admin operation and implemented in runtime | Implemented in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:111) |
-| `DescribeGroups` | Consumer/Admin | No | Yes | P0 | Required for group inspection and practical admin/client diagnostics | Generated messages exist; not part of fallback matrix yet |
-| `ListGroups` | Consumer/Admin | No | Yes | P0 | Required for group discovery and basic admin inspection | Generated messages exist; not part of fallback matrix yet |
-| `DeleteGroups` | Admin | No | Yes | P0 | Required for modern group administration baseline | Public/admin-level relevance confirmed in [code-map.md](K:\nkafka\spec\code-map.md:320) |
-| `DescribeCluster` | Admin | No | Yes | P1 | Already exposed by `AdminClient`, should participate in fallback behavior | Implemented in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:185) |
-| `DescribeConfigs` | Admin | No | Yes | P1 | Public admin API already exists and should be consistent with fallback compatibility behavior | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:241) |
-| `AlterConfigs` | Admin | No | Yes | P1 | Public admin API exists; needed for legacy config mutation support | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:255) |
-| `IncrementalAlterConfigs` | Admin | No | Yes | P1 | Public admin API exists; this is the modern config mutation path | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:270) |
-| `DescribeAcls` | Admin/Security | No | Yes | P1 | Public admin API exists for ACL inspection | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:203) |
-| `CreateAcls` | Admin/Security | No | Yes | P1 | Public admin API exists for ACL creation | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:215) |
-| `DeleteAcls` | Admin/Security | No | Yes | P1 | Public admin API exists for ACL deletion | Public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:228) |
-| `ConsumerGroupHeartbeat` | Consumer | No | Yes | P1 | Required for the modern consumer group protocol in Kafka `4.x` | Messages and KIP references exist; runtime integration is still incomplete per [code-gaps.md](K:\nkafka\spec\code-gaps.md:55) |
-| `ConsumerGroupDescribe` | Consumer/Admin | No | Yes | P1 | Useful companion API for the modern consumer group protocol and group diagnostics | Messages exist; not yet part of minimal fallback matrix |
+| `InitProducerId` | Producer | Yes | Yes | P0 | Required for idempotent and transactional producer initialization | `Fallback-known`; runtime path exists in [Producer.Transaction.cs](K:\nkafka\src\NKafka\Clients\Producer\Producer.Transaction.cs:32) and [TransactionManager.cs](K:\nkafka\src\NKafka\Clients\Producer\Internals\TransactionManager.cs:72) |
+| `TxnOffsetCommit` | Producer/Transactions | Yes | Yes | P0 | Required for `SendOffsetsToTransactionAsync()` and full transactional offsets flow | `Fallback-known`; runtime flow is still missing in [code-gaps.md](K:\nkafka\spec\code-gaps.md:48) |
+| `OffsetForLeaderEpoch` | Consumer | Yes | Yes | P0 | Required for log truncation handling and modern fetch recovery semantics | `Fallback-known`; needed for `KIP-320` class of behavior |
+| `DeleteTopics` | Admin | Yes | Yes | P0 | Already exposed as public admin operation and implemented in runtime | `Fallback-known`; implemented in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:111) |
+| `DescribeGroups` | Consumer/Admin | Yes | Yes | P0 | Required for group inspection and practical admin/client diagnostics | `Fallback-known`; not runtime-integrated into higher-level diagnostics flows yet |
+| `ListGroups` | Consumer/Admin | Yes | Yes | P0 | Required for group discovery and basic admin inspection | `Fallback-known`; not runtime-integrated into higher-level diagnostics flows yet |
+| `DeleteGroups` | Admin | Yes | Yes | P0 | Required for modern group administration baseline | `Fallback-known`; public/admin-level relevance confirmed in [code-map.md](K:\nkafka\spec\code-map.md:320) |
+| `DescribeCluster` | Admin | Yes | Yes | P1 | Already exposed by `AdminClient`, should participate in fallback behavior | `Fallback-known`; implemented in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:185) |
+| `DescribeConfigs` | Admin | Yes | Yes | P1 | Public admin API already exists and should be consistent with fallback compatibility behavior | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:241) |
+| `AlterConfigs` | Admin | Yes | Yes | P1 | Public admin API exists; needed for legacy config mutation support | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:255) |
+| `IncrementalAlterConfigs` | Admin | Yes | Yes | P1 | Public admin API exists; this is the modern config mutation path | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:270) |
+| `DescribeAcls` | Admin/Security | Yes | Yes | P1 | Public admin API exists for ACL inspection | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:203) |
+| `CreateAcls` | Admin/Security | Yes | Yes | P1 | Public admin API exists for ACL creation | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:215) |
+| `DeleteAcls` | Admin/Security | Yes | Yes | P1 | Public admin API exists for ACL deletion | `Fallback-known`; public API exists, runtime currently stubbed in [AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs:228) |
+| `ConsumerGroupHeartbeat` | Consumer | Yes | Yes | P1 | Required for the modern consumer group protocol in Kafka `4.x` | `Fallback-known`; runtime integration is still incomplete per [code-gaps.md](K:\nkafka\spec\code-gaps.md:56) |
+| `ConsumerGroupDescribe` | Consumer/Admin | Yes | Yes | P1 | Useful companion API for the modern consumer group protocol and group diagnostics | `Fallback-known`; runtime integration is still incomplete |
 | `DescribeTopicPartitions` | Admin/Metadata | No | Maybe | P2 | Useful for modern topic introspection, but not required for the smallest baseline | Nice-to-have extension for admin completeness |
 | `CreatePartitions` | Admin | No | Maybe | P2 | Useful admin operation, but not required for minimal producer/consumer viability | Messages exist; not currently part of runtime-critical path |
 | `DeleteRecords` | Admin | No | Maybe | P2 | Useful for maintenance/admin scenarios, but not part of core client behavior | Messages exist; optional admin expansion |
@@ -103,7 +118,7 @@ An API may stay out of the minimal fallback matrix when:
 
 ## Recommended minimal additions
 
-The highest-value additions for the fallback matrix are:
+The highest-value additions for the fallback matrix were:
 
 1. `InitProducerId`
 2. `TxnOffsetCommit`
@@ -113,7 +128,7 @@ The highest-value additions for the fallback matrix are:
 6. `ListGroups`
 7. `DeleteGroups`
 
-These are the smallest set that closes the most visible mismatch between:
+These were the smallest set that closed the most visible mismatch between:
 
 - current public/runtime client surface
 - generated protocol support
@@ -121,7 +136,7 @@ These are the smallest set that closes the most visible mismatch between:
 
 ## Recommended second wave
 
-The next group should be added once `AdminClient` and modern Kafka `4.x` support are treated as baseline, not as roadmap-only:
+The next group was added in the current protocol-awareness stage once `AdminClient` and modern Kafka `4.x` support were treated as fallback baseline knowledge:
 
 1. `DescribeCluster`
 2. `DescribeConfigs`

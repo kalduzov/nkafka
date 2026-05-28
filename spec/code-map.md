@@ -150,6 +150,8 @@
 - есть records/batches/buffers
 - явно поддерживается version-aware обработка сообщений
 - есть большое количество message tests в `tests/NKafka.Tests/Messages`
+- в текущем protocol-awareness stage добавлены `DescribeCluster` и `ConsumerGroupDescribe` contracts
+- ручная fallback compatibility matrix расширена для stage API from `InitProducerId` through `ConsumerGroupDescribe`
 
 Что ограничено:
 
@@ -182,6 +184,7 @@
 
 - полнота определяется входными JSON specs и тем, насколько новые KIP-сообщения реально включены в клиентские workflows
 - generated code нельзя рассматривать как бизнес-реализацию сам по себе, это инфраструктурный слой
+- часть новых contracts уже `Protocol-known`/`Fallback-known`, но ещё не `Runtime-integrated`
 
 ### 5. Message Generator
 
@@ -335,6 +338,7 @@
 - `DescribeConfigsAsync()` возвращает пустой result
 - `AlterConfigsAsync()` возвращает пустой result
 - `IncrementalAlterConfigsAsync()` возвращает пустой result
+- protocol/fallback awareness для этих API уже добавлена, но orchestration и mapping не реализованы
 
 Вывод:
 

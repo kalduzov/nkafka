@@ -1,5 +1,25 @@
 # Protocol API Addition Plan
 
+## Status
+
+Current status: `Completed`
+
+This stage is closed as of `2026-05-28`.
+
+Implemented result:
+
+- all selected APIs for this stage are present in the protocol layer
+- generated message contracts, builders, and generated tests exist for the selected APIs
+- the manual fallback compatibility matrix was updated for the selected APIs using Kafka request `validVersions` as the source baseline
+- related specifications were updated to distinguish `Fallback-known` from incomplete runtime integration
+- no producer, consumer, or admin orchestration logic was intentionally wired to the new APIs during this stage
+
+Verification summary:
+
+- targeted protocol/message tests for the stage APIs passed
+- targeted `SupportVersionsExtensions` tests passed
+- a full `dotnet build` was attempted during the verification wave, but one run was blocked by a transient file lock in `obj/`; the stage was validated through successful targeted protocol-level test execution
+
 ## Purpose
 
 This document fixes the implementation plan for the current stage of protocol work.

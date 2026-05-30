@@ -41,31 +41,31 @@ public partial class ClusterTests
         var connector1 = SetupConnector(1);
         var connector2 = SetupConnector(2);
 
-        _connectorPool.TryGetConnector(-1, false, out Arg.Any<IKafkaConnector>())
+        _connectorPool.TryGetSharedConnector(-1, out Arg.Any<IKafkaConnector>())
             .Returns(x =>
             {
-                x[2] = connector1;
+                x[1] = connector1;
 
                 return true;
             });
 
-        _connectorPool.TryGetConnector(1, false, out Arg.Any<IKafkaConnector>())
+        _connectorPool.TryGetSharedConnector(1, out Arg.Any<IKafkaConnector>())
             .Returns(x =>
             {
-                x[2] = connector1;
+                x[1] = connector1;
 
                 return true;
             });
 
-        _connectorPool.TryGetConnector(2, false, out Arg.Any<IKafkaConnector>())
+        _connectorPool.TryGetSharedConnector(2, out Arg.Any<IKafkaConnector>())
             .Returns(x =>
             {
-                x[2] = connector2;
+                x[1] = connector2;
 
                 return true;
             });
 
-        _connectorPool.GetAllOpenedConnectors()
+        _connectorPool.GetOpenedSharedConnectors()
             .Returns([
                 connector1,
                 connector2

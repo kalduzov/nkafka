@@ -47,22 +47,17 @@ public class KafkaConnectorPoolTests: IClassFixture<ConnectorFixture>
     }
 
     [Fact]
-    public void GetConnectorFromPool_WhenNoConnectors_Successful()
+    public void TryGetBootstrapConnector_WhenNoConnectors_ReturnsFalse()
     {
         var connectorPool = CreateConnectorPool();
 
-        IKafkaConnector GetConnector()
-        {
-            return connectorPool.GetConnector();
-        }
-
-        FluentActions.Invoking(GetConnector)
-            .Should()
-            .Throw<ConnectorNotFoundException>();
+        var result = connectorPool.TryGetBootstrapConnector(out var connector);
+        result.Should().BeFalse();
+        connector.Should().BeNull();
     }
 
     [Fact]
-    public void TryGetConnector_WithBrokers_Successful()
+    public void TryGetSharedConnector_WithBrokers_Successful()
     {
         var config = new ClusterConfig();
 
@@ -82,13 +77,13 @@ public class KafkaConnectorPoolTests: IClassFixture<ConnectorFixture>
             config.ApiVersionRequest,
             NullLoggerFactory.Instance);
 
-        var result = connectorPool.TryGetConnector(1, false, out var connector);
+        var result = connectorPool.TryGetSharedConnector(1, out var connector);
         result.Should().BeTrue();
         connector.Should().NotBeNull();
     }
 
     [Fact]
-    public void GetConnector_WithSeeds_Successful()
+    public void TryGetBootstrapConnector_WithSeeds_Successful()
     {
         var config = new ClusterConfig();
 
@@ -108,17 +103,19 @@ public class KafkaConnectorPoolTests: IClassFixture<ConnectorFixture>
             config.ApiVersionRequest,
             NullLoggerFactory.Instance);
 
-        var connector = connectorPool.GetConnector();
+        var result = connectorPool.TryGetBootstrapConnector(out var connector);
+        result.Should().BeTrue();
         connector.Should().NotBeNull();
         ((IPEndPoint)connector.Endpoint).Port.Should().Be(9001);
 
-        connector = connectorPool.GetConnector();
+        result = connectorPool.TryGetBootstrapConnector(out connector);
+        result.Should().BeTrue();
         connector.Should().NotBeNull();
         ((IPEndPoint)connector.Endpoint).Port.Should().Be(9002);
     }
 
     [Fact]
-    public void GetConnector_WithBrokers_Successful()
+    public void TryGetAnySharedBrokerConnector_WithBrokers_Successful()
     {
         var config = new ClusterConfig();
 
@@ -138,7 +135,8 @@ public class KafkaConnectorPoolTests: IClassFixture<ConnectorFixture>
             config.ApiVersionRequest,
             NullLoggerFactory.Instance);
 
-        var connector = connectorPool.GetConnector();
+        var result = connectorPool.TryGetAnySharedBrokerConnector(out var connector);
+        result.Should().BeTrue();
         connector.Should().NotBeNull();
         connector.CurrentNumberInflightRequests.Should().Be(1);
     }

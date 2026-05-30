@@ -111,11 +111,18 @@ public abstract class ClientTests
         SetupJointToGroupRequests(kafkaConnector1);
         SetupOffsetFetchRequests(kafkaConnector1);
 
-        connectionPool.GetConnector().Returns(kafkaConnector1);
-        connectionPool.TryGetConnector(1, true, connector: out Arg.Any<IKafkaConnector>())
+        connectionPool.TryGetAnySharedBrokerConnector(out Arg.Any<IKafkaConnector>())
             .Returns(x =>
             {
-                x[2] = kafkaConnector1;
+                x[0] = kafkaConnector1;
+
+                return true;
+            });
+
+        connectionPool.TryCreateDedicatedConnector(1, connector: out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[1] = kafkaConnector1;
 
                 return true;
             });

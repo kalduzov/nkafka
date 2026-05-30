@@ -1417,6 +1417,16 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 
 - test suite использует новые названия и методы
 
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- unit tests for cluster, client and connector-pool routing migrated to explicit methods
+- legacy test call sites for `GetConnector()`, `TryGetConnector(...)`, `GetAllOpenedConnectors()` and `ProvideDedicateConnector` removed
+- verification remains partially limited by an existing `KafkaCluster.DisposeAsync()` failure in two cluster tests
+
 ### Step 6. Remove old ambiguous methods
 
 Цель:
@@ -1433,6 +1443,15 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 
 - в кодовой базе остаётся только explicit routing contract
 
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- old pool methods `GetConnector()`, `TryGetConnector(...)` and `GetAllOpenedConnectors()` removed from interface and implementation
+- only explicit routing methods remain in `IKafkaConnectorPool`
+
 ### Step 7. Start cluster helper cleanup
 
 Цель:
@@ -1448,6 +1467,17 @@ private IKafkaConnector GetConnectorForServiceRequests(bool controllerRequired =
 Критерий завершения:
 
 - `KafkaCluster` routing logic больше не размазана по нескольким местам
+
+Статус:
+
+- `Done`
+
+Примечание по реализации:
+
+- `KafkaCluster` now has explicit routing-state helpers `HasUsableBrokerTopology` and `HasKnownController`
+- broker-targeted acquisition centralized in `GetConnectorForKnownBroker(int nodeId)`
+- bootstrap vs any-broker fallback centralized in `GetConnectorForBootstrapOrAnyBroker()`
+- `GetConnectorForServiceRequests()` now composes these helpers instead of carrying all routing branches inline
 
 ## Recommended immediate next step
 

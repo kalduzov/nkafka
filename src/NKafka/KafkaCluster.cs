@@ -139,6 +139,10 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public IReadOnlyCollection<Node> Brokers { get; private set; } = [];
 
+    private bool HasUsableBrokerTopology => _nodes.Count != 0 && Brokers.Count != 0;
+
+    private bool HasKnownController => _controllerId != Node.NoNode.Id;
+
     /// <inheritdoc />
     public IAdminClient AdminClient
     {
@@ -321,12 +325,8 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     Task<TResponseMessage> IKafkaCluster.SendAsync<TRequestMessage, TResponseMessage>(TRequestMessage message, int nodeId, CancellationToken token)
     {
-        if (_connectorPool.TryGetSharedConnector(nodeId, out var connector))
-        {
-            return connector.SendAsync<TRequestMessage, TResponseMessage>(message, false, token);
-        }
-
-        throw new ConnectorNotFoundException($"Коннектор для брокера {nodeId} не найден");
+        return GetConnectorForKnownBroker(nodeId)
+            .SendAsync<TRequestMessage, TResponseMessage>(message, false, token);
     }
 
     /// <summary>
@@ -587,12 +587,12 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// </remarks>
     private IKafkaConnector GetConnectorForServiceRequests(bool throwExceptionIfNoController = false)
     {
-        if (_controllerId == -1 && throwExceptionIfNoController)
+        if (throwExceptionIfNoController && !HasKnownController)
         {
             throw new ClusterKafkaException(ExceptionMessages.NoController);
         }
 
-        if (_connectorPool.TryGetSharedConnector(_controllerId, out var controllerConnector))
+        if (HasKnownController && _connectorPool.TryGetSharedConnector(_controllerId, out var controllerConnector))
         {
             return controllerConnector;
         }
@@ -602,7 +602,22 @@ internal sealed class KafkaCluster: IKafkaCluster
             throw new ClusterKafkaException(ExceptionMessages.NoConnectionToController);
         }
 
-        if (_connectorPool.TryGetAnySharedBrokerConnector(out var brokerConnector))
+        return GetConnectorForBootstrapOrAnyBroker();
+    }
+
+    private IKafkaConnector GetConnectorForKnownBroker(int nodeId)
+    {
+        if (_connectorPool.TryGetSharedConnector(nodeId, out var connector))
+        {
+            return connector;
+        }
+
+        throw new ConnectorNotFoundException($"Коннектор для брокера {nodeId} не найден");
+    }
+
+    private IKafkaConnector GetConnectorForBootstrapOrAnyBroker()
+    {
+        if (HasUsableBrokerTopology && _connectorPool.TryGetAnySharedBrokerConnector(out var brokerConnector))
         {
             return brokerConnector;
         }
@@ -610,6 +625,11 @@ internal sealed class KafkaCluster: IKafkaCluster
         if (_connectorPool.TryGetBootstrapConnector(out var bootstrapConnector))
         {
             return bootstrapConnector;
+        }
+
+        if (_connectorPool.TryGetAnySharedBrokerConnector(out var fallbackBrokerConnector))
+        {
+            return fallbackBrokerConnector;
         }
 
         throw new ConnectorNotFoundException(ExceptionMessages.ConnectorPool_NoAvailableConnections);

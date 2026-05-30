@@ -52,32 +52,6 @@ internal interface IKafkaConnectorPool: IDisposable, IAsyncDisposable
     internal bool TryGetBootstrapConnector(out IKafkaConnector connector);
 
     /// <summary>
-    /// Возвращает все рабочие соединения
-    /// </summary>
-    internal IEnumerable<IKafkaConnector> GetAllOpenedConnectors();
-
-    /// <summary>
-    ///     Returns a connection to a specific broker
-    /// </summary>
-    /// <param name="nodeId">Broker id</param>
-    /// <param name="isDedicated">Create a dedicated connection or use an existing one</param>
-    /// <param name="connector">Created or existing connection</param>
-    /// <returns>true if the connection was successfully obtained or false otherwise</returns>
-    internal bool TryGetConnector(int nodeId, bool isDedicated, out IKafkaConnector connector);
-
-    /// <summary>
-    ///     Returns a connection
-    /// </summary>
-    /// <remarks>
-    ///     The connection to return is selected based on the state of the pool.
-    ///     If there is no information about the cluster brokers in the pool,
-    ///     then each method call will return a connection to the seed broker using the Rundrobin algorithm.
-    ///     If information about the broker is in the pool, then the least loaded connection to a randomly
-    ///     selected broker will be returned.
-    /// </remarks>
-    internal IKafkaConnector GetConnector();
-
-    /// <summary>
     /// </summary>
     /// <param name="nodes"></param>
     /// <param name="token"></param>

@@ -28,8 +28,6 @@ using Microsoft.Extensions.Logging;
 using NKafka.Config;
 using NKafka.Exceptions;
 
-using EM = NKafka.Resources.ExceptionMessages;
-
 namespace NKafka.Connection;
 
 internal partial class KafkaConnectorPool: IKafkaConnectorPool
@@ -191,23 +189,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         }
     }
 
-    /// <summary>
-    /// Возвращает все рабочие соединения
-    /// </summary>
-    public IEnumerable<IKafkaConnector> GetAllOpenedConnectors()
-    {
-        foreach (var connectors in _brokersConnectors.Values)
-        {
-            foreach (var connector in connectors)
-            {
-                if (connector.ConnectorState == KafkaConnector.State.Open)
-                {
-                    yield return connector;
-                }
-            }
-        }
-    }
-
     public bool TryGetSharedConnector(int nodeId, out IKafkaConnector connector)
     {
         if (_brokers.TryGetValue(nodeId, out var node)
@@ -246,28 +227,7 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
 
     public bool TryGetBootstrapConnector(out IKafkaConnector connector)
     {
-        if (_seedConnectors.Count == 0)
-        {
-            connector = null!;
-
-            return false;
-        }
-
-        var index = _seedConnectorsNumberCounter.GetNextNumber();
-        connector = _seedConnectors.ToArray()[index].Value;
-
-        return true;
-    }
-
-    /// <inheritdoc />
-    public bool TryGetConnector(int nodeId, bool isDedicated, out IKafkaConnector connector)
-    {
-        if (isDedicated)
-        {
-            return TryDedicateConnector(nodeId, out connector);
-        }
-
-        return TryGetSharedConnector(nodeId, out connector);
+        return TryGetSeedConnectorAsRoundRobin(out connector);
     }
 
     private static IKafkaConnector TakeLeastLoaded(IReadOnlyList<IKafkaConnector> connectors)
@@ -337,16 +297,6 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         return false;
     }
 
-    public IKafkaConnector GetConnector()
-    {
-        if (TryGetAnySharedBrokerConnector(out var brokerConnector))
-        {
-            return brokerConnector;
-        }
-
-        return GetSeedConnectorAsRoundRobin();
-    }
-
     private Node GetBrokerAsRandom()
     {
         var index = _brokersNumberCounter.GetNextNumber(_brokers.Count);
@@ -355,16 +305,19 @@ internal partial class KafkaConnectorPool: IKafkaConnectorPool
         return _brokers[broker];
     }
 
-    private IKafkaConnector GetSeedConnectorAsRoundRobin()
+    private bool TryGetSeedConnectorAsRoundRobin(out IKafkaConnector connector)
     {
         if (_seedConnectors.Count == 0)
         {
-            throw new ConnectorNotFoundException(EM.ConnectorPool_NoAvailableConnections);
+            connector = null!;
+
+            return false;
         }
 
         var index = _seedConnectorsNumberCounter.GetNextNumber();
+        connector = _seedConnectors.ToArray()[index].Value;
 
-        return _seedConnectors.ToArray()[index].Value;
+        return true;
     }
 
     public async ValueTask AddOrUpdateConnectorsAsync(IEnumerable<Node> nodes, CancellationToken token)

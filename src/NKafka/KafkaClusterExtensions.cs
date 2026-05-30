@@ -75,7 +75,7 @@ public static class KafkaClusterExtensions
     /// <param name="token"></param>
     /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
     /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
-    public static Task<IKafkaCluster> CreateCluster(
+    internal static Task<IKafkaCluster> CreateCluster(
         this IClusterConfigFactory clusterConfigFactory,
         bool openImmediately,
         ILoggerFactory loggerFactory,
@@ -93,6 +93,18 @@ public static class KafkaClusterExtensions
     public static Task<IKafkaCluster> CreateCluster(this ClusterConfig config, ILoggerFactory loggerFactory)
     {
         return CreateClusterInternal(config, loggerFactory, true, null, CancellationToken.None);
+    }
+
+    /// <param name="config">Configuration</param>
+    /// <param name="loggerFactory">Logging factory instance</param>
+    /// <param name="openImmediately">The connection to the cluster will be established immediately. Otherwise, you must call the <see cref="KafkaCluster.OpenAsync"/>OpenAsync method.</param>
+    /// <exception cref="ClusterKafkaException">Failed to initialize cluster</exception>
+    internal static Task<IKafkaCluster> CreateCluster(
+        this ClusterConfig config,
+        ILoggerFactory loggerFactory,
+        bool openImmediately)
+    {
+        return CreateClusterInternal(config, loggerFactory, openImmediately, null, CancellationToken.None);
     }
 
     internal static async Task<IKafkaCluster> CreateClusterInternal(

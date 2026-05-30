@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
+  
+  <PropertyGroup>
+    <PackageTags>kafka;nkafka;kafka-client</PackageTags>
+    <Authors>Aleksey Kalduzov</Authors>
+    <Copyright>Copyright © 2022 Aleksey Kalduzov. All rights reserved</Copyright>
+    <PackageProjectUrl>https://github.com/kalduzov/nkafka/</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/kalduzov/nkafka/blob/dev/LICENCE</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/kalduzov/nkafka/</RepositoryUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <MinVerMinimumMajorMinor>0.4</MinVerMinimumMajorMinor>
+    <Deterministic>false</Deterministic>
+    <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
+  </PropertyGroup>
+</Project>

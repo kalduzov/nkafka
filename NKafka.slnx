@@ -196,17 +196,21 @@
     <File Path="spec/protocol-interaction.md" />
     <File Path="spec/protocol-minimal-client-api-matrix.md" />
     <File Path="spec/technical-requirements.md" />
+    <File Path="spec/network-interaction.md" />
   </Folder>
   <Folder Name="/spec/KIP/">
     <File Path="spec/KIP/client-side-kips.md" />
     <File Path="spec/KIP/client-side-kips-table.md" />
   </Folder>
   <Folder Name="/src/">
+    <File Path="src/Directory.Build.props" />
+    <Project Path="src/NKafka.AspNetCore/NKafka.AspNetCore.csproj" />
     <Project Path="src/NKafka.MessageGenerator/NKafka.MessageGenerator.csproj" />
     <Project Path="src/NKafka/NKafka.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
+    <Project Path="tests/NKafka.AspNetCore.Tests/NKafka.AspNetCore.Tests.csproj" />
     <Project Path="tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj" />
     <Project Path="tests/NKafka.MessageGenerator.Tests/NKafka.MessageGenerator.Tests.csproj" />
     <Project Path="tests/NKafka.Tests/NKafka.Tests.csproj" />

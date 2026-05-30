@@ -1,21 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageTags>kafka;nkafka;kafka-client</PackageTags>
     <PackageId>NKafka</PackageId>
     <Title>NKafka</Title>
-    <Authors>Aleksey Kalduzov</Authors>
     <Description>It is a high performance fully managed client for Kafka.</Description>
-    <Copyright>Copyright © 2022 Aleksey Kalduzov. All rights reserved</Copyright>
-    <PackageProjectUrl>https://github.com/kalduzov/nkafka/</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/kalduzov/nkafka/blob/dev/LICENCE</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/kalduzov/nkafka/</RepositoryUrl>
-    <PackageIcon>logo.png</PackageIcon>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>NKafka</AssemblyName>
-    <MinVerMinimumMajorMinor>0.3</MinVerMinimumMajorMinor>
-    <Deterministic>false</Deterministic>
-    <MinVerDefaultPreReleaseIdentifiers>dev</MinVerDefaultPreReleaseIdentifiers>
+    
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

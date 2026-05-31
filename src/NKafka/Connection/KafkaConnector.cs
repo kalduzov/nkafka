@@ -179,6 +179,16 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
         _globalTimeWaiting.Restart(); //Каждый новый запрос перезапускает таймер
 
+        if (message is not ApiVersionsRequestMessage)
+        {
+            await EnsureSessionEstablishedAsync(token);
+        }
+
+        if (token.IsCancellationRequested)
+        {
+            return await Task.FromCanceled<TResponseMessage>(token);
+        }
+
         var contentVersion = message.ApiKey.GetEffectiveApiVersion(SupportVersions);
         var headerVersion = message.ApiKey.GetRequestHeaderVersion(contentVersion);
         var requestId = Interlocked.Increment(ref _requestId);
@@ -210,23 +220,11 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 ThrowExceptionIfRequestNotValid(request, activity);
             }
 
-            if (message is not ApiVersionsRequestMessage)
-            {
-                await EnsureSessionEstablishedAsync(token);
-            }
-
-            if (token.IsCancellationRequested)
-            {
-                return await Task.FromCanceled<TResponseMessage>(token);
-            }
-
-            using var cts = CancellationTokenSource.CreateLinkedTokenSource(token);
-
             var responseCompletionSource = new ResponseTaskCompletionSource(
                 (ApiKeys)request.Header.RequestApiKey,
                 (ApiVersion)request.Header.RequestApiVersion);
 
-            token.Register(
+            using var cancellationRegistration = token.Register(
                 state =>
                 {
                     var awaiter = state as ResponseTaskCompletionSource;
@@ -237,9 +235,14 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
             try
             {
-                _inFlightRequests.TryAdd(requestId, responseCompletionSource);
+                if (!_inFlightRequests.TryAdd(requestId, responseCompletionSource))
+                {
+                    throw new ConnectionKafkaException($"Request with correlation id {requestId} is already registered for NodeId={NodeId}.");
+                }
+
+                // The response may arrive as soon as the broker accepts the frame, so the
+                // request must be visible in the inflight registry before any bytes are written.
                 WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
-                cts.CancelAfter(_requestTimeoutMs);
 
                 if (CanWrite)
                 {
@@ -258,9 +261,9 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
                 _inFlightRequests.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
 
-                if (!responseCompletionSource.Task.IsCanceled || !responseCompletionSource.Task.IsCompleted)
+                if (!responseCompletionSource.Task.IsCanceled && !responseCompletionSource.Task.IsCompleted)
                 {
-                    responseCompletionSource.SetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError,
+                    responseCompletionSource.TrySetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError,
                         "Не удалось отправить запрос",
                         exc));
                 }

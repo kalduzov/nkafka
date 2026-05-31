@@ -542,6 +542,57 @@ State machine должна обеспечивать следующие invariant
 - write/timeout/reset behavior предсказуем и документирован
 - response correlation остаётся корректным при concurrent completion
 
+#### Wave 4 concrete steady-state invariants
+
+`Wave 4` фокусируется только на steady-state path уже установленной physical session.
+Setup pipeline из `Wave 3` считается входным условием и не смешивается с этими invariants.
+
+##### Request send invariants
+
+- обычный broker request не должен вычислять effective API version до того, как connector убедился, что current session established
+- каждый outgoing request получает correlation id ровно один раз
+- inflight registration происходит до фактической отправки bytes в stream
+- failed write не должен оставлять request в inflight registry
+- steady-state request не должен silently использовать invalidated `SupportVersions`
+
+##### Inflight ownership rules
+
+- один correlation id соответствует ровно одному pending response completion source
+- inflight request может завершиться только одним из путей:
+  - successful response
+  - caller cancellation
+  - failed write
+  - connector cleanup/reset/disconnect
+- completion path не должен пытаться завершать один и тот же request повторно разными исходами
+- после successful response или failed completion request должен исчезнуть из inflight registry
+
+##### Response loop invariants
+
+- у одной physical session есть ровно один active response reader
+- response loop принадлежит конкретной session и не должен продолжать работу после её cleanup
+- response correlation всегда использует response header correlation id как единственный ключ lookup
+- response parsing failure для одного frame считается connection-scoped failure, а не локальной ошибкой одного request
+
+##### Timeout and cancellation rules
+
+- caller cancellation завершает конкретный request, но не должна автоматически считаться connection failure
+- request timeout policy должна быть явной и не зависеть от случайного поведения background tasks
+- если timeout policy выбирает reset/disconnect, все затронутые inflight requests должны завершаться предсказуемо
+
+##### Failed write rules
+
+- если request не удалось записать в stream целиком, он не должен оставаться зарегистрированным как pending response
+- failed write должен завершать request понятной transport/protocol exception category
+- failed write не должен оставлять response loop в ожидании response для request, который фактически не был отправлен
+
+##### Current implementation target
+
+Для первого прохода `Wave 4` достаточно добиться следующего:
+
+- `SendAsync(...)` выражает понятный contract регистрации, отправки и cleanup request
+- response loop остаётся single-reader и session-scoped
+- request completion and cleanup semantics не противоречат state machine из `Wave 2`
+
 ### Wave 5. Pool topology and orchestration cleanup
 
 Цель:

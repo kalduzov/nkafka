@@ -113,6 +113,13 @@ internal class MockStream: Stream
 
                         break;
                     }
+                case ApiKeys.Metadata:
+                    {
+                        var response = new MetadataResponseMessage();
+                        response.Write(ref writer, requestData.ApiVersion);
+
+                        break;
+                    }
             }
 
             lock (_lockObject)

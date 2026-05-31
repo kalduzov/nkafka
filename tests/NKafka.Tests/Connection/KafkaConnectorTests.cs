@@ -53,7 +53,7 @@ public class KafkaConnectorTests
                 SslSettings.None,
                 "test",
                 true,
-                CreateSocketFactory(CreateEndpoint()),
+                CreateSocketFactoryContext(CreateEndpoint()).SocketFactory,
                 NullLoggerFactory.Instance);
 
         FluentActions.Invoking(CreateConnector).Should().NotThrow();
@@ -66,6 +66,59 @@ public class KafkaConnectorTests
 
         await kafkaConnector.OpenAsync(CancellationToken.None);
         kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WithApiVersionNegotiation_PublishesSupportVersions()
+    {
+        var kafkaConnector = CreateConnector(apiRequest: true);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.SupportVersions.Should().ContainKey(ApiKeys.ApiVersions);
+        kafkaConnector.SupportVersions.Should().ContainKey(ApiKeys.Metadata);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WithApiVersionNegotiationDisabled_LeavesSupportVersionsEmpty()
+    {
+        var kafkaConnector = CreateConnector(apiRequest: false);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.SupportVersions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task OpenAsync_WithSslTransport_CreatesSslStream()
+    {
+        var socketContext = CreateSocketFactoryContext(CreateEndpoint());
+        var kafkaConnector = CreateConnector(
+            apiRequest: false,
+            securityProtocol: SecurityProtocols.Ssl,
+            socketContext: socketContext);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        socketContext.SocketFactory.Received(1).CreateSslStream(Arg.Any<Stream>());
+    }
+
+    [Fact]
+    public async Task SendAsync_DoesNotReestablishSession_WhenConnectorIsAlreadyOpen()
+    {
+        var socketContext = CreateSocketFactoryContext(CreateEndpoint());
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            socketContext: socketContext);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        await ((IKafkaConnector)kafkaConnector).SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        await socketContext.SocketProxy.Received(1).ConnectAsync(Arg.Any<EndPoint>(), Arg.Any<CancellationToken>());
     }
 
     [Fact]
@@ -105,7 +158,11 @@ public class KafkaConnectorTests
         kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Closed);
     }
 
-    private KafkaConnector CreateConnector(bool apiRequest, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+    private KafkaConnector CreateConnector(
+        bool apiRequest,
+        IEnumerable<ApiKeys>? requestsWithoutResponse = null,
+        SecurityProtocols securityProtocol = SecurityProtocols.PlainText,
+        SocketFactoryContext? socketContext = null)
         => new(
             CreateEndpoint(),
             100,
@@ -114,18 +171,18 @@ public class KafkaConnectorTests
             1000,
             1000,
             0,
-            SecurityProtocols.PlainText,
+            securityProtocol,
             SaslSettings.None,
             SslSettings.None,
             "test",
             apiRequest,
-            CreateSocketFactory(CreateEndpoint(), requestsWithoutResponse),
+            (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse)).SocketFactory,
             NullLoggerFactory.Instance);
 
     private static IPEndPoint CreateEndpoint()
         => new(IPAddress.Loopback, 9000);
 
-    private static ISocketFactory CreateSocketFactory(EndPoint endpoint, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+    private static SocketFactoryContext CreateSocketFactoryContext(EndPoint endpoint, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
     {
         var isConnected = false;
         var socketMock = Substitute.For<ISocketProxy>();
@@ -143,6 +200,8 @@ public class KafkaConnectorTests
         socketFactory.CreateNetworkStream(Arg.Any<Socket>(), Arg.Any<bool>()).Returns(mockStream);
         socketFactory.CreateSslStream(Arg.Any<Stream>()).Returns(sslStreamMock);
 
-        return socketFactory;
+        return new SocketFactoryContext(socketFactory, socketMock);
     }
+
+    private sealed record SocketFactoryContext(ISocketFactory SocketFactory, ISocketProxy SocketProxy);
 }

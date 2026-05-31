@@ -421,6 +421,104 @@ State machine должна обеспечивать следующие invariant
 - setup sequence читается как отдельный lifecycle path
 - auth integration больше не размазывается по steady-state send/receive коду
 
+#### Wave 3 concrete extraction plan
+
+`Wave 3` не требует немедленного выделения новых public или even separate internal types.
+На первом проходе достаточно превратить текущий setup path в явный pipeline внутри `KafkaConnector`.
+
+##### Target setup pipeline
+
+Целевой setup pipeline для одной physical session:
+
+1. `EstablishTransportAsync`
+2. `NegotiateApiVersionsAsync`
+3. `AuthenticateSessionAsync`
+4. `PublishOpenState`
+
+Этот pipeline должен оставаться единственным местом, где connector проходит путь от `Closed` до `Open`.
+
+##### Step responsibilities
+
+`EstablishTransportAsync`:
+
+- выполняет TCP connect
+- создаёт `NetworkStream`
+- выполняет SSL handshake, если он нужен
+- не публикует `SupportVersions`
+- не публикует `Open`
+
+`NegotiateApiVersionsAsync`:
+
+- выполняет `ApiVersions` request/response sequence
+- строит capability snapshot для текущей session
+- не публикует `Open`
+- не смешивает transport work и SASL work
+
+`AuthenticateSessionAsync`:
+
+- выполняет SASL handshake/authentication, если это требуется конфигурацией
+- использует уже установленный transport и уже negotiated protocol context
+- не должен сам принимать решения о publication `Open`
+
+`PublishOpenState`:
+
+- публикует `SupportVersions` как валидные для текущей session
+- переводит connector в `Open`
+- считается последним шагом successful setup sequence
+
+##### Extraction boundaries
+
+При извлечении setup pipeline нужно сохранить следующие границы:
+
+- setup logic не должна утекать обратно в `SendAsync(...)`, кроме необходимого internal send path для setup requests
+- steady-state request handling не должно владеть transport/session establishment semantics
+- `KafkaConnector.Auth..cs` остаётся местом auth-specific logic, но orchestration auth phase должна читаться из setup pipeline
+- publication of `SupportVersions` должна происходить только после успешного завершения negotiation/auth path
+
+##### Recommended implementation order
+
+Для первого прохода `Wave 3` рекомендуется такой порядок:
+
+1. выделить единый private setup entrypoint, который заменит монолитный `ReEstablishConnectionAsync()`
+2. вынести transport establishment в отдельный private method
+3. вынести `ApiVersions` negotiation и capability publication в отдельный private method
+4. вынести auth orchestration в отдельный private method
+5. оставить internal send path на месте, но сделать setup sequence читаемым сверху вниз
+
+##### Non-goals for the first pass
+
+На первом проходе `Wave 3` не требуется:
+
+- выносить setup pipeline в отдельный класс
+- переписывать response loop
+- менять pool/cluster orchestration
+- завершать SCRAM integration
+
+##### Success signal
+
+`Wave 3` считается продвинутой вперёд, когда `KafkaConnector` можно читать так:
+
+- connector decides whether a new session must be established
+- setup pipeline establishes transport
+- setup pipeline negotiates protocol capabilities
+- setup pipeline authenticates if needed
+- only then connector publishes `Open`
+
+##### Current implementation status
+
+На текущем этапе в коде уже реализованы следующие части `Wave 3`:
+
+- `OpenAsync()` и lazy reconnect идут через один canonical session-establishment path
+- setup sequence читается как явный pipeline:
+  - `EstablishTransportAsync`
+  - `NegotiateApiVersionsAsync`
+  - `AuthenticateSessionAsync`
+  - `PublishOpenState`
+- transport establishment, `ApiVersions` negotiation и SASL orchestration разделены на отдельные internal steps
+- focused tests покрывают negotiation publication, SSL transport branch и повторное использование уже открытой session без нового connect
+
+`Wave 3` можно считать завершённой, если дальнейшая работа больше не требует возвращаться к монолитному setup flow внутри `KafkaConnector`.
+
 ### Wave 4. Steady-state request/response cleanup
 
 Цель:

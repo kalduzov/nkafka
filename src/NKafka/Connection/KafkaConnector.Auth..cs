@@ -30,19 +30,18 @@ namespace NKafka.Connection;
 
 internal sealed partial class KafkaConnector
 {
-    private Task AuthenticateProcessAsync(CancellationToken token)
+    private Task AuthenticateSaslSessionAsync(CancellationToken token)
     {
         return _saslSettings.Version switch
         {
-            SaslVersion.SaslHandshakeV1 => AuthenticateProcessV1Async(token),
+            SaslVersion.SaslHandshakeV1 => AuthenticateSaslHandshakeV1Async(token),
 
             // ReSharper disable once NotResolvedInText
             _ => throw new ArgumentOutOfRangeException("Sasl.Version", ExceptionMessages.SaslVersionInvalid)
         };
-
     }
 
-    private async Task AuthenticateProcessV1Async(CancellationToken token)
+    private async Task AuthenticateSaslHandshakeV1Async(CancellationToken token)
     {
         ISaslProvider saslProvider = _saslSettings.Mechanism switch
         {
@@ -54,7 +53,6 @@ internal sealed partial class KafkaConnector
 
         if (_saslSettings.Handshake)
         {
-            // handshake step
             var saslHandshakeRequest = new SaslHandshakeRequestMessage
             {
                 Mechanism = saslProvider.Mechanism
@@ -71,6 +69,8 @@ internal sealed partial class KafkaConnector
             }
         }
 
+        // The final authenticate request is sent only after the broker accepts the
+        // selected mechanism so that the session never mixes credentials across auth flows.
         var authenticateRequest = new SaslAuthenticateRequestMessage
         {
             AuthBytes = saslProvider.GetAuthData()

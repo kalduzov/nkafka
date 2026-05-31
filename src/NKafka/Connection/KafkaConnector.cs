@@ -160,7 +160,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     public async ValueTask OpenAsync(CancellationToken token)
     {
-        await ReEstablishConnectionAsync(token);
+        await EnsureSessionEstablishedAsync(token);
     }
 
     async Task<TResponseMessage> IKafkaConnector.SendAsync<TRequestMessage, TResponseMessage>(
@@ -212,7 +212,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
             if (message is not ApiVersionsRequestMessage)
             {
-                await ReEstablishConnectionAsync(token);
+                await EnsureSessionEstablishedAsync(token);
             }
 
             if (token.IsCancellationRequested)
@@ -307,39 +307,16 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         }
     }
 
-    private async Task ReEstablishConnectionAsync(CancellationToken token)
+    private async Task EnsureSessionEstablishedAsync(CancellationToken token)
     {
         try
         {
-            if (!_socketProxy.Connected && !token.IsCancellationRequested && ConnectorState == State.Closed)
+            if (!ShouldEstablishSession(token))
             {
-                SetState(State.Connecting);
-                await _socketProxy.ConnectAsync(Endpoint, token);
-                var stream = _socketFactory.CreateNetworkStream(_socketProxy.Socket, true);
-
-                if (_securityProtocol is SecurityProtocols.Ssl or SecurityProtocols.SaslSsl)
-                {
-                    _stream = _socketFactory.CreateSslStream(stream);
-                    await ((SslStream)_stream).AuthenticateAsClientAsync("", null, _sslSettings.Protocols, _sslSettings.CheckCertificateRevocation);
-                }
-                else
-                {
-                    _stream = stream;
-                }
-
-                _globalTimeWaiting.Start();
-
-                SetState(State.Negotiating);
-                await TryRequestApiSupportVersionsAsync(token);
-
-                if (_securityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
-                {
-                    SetState(State.Authenticating);
-                    await AuthenticateProcessAsync(token);
-                }
-
-                SetState(State.Open);
+                return;
             }
+
+            await SetupConnectionSessionAsync(token);
         }
         catch (AuthenticationException exc)
         {
@@ -364,13 +341,55 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         }
     }
 
-    private async Task TryRequestApiSupportVersionsAsync(CancellationToken token)
+    private bool ShouldEstablishSession(CancellationToken token)
     {
+        return !_socketProxy.Connected && !token.IsCancellationRequested && ConnectorState == State.Closed;
+    }
+
+    private async Task SetupConnectionSessionAsync(CancellationToken token)
+    {
+        await EstablishTransportAsync(token);
+        _globalTimeWaiting.Start();
+
+        await NegotiateApiVersionsAsync(token);
+        await AuthenticateSessionAsync(token);
+        PublishOpenState();
+    }
+
+    private async Task EstablishTransportAsync(CancellationToken token)
+    {
+        SetState(State.Connecting);
+        await _socketProxy.ConnectAsync(Endpoint, token);
+
+        // The connector must always switch to the final transport stream here so that
+        // every later setup step and every steady-state request uses the same session.
+        var networkStream = _socketFactory.CreateNetworkStream(_socketProxy.Socket, true);
+
+        if (_securityProtocol is SecurityProtocols.Ssl or SecurityProtocols.SaslSsl)
+        {
+            _stream = _socketFactory.CreateSslStream(networkStream);
+
+            // SSL handshake completes the transport contract before any Kafka-level
+            // negotiation starts because ApiVersions and SASL must run on the final wire format.
+            await ((SslStream)_stream).AuthenticateAsClientAsync("", null, _sslSettings.Protocols, _sslSettings.CheckCertificateRevocation);
+        }
+        else
+        {
+            _stream = networkStream;
+        }
+    }
+
+    private async Task NegotiateApiVersionsAsync(CancellationToken token)
+    {
+        SetState(State.Negotiating);
+
         if (SupportVersions.Count != 0 || !_apiVersionRequest)
         {
             return;
         }
 
+        // The negotiated API map belongs to the current physical session because
+        // every reconnect may land on a different capability set or require a new fallback range.
         var request = ApiVersionsRequestMessage.Build();
         var response = await ((IKafkaConnector)this).SendAsync<ApiVersionsRequestMessage, ApiVersionsResponseMessage>(
             request,
@@ -378,22 +397,47 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             token);
 
         ((IResponseMessage)response).ThrowIfError();
+        PublishSupportVersions(response);
+    }
 
+    private void PublishSupportVersions(ApiVersionsResponseMessage response)
+    {
         if (response is { Code: ErrorCodes.None, ApiKeys.Count: 0 })
         {
             SupportVersions = SupportVersionsExtensions.Default;
+
+            return;
         }
-        else
+
+        var supportVersions = new Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)>(response.ApiKeys.Count);
+
+        foreach (var apiKey in response.ApiKeys)
         {
-            var supportVersions = new Dictionary<ApiKeys, (ApiVersion MinVersion, ApiVersion MaxVersion)>(response.ApiKeys.Count);
-
-            foreach (var apiKey in response.ApiKeys)
-            {
-                supportVersions.Add((ApiKeys)apiKey.ApiKey, ((ApiVersion)apiKey.MinVersion, (ApiVersion)apiKey.MaxVersion));
-            }
-
-            SupportVersions = supportVersions;
+            supportVersions.Add((ApiKeys)apiKey.ApiKey, ((ApiVersion)apiKey.MinVersion, (ApiVersion)apiKey.MaxVersion));
         }
+
+        SupportVersions = supportVersions;
+    }
+
+    private async Task AuthenticateSessionAsync(CancellationToken token)
+    {
+        if (_securityProtocol is not (SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl))
+        {
+            return;
+        }
+
+        SetState(State.Authenticating);
+
+        // Authentication runs as a dedicated setup step because it depends on the
+        // negotiated session context but must still complete before the connector becomes Open.
+        await AuthenticateSaslSessionAsync(token);
+    }
+
+    private void PublishOpenState()
+    {
+        // Open is published only after the full setup pipeline succeeds so that callers
+        // never observe a write-ready connector with incomplete protocol or auth state.
+        SetState(State.Open);
     }
 
     private void ThrowExceptionIfRequestNotValid(SendMessage message, Activity? activity)

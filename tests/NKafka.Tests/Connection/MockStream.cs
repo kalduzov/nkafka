@@ -21,19 +21,24 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO.Pipelines;
 
 using NKafka.Messages;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 
+using static System.Buffers.Binary.BinaryPrimitives;
+
 namespace NKafka.Tests.Connection;
 
 internal class MockStream: Stream
 {
+    private readonly HashSet<ApiKeys> _requestsWithoutResponse;
     private readonly ConcurrentQueue<IRequestMessage> _requestMessages = new();
     private readonly ConcurrentQueue<byte[]> _sendQueue = new();
     private readonly ConcurrentDictionary<IRequestMessage, (int CorrelactionId, ApiVersion ApiVersion)> _correlationIds = new();
     private readonly Task _processTask;
+    private readonly MemoryStream _writeBuffer = new();
 
 #if NET9_0_OR_GREATER
     private readonly Lock _lockObject = new();
@@ -43,8 +48,9 @@ internal class MockStream: Stream
 
     private readonly CancellationTokenSource _tokenSource = new();
 
-    public MockStream()
+    public MockStream(IEnumerable<ApiKeys>? requestsWithoutResponse = null)
     {
+        _requestsWithoutResponse = requestsWithoutResponse?.ToHashSet() ?? [];
         _processTask = ProcessRequests(_tokenSource.Token);
     }
 
@@ -67,6 +73,13 @@ internal class MockStream: Stream
     {
         try
         {
+            if (_requestsWithoutResponse.Contains(requestMessage.ApiKey))
+            {
+                _correlationIds.TryRemove(requestMessage, out _);
+
+                return;
+            }
+
             var arrayBuffer = new ArrayBuffer(true, false, 10000);
             var writer = new BufferWriter(ref arrayBuffer);
 
@@ -84,6 +97,18 @@ internal class MockStream: Stream
                 case ApiKeys.ApiVersions:
                     {
                         var response = new ApiVersionsResponseMessage();
+                        response.ApiKeys.Add(new ApiVersionsResponseMessage.ApiVersionMessage
+                        {
+                            ApiKey = (short)ApiKeys.ApiVersions,
+                            MinVersion = (short)ApiVersion.Version0,
+                            MaxVersion = (short)ApiVersion.Version3
+                        });
+                        response.ApiKeys.Add(new ApiVersionsResponseMessage.ApiVersionMessage
+                        {
+                            ApiKey = (short)ApiKeys.Metadata,
+                            MinVersion = (short)ApiVersion.Version0,
+                            MaxVersion = (short)ApiVersion.Version12
+                        });
                         response.Write(ref writer, requestData.ApiVersion);
 
                         break;
@@ -92,11 +117,13 @@ internal class MockStream: Stream
 
             lock (_lockObject)
             {
-                //Т.к. из потока читается в 3 этапа, то для эмуляции нужно отправить 3 пакета байт
                 var array = arrayBuffer.DangerousGetFirstBuffer();
-                _sendQueue.Enqueue([]); //Тут нужно корректно написать длину данных
-                _sendQueue.Enqueue(array[..4]);
-                _sendQueue.Enqueue(array[4..]);
+                var contentLength = writer.WrittenCount;
+                var lengthBuffer = new byte[sizeof(int)];
+                WriteInt32BigEndian(lengthBuffer, contentLength);
+
+                _sendQueue.Enqueue(lengthBuffer);
+                _sendQueue.Enqueue(array[..contentLength]);
             }
         }
         catch (Exception exc)
@@ -154,15 +181,72 @@ internal class MockStream: Stream
 
     public override void Write(byte[] buffer, int offset, int count)
     {
-        using var reader = new BufferReader(buffer);
-        _ = reader.ReadInt();
-        var apiKey = (ApiKeys)reader.ReadShort();
-        var requestApiVersion = (ApiVersion)reader.ReadShort();
-        var correlationId = reader.ReadInt();
-        var request = RequestBuilder.Build(apiKey, requestApiVersion, buffer[4..count]);
+        lock (_lockObject)
+        {
+            _writeBuffer.Position = _writeBuffer.Length;
+            _writeBuffer.Write(buffer, offset, count);
+            _writeBuffer.Position = 0;
 
-        _requestMessages.Enqueue(request);
-        _correlationIds.TryAdd(request, (correlationId, requestApiVersion));
+            while (TryReadRequestFrame(out var requestFrame))
+            {
+                using var reader = new BufferReader(requestFrame);
+                var apiKey = (ApiKeys)reader.ReadShort();
+                var requestApiVersion = (ApiVersion)reader.ReadShort();
+                var correlationId = reader.ReadInt();
+                var request = RequestBuilder.Build(apiKey, requestApiVersion, requestFrame);
+
+                _requestMessages.Enqueue(request);
+                _correlationIds.TryAdd(request, (correlationId, requestApiVersion));
+            }
+
+            PreserveUnreadBytes();
+        }
+    }
+
+    private bool TryReadRequestFrame(out byte[] requestFrame)
+    {
+        requestFrame = [];
+
+        if (_writeBuffer.Length - _writeBuffer.Position < sizeof(int))
+        {
+            return false;
+        }
+
+        var lengthBuffer = new byte[sizeof(int)];
+        _ = _writeBuffer.Read(lengthBuffer, 0, sizeof(int));
+        var messageLength = ReadInt32BigEndian(lengthBuffer);
+
+        if (_writeBuffer.Length - _writeBuffer.Position < messageLength)
+        {
+            _writeBuffer.Position -= sizeof(int);
+
+            return false;
+        }
+
+        requestFrame = new byte[messageLength];
+        _ = _writeBuffer.Read(requestFrame, 0, messageLength);
+
+        return true;
+    }
+
+    private void PreserveUnreadBytes()
+    {
+        if (_writeBuffer.Position == _writeBuffer.Length)
+        {
+            _writeBuffer.SetLength(0);
+            _writeBuffer.Position = 0;
+
+            return;
+        }
+
+        var unreadLength = (int)(_writeBuffer.Length - _writeBuffer.Position);
+        var unreadBytes = new byte[unreadLength];
+        _ = _writeBuffer.Read(unreadBytes, 0, unreadLength);
+
+        _writeBuffer.SetLength(0);
+        _writeBuffer.Position = 0;
+        _writeBuffer.Write(unreadBytes, 0, unreadBytes.Length);
+        _writeBuffer.Position = 0;
     }
 
     /// <summary>Releases the unmanaged resources used by the <see cref="T:System.IO.Stream" /> and optionally releases the managed resources.</summary>

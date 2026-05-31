@@ -73,7 +73,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly int _messageMaxBytes;
     private readonly int _requestTimeoutMs;
 
-    private readonly CancellationTokenSource _responseProcessingTokenSource = new();
+    private CancellationTokenSource _responseProcessingTokenSource = new();
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly SaslSettings _saslSettings;
     private readonly SecurityProtocols _securityProtocol;
@@ -161,8 +161,6 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     public async ValueTask OpenAsync(CancellationToken token)
     {
         await ReEstablishConnectionAsync(token);
-
-        ConnectorState = State.Open;
     }
 
     async Task<TResponseMessage> IKafkaConnector.SendAsync<TRequestMessage, TResponseMessage>(
@@ -291,23 +289,14 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     /// </returns>
     public async ValueTask DisposeAsync()
     {
-        ConnectorState = State.Closing;
-
-        await _stream.DisposeAsync();
-        _socketProxy.Dispose();
+        await CloseConnectionCoreAsync(CreateClosedException("Connector is being disposed."));
         GC.SuppressFinalize(this);
-
-        ConnectorState = State.Closed;
     }
 
     private void ResetConnection()
     {
         _logger.ConnectionResetInformation(Endpoint, NodeId, _connectionsMaxIdleMs);
-
-        ConnectorState = State.Closing;
-        _stream.Dispose();
-        _socketProxy.Close(_closeConnectionTimeoutMs);
-        ConnectorState = State.Closed;
+        CloseConnectionCore(CreateClosedException("Connection was reset."));
     }
 
     private void WakeupProcessingResponses()
@@ -324,6 +313,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         {
             if (!_socketProxy.Connected && !token.IsCancellationRequested && ConnectorState == State.Closed)
             {
+                SetState(State.Connecting);
                 await _socketProxy.ConnectAsync(Endpoint, token);
                 var stream = _socketFactory.CreateNetworkStream(_socketProxy.Socket, true);
 
@@ -339,30 +329,35 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
                 _globalTimeWaiting.Start();
 
+                SetState(State.Negotiating);
                 await TryRequestApiSupportVersionsAsync(token);
 
                 if (_securityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
                 {
+                    SetState(State.Authenticating);
                     await AuthenticateProcessAsync(token);
                 }
 
-                ConnectorState = State.Open;
+                SetState(State.Open);
             }
         }
         catch (AuthenticationException exc)
         {
+            HandleConnectionFault(new ConnectionKafkaException("Authentication failed during connector setup.", exc));
             Debug.WriteLine(exc.Message);
 
             throw;
         }
         catch (SocketException exc)
         {
+            HandleConnectionFault(new ConnectionKafkaException("Socket failure during connector setup.", exc));
             Debug.WriteLine(exc.Message);
 
             throw;
         }
         catch (Exception exc)
         {
+            HandleConnectionFault(new ConnectionKafkaException("Unexpected connector setup failure.", exc));
             Debug.WriteLine(exc.Message);
 
             throw;
@@ -416,16 +411,116 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private void Dispose(bool disposing)
 
     {
-        ConnectorState = State.Closing;
+        CloseConnectionCore(CreateClosedException("Connector is being disposed."), disposing);
 
         if (disposing)
         {
-            _stream.Dispose();
-            _socketProxy.Dispose();
             _responseProcessingTokenSource.Dispose();
         }
+    }
 
-        ConnectorState = State.Closed;
+    private void SetState(State state)
+    {
+        ConnectorState = state;
+    }
+
+    private void InvalidateSupportVersions()
+    {
+        SupportVersions = [];
+    }
+
+    private void FailAllInflightRequests(Exception exception)
+    {
+        while (!_inFlightRequests.IsEmpty)
+        {
+            var pendingRequests = _inFlightRequests.Keys.ToArray();
+
+            foreach (var requestId in pendingRequests)
+            {
+                if (_inFlightRequests.TryRemove(requestId, out var responseCompletionSource))
+                {
+                    responseCompletionSource.TrySetException(exception);
+                }
+            }
+        }
+    }
+
+    private void CloseConnectionCore(Exception exception, bool disposeSocket = false)
+    {
+        if (ConnectorState == State.Closed)
+        {
+            return;
+        }
+
+        SetState(State.Closing);
+        InvalidateSupportVersions();
+        StopResponseProcessing();
+        FailAllInflightRequests(exception);
+
+        _stream.Dispose();
+        _stream = Stream.Null;
+
+        if (disposeSocket)
+        {
+            _socketProxy.Dispose();
+        }
+        else
+        {
+            _socketProxy.Close(_closeConnectionTimeoutMs);
+        }
+
+        ResetResponseProcessing();
+        SetState(State.Closed);
+    }
+
+    private async ValueTask CloseConnectionCoreAsync(Exception exception)
+    {
+        if (ConnectorState == State.Closed)
+        {
+            return;
+        }
+
+        SetState(State.Closing);
+        InvalidateSupportVersions();
+        StopResponseProcessing();
+        FailAllInflightRequests(exception);
+
+        await _stream.DisposeAsync();
+        _stream = Stream.Null;
+        _socketProxy.Dispose();
+
+        ResetResponseProcessing();
+        SetState(State.Closed);
+    }
+
+    private ConnectionKafkaException CreateClosedException(string reason)
+    {
+        return new ConnectionKafkaException($"{reason} Endpoint={Endpoint}, NodeId={NodeId}");
+    }
+
+    private void HandleConnectionFault(ConnectionKafkaException exception)
+    {
+        if (ConnectorState is State.Closing or State.Closed)
+        {
+            return;
+        }
+
+        SetState(State.Faulted);
+        CloseConnectionCore(exception);
+    }
+
+    private void StopResponseProcessing()
+    {
+        if (!_responseProcessingTokenSource.IsCancellationRequested)
+        {
+            _responseProcessingTokenSource.Cancel();
+        }
+    }
+
+    private void ResetResponseProcessing()
+    {
+        _responseProcessingTokenSource.Dispose();
+        _responseProcessingTokenSource = new CancellationTokenSource();
     }
 
     /// <summary>
@@ -438,9 +533,13 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     internal enum State
     {
+        Closed,
+        Connecting,
+        Negotiating,
+        Authenticating,
         Open,
+        Faulted,
         Closing,
-        Closed
     }
 
     private sealed class ResponseTaskCompletionSource(ApiKeys apiKey, ApiVersion version)

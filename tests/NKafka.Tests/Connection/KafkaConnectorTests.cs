@@ -21,27 +21,27 @@
 
 using Microsoft.Extensions.Logging.Abstractions;
 
+using System.Net;
+using System.Net.Security;
+using System.Net.Sockets;
+
 using NKafka.Config;
 using NKafka.Connection;
-using NKafka.Tests.Connection.Fixtures;
+using NKafka.Exceptions;
+using NKafka.Messages;
+using NKafka.Protocol;
+using NSubstitute;
 
 namespace NKafka.Tests.Connection;
 
-public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
+public class KafkaConnectorTests
 {
-    private readonly ConnectorFixture _fixture;
-
-    public KafkaConnectorTests(ConnectorFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     [Fact]
     public void CreateConnector_Successful()
     {
         IKafkaConnector CreateConnector()
             => new KafkaConnector(
-                _fixture.EndPoint,
+                CreateEndpoint(),
                 100,
                 1000,
                 1000,
@@ -53,19 +53,61 @@ public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
                 SslSettings.None,
                 "test",
                 true,
-                _fixture.SocketFactory,
+                CreateSocketFactory(CreateEndpoint()),
                 NullLoggerFactory.Instance);
 
         FluentActions.Invoking(CreateConnector).Should().NotThrow();
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task ConnectorOpen_Successful(bool apiRequest)
+    [Fact]
+    public async Task ConnectorOpen_Successful()
     {
-        var kafkaConnector = new KafkaConnector(
-            _fixture.EndPoint,
+        var kafkaConnector = CreateConnector(apiRequest: true);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    }
+
+    [Fact]
+    public async Task DisposeAsync_ClearsSupportVersionsAndClosesConnector()
+    {
+        var kafkaConnector = CreateConnector(apiRequest: true);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.SupportVersions.Should().NotBeEmpty();
+
+        await kafkaConnector.DisposeAsync();
+
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Closed);
+        kafkaConnector.SupportVersions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_FailsInflightRequestsAndClearsRegistry()
+    {
+        var kafkaConnector = CreateConnector(apiRequest: true, requestsWithoutResponse: [ApiKeys.Metadata]);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        var responseTask = ((IKafkaConnector)kafkaConnector).SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        await kafkaConnector.DisposeAsync();
+
+        await FluentActions.Awaiting(async () => await responseTask)
+            .Should()
+            .ThrowAsync<ConnectionKafkaException>();
+
+        kafkaConnector.CurrentNumberInflightRequests.Should().Be(0);
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Closed);
+    }
+
+    private KafkaConnector CreateConnector(bool apiRequest, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+        => new(
+            CreateEndpoint(),
             100,
             1000,
             1000,
@@ -77,10 +119,30 @@ public class KafkaConnectorTests: IClassFixture<ConnectorFixture>
             SslSettings.None,
             "test",
             apiRequest,
-            _fixture.SocketFactory,
+            CreateSocketFactory(CreateEndpoint(), requestsWithoutResponse),
             NullLoggerFactory.Instance);
 
-        await kafkaConnector.OpenAsync(CancellationToken.None);
-        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    private static IPEndPoint CreateEndpoint()
+        => new(IPAddress.Loopback, 9000);
+
+    private static ISocketFactory CreateSocketFactory(EndPoint endpoint, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+    {
+        var isConnected = false;
+        var socketMock = Substitute.For<ISocketProxy>();
+        socketMock.ConnectAsync(endpoint, Arg.Any<CancellationToken>())
+            .Returns(ValueTask.CompletedTask)
+            .AndDoes(_ => isConnected = true);
+        socketMock.Connected.Returns(_ => isConnected);
+
+        var mockStream = new MockStream(requestsWithoutResponse);
+        var remoteCertificateValidationCallback = new RemoteCertificateValidationCallback((_, _, _, _) => true);
+        var sslStreamMock = Substitute.For<SslStream>(mockStream, false, remoteCertificateValidationCallback);
+
+        var socketFactory = Substitute.For<ISocketFactory>();
+        socketFactory.CreateSocket(SocketType.Stream, ProtocolType.Tcp, 0).Returns(socketMock);
+        socketFactory.CreateNetworkStream(Arg.Any<Socket>(), Arg.Any<bool>()).Returns(mockStream);
+        socketFactory.CreateSslStream(Arg.Any<Stream>()).Returns(sslStreamMock);
+
+        return socketFactory;
     }
 }

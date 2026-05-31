@@ -188,6 +188,7 @@
     <Project Path="samples/NKafka.Samples/NKafka.Samples.csproj" />
   </Folder>
   <Folder Name="/spec/">
+    <File Path="spec/network-layer-decoupling-plan.md" />
     <File Path="spec/code-gaps.md" />
     <File Path="spec/code-map.md" />
     <File Path="spec/consumer-rebalance-notes-ozontech-2025-05.md" />

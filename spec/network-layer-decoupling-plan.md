@@ -170,6 +170,229 @@
 - reset/reconnect path deterministic
 - unit tests покрывают state transitions и inflight cleanup semantics
 
+#### Wave 2 state-machine contract
+
+Ниже зафиксирован обязательный lifecycle contract для physical connector session.
+
+##### Logical states
+
+Для одного `KafkaConnector` вводится следующая целевая state model:
+
+1. `Closed`
+2. `Connecting`
+3. `Negotiating`
+4. `Authenticating`
+5. `Open`
+6. `Faulted`
+7. `Closing`
+
+##### State meanings
+
+`Closed`:
+
+- physical session отсутствует
+- connector не владеет usable stream for send/receive
+- `SupportVersions` не считаются валидными
+
+`Connecting`:
+
+- начинается physical open sequence
+- создаётся socket/session transport foundation
+- steady-state requests через connector ещё недопустимы
+
+`Negotiating`:
+
+- transport уже поднят достаточно, чтобы выполнять connection-scoped protocol setup
+- выполняется `ApiVersions` negotiation и связанные setup actions до steady state
+
+`Authenticating`:
+
+- transport и protocol negotiation уже дошли до authentication phase
+- выполняется SASL sequence, если она требуется конфигурацией
+
+`Open`:
+
+- connector завершил session establishment
+- stream считается пригодным для steady-state writes and reads
+- `SupportVersions` опубликованы и валидны для этой physical session
+
+`Faulted`:
+
+- session признана недоверенной или unusable
+- дальнейшее использование текущего stream/negotiation state недопустимо
+- connector требует controlled reset/reopen path
+
+`Closing`:
+
+- выполняется controlled shutdown or reset
+- inflight cleanup, stream disposal и state invalidation уже начаты
+
+##### Allowed transitions
+
+Разрешённые переходы:
+
+- `Closed -> Connecting`
+- `Connecting -> Negotiating`
+- `Negotiating -> Authenticating`
+- `Negotiating -> Open`
+- `Authenticating -> Open`
+- `Connecting -> Faulted`
+- `Negotiating -> Faulted`
+- `Authenticating -> Faulted`
+- `Open -> Faulted`
+- `Open -> Closing`
+- `Faulted -> Closing`
+- `Closing -> Closed`
+- `Faulted -> Connecting`
+- `Closed -> Closing` допускается только в dispose-oriented paths, если implementation это упрощает
+
+Нежелательные переходы, которые не должны происходить напрямую:
+
+- `Open -> Connecting` без промежуточного reset/closing semantics
+- `Faulted -> Open` без нового session establishment
+- `Closed -> Open` без прохождения setup phases
+- `Connecting -> Open` в обход negotiation/auth steps, кроме случаев, где protocol setup явно не требуется и это задокументировано как equivalent path
+
+##### Required side effects by transition
+
+`Closed -> Connecting`:
+
+- создаётся новая попытка session establishment
+- старая capability state не должна переживать этот переход
+- connector должен рассматриваться как entering a new physical session scope
+
+`Connecting -> Negotiating`:
+
+- transport готов для protocol-level setup
+- write/read loops steady state ещё не считаются fully active
+
+`Negotiating -> Authenticating`:
+
+- `ApiVersions` negotiation завершена настолько, насколько это требуется для auth path
+- connector ещё не считается `Open`
+
+`Negotiating -> Open`:
+
+- допустим только если auth не требуется
+- `SupportVersions` должны быть опубликованы до входа в `Open`
+
+`Authenticating -> Open`:
+
+- auth path завершён успешно
+- connector разрешает steady-state send/receive
+- `SupportVersions` уже валидны для текущей session
+
+`Any setup state -> Faulted`:
+
+- setup sequence aborted
+- connector не должен публиковаться как `Open`
+- `SupportVersions` должны считаться невалидными
+
+`Open -> Faulted`:
+
+- текущему stream/session больше нельзя доверять
+- дальнейшее steady-state использование недопустимо
+
+`Open/Faulted -> Closing`:
+
+- начинается единый cleanup path
+- новые steady-state writes больше не должны приниматься
+- inflight requests должны завершиться детерминированно
+
+`Closing -> Closed`:
+
+- stream/socket/session resources освобождены или переведены в non-usable state
+- inflight registry очищен
+- `SupportVersions` невалидны
+
+##### Inflight invariants tied to the state machine
+
+State machine должна обеспечивать следующие invariants:
+
+- в `Open` connector может иметь inflight requests
+- в `Connecting`, `Negotiating` и `Authenticating` inflight requests допускаются только для setup-internal operations, если implementation использует тот же send path
+- при переходе в `Closing` все inflight requests должны быть завершены predictably
+- после перехода в `Closed` inflight registry должен быть пуст
+- после перехода в `Faulted` нельзя silently сохранить старые pending requests как будто session ещё валидна
+
+##### `SupportVersions` lifecycle rules
+
+`SupportVersions` трактуются как connection-scoped state.
+
+Обязательные правила:
+
+- `SupportVersions` публикуются только при успешном завершении setup sequence
+- `SupportVersions` валидны только в `Open`
+- любой переход в `Faulted` инвалидирует `SupportVersions`
+- любой reset/close path инвалидирует `SupportVersions`
+- новый `Connecting` означает новую session scope и не может reuse старые negotiated versions
+
+##### Explicit Wave 2 decisions
+
+Для `Wave 2` дополнительно зафиксированы следующие обязательные решения:
+
+- `SupportVersions` очищаются при любом `disconnect` и любом `reset`
+- все inflight requests централизованно завершаются при любом `disconnect` и любом `reset`
+- `Open` публикуется только после полного session setup
+- `auth failure` обрабатывается отдельно от обычного transport disconnect
+
+Эти решения считаются частью собственного lifecycle contract `NKafka`.
+Они опираются на хорошие практики из клиентской экосистемы Kafka, но не означают копирование чужой архитектуры или layering model.
+
+##### Response-loop interaction rules
+
+Для read path вводятся такие обязательные правила:
+
+- steady-state response loop принадлежит только `Open` session
+- если response loop теряет stream alignment или получает transport-fatal failure, connector должен перейти в `Faulted`
+- `Faulted` read path должен привести к controlled cleanup, а не оставлять dangling inflight tasks
+- response loop не должен жить дольше, чем session, которой он принадлежит
+
+##### Error-class mapping to state transitions
+
+`Transport failures`:
+
+- обычно переводят connector в `Faulted`
+- затем запускают controlled transition `Faulted -> Closing -> Closed` либо новый reconnect attempt через higher-level path
+
+`Session setup failures`:
+
+- переводят connector в `Faulted`
+- не допускают публикацию `Open`
+- не допускают публикацию valid `SupportVersions`
+
+`Protocol-fatal response/parsing failures`:
+
+- если доверие к дальнейшему чтению stream потеряно, переводят connector в `Faulted`
+
+`Caller cancellation`:
+
+- сама по себе не должна автоматически трактоваться как connection fault
+- но если cancellation произошла посреди cleanup/reset, финальный state всё равно должен быть deterministic
+
+##### Implementation notes for Wave 2
+
+Для `Wave 2` не требуется сразу идеально разнести все transport concerns по новым типам.
+
+Достаточно, чтобы:
+
+- state changes больше не происходили хаотично из разных мест
+- reset semantics была централизована
+- inflight failure and `SupportVersions` invalidation были привязаны к transition rules
+- code and tests выражали ту же lifecycle model, что и эта секция
+
+##### Current implementation status
+
+На текущем этапе в коде уже реализованы следующие части `Wave 2`:
+
+- `KafkaConnector` переведён на lifecycle states `Closed / Connecting / Negotiating / Authenticating / Open / Faulted / Closing`
+- `Open` публикуется только из setup path после завершения session establishment
+- `SupportVersions` инвалидируются на fault, reset и dispose paths
+- inflight requests централизованно завершаются в общем cleanup path
+- response loop fault path больше не остаётся isolated background failure и переводит connector в controlled cleanup
+
+При этом `Wave 2` ещё не считается полностью закрытой, пока соответствующие unit tests не подтвердят cleanup и invalidation semantics.
+
 ### Wave 3. Session establishment extraction
 
 Цель:

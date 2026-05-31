@@ -103,8 +103,10 @@ internal sealed partial class KafkaConnector
         catch (Exception exc)
         {
             Debug.WriteLine(exc.Message);
-
-            throw;
+            if (exc is not OperationCanceledException || ConnectorState is not State.Closing and not State.Closed)
+            {
+                HandleConnectionFault(new ConnectionKafkaException("Response processing failed.", exc));
+            }
         }
     }
 

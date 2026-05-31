@@ -22,6 +22,7 @@
 using System.Buffers;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -74,6 +75,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly int _requestTimeoutMs;
 
     private CancellationTokenSource _responseProcessingTokenSource = new();
+    private int _responseProcessingSessionId;
+    private readonly object _responseReaderSync = new();
     private readonly ConcurrentDictionary<int, Task> _responsesTasks = new();
     private readonly SaslSettings _saslSettings;
     private readonly SecurityProtocols _securityProtocol;
@@ -224,13 +227,21 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 (ApiKeys)request.Header.RequestApiKey,
                 (ApiVersion)request.Header.RequestApiVersion);
 
-            using var cancellationRegistration = token.Register(
+            using var requestLifetimeCts = CancellationTokenSource.CreateLinkedTokenSource(token);
+            requestLifetimeCts.CancelAfter(_requestTimeoutMs);
+
+            // The registration only needs synchronous teardown because it just detaches
+            // the callback from the current request lifetime and does not own async cleanup.
+            using IDisposable cancellationRegistration = requestLifetimeCts.Token.Register(
                 state =>
                 {
-                    var awaiter = state as ResponseTaskCompletionSource;
-                    awaiter?.TrySetCanceled();
+                    var context = (RequestLifetimeContext)state!;
+                    context.Connector.CompleteRequestFromLifetimeCancellation(
+                        context.RequestId,
+                        context.ResponseCompletionSource,
+                        context.CallerToken);
                 },
-                responseCompletionSource,
+                new RequestLifetimeContext(this, requestId, responseCompletionSource, token),
                 false);
 
             try
@@ -261,11 +272,11 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
                 _inFlightRequests.TryRemove(requestId, out _); //Если не удалось отправить запрос, то удаляем сообщение
 
-                if (!responseCompletionSource.Task.IsCanceled && !responseCompletionSource.Task.IsCompleted)
+                if (!responseCompletionSource.Task.IsCompleted)
                 {
-                    responseCompletionSource.TrySetException(new ProtocolKafkaException(ErrorCodes.UnknownServerError,
-                        "Не удалось отправить запрос",
-                        exc));
+                    CompleteRequestAsWriteFailed(
+                        responseCompletionSource,
+                        exc);
                 }
             }
 
@@ -304,9 +315,24 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private void WakeupProcessingResponses()
     {
-        if (_processData.Status == TaskStatus.RanToCompletion)
+        if (ConnectorState is State.Closing or State.Closed or State.Faulted)
         {
-            _processData = ResponseReaderTask();
+            return;
+        }
+
+        lock (_responseReaderSync)
+        {
+            if (!_processData.IsCompleted)
+            {
+                return;
+            }
+
+            var sessionId = _responseProcessingSessionId;
+            var responseProcessingToken = _responseProcessingTokenSource.Token;
+
+            // A physical session must have exactly one active response reader so that
+            // correlation ids are consumed in arrival order by a single stream owner.
+            _processData = ResponseReaderTask(sessionId, responseProcessingToken);
         }
     }
 
@@ -492,6 +518,73 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         }
     }
 
+    private bool TryTakeInflightRequest(int requestId, [NotNullWhen(true)] out ResponseTaskCompletionSource? responseCompletionSource)
+    {
+        return _inFlightRequests.TryRemove(requestId, out responseCompletionSource);
+    }
+
+    private void CompleteRequestFromLifetimeCancellation(
+        int requestId,
+        ResponseTaskCompletionSource responseCompletionSource,
+        CancellationToken callerToken)
+    {
+        if (!TryTakeInflightRequest(requestId, out _))
+        {
+            return;
+        }
+
+        if (callerToken.IsCancellationRequested)
+        {
+            CompleteRequestAsCanceled(responseCompletionSource, callerToken);
+
+            return;
+        }
+
+        CompleteRequestAsTimedOut(responseCompletionSource);
+    }
+
+    private void CompleteRequestAsCanceled(
+        ResponseTaskCompletionSource responseCompletionSource,
+        CancellationToken cancellationToken)
+    {
+        responseCompletionSource.TrySetCanceled(cancellationToken);
+    }
+
+    private void CompleteRequestAsTimedOut(ResponseTaskCompletionSource responseCompletionSource)
+    {
+        responseCompletionSource.TrySetException(
+            new ProtocolKafkaException(
+                ErrorCodes.RequestTimedOut,
+                $"Request to NodeId={NodeId} timed out after {_requestTimeoutMs} ms."));
+    }
+
+    private void CompleteRequestAsWriteFailed(
+        ResponseTaskCompletionSource responseCompletionSource,
+        Exception exception)
+    {
+        // A failed write means the broker cannot produce a correlated response for this request,
+        // so the pending completion must leave the inflight registry immediately.
+        responseCompletionSource.TrySetException(
+            new ProtocolKafkaException(
+                ErrorCodes.NetworkException,
+                $"Failed to send request to NodeId={NodeId}.",
+                exception));
+    }
+
+    private void CompleteRequestFromResponse(
+        ResponseTaskCompletionSource responseCompletionSource,
+        IResponseMessage responseMessage)
+    {
+        responseCompletionSource.TrySetResult(responseMessage);
+    }
+
+    private void CompleteRequestAsResponseFailure(
+        ResponseTaskCompletionSource responseCompletionSource,
+        Exception exception)
+    {
+        responseCompletionSource.TrySetException(exception);
+    }
+
     private void CloseConnectionCore(Exception exception, bool disposeSocket = false)
     {
         if (ConnectorState == State.Closed)
@@ -568,6 +661,8 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     {
         _responseProcessingTokenSource.Dispose();
         _responseProcessingTokenSource = new CancellationTokenSource();
+        _processData = Task.CompletedTask;
+        Interlocked.Increment(ref _responseProcessingSessionId);
     }
 
     /// <summary>
@@ -599,4 +694,10 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             return ResponseBuilder.Build(ApiKey, version, span);
         }
     }
+
+    private sealed record RequestLifetimeContext(
+        KafkaConnector Connector,
+        int RequestId,
+        ResponseTaskCompletionSource ResponseCompletionSource,
+        CancellationToken CallerToken);
 }

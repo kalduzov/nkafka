@@ -32,16 +32,10 @@ internal sealed partial class KafkaConnector
 {
     private long _totalBytesReceived;
 
-    private async Task ResponseReaderTask()
+    private async Task ResponseReaderTask(int sessionId, CancellationToken token)
     {
-        /*
-         * Задача на чтение запускается при постановке нового запроса в очередь ожидания
-         * Задача не завершается, пока в очереди запросов есть хотя бы один не обработанный запрос
-         *
-         *
-         * в случае если данные для запроса так и не придут, скорее всего было потеряно соединение
-         * с брокером и тогда нужно будет удалить все запросы и сбросить соединение
-         */
+        // The reader belongs to one physical session and must stop as soon as that
+        // session is canceled or replaced so that a new stream never has two owners.
         await Task.Yield();
 
         try
@@ -50,8 +44,13 @@ internal sealed partial class KafkaConnector
 
             Memory<byte> intBuffer = new(new byte[sizeof(int)]);
 
-            while (!_responseProcessingTokenSource.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
+                if (sessionId != _responseProcessingSessionId)
+                {
+                    return;
+                }
+
                 if (_inFlightRequests.IsEmpty)
                 {
                     return;
@@ -64,7 +63,7 @@ internal sealed partial class KafkaConnector
                     continue;
                 }
 
-                var countReadBytes = await _stream.ReadAsync(intBuffer);
+                var countReadBytes = await _stream.ReadAsync(intBuffer, token);
                 _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, countReadBytes);
 
                 var responseLen = ReadInt32BigEndian(intBuffer.Span);
@@ -87,7 +86,7 @@ internal sealed partial class KafkaConnector
                 do
                 {
                     var memorySlice = buffer.AsMemory(startPosition, leftRead);
-                    var currentRead = await _stream.ReadAsync(memorySlice, _responseProcessingTokenSource.Token);
+                    var currentRead = await _stream.ReadAsync(memorySlice, token);
                     _totalBytesReceived = Interlocked.Add(ref _totalBytesReceived, currentRead);
 
                     leftRead -= currentRead;
@@ -97,7 +96,7 @@ internal sealed partial class KafkaConnector
                 var requestId = ReadInt32BigEndian(buffer.AsSpan(0, 4));
                 _responsesTasks.TryAdd(
                     requestId,
-                    ParseResponseAsync(buffer, requestId, responseLen, _responseProcessingTokenSource.Token));
+                    ParseResponseAsync(buffer, requestId, responseLen, token));
             }
         }
         catch (Exception exc)
@@ -117,14 +116,14 @@ internal sealed partial class KafkaConnector
 
         try
         {
-            if (_inFlightRequests.TryRemove(requestId, out var responseInfo))
+            if (TryTakeInflightRequest(requestId, out var responseInfo))
             {
                 Debug.WriteLine(
                     $"Get new response for {responseInfo.ApiKey} from NodeId = {NodeId} CorrelationId={requestId}, ResponseLength={bodyLen}");
 
                 if (token.IsCancellationRequested)
                 {
-                    responseInfo.SetCanceled(token);
+                    CompleteRequestAsCanceled(responseInfo, token);
 
                     return;
                 }
@@ -134,20 +133,17 @@ internal sealed partial class KafkaConnector
                     var message = responseInfo.BuildResponseMessage(buffer);
                     _logger.GotResponseTrace(message, NodeId);
                     UpdateResponseMetrics(message.ThrottleTimeMs, bodyLen + 4);
-                    responseInfo.SetResult(message);
+                    CompleteRequestFromResponse(responseInfo, message);
                 }
                 catch (ProtocolKafkaException exc)
                 {
-                    responseInfo.SetException(exc);
+                    CompleteRequestAsResponseFailure(responseInfo, exc);
                 }
                 catch (Exception exc)
                 {
-                    responseInfo.SetException(
+                    CompleteRequestAsResponseFailure(
+                        responseInfo,
                         new ProtocolKafkaException(ErrorCodes.UnknownServerError, "Неизвестная ошибка при чтении запроса", exc));
-                }
-                finally
-                {
-                    _inFlightRequests.TryRemove(requestId, out responseInfo);
                 }
             }
             else

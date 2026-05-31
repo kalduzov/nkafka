@@ -158,31 +158,81 @@ public class KafkaConnectorTests
         kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Closed);
     }
 
+    [Fact]
+    public async Task SendAsync_WhenRequestTimesOut_FailsRequestAndClearsInflightRegistry()
+    {
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            requestTimeoutMs: 100,
+            requestsWithoutResponse: [ApiKeys.Metadata]);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        var responseTask = ((IKafkaConnector)kafkaConnector).SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        var exception = await FluentActions.Awaiting(async () => await responseTask)
+            .Should()
+            .ThrowAsync<ProtocolKafkaException>();
+
+        exception.Which.InternalError.Should().Be(ErrorCodes.RequestTimedOut);
+        kafkaConnector.CurrentNumberInflightRequests.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task SendAsync_WhenWriteFails_FailsRequestAndClearsInflightRegistry()
+    {
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            requestsWithWriteFailure: [ApiKeys.Metadata]);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        var responseTask = ((IKafkaConnector)kafkaConnector).SendAsync<MetadataRequestMessage, MetadataResponseMessage>(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        var exception = await FluentActions.Awaiting(async () => await responseTask)
+            .Should()
+            .ThrowAsync<ProtocolKafkaException>();
+
+        exception.Which.InternalError.Should().Be(ErrorCodes.NetworkException);
+        kafkaConnector.CurrentNumberInflightRequests.Should().Be(0);
+    }
+
     private KafkaConnector CreateConnector(
         bool apiRequest,
         IEnumerable<ApiKeys>? requestsWithoutResponse = null,
+        IEnumerable<ApiKeys>? requestsWithWriteFailure = null,
         SecurityProtocols securityProtocol = SecurityProtocols.PlainText,
-        SocketFactoryContext? socketContext = null)
+        SocketFactoryContext? socketContext = null,
+        int requestTimeoutMs = 1000)
         => new(
             CreateEndpoint(),
             100,
             1000,
             1000,
             1000,
-            1000,
+            requestTimeoutMs,
             0,
             securityProtocol,
             SaslSettings.None,
             SslSettings.None,
             "test",
             apiRequest,
-            (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse)).SocketFactory,
+            (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse, requestsWithWriteFailure)).SocketFactory,
             NullLoggerFactory.Instance);
 
     private static IPEndPoint CreateEndpoint()
         => new(IPAddress.Loopback, 9000);
 
-    private static SocketFactoryContext CreateSocketFactoryContext(EndPoint endpoint, IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+    private static SocketFactoryContext CreateSocketFactoryContext(
+        EndPoint endpoint,
+        IEnumerable<ApiKeys>? requestsWithoutResponse = null,
+        IEnumerable<ApiKeys>? requestsWithWriteFailure = null)
     {
         var isConnected = false;
         var socketMock = Substitute.For<ISocketProxy>();
@@ -191,7 +241,7 @@ public class KafkaConnectorTests
             .AndDoes(_ => isConnected = true);
         socketMock.Connected.Returns(_ => isConnected);
 
-        var mockStream = new MockStream(requestsWithoutResponse);
+        var mockStream = new MockStream(requestsWithoutResponse, requestsWithWriteFailure);
         var remoteCertificateValidationCallback = new RemoteCertificateValidationCallback((_, _, _, _) => true);
         var sslStreamMock = Substitute.For<SslStream>(mockStream, false, remoteCertificateValidationCallback);
 

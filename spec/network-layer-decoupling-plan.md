@@ -585,13 +585,22 @@ Setup pipeline из `Wave 3` считается входным условием 
 - failed write должен завершать request понятной transport/protocol exception category
 - failed write не должен оставлять response loop в ожидании response для request, который фактически не был отправлен
 
-##### Current implementation target
+##### Current implementation status
 
-Для первого прохода `Wave 4` достаточно добиться следующего:
+На текущем этапе в коде уже реализованы следующие части `Wave 4`:
 
-- `SendAsync(...)` выражает понятный contract регистрации, отправки и cleanup request
-- response loop остаётся single-reader и session-scoped
-- request completion and cleanup semantics не противоречат state machine из `Wave 2`
+- `SendAsync(...)` сначала убеждается, что session established, и только потом выбирает effective API version
+- inflight registration происходит до записи bytes в stream, а failed write сразу удаляет request из inflight registry
+- caller cancellation и request timeout идут через единый request lifetime contract, но завершаются разными outcome:
+  - caller cancellation -> canceled request
+  - timeout -> `ProtocolKafkaException(ErrorCodes.RequestTimedOut, ...)`
+- response loop остаётся single-reader и привязан к конкретной physical session через session-scoped token and session id snapshot
+- request completion semantics сведены к единому ownership rule:
+  - request first leaves inflight registry
+  - then it completes as response, cancellation, timeout, failed write or connection cleanup
+- focused tests покрывают timeout и failed write alongside the existing cleanup and setup coverage
+
+`Wave 4` можно считать завершённой, если дальнейшая работа больше не требует возвращаться к неявным races между send path, timeout/cancel path и response path внутри `KafkaConnector`.
 
 ### Wave 5. Pool topology and orchestration cleanup
 

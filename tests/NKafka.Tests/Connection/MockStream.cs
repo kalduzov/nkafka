@@ -33,6 +33,7 @@ namespace NKafka.Tests.Connection;
 
 internal class MockStream: Stream
 {
+    private readonly HashSet<ApiKeys> _requestsWithWriteFailure;
     private readonly HashSet<ApiKeys> _requestsWithoutResponse;
     private readonly ConcurrentQueue<IRequestMessage> _requestMessages = new();
     private readonly ConcurrentQueue<byte[]> _sendQueue = new();
@@ -48,9 +49,12 @@ internal class MockStream: Stream
 
     private readonly CancellationTokenSource _tokenSource = new();
 
-    public MockStream(IEnumerable<ApiKeys>? requestsWithoutResponse = null)
+    public MockStream(
+        IEnumerable<ApiKeys>? requestsWithoutResponse = null,
+        IEnumerable<ApiKeys>? requestsWithWriteFailure = null)
     {
         _requestsWithoutResponse = requestsWithoutResponse?.ToHashSet() ?? [];
+        _requestsWithWriteFailure = requestsWithWriteFailure?.ToHashSet() ?? [];
         _processTask = ProcessRequests(_tokenSource.Token);
     }
 
@@ -208,6 +212,23 @@ internal class MockStream: Stream
 
             PreserveUnreadBytes();
         }
+    }
+
+    public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+    {
+        if (buffer.Length >= sizeof(short))
+        {
+            var apiKey = (ApiKeys)ReadInt16BigEndian(buffer.Span[..sizeof(short)]);
+
+            if (_requestsWithWriteFailure.Contains(apiKey))
+            {
+                throw new IOException($"Simulated write failure for {apiKey}.");
+            }
+        }
+
+        Write(buffer.ToArray(), 0, buffer.Length);
+
+        return ValueTask.CompletedTask;
     }
 
     private bool TryReadRequestFrame(out byte[] requestFrame)

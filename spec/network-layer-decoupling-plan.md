@@ -884,6 +884,10 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - authenticated setup logs the selected SASL mechanism
   - session teardown logs negotiated API-version invalidation
   - faulted authentication emits the dedicated connection-fault warning
+- integration test infrastructure is now less tightly coupled to plaintext-only local defaults:
+  - integration cluster creation is centralized
+  - bootstrap servers and security settings can be overridden through environment variables
+  - future SASL/SSL scenarios can reuse the same test entrypoint instead of forking client bootstrap code
 
 Оставшиеся задачи `Wave 7`:
 

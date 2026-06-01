@@ -19,10 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using Microsoft.Extensions.Logging.Abstractions;
-
 using NKafka.Clients.Admin;
-using NKafka.Config;
 using NKafka.Protocol;
 
 using TopicDetail = NKafka.Clients.Admin.TopicDetail;
@@ -147,18 +144,5 @@ public class TopicsManipulationTests
     }
 
     private static async Task<IKafkaCluster> BuildKafkaCluster()
-    {
-        var clusterConfig = new ClusterConfig
-        {
-            BootstrapServers =
-            [
-                "localhost:29091"
-            ]
-        };
-
-        var loggerFactory = NullLoggerFactory.Instance;
-        var kafkaCluster = await clusterConfig.CreateCluster(loggerFactory);
-
-        return kafkaCluster;
-    }
+        => await IntegrationClusterFactory.CreateClusterAsync();
 }

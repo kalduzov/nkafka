@@ -908,6 +908,12 @@ Supported inputs:
 - `NKAFKA_IT_SASL_MECHANISM` accepts `Plain`, `OAuthBearer`, `ScramSha256` or `ScramSha512`
 - `NKAFKA_IT_SASL_USERNAME` and `NKAFKA_IT_SASL_PASSWORD` provide credentials for SASL-based runs
 
+When `NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true`:
+
+- `NKAFKA_IT_SECURITY_PROTOCOL` becomes mandatory and may not remain `PlainText`
+- SASL-based runs require explicit `NKAFKA_IT_SASL_MECHANISM`, `NKAFKA_IT_SASL_USERNAME` and `NKAFKA_IT_SASL_PASSWORD`
+- missing security inputs now fail fast with a configuration error instead of silently falling back to placeholder credentials
+
 Example `SCRAM-SHA-256` run:
 
 ```powershell

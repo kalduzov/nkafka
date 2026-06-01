@@ -26,6 +26,7 @@ internal static class IntegrationClusterFactory
     private static ClusterConfig BuildClusterConfigFromEnvironment()
     {
         var securityProtocol = ReadSecurityProtocol();
+        EnsureSecurityScenarioInputsAreValid(securityProtocol);
         var clusterConfig = new ClusterConfig
         {
             BootstrapServers = [ReadEnvironment("NKAFKA_IT_BOOTSTRAP_SERVERS", "localhost:29091")],
@@ -49,12 +50,33 @@ internal static class IntegrationClusterFactory
             clusterConfig.Sasl = new SaslSettings
             {
                 Mechanism = ReadSaslMechanism(),
-                UserName = ReadEnvironment("NKAFKA_IT_SASL_USERNAME", "user"),
-                Password = ReadEnvironment("NKAFKA_IT_SASL_PASSWORD", "password")
+                UserName = ReadRequiredEnvironment("NKAFKA_IT_SASL_USERNAME"),
+                Password = ReadRequiredEnvironment("NKAFKA_IT_SASL_PASSWORD")
             };
         }
 
         return clusterConfig;
+    }
+
+    private static void EnsureSecurityScenarioInputsAreValid(SecurityProtocols securityProtocol)
+    {
+        if (!ReadBooleanEnvironment("NKAFKA_IT_ENABLE_SECURITY_SCENARIOS", false))
+        {
+            return;
+        }
+
+        if (securityProtocol is SecurityProtocols.PlainText)
+        {
+            throw new InvalidOperationException(
+                "NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true requires NKAFKA_IT_SECURITY_PROTOCOL to be set to Ssl, SaslPlaintext or SaslSsl.");
+        }
+
+        if (securityProtocol is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl)
+        {
+            _ = ReadRequiredEnvironment("NKAFKA_IT_SASL_MECHANISM");
+            _ = ReadRequiredEnvironment("NKAFKA_IT_SASL_USERNAME");
+            _ = ReadRequiredEnvironment("NKAFKA_IT_SASL_PASSWORD");
+        }
     }
 
     private static SecurityProtocols ReadSecurityProtocol()
@@ -80,4 +102,9 @@ internal static class IntegrationClusterFactory
 
     private static string ReadEnvironment(string variableName, string defaultValue)
         => Environment.GetEnvironmentVariable(variableName) ?? defaultValue;
+
+    private static string ReadRequiredEnvironment(string variableName)
+        => Environment.GetEnvironmentVariable(variableName)
+           ?? throw new InvalidOperationException(
+               $"Integration security scenario requires the environment variable '{variableName}'.");
 }

@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 
 using System.Net;
 using System.Net.Security;
@@ -159,6 +160,38 @@ public class KafkaConnectorTests
     }
 
     [Fact]
+    public async Task OpenAsync_WithPlainSasl_LogsSessionSetupTransitionsAndAuthenticationStart()
+    {
+        var loggerFactory = new InMemoryLoggerFactory();
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.Plain,
+            UserName = "user",
+            Password = "password"
+        };
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings,
+            loggerFactory: loggerFactory);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Debug
+            && x.Message.Contains("transitions from Closed to Connecting"));
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Debug
+            && x.Message.Contains("transitions from Negotiating to Authenticating"));
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Debug
+            && x.Message.Contains("transitions from Authenticating to Open"));
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Debug
+            && x.Message.Contains("starts SASL authentication using PLAIN"));
+    }
+
+    [Fact]
     public async Task OpenAsync_WhenBrokerAdvertisesDifferentSaslMechanism_ThrowsUnsupportedSaslMechanism()
     {
         var saslSettings = new SaslSettings
@@ -219,6 +252,40 @@ public class KafkaConnectorTests
     }
 
     [Fact]
+    public async Task OpenAsync_WhenSaslAuthenticateFails_LogsConnectionFaultWarning()
+    {
+        var loggerFactory = new InMemoryLoggerFactory();
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.Plain,
+            UserName = "user",
+            Password = "password"
+        };
+        var socketContext = CreateSocketFactoryContext(
+            CreateEndpoint(),
+            saslSettings: saslSettings,
+            saslScenarioOverride: new SaslTestScenario(
+                SaslMechanism.Plain,
+                "user",
+                "password",
+                AuthenticateErrorCode: ErrorCodes.SaslAuthenticationFailed));
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings,
+            socketContext: socketContext,
+            loggerFactory: loggerFactory);
+
+        await FluentActions.Awaiting(async () => await kafkaConnector.OpenAsync(CancellationToken.None))
+            .Should()
+            .ThrowAsync<ProtocolKafkaException>();
+
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Warning
+            && x.Message.Contains("entered fault handling"));
+    }
+
+    [Fact]
     public async Task SendAsync_DoesNotReestablishSession_WhenConnectorIsAlreadyOpen()
     {
         var socketContext = CreateSocketFactoryContext(CreateEndpoint());
@@ -249,6 +316,20 @@ public class KafkaConnectorTests
 
         kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Closed);
         kafkaConnector.SupportVersions.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task DisposeAsync_WhenSupportVersionsExist_LogsInvalidation()
+    {
+        var loggerFactory = new InMemoryLoggerFactory();
+        var kafkaConnector = CreateConnector(apiRequest: true, loggerFactory: loggerFactory);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+        await kafkaConnector.DisposeAsync();
+
+        loggerFactory.Entries.Should().Contain(x =>
+            x.LogLevel == LogLevel.Trace
+            && x.Message.Contains("invalidated negotiated API versions"));
     }
 
     [Fact]
@@ -325,6 +406,7 @@ public class KafkaConnectorTests
         SecurityProtocols securityProtocol = SecurityProtocols.PlainText,
         SaslSettings? saslSettings = null,
         SocketFactoryContext? socketContext = null,
+        ILoggerFactory? loggerFactory = null,
         int requestTimeoutMs = 1000)
         => new(
             CreateEndpoint(),
@@ -340,7 +422,7 @@ public class KafkaConnectorTests
             "test",
             apiRequest,
             (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse, requestsWithWriteFailure, saslSettings)).SocketFactory,
-            NullLoggerFactory.Instance);
+            loggerFactory ?? NullLoggerFactory.Instance);
 
     private static IPEndPoint CreateEndpoint()
         => new(IPAddress.Loopback, 9000);

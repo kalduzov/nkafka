@@ -879,10 +879,14 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - negotiated API-version invalidation is logged when a session is torn down
   - fault handling now emits a dedicated warning with the connection-scope reason
   - SASL authentication start is logged with the selected mechanism
+- focused verification now also checks the observability surface itself:
+  - session setup emits expected state-transition logs
+  - authenticated setup logs the selected SASL mechanism
+  - session teardown logs negotiated API-version invalidation
+  - faulted authentication emits the dedicated connection-fault warning
 
 Оставшиеся задачи `Wave 7`:
 
-- определить, нужен ли отдельный test harness для deeper diagnostics/log assertions
 - добрать integration-style verification outside the focused mock-stream scenarios where it adds confidence
 - провести финальную синхронизацию связанных spec-документов, если найдутся ещё расхождения по wording or support matrix
 

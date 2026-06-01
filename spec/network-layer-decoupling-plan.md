@@ -932,6 +932,17 @@ $env:NKAFKA_IT_SASL_PASSWORD = "pencil"
 dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "FullyQualifiedName~ClusterDescribeSecurityTests"
 ```
 
+Recommended targeted filters:
+
+- all security integration entrypoints:
+  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "Category=SecurityIntegration"`
+- only `PLAIN`:
+  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=PLAIN"`
+- only `OAUTHBEARER`:
+  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=OAUTHBEARER"`
+- only `SCRAM`:
+  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=SCRAM"`
+
 Оставшиеся задачи `Wave 7`:
 
 - добрать integration-style verification outside the focused mock-stream scenarios where it adds confidence

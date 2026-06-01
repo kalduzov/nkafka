@@ -9,6 +9,8 @@ public class ClusterDescribeSecurityTests
     public static bool IsOAuthBearerSecurityScenarioEnabled => IntegrationClusterFactory.IsOAuthBearerSecurityScenarioEnabled;
     public static bool IsScramSecurityScenarioEnabled => IntegrationClusterFactory.IsScramSecurityScenarioEnabled;
 
+    [Trait("Category", "SecurityIntegration")]
+    [Trait("SecurityTransport", "Generic")]
     [Fact(
         SkipUnless = nameof(IsSecurityScenarioEnabled),
         Skip = "Security integration scenario is disabled. Set NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true and configure a non-plaintext integration broker.")]
@@ -23,6 +25,8 @@ public class ClusterDescribeSecurityTests
         result.ClusterId.Should().NotBeNull();
     }
 
+    [Trait("Category", "SecurityIntegration")]
+    [Trait("SecurityMechanism", "PLAIN")]
     [Fact(
         SkipUnless = nameof(IsPlainSaslSecurityScenarioEnabled),
         Skip = "PLAIN integration scenario is disabled. Set NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true and configure NKAFKA_IT_SECURITY_PROTOCOL plus NKAFKA_IT_SASL_MECHANISM=Plain.")]
@@ -37,6 +41,8 @@ public class ClusterDescribeSecurityTests
         result.ClusterId.Should().NotBeNull();
     }
 
+    [Trait("Category", "SecurityIntegration")]
+    [Trait("SecurityMechanism", "OAUTHBEARER")]
     [Fact(
         SkipUnless = nameof(IsOAuthBearerSecurityScenarioEnabled),
         Skip = "OAUTHBEARER integration scenario is disabled. Set NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true and configure NKAFKA_IT_SECURITY_PROTOCOL plus NKAFKA_IT_SASL_MECHANISM=OAuthBearer.")]
@@ -51,6 +57,8 @@ public class ClusterDescribeSecurityTests
         result.ClusterId.Should().NotBeNull();
     }
 
+    [Trait("Category", "SecurityIntegration")]
+    [Trait("SecurityMechanism", "SCRAM")]
     [Fact(
         SkipUnless = nameof(IsScramSecurityScenarioEnabled),
         Skip = "SCRAM integration scenario is disabled. Set NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true and configure NKAFKA_IT_SECURITY_PROTOCOL plus NKAFKA_IT_SASL_MECHANISM=ScramSha256 or ScramSha512.")]

@@ -11,6 +11,11 @@ internal static class IntegrationClusterFactory
         ReadBooleanEnvironment("NKAFKA_IT_ENABLE_SECURITY_SCENARIOS", false)
         && ReadSecurityProtocol() is not SecurityProtocols.PlainText;
 
+    public static bool IsScramSecurityScenarioEnabled =>
+        IsSecurityScenarioEnabled
+        && ReadSecurityProtocol() is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl
+        && ReadSaslMechanism() is SaslMechanism.ScramSha256 or SaslMechanism.ScramSha512;
+
     public static Task<IKafkaCluster> CreateClusterAsync(ILoggerFactory? loggerFactory = null)
     {
         var clusterConfig = BuildClusterConfigFromEnvironment();

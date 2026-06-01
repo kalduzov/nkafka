@@ -891,6 +891,9 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 - the first opt-in integration-style security scenario now exists:
   - cluster describe can run against a non-plaintext broker configuration
   - the scenario stays gated behind explicit environment variables so ordinary local runs do not start failing on missing secure test infrastructure
+- there is also a SCRAM-specific opt-in integration entrypoint:
+  - cluster describe can be exercised against `SCRAM-SHA-256` or `SCRAM-SHA-512`
+  - the scenario is isolated from generic security gating so SCRAM failures are easier to diagnose against a secure broker setup
 
 Оставшиеся задачи `Wave 7`:
 

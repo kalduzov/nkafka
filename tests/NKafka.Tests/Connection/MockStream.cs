@@ -22,7 +22,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO.Pipelines;
+using System.Text;
 
+using NKafka.Config;
+using NKafka.Connection.Sasl;
+using NKafka.Connection.Sasl.Messages;
 using NKafka.Messages;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
@@ -39,6 +43,9 @@ internal class MockStream: Stream
     private readonly ConcurrentQueue<byte[]> _sendQueue = new();
     private readonly ConcurrentDictionary<IRequestMessage, (int CorrelactionId, ApiVersion ApiVersion)> _correlationIds = new();
     private readonly Task _processTask;
+    private readonly SaslTestScenario? _saslScenario;
+    private ClientFirstMessage? _scramClientFirstMessage;
+    private ServerFirstMessage? _scramServerFirstMessage;
     private readonly MemoryStream _writeBuffer = new();
 
 #if NET9_0_OR_GREATER
@@ -51,10 +58,12 @@ internal class MockStream: Stream
 
     public MockStream(
         IEnumerable<ApiKeys>? requestsWithoutResponse = null,
-        IEnumerable<ApiKeys>? requestsWithWriteFailure = null)
+        IEnumerable<ApiKeys>? requestsWithWriteFailure = null,
+        SaslTestScenario? saslScenario = null)
     {
         _requestsWithoutResponse = requestsWithoutResponse?.ToHashSet() ?? [];
         _requestsWithWriteFailure = requestsWithWriteFailure?.ToHashSet() ?? [];
+        _saslScenario = saslScenario;
         _processTask = ProcessRequests(_tokenSource.Token);
     }
 
@@ -113,6 +122,23 @@ internal class MockStream: Stream
                             MinVersion = (short)ApiVersion.Version0,
                             MaxVersion = (short)ApiVersion.Version12
                         });
+
+                        if (_saslScenario is not null)
+                        {
+                            response.ApiKeys.Add(new ApiVersionsResponseMessage.ApiVersionMessage
+                            {
+                                ApiKey = (short)ApiKeys.SaslHandshake,
+                                MinVersion = (short)ApiVersion.Version0,
+                                MaxVersion = (short)ApiVersion.Version1
+                            });
+                            response.ApiKeys.Add(new ApiVersionsResponseMessage.ApiVersionMessage
+                            {
+                                ApiKey = (short)ApiKeys.SaslAuthenticate,
+                                MinVersion = (short)ApiVersion.Version0,
+                                MaxVersion = (short)ApiVersion.Version2
+                            });
+                        }
+
                         response.Write(ref writer, requestData.ApiVersion);
 
                         break;
@@ -120,6 +146,26 @@ internal class MockStream: Stream
                 case ApiKeys.Metadata:
                     {
                         var response = new MetadataResponseMessage();
+                        response.Write(ref writer, requestData.ApiVersion);
+
+                        break;
+                    }
+                case ApiKeys.SaslHandshake:
+                    {
+                        var request = (SaslHandshakeRequestMessage)requestMessage;
+                        var response = new SaslHandshakeResponseMessage
+                        {
+                            ErrorCode = request.Mechanism == _saslScenario?.AdvertisedMechanismName ? (short)ErrorCodes.None : (short)ErrorCodes.UnsupportedSaslMechanism,
+                            Mechanisms = _saslScenario is null ? [] : [_saslScenario.AdvertisedMechanismName]
+                        };
+                        response.Write(ref writer, requestData.ApiVersion);
+
+                        break;
+                    }
+                case ApiKeys.SaslAuthenticate:
+                    {
+                        var request = (SaslAuthenticateRequestMessage)requestMessage;
+                        var response = BuildSaslAuthenticateResponse(request);
                         response.Write(ref writer, requestData.ApiVersion);
 
                         break;
@@ -141,6 +187,68 @@ internal class MockStream: Stream
         {
             Debug.WriteLine(exc.Message);
         }
+    }
+
+    private SaslAuthenticateResponseMessage BuildSaslAuthenticateResponse(SaslAuthenticateRequestMessage request)
+    {
+        if (_saslScenario is null)
+        {
+            return new SaslAuthenticateResponseMessage();
+        }
+
+        if (_saslScenario.AuthenticateErrorCode != ErrorCodes.None)
+        {
+            return new SaslAuthenticateResponseMessage
+            {
+                ErrorCode = (short)_saslScenario.AuthenticateErrorCode,
+                ErrorMessage = $"Simulated SASL authenticate failure: {_saslScenario.AuthenticateErrorCode}"
+            };
+        }
+
+        return _saslScenario.Mechanism switch
+        {
+            SaslMechanism.Plain or SaslMechanism.OAuthBearer => new SaslAuthenticateResponseMessage(),
+            SaslMechanism.ScramSha256 or SaslMechanism.ScramSha512 => BuildScramAuthenticateResponse(request),
+            _ => new SaslAuthenticateResponseMessage
+            {
+                ErrorCode = (short)ErrorCodes.UnsupportedSaslMechanism,
+                ErrorMessage = $"Unsupported SASL mechanism {_saslScenario.MechanismName}"
+            }
+        };
+    }
+
+    private SaslAuthenticateResponseMessage BuildScramAuthenticateResponse(SaslAuthenticateRequestMessage request)
+    {
+        var scramMechanism = _saslScenario!.Mechanism == SaslMechanism.ScramSha256
+            ? ScramMechanism.ScramSha256
+            : ScramMechanism.ScramSha512;
+
+        if (_scramClientFirstMessage is null)
+        {
+            _scramClientFirstMessage = new ClientFirstMessage(request.AuthBytes);
+            _scramServerFirstMessage = new ServerFirstMessage(
+                _scramClientFirstMessage.Nonce,
+                "server-nonce",
+                Convert.FromBase64String("W22ZaJ0SNY7soEsUEjb6gQ=="),
+                4096);
+
+            return new SaslAuthenticateResponseMessage
+            {
+                AuthBytes = Encoding.UTF8.GetBytes(_scramServerFirstMessage.ToMessage())
+            };
+        }
+
+        var clientFinalMessage = new ClientFinalMessage(request.AuthBytes);
+
+        using var formatter = new ScramFormatter(scramMechanism);
+        var saltedPassword = formatter.SaltedPassword(_saslScenario.Password, _scramServerFirstMessage!.Salt, _scramServerFirstMessage.Iterations);
+        var serverKey = formatter.ServerKey(saltedPassword);
+        var serverSignature = formatter.ServerSignature(serverKey, _scramClientFirstMessage, _scramServerFirstMessage, clientFinalMessage);
+
+        return new SaslAuthenticateResponseMessage
+        {
+            AuthBytes = Encoding.UTF8.GetBytes($"v={Convert.ToBase64String(serverSignature)}")
+        };
     }
 
     public override void Flush()
@@ -301,4 +409,15 @@ internal class MockStream: Stream
     public override long Length { get; }
 
     public override long Position { get; set; }
+}
+
+internal sealed record SaslTestScenario(
+    SaslMechanism Mechanism,
+    string UserName = "user",
+    string Password = "pencil",
+    string? AdvertisedMechanism = null,
+    ErrorCodes AuthenticateErrorCode = ErrorCodes.None)
+{
+    public string MechanismName => SaslSettings.MechanismAsString(Mechanism);
+    public string AdvertisedMechanismName => AdvertisedMechanism ?? SaslSettings.MechanismAsString(Mechanism);
 }

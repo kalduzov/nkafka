@@ -104,6 +104,121 @@ public class KafkaConnectorTests
     }
 
     [Fact]
+    public async Task OpenAsync_WithPlainSasl_CompletesAuthentication()
+    {
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.Plain,
+            UserName = "user",
+            Password = "password"
+        };
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WithScramSha256Sasl_CompletesAuthentication()
+    {
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.ScramSha256,
+            UserName = "user",
+            Password = "pencil"
+        };
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WithOAuthBearerSasl_CompletesAuthentication()
+    {
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.OAuthBearer
+        };
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings);
+
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WhenBrokerAdvertisesDifferentSaslMechanism_ThrowsUnsupportedSaslMechanism()
+    {
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.Plain,
+            UserName = "user",
+            Password = "password"
+        };
+        var socketContext = CreateSocketFactoryContext(
+            CreateEndpoint(),
+            saslSettings: saslSettings,
+            saslScenarioOverride: new SaslTestScenario(
+                SaslMechanism.Plain,
+                "user",
+                "password",
+                AdvertisedMechanism: SaslSettings.MechanismAsString(SaslMechanism.OAuthBearer)));
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings,
+            socketContext: socketContext);
+
+        var exception = await FluentActions.Awaiting(async () => await kafkaConnector.OpenAsync(CancellationToken.None))
+            .Should()
+            .ThrowAsync<ProtocolKafkaException>();
+
+        exception.Which.InternalError.Should().Be(ErrorCodes.UnsupportedSaslMechanism);
+    }
+
+    [Fact]
+    public async Task OpenAsync_WhenSaslAuthenticateFails_ThrowsAuthenticationError()
+    {
+        var saslSettings = new SaslSettings
+        {
+            Mechanism = SaslMechanism.Plain,
+            UserName = "user",
+            Password = "password"
+        };
+        var socketContext = CreateSocketFactoryContext(
+            CreateEndpoint(),
+            saslSettings: saslSettings,
+            saslScenarioOverride: new SaslTestScenario(
+                SaslMechanism.Plain,
+                "user",
+                "password",
+                AuthenticateErrorCode: ErrorCodes.SaslAuthenticationFailed));
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            securityProtocol: SecurityProtocols.SaslPlaintext,
+            saslSettings: saslSettings,
+            socketContext: socketContext);
+
+        var exception = await FluentActions.Awaiting(async () => await kafkaConnector.OpenAsync(CancellationToken.None))
+            .Should()
+            .ThrowAsync<ProtocolKafkaException>();
+
+        exception.Which.InternalError.Should().Be(ErrorCodes.SaslAuthenticationFailed);
+    }
+
+    [Fact]
     public async Task SendAsync_DoesNotReestablishSession_WhenConnectorIsAlreadyOpen()
     {
         var socketContext = CreateSocketFactoryContext(CreateEndpoint());
@@ -208,6 +323,7 @@ public class KafkaConnectorTests
         IEnumerable<ApiKeys>? requestsWithoutResponse = null,
         IEnumerable<ApiKeys>? requestsWithWriteFailure = null,
         SecurityProtocols securityProtocol = SecurityProtocols.PlainText,
+        SaslSettings? saslSettings = null,
         SocketFactoryContext? socketContext = null,
         int requestTimeoutMs = 1000)
         => new(
@@ -219,11 +335,11 @@ public class KafkaConnectorTests
             requestTimeoutMs,
             0,
             securityProtocol,
-            SaslSettings.None,
+            saslSettings ?? SaslSettings.None,
             SslSettings.None,
             "test",
             apiRequest,
-            (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse, requestsWithWriteFailure)).SocketFactory,
+            (socketContext ?? CreateSocketFactoryContext(CreateEndpoint(), requestsWithoutResponse, requestsWithWriteFailure, saslSettings)).SocketFactory,
             NullLoggerFactory.Instance);
 
     private static IPEndPoint CreateEndpoint()
@@ -232,7 +348,9 @@ public class KafkaConnectorTests
     private static SocketFactoryContext CreateSocketFactoryContext(
         EndPoint endpoint,
         IEnumerable<ApiKeys>? requestsWithoutResponse = null,
-        IEnumerable<ApiKeys>? requestsWithWriteFailure = null)
+        IEnumerable<ApiKeys>? requestsWithWriteFailure = null,
+        SaslSettings? saslSettings = null,
+        SaslTestScenario? saslScenarioOverride = null)
     {
         var isConnected = false;
         var socketMock = Substitute.For<ISocketProxy>();
@@ -241,7 +359,10 @@ public class KafkaConnectorTests
             .AndDoes(_ => isConnected = true);
         socketMock.Connected.Returns(_ => isConnected);
 
-        var mockStream = new MockStream(requestsWithoutResponse, requestsWithWriteFailure);
+        var saslScenario = saslScenarioOverride ?? (saslSettings is null || saslSettings == SaslSettings.None
+            ? null
+            : new SaslTestScenario(saslSettings.Mechanism, saslSettings.UserName, saslSettings.Password));
+        var mockStream = new MockStream(requestsWithoutResponse, requestsWithWriteFailure, saslScenario);
         var remoteCertificateValidationCallback = new RemoteCertificateValidationCallback((_, _, _, _) => true);
         var sslStreamMock = Substitute.For<SslStream>(mockStream, false, remoteCertificateValidationCallback);
 

@@ -756,6 +756,98 @@ Session establishment и steady-state request/response semantics из `Wave 2-4`
 - runtime support matrix соответствует documentation и config surface
 - SCRAM не является скрытым "почти готовым" путём
 
+#### Wave 6 concrete extraction plan
+
+`Wave 6` фокусируется только на security/runtime honesty и на завершении SCRAM authentication path.
+Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаются уже стабилизированными.
+
+##### Target security responsibilities
+
+- `SaslSettings` и cluster config должны принимать только те combinations, для которых есть честный runtime contract
+- `KafkaConnector` должен выполнять ровно тот authentication flow, который соответствует выбранному mechanism
+- unsupported mechanisms должны fail-fast до того, как connector войдёт в partially-authenticated session
+- SCRAM должен использовать тот же setup/send/receive lifecycle, что и другие SASL paths, без special-case transport обходов
+
+##### Target runtime support matrix
+
+Для первого прохода `Wave 6` целевая matrix должна быть выражена явно:
+
+- `PLAIN`
+  - supported
+  - production auth path implemented
+- `OAUTHBEARER`
+  - supported
+  - production auth path implemented
+- `SCRAM-SHA-256`
+  - supported after `Wave 6`
+  - end-to-end runtime path and tests required
+- `SCRAM-SHA-512`
+  - supported after `Wave 6`
+  - end-to-end runtime path and tests required
+- `Kerberos/GSSAPI`
+  - not supported in runtime for now
+  - config validation must not present it as ready-to-use
+
+##### Wave 6 implementation steps
+
+1. Зафиксировать explicit support matrix in code and spec.
+2. Синхронизировать `SaslSettings.Validate()` с реальной runtime support matrix.
+3. Убрать misleading assumptions, где config surface принимает mechanism без end-to-end runtime path.
+4. Выделить явный auth-provider/client selection path inside `KafkaConnector.Auth..cs`.
+5. Подключить SCRAM client orchestration к стандартному `SaslHandshake -> token exchange` pipeline.
+6. Убедиться, что auth failures остаются отдельной session failure category и не маскируются под обычный transport disconnect.
+7. Добавить focused tests на:
+   - `PLAIN`
+   - `OAUTHBEARER`
+   - `SCRAM-SHA-256`
+   - `SCRAM-SHA-512`
+   - unsupported mechanism/config combinations
+
+##### Wave 6 non-goals
+
+- не добавлять Kerberos/GSSAPI runtime path в этой волне
+- не менять transport lifecycle rules из `Wave 2`
+- не возвращаться к pool/topology responsibilities из `Wave 5`
+- не расширять public config surface быстрее, чем появляется честная runtime support
+
+##### Current implementation target
+
+Для первого прохода `Wave 6` достаточно добиться следующего:
+
+- `SaslSettings` validates only mechanisms with honest runtime status
+- `KafkaConnector` has one explicit mechanism-selection path for auth setup
+- SCRAM is integrated into the same session-establishment pipeline as the existing SASL flows
+- tests confirm both supported and unsupported security combinations
+
+##### Current implementation status
+
+На текущем этапе перед началом `Wave 6` в коде наблюдается следующая картина:
+
+- `KafkaConnector` already has a dedicated auth setup step via `AuthenticateSessionAsync(...)`
+- runtime auth path is connected for:
+  - `PLAIN`
+  - `OAUTHBEARER`
+  - `SCRAM-SHA-256`
+  - `SCRAM-SHA-512`
+- `KafkaConnector.Auth..cs` now uses one explicit auth-session contract for:
+  - single-stage mechanisms
+  - challenge/response mechanisms
+- `SaslSettings.Validate()` is now aligned with the honest runtime matrix:
+  - `PLAIN` is allowed when credentials are present
+  - `OAUTHBEARER` is allowed
+  - `SCRAM-SHA-256` and `SCRAM-SHA-512` are allowed when credentials are present
+  - `Kerberos/GSSAPI` is rejected as unsupported runtime behavior
+- SCRAM primitives are connected to the standard `SaslHandshake -> SaslAuthenticate` pipeline without bypassing the connector request/response lifecycle
+- `Kerberos/GSSAPI` has config surface only and must currently be treated as unsupported runtime behavior
+- focused tests now cover:
+  - `SaslSettings` support matrix
+  - `ScramSaslClient` challenge/response exchange
+  - connector setup path for `PLAIN`
+  - connector setup path for `OAUTHBEARER`
+  - connector setup path for `SCRAM-SHA-256`
+  - unsupported mechanism advertised by broker during handshake
+  - explicit SASL authentication failure returned by broker
+
 ### Wave 7. Hardening, verification and spec sync
 
 Цель:

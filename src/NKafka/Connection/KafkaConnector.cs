@@ -70,6 +70,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private readonly ConcurrentDictionary<int, ResponseTaskCompletionSource> _inFlightRequests;
     private readonly ILogger<KafkaConnector> _logger;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly int _maxInflightRequests;
     private readonly int _messageMaxBytes;
     private readonly int _requestTimeoutMs;
@@ -142,6 +143,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         _clientId = clientId;
         _apiVersionRequest = apiVersionRequest;
         _socketFactory = socketFactory;
+        _loggerFactory = loggerFactory;
 
         _arrayPool = ArrayPool<byte>.Shared;
         _inFlightRequests = new ConcurrentDictionary<int, ResponseTaskCompletionSource>(Environment.ProcessorCount, _maxInflightRequests);

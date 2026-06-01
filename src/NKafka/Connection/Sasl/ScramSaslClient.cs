@@ -150,7 +150,7 @@ internal class ScramSaslClient: ISaslClient
                                 _serverFirstMessage.Salt,
                                 _serverFirstMessage.Iterations,
                                 hashAlgorithmName,
-                                hashAlgorithmName == HashAlgorithmName.SHA256 ? 16 : 32);
+                                hashAlgorithmName == HashAlgorithmName.SHA256 ? 32 : 64);
                             _clientFinalMessage = new ClientFinalMessage("n,,"u8, _serverFirstMessage.Nonce);
                             var clientProof = _formatter.ClientProof(_saltedPassword, _clientFirstMessage!, _serverFirstMessage, _clientFinalMessage);
                             _clientFinalMessage.Proof = clientProof;

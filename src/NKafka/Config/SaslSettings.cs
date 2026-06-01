@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Resources;
+using NKafka.Exceptions;
 
 namespace NKafka.Config;
 
@@ -101,18 +102,24 @@ public record SaslSettings
         _ = Mechanism switch
         {
             SaslMechanism.Plain => SaslMechanism.Plain,
+            SaslMechanism.OAuthBearer => SaslMechanism.OAuthBearer,
             SaslMechanism.ScramSha256 => SaslMechanism.ScramSha256,
             SaslMechanism.ScramSha512 => SaslMechanism.ScramSha512,
-            SaslMechanism.OAuthBearer => SaslMechanism.OAuthBearer,
-            SaslMechanism.Kerberos => SaslMechanism.Kerberos,
-            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
+            SaslMechanism.Kerberos => throw new KafkaConfigException(
+                nameof(Mechanism),
+                Mechanism,
+                "Kerberos/GSSAPI is not supported by the runtime authentication path."),
+            _ => throw new KafkaConfigException(nameof(Mechanism), Mechanism, ExceptionMessages.SaslMechanismInvalid)
         };
 
-        if (Mechanism == SaslMechanism.Plain)
+        if (Mechanism is SaslMechanism.Plain or SaslMechanism.ScramSha256 or SaslMechanism.ScramSha512)
         {
             if (string.IsNullOrEmpty(UserName) || string.IsNullOrEmpty(Password))
             {
-                throw new ArgumentException("Invalid credentials for sasl plaintext");
+                throw new KafkaConfigException(
+                    nameof(Mechanism),
+                    Mechanism,
+                    $"{Mechanism} authentication requires both UserName and Password.");
             }
         }
     }

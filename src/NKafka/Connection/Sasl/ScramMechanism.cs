@@ -31,53 +31,56 @@ internal enum ScramMechanism
 
 internal static class ScramMechanismExtensions
 {
-    public static string GetName(this ScramMechanism mechanism)
+    extension(ScramMechanism mechanism)
     {
-        return mechanism switch
+        public string GetName()
         {
-            ScramMechanism.ScramSha256 => "SCARM-SHA-256",
-            ScramMechanism.ScramSha512 => "SCARM-SHA-512",
-            _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
-        };
-    }
+            return mechanism switch
+            {
+                ScramMechanism.ScramSha256 => "SCRAM-SHA-256",
+                ScramMechanism.ScramSha512 => "SCRAM-SHA-512",
+                _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
+            };
+        }
 
-    public static int MinIterations(this ScramMechanism mechanism)
-    {
-        return mechanism switch
+        public int MinIterations()
         {
-            ScramMechanism.ScramSha256 => 4096,
-            ScramMechanism.ScramSha512 => 4096,
-            _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
-        };
-    }
+            return mechanism switch
+            {
+                ScramMechanism.ScramSha256 => 4096,
+                ScramMechanism.ScramSha512 => 4096,
+                _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
+            };
+        }
 
-    public static HashAlgorithm GetHashAlgorithm(this ScramMechanism mechanism)
-    {
-        return mechanism switch
+        public HashAlgorithm GetHashAlgorithm()
         {
-            ScramMechanism.ScramSha256 => SHA256.Create(),
-            ScramMechanism.ScramSha512 => SHA512.Create(),
-            _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
-        };
-    }
+            return mechanism switch
+            {
+                ScramMechanism.ScramSha256 => SHA256.Create(),
+                ScramMechanism.ScramSha512 => SHA512.Create(),
+                _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
+            };
+        }
 
-    public static KeyedHashAlgorithm GetMacAlgorithm(this ScramMechanism mechanism)
-    {
-        return mechanism switch
+        public KeyedHashAlgorithm GetMacAlgorithm()
         {
-            ScramMechanism.ScramSha256 => new HMACSHA256(),
-            ScramMechanism.ScramSha512 => new HMACSHA512(),
-            _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
-        };
-    }
+            return mechanism switch
+            {
+                ScramMechanism.ScramSha256 => new HMACSHA256(),
+                ScramMechanism.ScramSha512 => new HMACSHA512(),
+                _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
+            };
+        }
 
-    public static HashAlgorithmName GetHashAlgorithmName(this ScramMechanism mechanism)
-    {
-        return mechanism switch
+        public HashAlgorithmName GetHashAlgorithmName()
         {
-            ScramMechanism.ScramSha256 => HashAlgorithmName.SHA256,
-            ScramMechanism.ScramSha512 => HashAlgorithmName.SHA512,
-            _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
-        };
+            return mechanism switch
+            {
+                ScramMechanism.ScramSha256 => HashAlgorithmName.SHA256,
+                ScramMechanism.ScramSha512 => HashAlgorithmName.SHA512,
+                _ => throw new ArgumentOutOfRangeException(nameof(mechanism), mechanism, null)
+            };
+        }
     }
 }

@@ -19,7 +19,10 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using Microsoft.Extensions.Logging;
+
 using NKafka.Config;
+using NKafka.Connection.Sasl;
 using NKafka.Connection.Sasl.Providers;
 using NKafka.Exceptions;
 using NKafka.Messages;
@@ -43,19 +46,13 @@ internal sealed partial class KafkaConnector
 
     private async Task AuthenticateSaslHandshakeV1Async(CancellationToken token)
     {
-        ISaslProvider saslProvider = _saslSettings.Mechanism switch
-        {
-            SaslMechanism.Plain => new SaslPlaintTextProvider(_saslSettings),
-            SaslMechanism.OAuthBearer => new SaslOAuthBearerProvider(_saslSettings),
-
-            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
-        };
+        using var authenticationSession = CreateSaslAuthenticationSession();
 
         if (_saslSettings.Handshake)
         {
             var saslHandshakeRequest = new SaslHandshakeRequestMessage
             {
-                Mechanism = saslProvider.Mechanism
+                Mechanism = authenticationSession.Mechanism
             };
 
             var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeRequestMessage, SaslHandshakeResponseMessage>(
@@ -67,59 +64,143 @@ internal sealed partial class KafkaConnector
             {
                 throw new ProtocolKafkaException(handshakeResponse.Code);
             }
+
+            if (handshakeResponse.Mechanisms.Count != 0
+                && !handshakeResponse.Mechanisms.Contains(authenticationSession.Mechanism, StringComparer.Ordinal))
+            {
+                throw new ProtocolKafkaException(
+                    ErrorCodes.UnsupportedSaslMechanism,
+                    $"Broker does not advertise SASL mechanism {authenticationSession.Mechanism}.");
+            }
         }
 
-        // The final authenticate request is sent only after the broker accepts the
-        // selected mechanism so that the session never mixes credentials across auth flows.
-        var authenticateRequest = new SaslAuthenticateRequestMessage
+        await RunAuthenticateLoopAsync(authenticationSession, token);
+    }
+
+    private ISaslAuthenticationSession CreateSaslAuthenticationSession()
+    {
+        return _saslSettings.Mechanism switch
         {
-            AuthBytes = saslProvider.GetAuthData()
+            SaslMechanism.Plain => new SingleStageSaslAuthenticationSession(new SaslPlaintTextProvider(_saslSettings)),
+            SaslMechanism.OAuthBearer => new SingleStageSaslAuthenticationSession(new SaslOAuthBearerProvider(_saslSettings)),
+            SaslMechanism.ScramSha256 => new ScramSaslAuthenticationSession(
+                new ScramSaslClient(
+                    ScramMechanism.ScramSha256,
+                    new SaslSettingsAuthStore(_saslSettings),
+                    _loggerFactory.CreateLogger<ScramSaslClient>())),
+            SaslMechanism.ScramSha512 => new ScramSaslAuthenticationSession(
+                new ScramSaslClient(
+                    ScramMechanism.ScramSha512,
+                    new SaslSettingsAuthStore(_saslSettings),
+                    _loggerFactory.CreateLogger<ScramSaslClient>())),
+            _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
         };
+    }
 
-        var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateRequestMessage, SaslAuthenticateResponseMessage>(
-            authenticateRequest,
-            true,
-            token);
+    private async Task RunAuthenticateLoopAsync(ISaslAuthenticationSession authenticationSession, CancellationToken token)
+    {
+        var authBytes = authenticationSession.CreateInitialRequest();
 
-        if (authenticateResponse.Code != ErrorCodes.None)
+        while (true)
         {
-            throw new ProtocolKafkaException(authenticateResponse.Code);
+            // Every mechanism uses the same authenticate exchange so that challenge-based
+            // flows never bypass the connector's normal request/response lifecycle.
+            var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateRequestMessage, SaslAuthenticateResponseMessage>(
+                new SaslAuthenticateRequestMessage
+                {
+                    AuthBytes = authBytes
+                },
+                true,
+                token);
+
+            if (authenticateResponse.Code != ErrorCodes.None)
+            {
+                throw new ProtocolKafkaException(authenticateResponse.Code);
+            }
+
+            if (!authenticationSession.TryContinue(authenticateResponse.AuthBytes, out authBytes))
+            {
+                return;
+            }
         }
     }
 
-    // private async Task AuthenticateSaslScramV0Async(SaslMechanism saslMechanism, CancellationToken token)
-    // {
-    //     // handshake step
-    //     var saslHandshakeRequest = new SaslHandshakeRequestMessage
-    //     {
-    //         Mechanism = SaslSettings.MechanismAsString(saslMechanism)
-    //     };
-    //
-    //     var handshakeResponse = await ((IKafkaConnector)this).SendAsync<SaslHandshakeRequestMessage, SaslHandshakeResponseMessage>(
-    //         saslHandshakeRequest,
-    //         true,
-    //         token);
-    //
-    //     if (handshakeResponse.Code != ErrorCodes.None)
-    //     {
-    //         throw new ProtocolKafkaException(handshakeResponse.Code, $"Не удалось начать процедуру аутентификации по механизму {saslMechanism}");
-    //     }
-    //
-    //     // initial step
-    //     var authenticateRequest = new SaslAuthenticateRequestMessage
-    //     {
-    //         AuthBytes = CreateSaslToken(Array.Empty<byte>(), true)
-    //     };
-    //     var authenticateResponse = await ((IKafkaConnector)this).SendAsync<SaslAuthenticateRequestMessage, SaslAuthenticateResponseMessage>(
-    //         authenticateRequest,
-    //         true,
-    //         token);
-    // }
-    //
-    // private byte[] CreateSaslToken(byte[] empty, bool b)
-    // {
-    //     return new byte[]
-    //     {
-    //     };
-    // }
+    private interface ISaslAuthenticationSession: IDisposable
+    {
+        string Mechanism { get; }
+
+        byte[] CreateInitialRequest();
+
+        bool TryContinue(byte[] challenge, out byte[] nextRequest);
+    }
+
+    private sealed class SingleStageSaslAuthenticationSession(ISaslProvider provider): ISaslAuthenticationSession
+    {
+        public string Mechanism => provider.Mechanism;
+
+        public byte[] CreateInitialRequest()
+        {
+            return provider.GetAuthData();
+        }
+
+        public bool TryContinue(byte[] challenge, out byte[] nextRequest)
+        {
+            nextRequest = [];
+
+            return false;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class ScramSaslAuthenticationSession(ISaslClient saslClient): ISaslAuthenticationSession
+    {
+        public string Mechanism => saslClient.MechanismName;
+
+        public byte[] CreateInitialRequest()
+        {
+            return saslClient.EvaluateChallenge([]).ToArray();
+        }
+
+        public bool TryContinue(byte[] challenge, out byte[] nextRequest)
+        {
+            var responseBytes = saslClient.EvaluateChallenge(challenge).ToArray();
+
+            if (saslClient.IsComplete)
+            {
+                nextRequest = [];
+
+                return false;
+            }
+
+            nextRequest = responseBytes;
+
+            return true;
+        }
+
+        public void Dispose()
+        {
+            saslClient.Dispose();
+        }
+    }
+
+    private sealed class SaslSettingsAuthStore(SaslSettings settings): ISaslAuthStore
+    {
+        public string GetUserName()
+        {
+            return settings.UserName;
+        }
+
+        public Dictionary<string, string> GetExtensions()
+        {
+            return [];
+        }
+
+        public Span<byte> GetPasswordAsBytes()
+        {
+            return System.Text.Encoding.UTF8.GetBytes(settings.Password);
+        }
+    }
 }

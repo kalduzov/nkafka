@@ -83,7 +83,6 @@ internal sealed partial class KafkaConnector
         return _saslSettings.Mechanism switch
         {
             SaslMechanism.Plain => new SingleStageSaslAuthenticationSession(new SaslPlaintTextProvider(_saslSettings)),
-            SaslMechanism.OAuthBearer => new SingleStageSaslAuthenticationSession(new SaslOAuthBearerProvider(_saslSettings)),
             SaslMechanism.ScramSha256 => new ScramSaslAuthenticationSession(
                 new ScramSaslClient(
                     ScramMechanism.ScramSha256,
@@ -94,6 +93,7 @@ internal sealed partial class KafkaConnector
                     ScramMechanism.ScramSha512,
                     new SaslSettingsAuthStore(_saslSettings),
                     _loggerFactory.CreateLogger<ScramSaslClient>())),
+            SaslMechanism.OAuthBearer => throw new NotSupportedException("OAUTHBEARER runtime authentication is not implemented."),
             _ => throw new ArgumentException(ExceptionMessages.SaslMechanismInvalid)
         };
     }

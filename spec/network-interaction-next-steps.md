@@ -104,7 +104,8 @@ KafkaConnector
 ### 3.2 SCRAM integration point
 
 - Wire existing SCRAM provider into `Auth.` flow
-- Currently only `PLAIN` and `OAUTHBEARER` are reachable in runtime auth switch
+- Currently only `PLAIN`, `SCRAM-SHA-256` and `SCRAM-SHA-512` should be treated as honest runtime auth paths
+- `OAUTHBEARER` remains partially wired infrastructure and must stay outside the supported runtime matrix until its provider path is implemented
 - SCRAM classes exist in `Connection/Sasl/` but not connected
 
 ---

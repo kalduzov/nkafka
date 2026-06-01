@@ -21,11 +21,6 @@ internal static class IntegrationClusterFactory
         && ReadSecurityProtocol() is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl
         && ReadSaslMechanism() is SaslMechanism.Plain;
 
-    public static bool IsOAuthBearerSecurityScenarioEnabled =>
-        IsSecurityScenarioEnabled
-        && ReadSecurityProtocol() is SecurityProtocols.SaslPlaintext or SecurityProtocols.SaslSsl
-        && ReadSaslMechanism() is SaslMechanism.OAuthBearer;
-
     public static Task<IKafkaCluster> CreateClusterAsync(ILoggerFactory? loggerFactory = null)
     {
         var clusterConfig = BuildClusterConfigFromEnvironment();

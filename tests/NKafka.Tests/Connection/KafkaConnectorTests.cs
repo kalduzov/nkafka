@@ -143,7 +143,7 @@ public class KafkaConnectorTests
     }
 
     [Fact]
-    public async Task OpenAsync_WithOAuthBearerSasl_CompletesAuthentication()
+    public async Task OpenAsync_WithOAuthBearerSasl_ThrowsNotSupportedException()
     {
         var saslSettings = new SaslSettings
         {
@@ -154,9 +154,9 @@ public class KafkaConnectorTests
             securityProtocol: SecurityProtocols.SaslPlaintext,
             saslSettings: saslSettings);
 
-        await kafkaConnector.OpenAsync(CancellationToken.None);
-
-        kafkaConnector.ConnectorState.Should().Be(KafkaConnector.State.Open);
+        await FluentActions.Awaiting(async () => await kafkaConnector.OpenAsync(CancellationToken.None))
+            .Should()
+            .ThrowAsync<NotSupportedException>();
     }
 
     [Fact]

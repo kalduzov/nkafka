@@ -776,8 +776,8 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - supported
   - production auth path implemented
 - `OAUTHBEARER`
-  - supported
-  - production auth path implemented
+  - not supported in runtime for now
+  - config visibility must not be treated as production-ready auth support
 - `SCRAM-SHA-256`
   - supported after `Wave 6`
   - end-to-end runtime path and tests required
@@ -798,7 +798,6 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 6. Убедиться, что auth failures остаются отдельной session failure category и не маскируются под обычный transport disconnect.
 7. Добавить focused tests на:
    - `PLAIN`
-   - `OAUTHBEARER`
    - `SCRAM-SHA-256`
    - `SCRAM-SHA-512`
    - unsupported mechanism/config combinations
@@ -826,7 +825,6 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 - `KafkaConnector` already has a dedicated auth setup step via `AuthenticateSessionAsync(...)`
 - runtime auth path is connected for:
   - `PLAIN`
-  - `OAUTHBEARER`
   - `SCRAM-SHA-256`
   - `SCRAM-SHA-512`
 - `KafkaConnector.Auth..cs` now uses one explicit auth-session contract for:
@@ -834,8 +832,8 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - challenge/response mechanisms
 - `SaslSettings.Validate()` is now aligned with the honest runtime matrix:
   - `PLAIN` is allowed when credentials are present
-  - `OAUTHBEARER` is allowed
   - `SCRAM-SHA-256` and `SCRAM-SHA-512` are allowed when credentials are present
+  - `OAUTHBEARER` is rejected as unsupported runtime behavior
   - `Kerberos/GSSAPI` is rejected as unsupported runtime behavior
 - SCRAM primitives are connected to the standard `SaslHandshake -> SaslAuthenticate` pipeline without bypassing the connector request/response lifecycle
 - `Kerberos/GSSAPI` has config surface only and must currently be treated as unsupported runtime behavior
@@ -843,7 +841,7 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - `SaslSettings` support matrix
   - `ScramSaslClient` challenge/response exchange
   - connector setup path for `PLAIN`
-  - connector setup path for `OAUTHBEARER`
+  - explicit rejection of `OAUTHBEARER` until the provider emits real auth data
   - connector setup path for `SCRAM-SHA-256`
   - unsupported mechanism advertised by broker during handshake
   - explicit SASL authentication failure returned by broker
@@ -872,7 +870,8 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 
 - focused verification now covers:
   - connector lifecycle cleanup and inflight invalidation
-  - setup pipeline for `PLAIN`, `OAUTHBEARER` and `SCRAM-SHA-256`
+  - setup pipeline for `PLAIN` and `SCRAM-SHA-256`
+  - explicit rejection of `OAUTHBEARER` until its runtime auth data path is implemented
   - negative SASL paths for unsupported broker-advertised mechanism and explicit authenticate failure
 - connector observability has been tightened around lifecycle decisions:
   - state transitions are logged explicitly
@@ -894,12 +893,10 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 - there is now also a `PLAIN`-specific opt-in integration entrypoint:
   - cluster describe can be exercised specifically against `SASL/PLAIN`
   - the scenario is isolated from generic security gating so `PLAIN` regressions can be diagnosed without conflating them with `SCRAM`
-- there is also an `OAUTHBEARER`-specific opt-in integration entrypoint:
-  - cluster describe can be exercised specifically against `SASL/OAUTHBEARER`
-  - the scenario is isolated from the other SASL branches so broker-side token validation issues do not get mixed with `PLAIN` or `SCRAM` regressions
 - there is also a SCRAM-specific opt-in integration entrypoint:
   - cluster describe can be exercised against `SCRAM-SHA-256` or `SCRAM-SHA-512`
   - the scenario is isolated from generic security gating so SCRAM failures are easier to diagnose against a secure broker setup
+- `OAUTHBEARER` no longer has an opt-in integration entrypoint because the current provider remains a placeholder and must not be presented as a supported runtime mechanism
 
 ##### Integration security scenario inputs
 
@@ -911,7 +908,7 @@ Supported inputs:
 - `NKAFKA_IT_BOOTSTRAP_SERVERS` overrides the default `localhost:29091`
 - `NKAFKA_IT_SECURITY_PROTOCOL` accepts `Ssl`, `SaslPlaintext` or `SaslSsl`
 - `NKAFKA_IT_TRUST_SERVER_CERTIFICATE` controls whether self-signed certificates are accepted in integration environments
-- `NKAFKA_IT_SASL_MECHANISM` accepts `Plain`, `OAuthBearer`, `ScramSha256` or `ScramSha512`
+- `NKAFKA_IT_SASL_MECHANISM` accepts `Plain`, `ScramSha256` or `ScramSha512` for currently supported runtime scenarios
 - `NKAFKA_IT_SASL_USERNAME` and `NKAFKA_IT_SASL_PASSWORD` provide credentials for SASL-based runs
 
 When `NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true`:
@@ -938,8 +935,6 @@ Recommended targeted filters:
   - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "Category=SecurityIntegration"`
 - only `PLAIN`:
   - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=PLAIN"`
-- only `OAUTHBEARER`:
-  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=OAUTHBEARER"`
 - only `SCRAM`:
   - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=SCRAM"`
 
@@ -957,7 +952,7 @@ Recommended targeted filters:
 - Wave 3: integration tests или focused tests на setup sequence `connect -> SSL -> ApiVersions -> SASL`
 - Wave 4: regression tests на correlation, failed write, read loop shutdown, timeouts
 - Wave 5: tests на seed/shared/dedicated connector lifecycle
-- Wave 6: integration tests на `PLAIN`, `OAUTHBEARER`, SCRAM, а также unsupported combinations
+- Wave 6: integration tests на `PLAIN`, SCRAM и unsupported combinations; `OAUTHBEARER` не должен считаться supported runtime path до появления реального provider implementation
 
 ## Risks and anti-goals during execution
 

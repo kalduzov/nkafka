@@ -104,7 +104,7 @@
 - connection state и response processing связаны сильнее, чем нужно
 - reconnect behavior не оформлен как явная state machine
 - invalidation policy для `SupportVersions`, inflight requests и metadata hints описана не полностью
-- security runtime path всё ещё требует дальнейшего hardening, но production auth path уже покрывает `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512`
+- security runtime path всё ещё требует дальнейшего hardening; production auth path сейчас реально покрывает `PLAIN`, `SCRAM-SHA-256` и `SCRAM-SHA-512`, а `OAUTHBEARER` остаётся недореализованным provider path
 
 ## Target architecture
 
@@ -409,12 +409,13 @@ Read loop должен:
 Минимальная roadmap expectation:
 
 - сохранить рабочий путь для `PLAIN`
-- сохранить рабочий путь для `OAUTHBEARER`
+- не считать `OAUTHBEARER` рабочим runtime path, пока provider не начнёт формировать реальные auth bytes и broker-side token flow не будет реализован end-to-end
 - встроить SCRAM без дублирования send/receive logic и без special-case обходов протокольного слоя
 
 Текущее состояние:
 
-- `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512` идут через общий connector auth pipeline
+- `PLAIN`, `SCRAM-SHA-256` и `SCRAM-SHA-512` идут через общий connector auth pipeline
+- `OAUTHBEARER` пока не должен считаться production-ready runtime mechanism
 - `Kerberos/GSSAPI` остаётся явно unsupported runtime path
 
 ## Observability requirements

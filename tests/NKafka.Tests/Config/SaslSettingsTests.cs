@@ -34,14 +34,18 @@ public sealed class SaslSettingsTests
     }
 
     [Fact]
-    public void Validate_WithOAuthBearer_Succeeds()
+    public void Validate_WithOAuthBearer_ThrowsKafkaConfigException()
     {
         var settings = new SaslSettings
         {
             Mechanism = SaslMechanism.OAuthBearer
         };
 
-        FluentActions.Invoking(() => settings.Validate()).Should().NotThrow();
+        FluentActions.Invoking(() => settings.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(SaslSettings.Mechanism));
     }
 
     [Theory]

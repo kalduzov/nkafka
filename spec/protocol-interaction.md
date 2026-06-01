@@ -380,7 +380,8 @@ Reference baseline:
 
 - protocol core и message generation выглядят зрелыми
 - connection/auth/runtime orchestration стала заметно более формализованной
-- `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512` подключены к production auth path
+- `PLAIN`, `SCRAM-SHA-256` и `SCRAM-SHA-512` подключены к production auth path
+- `OAUTHBEARER` пока остаётся partially wired mechanism, а не production-ready auth flow
 - `Kerberos/GSSAPI` остаётся unsupported runtime behavior
 - transactional producer protocol path не завершён
 - часть admin и consumer protocol workflows пока неполная

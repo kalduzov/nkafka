@@ -102,9 +102,12 @@ public record SaslSettings
         _ = Mechanism switch
         {
             SaslMechanism.Plain => SaslMechanism.Plain,
-            SaslMechanism.OAuthBearer => SaslMechanism.OAuthBearer,
             SaslMechanism.ScramSha256 => SaslMechanism.ScramSha256,
             SaslMechanism.ScramSha512 => SaslMechanism.ScramSha512,
+            SaslMechanism.OAuthBearer => throw new KafkaConfigException(
+                nameof(Mechanism),
+                Mechanism,
+                "OAUTHBEARER is not supported by the runtime authentication path."),
             SaslMechanism.Kerberos => throw new KafkaConfigException(
                 nameof(Mechanism),
                 Mechanism,

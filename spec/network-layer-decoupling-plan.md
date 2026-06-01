@@ -888,6 +888,9 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - integration cluster creation is centralized
   - bootstrap servers and security settings can be overridden through environment variables
   - future SASL/SSL scenarios can reuse the same test entrypoint instead of forking client bootstrap code
+- the first opt-in integration-style security scenario now exists:
+  - cluster describe can run against a non-plaintext broker configuration
+  - the scenario stays gated behind explicit environment variables so ordinary local runs do not start failing on missing secure test infrastructure
 
 Оставшиеся задачи `Wave 7`:
 

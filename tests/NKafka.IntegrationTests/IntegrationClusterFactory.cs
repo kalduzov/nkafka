@@ -7,6 +7,10 @@ namespace NKafka.IntegrationTests;
 
 internal static class IntegrationClusterFactory
 {
+    public static bool IsSecurityScenarioEnabled =>
+        ReadBooleanEnvironment("NKAFKA_IT_ENABLE_SECURITY_SCENARIOS", false)
+        && ReadSecurityProtocol() is not SecurityProtocols.PlainText;
+
     public static Task<IKafkaCluster> CreateClusterAsync(ILoggerFactory? loggerFactory = null)
     {
         var clusterConfig = BuildClusterConfigFromEnvironment();

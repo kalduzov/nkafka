@@ -39,7 +39,6 @@
 |---|---|---|---|---|---|
 | Cluster | [src/NKafka/KafkaCluster.cs](K:\nkafka\src\NKafka\KafkaCluster.cs) | `GetOffset()` возвращает `Offset.Unset` без реальной реализации | Offset-related cluster API фактически не готов | P1 | Либо реализовать через `ListOffsets`, либо убрать misleading surface до появления полноценной реализации |
 | Cluster | [src/NKafka/KafkaCluster.cs](K:\nkafka\src\NKafka\KafkaCluster.cs) | Metadata lifecycle зависит от текущего локального состояния и частично смешивает orchestration с caching | Усложняет feature work и может скрывать race conditions | P2 | Выделить отдельно responsibilities: metadata fetch, topology cache, background refresh |
-| Connection | [src/NKafka/Connection/KafkaConnector.Auth..cs](K:\nkafka\src\NKafka\Connection\KafkaConnector.Auth..cs) | Runtime auth switch использует только `PLAIN` и `OAUTHBEARER` | SCRAM path подготовлен инфраструктурно, но не работает end-to-end | P0 | Добавить полноценный runtime path для SCRAM и закрыть его integration tests |
 | Connection | [src/NKafka/Connection/NullConnector.cs](K:\nkafka\src\NKafka\Connection\NullConnector.cs) | Заглушка с `NotImplementedException` | Может вводить в заблуждение при рефакторинге и тестовых сценариях | P2 | Ограничить использование только test-helper контекстом или сделать safer null-object contract |
 | Connection | [src/NKafka/Connection/KafkaConnector.cs](K:\nkafka\src\NKafka\Connection\KafkaConnector.cs) | Response processing всё ещё частично живёт внутри connector | Труднее масштабировать и упростить concurrency model | P2 | Отдельно описать целевую модель и вынести обработку ответов ближе к pool/runtime orchestration |
 | Producer | [src/NKafka/Clients/Producer/Producer.Transaction.cs](K:\nkafka\src\NKafka\Clients\Producer\Producer.Transaction.cs) | `ThrowIfNotTransactional()` сейчас всегда бросает исключение | Transactional producer API фактически unusable | P0 | Реализовать корректную проверку transactional mode вместо unconditional throw |
@@ -60,8 +59,8 @@
 | Admin | [src/NKafka/Clients/Admin/AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs) | `DescribeConfigsAsync()` возвращает пустой result, хотя API уже protocol/fallback-known | Config admin API не готов | P1 | Реализовать DescribeConfigs request/response path |
 | Admin | [src/NKafka/Clients/Admin/AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs) | `AlterConfigsAsync()` возвращает пустой result, хотя API уже protocol/fallback-known | Legacy config mutation API не реализован | P1 | Реализовать basic flow или явно пометить unsupported |
 | Admin | [src/NKafka/Clients/Admin/AdminClient.cs](K:\nkafka\src\NKafka\Clients\Admin\AdminClient.cs) | `IncrementalAlterConfigsAsync()` возвращает пустой result, хотя API уже protocol/fallback-known | Современный config mutation API не реализован | P1 | Реализовать incremental alter configs flow |
-| Security | [src/NKafka/Connection/Sasl](K:\nkafka\src\NKafka\Connection\Sasl) | SCRAM primitives есть, но не встроены в production auth path | Неполная поддержка client-side security features | P0 | Связать SCRAM state machine с connector auth flow |
-| Security | [src/NKafka/Config/SaslSettings.cs](K:\nkafka\src\NKafka\Config\SaslSettings.cs) | Конфигурационная поверхность шире, чем подтверждённая runtime-поддержка | Риск ложного ощущения поддерживаемых механизмов | P1 | Явно описать supported/unsupported combinations и закрепить validation |
+| Security | [src/NKafka/Connection/Sasl](K:\nkafka\src\NKafka\Connection\Sasl) | Production auth path уже покрывает `SCRAM-SHA-256` и `SCRAM-SHA-512`, но integration-style verification всё ещё узкое | Высокорисковые security branches пока в основном подтверждены focused mock-stream tests | P1 | Добрать integration-style security verification поверх реального broker setup, где это даст дополнительную уверенность |
+| Security | [src/NKafka/Config/SaslSettings.cs](K:\nkafka\src\NKafka\Config\SaslSettings.cs) | Supported matrix теперь честно отражает runtime, но `Kerberos/GSSAPI` остаётся явно unsupported | Пользователь может ожидать более широкую Kafka-compatible SASL surface, чем реально поддерживается клиентом | P1 | Либо реализовать `Kerberos/GSSAPI`, либо сохранить явный unsupported contract в docs/tests и не расширять advertised support matrix |
 | Diagnostics | [src/NKafka/Metrics](K:\nkafka\src\NKafka\Metrics) | Есть базовые metrics types, но нет явной feature-complete observability model | Сложнее развивать telemetry и client metrics KIPs | P2 | Сформировать отдельную telemetry spec и feature map |
 | Tests | [tests/NKafka.IntegrationTests](K:\nkafka\tests\NKafka.IntegrationTests) | Integration coverage узкое и заметно смещено в admin scenarios | High-risk runtime features недопроверены end-to-end | P1 | Добавить integration tests для producer, consumer, transactions, security |
 | Tests | [tests/NKafka.Tests](K:\nkafka\tests\NKafka.Tests) | Транзакционный producer path покрыт слабо относительно сложности | Риск регрессий в незавершённой state machine | P1 | Добавить focused unit tests на TransactionManager state transitions |
@@ -77,7 +76,7 @@
 - ACL admin API
 - config admin API
 - consumer session stop / rebalance error handling
-- SCRAM runtime auth
+- integration-style security verification
 
 ### Wave 2
 

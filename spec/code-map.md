@@ -115,8 +115,8 @@
 Что не завершено или ограничено:
 
 - `NullConnector` — заглушка для технических сценариев, не рабочая реализация
-- в [KafkaConnector.Auth..cs](K:\nkafka\src\NKafka\Connection\KafkaConnector.Auth..cs) реально задействованы только `PLAIN` и `OAUTHBEARER`
-- SCRAM flow присутствует в кодовой базе, но не подключён в основной auth switch
+- в [KafkaConnector.Auth..cs](K:\nkafka\src\NKafka\Connection\KafkaConnector.Auth..cs) production auth path уже покрывает `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512`
+- `Kerberos/GSSAPI` остаётся явно unsupported runtime path, несмотря на более широкую конфигурационную поверхность SASL в экосистеме Kafka
 - есть TODO о переносе части response processing из connector в pool
 
 ### 3. Protocol layer
@@ -460,13 +460,14 @@
 Что доработано:
 
 - есть config model для SSL/SASL
-- есть SCRAM classes и message parsing primitives
-- есть PLAIN и OAUTHBEARER providers
+- есть unified auth-session orchestration для `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512`
+- есть SCRAM classes, message parsing primitives и runtime connector wiring
+- есть PLAIN, OAUTHBEARER и SCRAM providers
 
 Что не завершено или ограничено:
 
-- основной runtime auth switch не использует SCRAM provider path
-- часть SASL support выглядит подготовленной инфраструктурно, но не доведённой до end-to-end integration
+- `Kerberos/GSSAPI` остаётся явно unsupported runtime path
+- часть SASL support всё ещё требует дальнейшего hardening через integration-style verification и observability assertions
 
 ## Тестовый срез
 

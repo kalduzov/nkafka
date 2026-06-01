@@ -379,8 +379,9 @@ Reference baseline:
 По текущему состоянию кодовой базы:
 
 - protocol core и message generation выглядят зрелыми
-- connection/auth/runtime orchestration всё ещё частично незавершены
-- SCRAM runtime integration не доведена до production-ready path
+- connection/auth/runtime orchestration стала заметно более формализованной
+- `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512` подключены к production auth path
+- `Kerberos/GSSAPI` остаётся unsupported runtime behavior
 - transactional producer protocol path не завершён
 - часть admin и consumer protocol workflows пока неполная
 

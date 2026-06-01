@@ -104,7 +104,7 @@
 - connection state и response processing связаны сильнее, чем нужно
 - reconnect behavior не оформлен как явная state machine
 - invalidation policy для `SupportVersions`, inflight requests и metadata hints описана не полностью
-- security runtime path подготовлен неравномерно: `PLAIN` и `OAUTHBEARER` подключены, SCRAM infrastructure есть, но не встроена end-to-end
+- security runtime path всё ещё требует дальнейшего hardening, но production auth path уже покрывает `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512`
 
 ## Target architecture
 
@@ -412,6 +412,11 @@ Read loop должен:
 - сохранить рабочий путь для `OAUTHBEARER`
 - встроить SCRAM без дублирования send/receive logic и без special-case обходов протокольного слоя
 
+Текущее состояние:
+
+- `PLAIN`, `OAUTHBEARER`, `SCRAM-SHA-256` и `SCRAM-SHA-512` идут через общий connector auth pipeline
+- `Kerberos/GSSAPI` остаётся явно unsupported runtime path
+
 ## Observability requirements
 
 Сетевой слой должен публиковать достаточно сигналов для диагностики:
@@ -419,6 +424,8 @@ Read loop должен:
 - connection open/close/fault events
 - request send and response receive traces
 - timeout and reconnect counters
+- explicit state transition logs for physical connector lifecycle
+- SASL mechanism selection logs for authenticated session setup
 - auth and negotiation failures
 - inflight request count and selected connector metrics, где это уже поддерживается системой метрик
 

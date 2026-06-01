@@ -866,6 +866,26 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
 - основные transport/session regressions прикрыты
 - спецификации и код больше не расходятся по ключевым границам
 
+##### Current implementation status
+
+На текущем этапе `Wave 7` в коде уже выполнены следующие hardening pieces:
+
+- focused verification now covers:
+  - connector lifecycle cleanup and inflight invalidation
+  - setup pipeline for `PLAIN`, `OAUTHBEARER` and `SCRAM-SHA-256`
+  - negative SASL paths for unsupported broker-advertised mechanism and explicit authenticate failure
+- connector observability has been tightened around lifecycle decisions:
+  - state transitions are logged explicitly
+  - negotiated API-version invalidation is logged when a session is torn down
+  - fault handling now emits a dedicated warning with the connection-scope reason
+  - SASL authentication start is logged with the selected mechanism
+
+Оставшиеся задачи `Wave 7`:
+
+- определить, нужен ли отдельный test harness для deeper diagnostics/log assertions
+- добрать integration-style verification outside the focused mock-stream scenarios where it adds confidence
+- провести финальную синхронизацию связанных spec-документов, если найдутся ещё расхождения по wording or support matrix
+
 ## Cross-cutting testing plan
 
 Минимальный expected test plan по волнам:

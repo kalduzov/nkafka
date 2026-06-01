@@ -496,11 +496,21 @@ internal sealed partial class KafkaConnector: IKafkaConnector
 
     private void SetState(State state)
     {
+        if (ConnectorState != state)
+        {
+            _logger.StateTransitionDebug(NodeId, Endpoint, ConnectorState, state);
+        }
+
         ConnectorState = state;
     }
 
     private void InvalidateSupportVersions()
     {
+        if (SupportVersions.Count != 0)
+        {
+            _logger.SupportVersionsInvalidatedTrace(NodeId);
+        }
+
         SupportVersions = [];
     }
 
@@ -647,6 +657,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
             return;
         }
 
+        _logger.ConnectionFaultWarning(NodeId, Endpoint, exception.Message);
         SetState(State.Faulted);
         CloseConnectionCore(exception);
     }

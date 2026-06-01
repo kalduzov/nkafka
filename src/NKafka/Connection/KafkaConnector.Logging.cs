@@ -51,4 +51,37 @@ internal static partial class KafkaConnectorLoggerExtensions
         Level = LogLevel.Trace,
         Message = LogExtensions.LOGGER_PREFIX + "Got response {Message} from {NodeId}")]
     public static partial void GotResponseTrace(this ILogger<KafkaConnector> logger, IResponseMessage message, int nodeId);
+
+    [LoggerMessage(
+        EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 3,
+        Level = LogLevel.Debug,
+        Message = LogExtensions.LOGGER_PREFIX + "Connector {NodeId} at {EndPoint} transitions from {PreviousState} to {NextState}")]
+    public static partial void StateTransitionDebug(
+        this ILogger<KafkaConnector> logger,
+        int nodeId,
+        EndPoint endPoint,
+        KafkaConnector.State previousState,
+        KafkaConnector.State nextState);
+
+    [LoggerMessage(
+        EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 4,
+        Level = LogLevel.Warning,
+        Message = LogExtensions.LOGGER_PREFIX + "Connector {NodeId} at {EndPoint} entered fault handling: {Reason}")]
+    public static partial void ConnectionFaultWarning(
+        this ILogger<KafkaConnector> logger,
+        int nodeId,
+        EndPoint endPoint,
+        string reason);
+
+    [LoggerMessage(
+        EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 5,
+        Level = LogLevel.Trace,
+        Message = LogExtensions.LOGGER_PREFIX + "Connector {NodeId} invalidated negotiated API versions for the current session")]
+    public static partial void SupportVersionsInvalidatedTrace(this ILogger<KafkaConnector> logger, int nodeId);
+
+    [LoggerMessage(
+        EventId = LogExtensions.KAFKA_CONNECTOR_EVENT_BASE_ID + 6,
+        Level = LogLevel.Debug,
+        Message = LogExtensions.LOGGER_PREFIX + "Connector {NodeId} starts SASL authentication using {Mechanism}")]
+    public static partial void StartSaslAuthenticationDebug(this ILogger<KafkaConnector> logger, int nodeId, string mechanism);
 }

@@ -47,6 +47,7 @@ internal sealed partial class KafkaConnector
     private async Task AuthenticateSaslHandshakeV1Async(CancellationToken token)
     {
         using var authenticationSession = CreateSaslAuthenticationSession();
+        _logger.StartSaslAuthenticationDebug(NodeId, authenticationSession.Mechanism);
 
         if (_saslSettings.Handshake)
         {

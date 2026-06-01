@@ -64,6 +64,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     private readonly ConcurrentDictionary<string, TopicMetadata> _topics;
     private IAdminClient? _adminClient;
     private volatile int _controllerId = Node.NoNode.Id;
+    private volatile int _disposeState;
     private volatile int _metadataUpdating;
     private volatile int _metadataUpdatingCounter;
 
@@ -134,14 +135,14 @@ internal sealed class KafkaCluster: IKafkaCluster
     public bool Closed { get; private set; }
 
     /// <inheritdoc />
-    public Node Controller => _controllerId == Node.NO_ID ? Node.NoNode : _nodes[_controllerId];
+    public Node Controller => _nodes.TryGetValue(_controllerId, out var controllerNode) ? controllerNode : Node.NoNode;
 
     /// <inheritdoc />
     public IReadOnlyCollection<Node> Brokers { get; private set; } = [];
 
     private bool HasUsableBrokerTopology => _nodes.Count != 0 && Brokers.Count != 0;
 
-    private bool HasKnownController => _controllerId != Node.NoNode.Id;
+    private bool HasKnownController => _controllerId != Node.NoNode.Id && _nodes.ContainsKey(_controllerId);
 
     /// <inheritdoc />
     public IAdminClient AdminClient
@@ -346,6 +347,11 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <exception cref="ClusterKafkaException">Thrown when unable to create a dedicated connection.</exception>
     public IKafkaConnector ProvideDedicatedConnector(int nodeId)
     {
+        if (!_nodes.ContainsKey(nodeId))
+        {
+            throw new ClusterKafkaException($"Broker {nodeId} is not present in the current metadata snapshot.");
+        }
+
         if (_connectorPool.TryCreateDedicatedConnector(nodeId, out var connector))
         {
             return connector;
@@ -408,6 +414,11 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public void Dispose()
     {
+        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
+        {
+            return;
+        }
+
         _closeClusterTokenSource.Cancel();
         _metadataUpdaterTask.Dispose();
         _connectorPool.Dispose();
@@ -417,6 +428,11 @@ internal sealed class KafkaCluster: IKafkaCluster
     /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
+        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
+        {
+            return;
+        }
+
         await _closeClusterTokenSource.CancelAsync();
         await _metadataUpdaterTask;
         await _connectorPool.DisposeAsync();
@@ -560,6 +576,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         {
             _nodes = nodes;
             Brokers = _nodes.Values.ToArray();
+            _controllerId = Node.NoNode.Id;
 
             foreach (var node in nodes)
             {

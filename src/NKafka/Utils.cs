@@ -64,6 +64,25 @@ internal static class Utils
         return (host, port);
     }
 
+    internal static bool EndPointsEqual(EndPoint? left, EndPoint? right)
+    {
+        if (ReferenceEquals(left, right))
+        {
+            return true;
+        }
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        var leftAddress = GetComparableAddress(left);
+        var rightAddress = GetComparableAddress(right);
+
+        return leftAddress.Port == rightAddress.Port
+               && string.Equals(leftAddress.Host, rightAddress.Host, StringComparison.OrdinalIgnoreCase);
+    }
+
     private static void ValidatePort(int port)
     {
         if (port <= 1024)
@@ -78,6 +97,16 @@ internal static class Utils
         {
             throw new ArgumentException($"Host {host} is incorrect");
         }
+    }
+
+    private static (string Host, int Port) GetComparableAddress(EndPoint endPoint)
+    {
+        return endPoint switch
+        {
+            IPEndPoint ipEndPoint => (ipEndPoint.Address.ToString(), ipEndPoint.Port),
+            DnsEndPoint dnsEndPoint => (dnsEndPoint.Host, dnsEndPoint.Port),
+            _ => GetHostAndPort(endPoint.ToString()!)
+        };
     }
 
     public static string MkString<TKey, TValue>(

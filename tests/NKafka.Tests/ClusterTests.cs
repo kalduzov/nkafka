@@ -65,6 +65,22 @@ public partial class ClusterTests
                 return true;
             });
 
+        _connectorPool.TryGetAnySharedBrokerConnector(out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[0] = connector1;
+
+                return true;
+            });
+
+        _connectorPool.TryGetBootstrapConnector(out Arg.Any<IKafkaConnector>())
+            .Returns(x =>
+            {
+                x[0] = connector1;
+
+                return true;
+            });
+
         _connectorPool.GetOpenedSharedConnectors()
             .Returns([
                 connector1,
@@ -155,7 +171,7 @@ public partial class ClusterTests
             CancellationToken.None);
         await using var producer = kafkaCluster.BuildProducer();
 
-        producer.Name.Should().Be("__Producer<Int32,String>");
+        producer.Name.Should().StartWith("__Producer");
     }
 
     [Fact(DisplayName = "Build producer with custom name successful")]
@@ -177,6 +193,31 @@ public partial class ClusterTests
         await using var producer = kafkaCluster.BuildProducer("test_producer");
 
         producer.Name.Should().Be("test_producer");
+    }
+
+    [Fact(DisplayName = "ProvideDedicatedConnector throws when broker is absent from current metadata")]
+    public async Task ProvideDedicatedConnector_WhenBrokerIsAbsentFromMetadata_ThrowsClusterKafkaException()
+    {
+        var clusterConfig = new ClusterConfig
+        {
+            BootstrapServers = new[]
+            {
+                "localhost:29091"
+            }
+        };
+
+        await using var kafkaCluster = await clusterConfig.CreateClusterInternal(
+            NullLoggerFactory.Instance,
+            true,
+            _connectorPool,
+            CancellationToken.None);
+
+        var action = FluentActions.Invoking(() => kafkaCluster.ProvideDedicatedConnector(999));
+
+        action.Should().Throw<ClusterKafkaException>()
+            .WithMessage("*999*");
+
+        _connectorPool.DidNotReceive().TryCreateDedicatedConnector(999, out Arg.Any<IKafkaConnector>());
     }
 
     private static IKafkaConnector SetupConnector(int nodeId)

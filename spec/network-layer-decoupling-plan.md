@@ -625,6 +625,114 @@ Setup pipeline из `Wave 3` считается входным условием 
 - pool принимает policy decisions, но не подменяет cluster metadata layer
 - dedicated/shared lifecycle выражены явно
 
+#### Wave 5 concrete extraction plan
+
+`Wave 5` фокусируется только на topology/policy responsibilities around connector ownership.
+Session establishment и steady-state request/response semantics из `Wave 2-4` считаются уже стабилизированными.
+
+##### Target pool responsibilities
+
+- pool хранит и различает:
+  - bootstrap connectors
+  - shared broker connectors
+  - dedicated broker connectors
+- pool решает:
+  - какой shared connector отдать для конкретного broker
+  - когда создать новый dedicated connector
+  - когда topology update должна добавить, сохранить или удалить connector entry
+- pool не решает:
+  - metadata refresh policy
+  - controller semantics
+  - retry policy higher in the stack
+  - transport/session internals одного `KafkaConnector`
+
+##### Target cluster responsibilities
+
+- `KafkaCluster` остаётся владельцем:
+  - metadata snapshot
+  - controller knowledge
+  - service-routing semantics
+  - decision when topology is usable or stale
+- `KafkaCluster` должен передавать в pool уже готовый routing intent, а не спрашивать pool о metadata смысле
+
+##### Wave 5 implementation steps
+
+1. Зафиксировать topology vocabulary in code and spec:
+   - bootstrap
+   - shared broker
+   - dedicated broker
+2. Уточнить internal registry model inside `KafkaConnectorPool`:
+   - какие коллекции считаются authoritative
+   - что является identity для connector entry
+3. Разделить lifecycle rules for:
+   - bootstrap connectors
+   - shared broker connectors
+   - dedicated connectors
+4. Пересмотреть `AddOrUpdateConnectorsAsync(...)` так, чтобы topology sync не смешивал:
+   - connector creation
+   - connector reuse
+   - dead-entry cleanup
+5. Явно определить rules for removing connectors that are no longer represented in metadata.
+6. Явно определить ownership rule for dedicated connectors:
+   - pool creates them
+   - caller owns their usage
+   - shared balancing never reuses them
+7. Проверить `KafkaCluster` call sites against the clarified ownership model.
+8. Добавить focused tests на seed/shared/dedicated lifecycle.
+
+##### Wave 5 non-goals
+
+- не выносить transport ownership из `KafkaConnector`
+- не возвращать pool к knowledge of controller semantics
+- не смешивать topology cleanup с SCRAM/security work
+- не менять public cluster API без прямой необходимости
+
+##### Current implementation target
+
+Для первого прохода `Wave 5` достаточно добиться следующего:
+
+- `KafkaConnectorPool` выражает явную registry model для bootstrap/shared/dedicated connectors
+- topology update path не скрывает ownership decisions внутри случайных side effects
+- `KafkaCluster` и pool больше не спорят о том, кто отвечает за metadata meaning vs connector ownership
+
+##### Current implementation status
+
+На текущем этапе в коде уже реализованы следующие части `Wave 5`:
+
+- pool использует явную registry model:
+  - `_seedConnectors` for bootstrap ownership
+  - `_sharedConnectorsByNodeId` for metadata-driven broker traffic
+  - `_dedicatedConnectorsByNodeId` for explicit dedicated ownership
+  - `_brokerNodesById` as broker identity lookup
+- bootstrap promotion оформлена как отдельный `CreateSharedConnector(...)` path
+- endpoint matching в pool выполняется по semantic host/port identity, а не по reference equality объектов `EndPoint`
+- dedicated connectors создаются и регистрируются отдельно от shared registry
+- topology sync читается как отдельный lifecycle pipeline:
+  - `RegisterBrokerNode(...)`
+  - `EnsureSharedConnectorsForNode(...)`
+  - `RemoveStaleSharedConnectors(...)`
+  - `OpenSharedConnectorsAsync(...)`
+  - `RemoveDeadSharedConnectors(...)`
+  - `RemoveSharedConnectorsMissingFromMetadata(...)`
+- если broker исчезает из metadata snapshot, pool:
+  - удаляет shared connectors для этого broker
+  - перестаёт routing metadata-driven traffic к нему
+  - удаляет broker lookup entry, если для broker не осталось dedicated ownership
+- focused tests подтверждают:
+  - bootstrap connector promotion into shared registry
+  - shared connector replacement when the same broker id moves to a new endpoint
+  - dedicated connector creation is rejected after the broker disappears from metadata
+  - `KafkaCluster.ProvideDedicatedConnector(...)` does not ask the pool for a broker that is absent from the current metadata snapshot
+
+Оставшиеся вопросы для следующих шагов `Wave 5`:
+
+- нужно ли явно чистить stale dedicated entries, если owning caller их больше не держит
+
+Дополнительно после проверки call sites:
+
+- `KafkaCluster` теперь трактует controller как valid only if it exists in the current metadata snapshot
+- `KafkaCluster.ProvideDedicatedConnector(...)` валидирует broker presence against current metadata before asking pool for a dedicated connector
+
 ### Wave 6. Security hardening and SCRAM integration
 
 Цель:

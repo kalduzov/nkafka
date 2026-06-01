@@ -895,6 +895,31 @@ Session lifecycle, setup pipeline и pool topology из `Wave 2-5` считаю�
   - cluster describe can be exercised against `SCRAM-SHA-256` or `SCRAM-SHA-512`
   - the scenario is isolated from generic security gating so SCRAM failures are easier to diagnose against a secure broker setup
 
+##### Integration security scenario inputs
+
+The current integration-style security checks are opt-in and expect broker configuration to be supplied through environment variables.
+
+Supported inputs:
+
+- `NKAFKA_IT_ENABLE_SECURITY_SCENARIOS=true` enables security-specific integration tests
+- `NKAFKA_IT_BOOTSTRAP_SERVERS` overrides the default `localhost:29091`
+- `NKAFKA_IT_SECURITY_PROTOCOL` accepts `Ssl`, `SaslPlaintext` or `SaslSsl`
+- `NKAFKA_IT_TRUST_SERVER_CERTIFICATE` controls whether self-signed certificates are accepted in integration environments
+- `NKAFKA_IT_SASL_MECHANISM` accepts `Plain`, `OAuthBearer`, `ScramSha256` or `ScramSha512`
+- `NKAFKA_IT_SASL_USERNAME` and `NKAFKA_IT_SASL_PASSWORD` provide credentials for SASL-based runs
+
+Example `SCRAM-SHA-256` run:
+
+```powershell
+$env:NKAFKA_IT_ENABLE_SECURITY_SCENARIOS = "true"
+$env:NKAFKA_IT_BOOTSTRAP_SERVERS = "localhost:29092"
+$env:NKAFKA_IT_SECURITY_PROTOCOL = "SaslPlaintext"
+$env:NKAFKA_IT_SASL_MECHANISM = "ScramSha256"
+$env:NKAFKA_IT_SASL_USERNAME = "user"
+$env:NKAFKA_IT_SASL_PASSWORD = "pencil"
+dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "FullyQualifiedName~ClusterDescribeSecurityTests"
+```
+
 Оставшиеся задачи `Wave 7`:
 
 - добрать integration-style verification outside the focused mock-stream scenarios where it adds confidence

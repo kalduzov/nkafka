@@ -18,3 +18,7 @@ The **infra** folder contains a set of tools for deploying **kafka** to **docker
 > At the moment, only `docker-compose.yml` and `docker-compose.big-cluster.yml` files are fully functional. The rest of the deployment options need to be improved.
 
 > To run **integration tests**, you will also need to deploy the `docker-compose.yml` file.
+
+For the target real-broker matrix and the new `E2E` environment contract, see:
+
+- [spec/real-kafka-e2e-plan.md](K:\nkafka\spec\real-kafka-e2e-plan.md)

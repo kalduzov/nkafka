@@ -2,7 +2,7 @@ using NKafka.Clients.Admin;
 
 namespace NKafka.IntegrationTests.Clients.Admin;
 
-public class ClusterDescribeSecurityTests
+public abstract class ClusterDescribeSecurityTestsBase
 {
     public static bool IsSecurityScenarioEnabled => IntegrationClusterFactory.IsSecurityScenarioEnabled;
     public static bool IsPlainSaslSecurityScenarioEnabled => IntegrationClusterFactory.IsPlainSaslSecurityScenarioEnabled;

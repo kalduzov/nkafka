@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\NKafka\NKafka.csproj"/>
+    <ProjectReference Include="..\NKafka.IntegrationTests.Shared\NKafka.IntegrationTests.Shared.csproj"/>
+  </ItemGroup>
+</Project>

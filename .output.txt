@@ -1,0 +1,108 @@
+﻿Command finished with exit code 0.
+Command output:
+On branch next_step
+Your branch is ahead of 'origin/next_step' by 5 commits.
+  (use "git push" to publish your local commits)
+
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	new file:   infra/e2e/README.md
+	new file:   infra/e2e/kraft/plaintext/.env.example
+	new file:   infra/e2e/kraft/plaintext/README.md
+	new file:   infra/e2e/kraft/plaintext/docker-compose.yml
+	new file:   infra/e2e/kraft/plaintext/run-api-versions-matrix.ps1
+	new file:   infra/e2e/kraft/plaintext/run-api-versions-matrix.sh
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/ClusterDescribeSecurityTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/ClusterDescribeTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/KafkaVersionLineTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/NKafka.IntegrationTests.Kafka_3_7.csproj
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Protocol/ApiVersionsE2ETests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/Clients/Admin/ClusterDescribeTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/KafkaVersionLineTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/NKafka.IntegrationTests.Kafka_3_8.csproj
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/Protocol/ApiVersionsE2ETests.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/Clients/Admin/ClusterDescribeE2ETests.cs -> tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeE2ETests.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/Clients/Admin/ClusterDescribeSecurityTests.cs -> tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeSecurityTests.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/Clients/Admin/ClusterDescribeTests.cs -> tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeTests.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/Clients/Admin/TopicsManipulationTests.cs -> tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/TopicsManipulationTests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/KafkaVersionLineTests.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj -> tests/integration/NKafka.IntegrationTests.Kafka_3_9/NKafka.IntegrationTests.Kafka_3_9.csproj
+	new file:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Protocol/ApiVersionsE2ETests.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/AssemblyInfo.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Clients/Admin/ClusterDescribeTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Clients/Admin/TopicsManipulationTestsBase.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/E2E/KafkaE2EClusterFactory.cs -> tests/integration/NKafka.IntegrationTests.Shared/E2E/KafkaE2EClusterFactory.cs
+	renamed:    tests/integration/NKafka.IntegrationTests/IntegrationClusterFactory.cs -> tests/integration/NKafka.IntegrationTests.Shared/IntegrationClusterFactory.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/NKafka.IntegrationTests.Shared.csproj
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Protocol/ApiVersionsE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/TopicsManipulationTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Protocol/ApiVersionsE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/TopicsManipulationTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Protocol/ApiVersionsE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/TopicsManipulationTestsBase.cs
+	new file:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Protocol/ApiVersionsE2ETestsBase.cs
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   Directory.Packages.props
+	modified:   NKafka.slnx
+	modified:   infra/e2e/kraft/plaintext/README.md
+	modified:   infra/e2e/kraft/plaintext/run-api-versions-matrix.ps1
+	modified:   spec/code-gaps.md
+	modified:   spec/code-map.md
+	modified:   spec/network-layer-decoupling-plan.md
+	modified:   spec/real-kafka-e2e-plan.md
+	modified:   src/NKafka/assembly.cs
+	modified:   tests/NKafka.Tests/Connection/MockStream.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/ClusterDescribeSecurityTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/ClusterDescribeTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/NKafka.IntegrationTests.Kafka_3_7.csproj
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_7/Protocol/ApiVersionsE2ETests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/Clients/Admin/ClusterDescribeTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/NKafka.IntegrationTests.Kafka_3_8.csproj
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_8/Protocol/ApiVersionsE2ETests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeE2ETests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeSecurityTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/ClusterDescribeTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Clients/Admin/TopicsManipulationTests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/NKafka.IntegrationTests.Kafka_3_9.csproj
+	modified:   tests/integration/NKafka.IntegrationTests.Kafka_3_9/Protocol/ApiVersionsE2ETests.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/AssemblyInfo.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/E2E/KafkaE2EClusterFactory.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/NKafka.IntegrationTests.Shared.csproj
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Protocol/ApiVersionsE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/ClusterDescribeTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Clients/Admin/TopicsManipulationTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_7/Protocol/ApiVersionsE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/ClusterDescribeTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Clients/Admin/TopicsManipulationTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_8/Protocol/ApiVersionsE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeE2ETestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeSecurityTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/ClusterDescribeTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Clients/Admin/TopicsManipulationTestsBase.cs
+	modified:   tests/integration/NKafka.IntegrationTests.Shared/Versioned/Kafka_3_9/Protocol/ApiVersionsE2ETestsBase.cs
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/ClusterDescribeE2ETests.cs
+	tests/integration/NKafka.IntegrationTests.Kafka_3_7/Clients/Admin/TopicsManipulationTests.cs
+	tests/integration/NKafka.IntegrationTests.Kafka_3_8/Clients/Admin/ClusterDescribeE2ETests.cs
+	tests/integration/NKafka.IntegrationTests.Kafka_3_8/Clients/Admin/ClusterDescribeSecurityTests.cs
+	tests/integration/NKafka.IntegrationTests.Kafka_3_8/Clients/Admin/TopicsManipulationTests.cs

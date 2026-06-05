@@ -21,6 +21,7 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("NKafka.Tests")]
+[assembly: InternalsVisibleTo("NKafka.IntegrationTests.Shared")]
 [assembly: InternalsVisibleTo("NKafka.AspNetCore")]
 [assembly: InternalsVisibleTo("NKafka.Benchmarks")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

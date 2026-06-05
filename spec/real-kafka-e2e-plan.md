@@ -19,7 +19,7 @@ The repository already contains useful infrastructure fragments:
 - [infra/docker-compose.big-cluster.yml](K:\nkafka\infra\docker-compose.big-cluster.yml) for large ZooKeeper-based plaintext clusters
 - [infra/docker-compose.simple.yml](K:\nkafka\infra\docker-compose.simple.yml) for KRaft plaintext
 - [infra/docker-compose.kraft.sasl.yml](K:\nkafka\infra\docker-compose.kraft.sasl.yml) for KRaft with `SASL/PLAIN`
-- [tests/integration/NKafka.IntegrationTests](K:\nkafka\tests\integration\NKafka.IntegrationTests) for real-broker integration tests
+- [tests/integration](K:\nkafka\tests\integration) for real-broker integration tests
 
 But the current setup is still incomplete for a full `E2E` strategy:
 
@@ -94,6 +94,7 @@ The target environment model is therefore a cartesian combination of:
 - topology mode
 - Kafka version
 - security profile
+- effective API capability floor
 
 Combined names like `kraft-sasl-scram256` may still exist as convenient shortcuts in scripts or CI labels, but the underlying plan should treat them as composed values, not as the primary model.
 
@@ -149,6 +150,22 @@ Real Kafka `E2E` tests should focus on broker-backed confidence:
 - group coordination basics
 - security handshake success paths for supported mechanisms
 - version-dependent behavior where broker capabilities differ
+- mixed-version compatibility where the effective API surface is lower than the physical broker version
+
+### Current implementation status
+
+The repository now has the first dedicated broker-backed `ApiVersions` scenario in the versioned `E2E` test assemblies.
+That scenario intentionally checks only the negotiation baseline:
+
+- a real cluster can be opened
+- the aggregated cluster metadata contains `ApiVersions`
+- the capability snapshot is populated before broader admin or producer/consumer smoke flows are required
+
+The repository also now contains the first normalized infrastructure profile at:
+
+- [infra/e2e/kraft/plaintext/docker-compose.yml](K:\nkafka\infra\e2e\kraft\plaintext\docker-compose.yml)
+
+This profile is the starting point for the broader topology/security matrix and is meant to anchor the first real `ApiVersions` run.
 
 ## Implementation phases
 
@@ -204,6 +221,33 @@ Reusable code should be shared when reasonable, for example through:
 - shared environment/bootstrap contracts
 
 The repository should avoid duplicating the same smoke flow N times just because it runs against N Kafka versions.
+
+### Phase 1b. Add API-floor scenario assemblies
+
+Physical broker version and effective client-visible API surface are not the same thing.
+
+In real Kafka environments, especially during rolling upgrades, a cluster may contain newer brokers while the effective API compatibility seen by the client still has to respect lower broker capabilities.
+
+The `E2E` strategy must therefore cover both:
+
+- physical Kafka version lines
+- forced lower API floors on top of those physical versions
+
+Recommended model:
+
+- version-specific assemblies describe the physical broker line
+- additional scenario assemblies or test groups describe the forced API floor
+
+Examples:
+
+- `Kafka_3_9` physical broker line with default capabilities
+- `Kafka_3_9.ApiFloor_3_7`
+- `Kafka_3_9.ApiFloor_3_8`
+
+These scenarios should verify that the client chooses the lowest commonly supported API version instead of assuming that the highest broker version in the cluster defines the usable request version.
+
+The upgrade focus here must stay on minor-version transitions inside one major Kafka line.
+Scenarios like `2.x -> 3.x` or `3.x -> 4.x` should not be treated as ordinary rolling-upgrade E2E coverage because those transitions usually involve broader infrastructure migration steps rather than simple broker-by-broker updates.
 
 ### Phase 2. Normalize compose assets
 
@@ -291,6 +335,7 @@ Version support should be driven by:
 - pinned image tags
 - one selected Kafka version per run
 - version-specific test assembly selection
+- optional forced API-floor selection
 
 At this stage the harness should support commands like:
 
@@ -301,6 +346,7 @@ At this stage the harness should support commands like:
 - run `kraft + sasl-scram256` on any supported version where the profile is available
 - run `kraft + sasl-ssl-scram256` on any supported version where the secure profile is available
 - run `kraft + sasl-oauthbearer` on any supported version as a tracked unsupported-runtime profile
+- run a newer physical broker line with a lower forced API floor, for example `Kafka 3.9 physical + API floor 3.7`
 
 ### Phase 5. Expand from smoke tests to client workflows
 
@@ -329,6 +375,32 @@ This is the smallest matrix that gives meaningful confidence:
 | `kraft` | `SASL/OAUTHBEARER` | dynamically selected from supported client versions | keep the broker installation in the matrix and verify honest unsupported-runtime behavior until client support exists |
 | `kraft` | `SASL_SSL/SCRAM-SHA-256` | dynamically selected from supported client versions | keep secure SCRAM installation reproducible and ready for client validation |
 
+### API-floor matrix
+
+In addition to the physical broker matrix, the repository should keep explicit scenarios where the effective API capability floor is lower than the physical broker version.
+
+At minimum, this matrix should include:
+
+| Physical broker line | Forced API floor | Purpose |
+|---|---|---|
+| latest supported modern line | previous supported line | verify lowest-common-version selection during rolling upgrades |
+| latest supported modern line | oldest still-supported line | verify compatibility against the lowest supported API surface |
+
+These scenarios do not replace mixed-broker integration later on, but they do give a deterministic first layer of verification for the client's API version selection rules.
+
+The intended rolling-upgrade coverage is specifically:
+
+- `3.7 -> 3.8`
+- `3.8 -> 3.9`
+- similar minor-line transitions inside the same supported major line
+
+The plan should not require ordinary rolling-upgrade scenarios for:
+
+- `2.x -> 3.x`
+- `3.x -> 4.x`
+
+Those major-line transitions may still need separate validation later, but as infrastructure migration scenarios rather than standard broker upgrade tests.
+
 ### Extended matrix
 
 As the harness matures, the matrix can grow with:
@@ -348,6 +420,7 @@ Recommended contract:
 - `NKAFKA_E2E_TOPOLOGY_MODE=<zk|kraft>`
 - `NKAFKA_E2E_SECURITY_PROFILE=<plaintext|ssl|sasl-plain|sasl-scram256|sasl-scram512|sasl-oauthbearer|sasl-ssl-plain|sasl-ssl-scram256|sasl-ssl-scram512|sasl-ssl-oauthbearer>`
 - `NKAFKA_E2E_KAFKA_VERSION=<version>`
+- `NKAFKA_E2E_API_FLOOR_VERSION=<version|default>`
 - `NKAFKA_E2E_BOOTSTRAP_SERVERS=<host:port,...>`
 - `NKAFKA_E2E_SECURITY_PROTOCOL=<PlainText|SaslPlaintext|SaslSsl|Ssl>`
 - `NKAFKA_E2E_SASL_MECHANISM=<Plain|ScramSha256|ScramSha512|OAuthBearer>`
@@ -358,6 +431,8 @@ Recommended contract:
 The test harness should fail fast when a selected profile is underconfigured.
 
 If the repository keeps shortcut names for convenience, they should be derived from the explicit topology/security pair rather than replacing it.
+
+If `NKAFKA_E2E_API_FLOOR_VERSION` is set, the selected environment must expose a deterministic lower API capability surface for the client, even when the physical broker image is newer.
 
 ## CI strategy
 
@@ -370,7 +445,7 @@ Recommended CI layers:
 2. `E2E smoke per version`
    Runs selected version-specific assemblies against selected profiles, at least plaintext + one security profile.
 3. `extended matrix`
-   Runs nightly or on-demand for multiple Kafka versions and security combinations.
+   Runs nightly or on-demand for multiple Kafka versions, security combinations, and forced API-floor scenarios.
 
 ## Non-goals
 
@@ -392,4 +467,5 @@ This plan can be considered successfully implemented when:
 - `E2E` tests can connect to multiple broker setups through one shared harness with version-specific assemblies on top
 - supported runtime security mechanisms have real broker-backed smoke coverage
 - unsupported broker-side profiles such as `OAUTHBEARER` remain visible in the environment matrix and have explicit deterministic handling
+- the repository can verify that the client chooses the lowest commonly supported API version when the effective API floor is lower than the physical broker version
 - the repository can express which Kafka versions and profiles are actually verified, not just theoretically supported

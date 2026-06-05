@@ -29,6 +29,11 @@ internal static class KafkaE2EClusterFactory
 
     internal static string CurrentKafkaVersion => Environment.GetEnvironmentVariable("NKAFKA_E2E_KAFKA_VERSION") ?? string.Empty;
 
+    internal static bool IsSupportedRuntimeProfileEnabled => IsSelectedSupportedRuntimeProfile();
+
+    internal static bool IsKafkaVersionLineSelected(string versionPrefix)
+        => IsVersionLineSelected(versionPrefix);
+
     internal static bool IsZkPlaintextProfileEnabled => IsSelected(ZkTopologyMode, PlaintextSecurityProfile);
 
     internal static bool IsKraftPlaintextProfileEnabled => IsSelected(KraftTopologyMode, PlaintextSecurityProfile);
@@ -114,6 +119,28 @@ internal static class KafkaE2EClusterFactory
         => IsE2EEnabled
            && string.Equals(CurrentTopologyMode, topologyMode, StringComparison.OrdinalIgnoreCase)
            && string.Equals(CurrentSecurityProfile, securityProfile, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsVersionLineSelected(string versionPrefix)
+        => IsE2EEnabled
+           && !string.IsNullOrWhiteSpace(CurrentKafkaVersion)
+           && CurrentKafkaVersion.StartsWith(versionPrefix, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsSelectedSupportedRuntimeProfile()
+    {
+        if (!IsE2EEnabled)
+        {
+            return false;
+        }
+
+        var securityProtocol = ReadSecurityProtocol();
+        if (securityProtocol == SecurityProtocols.PlainText)
+        {
+            return true;
+        }
+
+        return securityProtocol == SecurityProtocols.SaslPlaintext
+               && ReadSaslMechanism() is SaslMechanism.Plain or SaslMechanism.ScramSha256 or SaslMechanism.ScramSha512;
+    }
 
     private static string ReadTopologyMode()
     {

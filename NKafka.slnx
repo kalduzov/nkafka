@@ -36,6 +36,16 @@
     <File Path="infra/kafka_server_jaas.conf" />
     <File Path="infra/readme.md" />
   </Folder>
+  <Folder Name="/infra/e2e/">
+    <File Path="infra/e2e/README.md" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/plaintext/">
+    <File Path="infra/e2e/kraft/plaintext/.env.example" />
+    <File Path="infra/e2e/kraft/plaintext/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/plaintext/README.md" />
+    <File Path="infra/e2e/kraft/plaintext/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/plaintext/run-api-versions-matrix.sh" />
+  </Folder>
   <Folder Name="/infra/choco/">
     <File Path="infra/choco/install.ps1" />
   </Folder>
@@ -217,7 +227,10 @@
     <Project Path="tests/NKafka.Tests/NKafka.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/integration/">
-    <Project Path="tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj" />
+    <Project Path="tests/integration/NKafka.IntegrationTests.Kafka_3_7/NKafka.IntegrationTests.Kafka_3_7.csproj" />
+    <Project Path="tests/integration/NKafka.IntegrationTests.Kafka_3_8/NKafka.IntegrationTests.Kafka_3_8.csproj" />
+    <Project Path="tests/integration/NKafka.IntegrationTests.Shared/NKafka.IntegrationTests.Shared.csproj" />
+    <Project Path="tests/integration/NKafka.IntegrationTests.Kafka_3_9/NKafka.IntegrationTests.Kafka_3_9.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/DockerBrokersGenerator/DockerBrokersGenerator.csproj" />

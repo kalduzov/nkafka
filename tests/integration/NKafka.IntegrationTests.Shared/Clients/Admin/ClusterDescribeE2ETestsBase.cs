@@ -4,7 +4,7 @@ using NKafka.IntegrationTests.E2E;
 
 namespace NKafka.IntegrationTests.Clients.Admin;
 
-public class ClusterDescribeE2ETests
+public abstract class ClusterDescribeE2ETestsBase
 {
     public static bool IsZkPlaintextProfileEnabled => KafkaE2EClusterFactory.IsZkPlaintextProfileEnabled;
 
@@ -94,7 +94,7 @@ public class ClusterDescribeE2ETests
             .WithMessage("*OAUTHBEARER*");
     }
 
-    private static async Task DescribeClusterSmokeAsync()
+    protected static async Task DescribeClusterSmokeAsync()
     {
         await using var kafkaCluster = await KafkaE2EClusterFactory.CreateClusterAsync();
 

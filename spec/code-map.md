@@ -35,7 +35,7 @@
 - [src/NKafka](K:\nkafka\src\NKafka) — основная библиотека
 - [src/NKafka.MessageGenerator](K:\nkafka\src\NKafka.MessageGenerator) — генератор protocol/message classes
 - [tests/NKafka.Tests](K:\nkafka\tests\NKafka.Tests) — unit tests
-- [tests/NKafka.IntegrationTests](K:\nkafka\tests\NKafka.IntegrationTests) — integration tests
+- [tests/integration/NKafka.IntegrationTests](K:\nkafka\tests\integration\NKafka.IntegrationTests) — integration tests
 - [tests/NKafka.MessageGenerator.Tests](K:\nkafka\tests\NKafka.MessageGenerator.Tests) — tests генератора
 
 Крупные подсистемы `src/NKafka`:
@@ -494,7 +494,7 @@
 
 Проект:
 
-- [tests/NKafka.IntegrationTests](K:\nkafka\tests\NKafka.IntegrationTests)
+- [tests/integration/NKafka.IntegrationTests](K:\nkafka\tests\integration\NKafka.IntegrationTests)
 
 Что видно по текущей структуре:
 

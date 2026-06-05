@@ -926,17 +926,17 @@ $env:NKAFKA_IT_SECURITY_PROTOCOL = "SaslPlaintext"
 $env:NKAFKA_IT_SASL_MECHANISM = "ScramSha256"
 $env:NKAFKA_IT_SASL_USERNAME = "user"
 $env:NKAFKA_IT_SASL_PASSWORD = "pencil"
-dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "FullyQualifiedName~ClusterDescribeSecurityTests"
+dotnet test tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "FullyQualifiedName~ClusterDescribeSecurityTests"
 ```
 
 Recommended targeted filters:
 
 - all security integration entrypoints:
-  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "Category=SecurityIntegration"`
+  - `dotnet test tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "Category=SecurityIntegration"`
 - only `PLAIN`:
-  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=PLAIN"`
+  - `dotnet test tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=PLAIN"`
 - only `SCRAM`:
-  - `dotnet test tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=SCRAM"`
+  - `dotnet test tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj --no-restore -f net9.0 --filter "SecurityMechanism=SCRAM"`
 
 Оставшиеся задачи `Wave 7`:
 

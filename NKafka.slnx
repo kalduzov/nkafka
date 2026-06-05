@@ -196,6 +196,7 @@
     <File Path="spec/protocol-api-addition-plan.md" />
     <File Path="spec/protocol-interaction.md" />
     <File Path="spec/protocol-minimal-client-api-matrix.md" />
+    <File Path="spec/real-kafka-e2e-plan.md" />
     <File Path="spec/technical-requirements.md" />
     <File Path="spec/network-interaction.md" />
   </Folder>
@@ -212,9 +213,11 @@
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
     <Project Path="tests/NKafka.AspNetCore.Tests/NKafka.AspNetCore.Tests.csproj" />
-    <Project Path="tests/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj" />
     <Project Path="tests/NKafka.MessageGenerator.Tests/NKafka.MessageGenerator.Tests.csproj" />
     <Project Path="tests/NKafka.Tests/NKafka.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tests/integration/">
+    <Project Path="tests/integration/NKafka.IntegrationTests/NKafka.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/tools/">
     <Project Path="tools/DockerBrokersGenerator/DockerBrokersGenerator.csproj" />

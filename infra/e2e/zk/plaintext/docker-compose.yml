@@ -1,0 +1,43 @@
+services:
+  zookeeper-1:
+    image: ${ZOOKEEPER_IMAGE:-zookeeper}:${ZOOKEEPER_VERSION:-3.9.3}
+    container_name: ${ZOOKEEPER_CONTAINER_NAME:-nkafka-e2e-zk-plaintext-zookeeper}
+    hostname: zookeeper-1
+    ports:
+      - "${ZOOKEEPER_EXTERNAL_PORT:-22181}:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_CLIENT_PORT: 2181
+      ZOO_TICK_TIME: 2000
+    volumes:
+      - zk_plaintext_zookeeper_data:/data
+      - zk_plaintext_zookeeper_datalog:/datalog
+
+  kafka-1:
+    image: ${KAFKA_IMAGE:-apache/kafka}:${KAFKA_VERSION:-3.9.1}
+    container_name: ${KAFKA_CONTAINER_NAME:-nkafka-e2e-zk-plaintext}
+    hostname: kafka-1
+    depends_on:
+      - zookeeper-1
+    ports:
+      - "${KAFKA_EXTERNAL_PORT:-29092}:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${KAFKA_ADVERTISED_HOST:-localhost}:${KAFKA_EXTERNAL_PORT:-29092}
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - zk_plaintext_kafka_data:/var/lib/kafka/data
+
+volumes:
+  zk_plaintext_zookeeper_data:
+  zk_plaintext_zookeeper_datalog:
+  zk_plaintext_kafka_data:

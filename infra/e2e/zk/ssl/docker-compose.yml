@@ -1,0 +1,62 @@
+services:
+  zookeeper-1:
+    image: ${ZOOKEEPER_IMAGE:-zookeeper}:${ZOOKEEPER_VERSION:-3.9.3}
+    container_name: ${ZOOKEEPER_CONTAINER_NAME:-nkafka-e2e-zk-ssl-zookeeper}
+    hostname: zookeeper-1
+    ports:
+      - "${ZOOKEEPER_EXTERNAL_PORT:-22181}:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_CLIENT_PORT: 2181
+      ZOO_TICK_TIME: 2000
+    volumes:
+      - zk_ssl_zookeeper_data:/data
+      - zk_ssl_zookeeper_datalog:/datalog
+
+  kafka-1:
+    image: ${KAFKA_IMAGE:-apache/kafka}:${KAFKA_VERSION:-3.9.1}
+    container_name: ${KAFKA_CONTAINER_NAME:-nkafka-e2e-zk-ssl}
+    hostname: kafka-1
+    depends_on:
+      - zookeeper-1
+    ports:
+      - "${KAFKA_EXTERNAL_PORT:-29092}:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST: ${KAFKA_ADVERTISED_HOST:-localhost}
+      KAFKA_EXTERNAL_PORT: ${KAFKA_EXTERNAL_PORT:-29092}
+      SASL_USERNAME: ${SASL_USERNAME:-test}
+      SASL_PASSWORD: ${SASL_PASSWORD:-test}
+      SSL_STORE_PASSWORD: ${SSL_STORE_PASSWORD:-changeit}
+    command:
+      - /bin/bash
+      - -lc
+      - |
+        cat >/tmp/server.properties <<EOF
+        broker.id=1
+        zookeeper.connect=zookeeper-1:2181
+        listeners=INTERNAL://:9094,EXTERNAL://:9092
+        advertised.listeners=INTERNAL://kafka-1:9094,EXTERNAL://$${KAFKA_ADVERTISED_HOST}:$${KAFKA_EXTERNAL_PORT}
+        listener.security.protocol.map=INTERNAL:PLAINTEXT,EXTERNAL:SSL
+        inter.broker.listener.name=INTERNAL
+        offsets.topic.replication.factor=1
+        transaction.state.log.replication.factor=1
+        transaction.state.log.min.isr=1
+        group.initial.rebalance.delay.ms=0
+        auto.create.topics.enable=true
+        log.dirs=/var/lib/kafka/data
+        ssl.keystore.type=PKCS12
+        ssl.keystore.location=/etc/kafka/secrets/kafka.keystore.p12
+        ssl.keystore.password=$${SSL_STORE_PASSWORD}
+        ssl.key.password=$${SSL_STORE_PASSWORD}
+        ssl.client.auth=none
+        EOF
+        exec /opt/kafka/bin/kafka-server-start.sh /tmp/server.properties
+    volumes:
+      - zk_ssl_data:/var/lib/kafka/data
+      - ./certs:/etc/kafka/secrets:ro
+
+volumes:
+  zk_ssl_data:
+  zk_ssl_zookeeper_data:
+  zk_ssl_zookeeper_datalog:
+

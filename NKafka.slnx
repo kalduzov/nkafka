@@ -46,6 +46,154 @@
     <File Path="infra/e2e/kraft/plaintext/run-api-versions-matrix.ps1" />
     <File Path="infra/e2e/kraft/plaintext/run-api-versions-matrix.sh" />
   </Folder>
+  <Folder Name="/infra/e2e/zk/plaintext/">
+    <File Path="infra/e2e/zk/plaintext/.env.example" />
+    <File Path="infra/e2e/zk/plaintext/docker-compose.yml" />
+    <File Path="infra/e2e/zk/plaintext/README.md" />
+    <File Path="infra/e2e/zk/plaintext/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/plaintext/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/scripts/">
+    <File Path="infra/e2e/scripts/ensure-ssl-certs.ps1" />
+    <File Path="infra/e2e/scripts/ensure-ssl-certs.sh" />
+    <File Path="infra/e2e/scripts/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/scripts/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-oauthbearer/">
+    <File Path="infra/e2e/kraft/sasl-oauthbearer/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-oauthbearer/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-oauthbearer/README.md" />
+    <File Path="infra/e2e/kraft/sasl-oauthbearer/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-oauthbearer/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-plain/">
+    <File Path="infra/e2e/kraft/sasl-plain/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-plain/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-plain/README.md" />
+    <File Path="infra/e2e/kraft/sasl-plain/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-plain/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-scram256/">
+    <File Path="infra/e2e/kraft/sasl-scram256/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-scram256/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-scram256/README.md" />
+    <File Path="infra/e2e/kraft/sasl-scram256/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-scram256/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-scram512/">
+    <File Path="infra/e2e/kraft/sasl-scram512/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-scram512/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-scram512/README.md" />
+    <File Path="infra/e2e/kraft/sasl-scram512/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-scram512/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-ssl-oauthbearer/">
+    <File Path="infra/e2e/kraft/sasl-ssl-oauthbearer/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-ssl-oauthbearer/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-ssl-oauthbearer/README.md" />
+    <File Path="infra/e2e/kraft/sasl-ssl-oauthbearer/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-ssl-oauthbearer/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-ssl-plain/">
+    <File Path="infra/e2e/kraft/sasl-ssl-plain/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-ssl-plain/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-ssl-plain/README.md" />
+    <File Path="infra/e2e/kraft/sasl-ssl-plain/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-ssl-plain/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-ssl-scram256/">
+    <File Path="infra/e2e/kraft/sasl-ssl-scram256/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram256/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram256/README.md" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram256/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram256/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/sasl-ssl-scram512/">
+    <File Path="infra/e2e/kraft/sasl-ssl-scram512/.env.example" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram512/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram512/README.md" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram512/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/sasl-ssl-scram512/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/ssl/">
+    <File Path="infra/e2e/kraft/ssl/.env.example" />
+    <File Path="infra/e2e/kraft/ssl/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/ssl/README.md" />
+    <File Path="infra/e2e/kraft/ssl/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/kraft/ssl/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/kraft/ssl-3broker/">
+    <File Path="infra/e2e/kraft/ssl-3broker/.env.example" />
+    <File Path="infra/e2e/kraft/ssl-3broker/docker-compose.yml" />
+    <File Path="infra/e2e/kraft/ssl-3broker/README.md" />
+    <File Path="infra/e2e/kraft/ssl-3broker/start-environment.ps1" />
+    <File Path="infra/e2e/kraft/ssl-3broker/start-environment.sh" />
+    <File Path="infra/e2e/kraft/ssl-3broker/stop-environment.ps1" />
+    <File Path="infra/e2e/kraft/ssl-3broker/stop-environment.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-oauthbearer/">
+    <File Path="infra/e2e/zk/sasl-oauthbearer/.env.example" />
+    <File Path="infra/e2e/zk/sasl-oauthbearer/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-oauthbearer/README.md" />
+    <File Path="infra/e2e/zk/sasl-oauthbearer/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-oauthbearer/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-plain/">
+    <File Path="infra/e2e/zk/sasl-plain/.env.example" />
+    <File Path="infra/e2e/zk/sasl-plain/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-plain/README.md" />
+    <File Path="infra/e2e/zk/sasl-plain/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-plain/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-scram256/">
+    <File Path="infra/e2e/zk/sasl-scram256/.env.example" />
+    <File Path="infra/e2e/zk/sasl-scram256/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-scram256/README.md" />
+    <File Path="infra/e2e/zk/sasl-scram256/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-scram256/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-scram512/">
+    <File Path="infra/e2e/zk/sasl-scram512/.env.example" />
+    <File Path="infra/e2e/zk/sasl-scram512/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-scram512/README.md" />
+    <File Path="infra/e2e/zk/sasl-scram512/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-scram512/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-ssl-oauthbearer/">
+    <File Path="infra/e2e/zk/sasl-ssl-oauthbearer/.env.example" />
+    <File Path="infra/e2e/zk/sasl-ssl-oauthbearer/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-ssl-oauthbearer/README.md" />
+    <File Path="infra/e2e/zk/sasl-ssl-oauthbearer/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-ssl-oauthbearer/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-ssl-plain/">
+    <File Path="infra/e2e/zk/sasl-ssl-plain/.env.example" />
+    <File Path="infra/e2e/zk/sasl-ssl-plain/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-ssl-plain/README.md" />
+    <File Path="infra/e2e/zk/sasl-ssl-plain/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-ssl-plain/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-ssl-scram256/">
+    <File Path="infra/e2e/zk/sasl-ssl-scram256/.env.example" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram256/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram256/README.md" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram256/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram256/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/sasl-ssl-scram512/">
+    <File Path="infra/e2e/zk/sasl-ssl-scram512/.env.example" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram512/docker-compose.yml" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram512/README.md" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram512/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/sasl-ssl-scram512/run-api-versions-matrix.sh" />
+  </Folder>
+  <Folder Name="/infra/e2e/zk/ssl/">
+    <File Path="infra/e2e/zk/ssl/.env.example" />
+    <File Path="infra/e2e/zk/ssl/docker-compose.yml" />
+    <File Path="infra/e2e/zk/ssl/README.md" />
+    <File Path="infra/e2e/zk/ssl/run-api-versions-matrix.ps1" />
+    <File Path="infra/e2e/zk/ssl/run-api-versions-matrix.sh" />
+  </Folder>
   <Folder Name="/infra/choco/">
     <File Path="infra/choco/install.ps1" />
   </Folder>
@@ -237,3 +385,5 @@
     <Project Path="tools/Generator/Generator.csproj" />
   </Folder>
 </Solution>
+
+

@@ -161,11 +161,34 @@ That scenario intentionally checks only the negotiation baseline:
 - the aggregated cluster metadata contains `ApiVersions`
 - the capability snapshot is populated before broader admin or producer/consumer smoke flows are required
 
-The repository also now contains the first normalized infrastructure profile at:
+The repository now contains normalized infrastructure profiles for the full current topology/security matrix.
+
+The first verified plaintext anchors are:
 
 - [infra/e2e/kraft/plaintext/docker-compose.yml](K:\nkafka\infra\e2e\kraft\plaintext\docker-compose.yml)
+- [infra/e2e/zk/plaintext/docker-compose.yml](K:\nkafka\infra\e2e\zk\plaintext\docker-compose.yml)
 
-This profile is the starting point for the broader topology/security matrix and is meant to anchor the first real `ApiVersions` run.
+The broader profile set now also exists for:
+
+- `ssl`
+- `sasl-plain`
+- `sasl-scram256`
+- `sasl-scram512`
+- `sasl-oauthbearer`
+- `sasl-ssl-plain`
+- `sasl-ssl-scram256`
+- `sasl-ssl-scram512`
+- `sasl-ssl-oauthbearer`
+
+for both `kraft` and `zk` topologies.
+
+Shared launch helpers for those profiles now live under [infra/e2e/scripts](K:\nkafka\infra\e2e\scripts).
+
+The repository also now has a dedicated full-environment profile for a three-broker `kraft + ssl` cluster at:
+
+- [infra/e2e/kraft/ssl-3broker](K:\nkafka\infra\e2e\kraft\ssl-3broker)
+
+That profile is intended for broker-backed cluster scenarios where a multi-broker topology and deterministic partition placement matter more than the narrow `ApiVersions` matrix run.
 
 ## Implementation phases
 

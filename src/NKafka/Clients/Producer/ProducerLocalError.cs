@@ -25,5 +25,8 @@ public enum ProducerLocalError
     TransportFailure,
 
     /// <summary>The producer was closing.</summary>
-    ProducerClosing
+    ProducerClosing,
+
+    /// <summary>The record exceeds the configured request size.</summary>
+    RecordTooLarge
 }

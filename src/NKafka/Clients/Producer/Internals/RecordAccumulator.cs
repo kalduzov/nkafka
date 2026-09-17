@@ -30,6 +30,7 @@ using NKafka.Compressions;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Metrics;
+using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
 using NKafka.Resources;
@@ -133,8 +134,20 @@ internal sealed class RecordAccumulator(
                 // prepare the buffer into which the data in the batch will be written
                 if (buffer is null)
                 {
+                    var recordSize = RecordBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers);
+
+                    if (recordSize > config.MaxRequestSize)
+                    {
+                        return new RecordAppendResult(
+                            null,
+                            false,
+                            false,
+                            0,
+                            new ProducerError(ErrorCodes.ClientError, ProducerLocalError.RecordTooLarge));
+                    }
+
                     // We calculate what buffer size we need and try to get it 
-                    var size = Math.Max(_batchSize, RecordBatch.EstimateSizeInBytesUpperBound(serializedKey, serializedValue, headers));
+                    var size = Math.Max(_batchSize, recordSize);
                     buffer = ArrayBufferPool.Rent(size);
                 }
 
@@ -198,7 +211,7 @@ internal sealed class RecordAccumulator(
 
         var batchIsFull = deque.Count > 1 || batch.IsFull;
 
-        return new RecordAppendResult(sendResultTask, batchIsFull, true, batch.EstimatedSizeInBytes);
+        return new RecordAppendResult(sendResultTask, batchIsFull, true, batch.EstimatedSizeInBytes - ProducerBatch.BATCH_HEADER_LEN);
     }
 
     /// <summary>

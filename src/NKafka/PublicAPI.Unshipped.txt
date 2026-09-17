@@ -231,6 +231,7 @@ NKafka.Clients.Producer.ProducerLocalError.EnqueueTimedOut = 2 -> NKafka.Clients
 NKafka.Clients.Producer.ProducerLocalError.DeliveryTimedOut = 3 -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.ProducerLocalError.TransportFailure = 4 -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.ProducerLocalError.ProducerClosing = 5 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.RecordTooLarge = 6 -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.ProducerLocalError.None = 0 -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.MessageDeliveryResult.Offset.get -> NKafka.Offset
 NKafka.Clients.Producer.MessageDeliveryResult.Offset.init -> void

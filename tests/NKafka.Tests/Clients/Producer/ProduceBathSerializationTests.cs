@@ -26,6 +26,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
+using NKafka.Protocol.Records;
 
 namespace NKafka.Tests.Clients.Producer;
 
@@ -158,5 +159,15 @@ public class ProduceBathSerializationTests
         close.Should().Throw<InvalidOperationException>();
 
         ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void RecordBatch_EstimateMustIncludeBatchHeader()
+    {
+        var value = "value"u8.ToArray();
+
+        RecordBatch.EstimateSizeInBytesUpperBound(value, value, Headers.Empty)
+            .Should()
+            .Be(RecordBatch.RECORD_BATCH_OVERHEAD + RecordExtensions.EstimateSizeInBytesUpperBound(value, value, Headers.Empty));
     }
 }

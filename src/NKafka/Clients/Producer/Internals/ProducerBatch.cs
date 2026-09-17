@@ -85,7 +85,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// <summary>
     /// How many bytes are left to add so that the batch is complete?
     /// </summary>
-    public int EstimatedSizeInBytes { get; set; }
+    public int EstimatedSizeInBytes { get; private set; } = BATCH_HEADER_LEN;
 
     /// <summary>
     /// Indicates that no more data can be added to the batch
@@ -154,7 +154,9 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
         var estimateSizeInBytesUpperBound = RecordExtensions.EstimateSizeInBytesUpperBound(key, value, headers);
 
-        if (_buffer.Remaining - estimateSizeInBytesUpperBound < 0)
+        var requiredSize = checked(estimateSizeInBytesUpperBound + (_recordsCount == 0 ? BATCH_HEADER_LEN : 0));
+
+        if (_buffer.Remaining < requiredSize)
         {
             sendResultTask = null;
 
@@ -173,7 +175,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         sendResultTask = new SendResultTask(_produceRequestResult, _recordsCount, timestamp, key?.Length ?? -1, value?.Length ?? -1);
         _recordTasks.Add(sendResultTask);
         _recordsCount++;
-        EstimatedSizeInBytes += estimateSizeInBytesUpperBound;
+        EstimatedSizeInBytes = checked(EstimatedSizeInBytes + estimateSizeInBytesUpperBound);
 
         return true;
     }
@@ -189,6 +191,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         var bufferWriter = new BufferWriter(ref _buffer);
         WriteRecords(ref bufferWriter);
         WriteHeader(ref bufferWriter);
+        Size = EstimatedSizeInBytes;
         IsFull = true;
         State = BatchState.Closed;
     }

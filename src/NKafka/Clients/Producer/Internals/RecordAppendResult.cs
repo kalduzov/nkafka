@@ -23,6 +23,8 @@
 
 namespace NKafka.Clients.Producer.Internals;
 
+using NKafka.Clients.Producer;
+
 /// <summary>
 /// Metadata about a record just appended to the record accumulator
 /// </summary>
@@ -30,8 +32,10 @@ namespace NKafka.Clients.Producer.Internals;
 /// <param name="NewBatchCreated">Indicates that a new batch was created in the process of adding a record</param>
 /// <param name="AppendedBytes">The size of the added record in the batch</param>
 /// <param name="SendResult">Batch send result</param>
+/// <param name="Error">Local error that prevented accepting the record</param>
 internal record RecordAppendResult(
     SendResultTask? SendResult,
     bool BatchIsFull,
     bool NewBatchCreated,
-    int AppendedBytes);
+    int AppendedBytes,
+    ProducerError? Error = null);

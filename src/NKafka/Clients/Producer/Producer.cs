@@ -285,9 +285,6 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
             var headers = message.Headers;
 
-            var serializedSize = RecordBatch.EstimateSizeInBytesUpperBound(message.Key, message.Value, headers);
-            EnsureValidRecordSize(serializedSize);
-
             // Trying to get a partition if it is not set  
             if (topicPartition.Partition.IsSpecial)
             {
@@ -310,6 +307,15 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                 message.Key,
                 message.Value,
                 headers);
+
+            if (appendResult.Error is not null)
+            {
+                return CreateFailureResult(
+                    PersistenceStatus.NotPersisted,
+                    appendResult.Error.LocalError,
+                    appendResult.Error.ErrorCode);
+            }
+
             accepted = true;
 
             if (_transactionManager.IsTransactional)

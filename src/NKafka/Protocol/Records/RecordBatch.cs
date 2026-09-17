@@ -168,10 +168,10 @@ internal class RecordBatch: IRecordsBatch
     /// </summary>
     internal static int EstimateSizeInBytesUpperBound(byte[]? serializedKey, byte[]? serializedValue, Headers headers)
     {
-        var keySize = serializedKey?.Length ?? -1;
-        var valueSize = serializedValue?.Length ?? -1;
-
-        return _MAX_RECORD_OVERHEAD + RecordExtensions.SizeOf(keySize, valueSize, headers);
+        return checked(RECORD_BATCH_OVERHEAD + RecordExtensions.EstimateSizeInBytesUpperBound(
+            serializedKey,
+            serializedValue,
+            headers));
     }
 
     /// <inheritdoc />

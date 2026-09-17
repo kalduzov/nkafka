@@ -37,7 +37,7 @@ public interface IPartitioner
     /// <param name="cluster">The Kafka cluster</param>
     /// <param name="token">The cancellation token</param>
     /// <returns>The partition number</returns>
-    ValueTask<int> Partition(
+    public ValueTask<int> Partition(
         string topic,
         byte[] keyBytes,
         byte[] valueBytes,

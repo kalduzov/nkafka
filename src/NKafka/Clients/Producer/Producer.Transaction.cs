@@ -32,7 +32,7 @@ namespace NKafka.Clients.Producer;
 internal sealed partial class Producer
 {
     /// <summary>
-    /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.
+    /// Needs to be called before any other methods for a transactional producer.
     /// </summary>
     /// <param name="token"></param>
     public async Task InitTransactionsAsync(CancellationToken token)

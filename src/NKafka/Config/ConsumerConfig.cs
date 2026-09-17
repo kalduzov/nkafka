@@ -179,22 +179,22 @@ public record ConsumerConfig: CommonConfig
 
         if (ChannelSize <= 0)
         {
-            ChannelSize.ThrowConfigException("Размер канал для приема сообщения не может быть меньше 1");
+            ChannelSize.ThrowConfigException(ConfigurationMessages.ConsumerConfig_ChannelSizeInvalid);
         }
 
         if (string.IsNullOrWhiteSpace(GroupId))
         {
-            GroupId.ThrowConfigException("Группа для консьюмера обязательно должна быть задана");
+            GroupId.ThrowConfigException(ConfigurationMessages.ConsumerConfig_GroupIdRequired);
         }
 
         if (EnableAutoCommit && AutoCommitIntervalMs <= 0)
         {
-            AutoCommitIntervalMs.ThrowConfigException("В настройках включен автокомит, но настроенный интервал меньше 1 мс");
+            AutoCommitIntervalMs.ThrowConfigException(ConfigurationMessages.ConsumerConfig_AutoCommitIntervalInvalid);
         }
 
         if (PartitionAssignors.Count == 0)
         {
-            PartitionAssignors.ThrowConfigException("Не задан ни один тип балансировки. Укажите хотя бы один тип", string.Empty);
+            PartitionAssignors.ThrowConfigException(ConfigurationMessages.ConsumerConfig_PartitionAssignorsRequired, string.Empty);
         }
 
         var uniqueName = new HashSet<string>(PartitionAssignors.Count);
@@ -203,18 +203,18 @@ public record ConsumerConfig: CommonConfig
         {
             if (uniqueName.Add(assignor.Name) is false)
             {
-                PartitionAssignors.ThrowConfigException("В коллекции типов балансировки содержатся не уникальные значения", string.Empty);
+                PartitionAssignors.ThrowConfigException(ConfigurationMessages.ConsumerConfig_PartitionAssignorsNotUnique, string.Empty);
             }
         }
 
         if (Heartbeat.IntervalMs >= SessionTimeoutMs)
         {
-            Heartbeat.ThrowConfigException("Нельзя установить Heartbeat интервал больше, чем таймаут сессии");
+            Heartbeat.ThrowConfigException(ConfigurationMessages.ConsumerConfig_HeartbeatInvalid);
         }
 
         if (MaxPollIntervalMs <= 0)
         {
-            MaxPollIntervalMs.ThrowConfigException("Величина интервала обработки сообщений не может быть меньше 1мс");
+            MaxPollIntervalMs.ThrowConfigException(ConfigurationMessages.ConsumerConfig_MaxPollIntervalInvalid);
         }
     }
 }

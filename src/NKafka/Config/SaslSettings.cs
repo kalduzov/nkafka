@@ -107,11 +107,11 @@ public record SaslSettings
             SaslMechanism.OAuthBearer => throw new KafkaConfigException(
                 nameof(Mechanism),
                 Mechanism,
-                "OAUTHBEARER is not supported by the runtime authentication path."),
+                ConfigurationMessages.SaslSettings_OAuthBearerUnsupported),
             SaslMechanism.Kerberos => throw new KafkaConfigException(
                 nameof(Mechanism),
                 Mechanism,
-                "Kerberos/GSSAPI is not supported by the runtime authentication path."),
+                ConfigurationMessages.SaslSettings_KerberosUnsupported),
             _ => throw new KafkaConfigException(nameof(Mechanism), Mechanism, ExceptionMessages.SaslMechanismInvalid)
         };
 
@@ -122,7 +122,7 @@ public record SaslSettings
                 throw new KafkaConfigException(
                     nameof(Mechanism),
                     Mechanism,
-                    $"{Mechanism} authentication requires both UserName and Password.");
+                    string.Format(ConfigurationMessages.SaslSettings_CredentialsRequired, Mechanism));
             }
         }
     }

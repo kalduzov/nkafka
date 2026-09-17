@@ -63,12 +63,12 @@ public record ClusterConfig: CommonConfig
 
         if (MetadataUpdateTimeoutMs <= 0)
         {
-            throw new KafkaConfigException(nameof(MetadataUpdateTimeoutMs), MetadataUpdateTimeoutMs, "MetadataUpdateTimeoutMs <= 0");
+            throw new KafkaConfigException(nameof(MetadataUpdateTimeoutMs), MetadataUpdateTimeoutMs, ConfigurationMessages.ClusterConfig_MetadataUpdateTimeoutInvalid);
         }
 
         if (ClusterInitTimeoutMs <= 0)
         {
-            throw new KafkaConfigException(nameof(ClusterInitTimeoutMs), ClusterInitTimeoutMs, "ClusterInitTimeoutMs <= 0");
+            throw new KafkaConfigException(nameof(ClusterInitTimeoutMs), ClusterInitTimeoutMs, ConfigurationMessages.ClusterConfig_ClusterInitTimeoutInvalid);
         }
     }
 }

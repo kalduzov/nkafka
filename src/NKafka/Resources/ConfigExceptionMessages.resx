@@ -57,7 +57,70 @@
   <data name="TransactionalProducerConfig_ExplicitIdDiffers" xml:space="preserve">
         <value>The configured TransactionalId differs from the explicit identifier.</value>
     </data>
-  <data name="TransactionalProducerConfig_AlreadyInUse" xml:space="preserve">
+    <data name="TransactionalProducerConfig_AlreadyInUse" xml:space="preserve">
         <value>The TransactionalId is already in use by another producer in this cluster.</value>
+    </data>
+    <data name="CommonConfig_ClientDisposeTimeoutInvalid" xml:space="preserve">
+        <value>The client disposal timeout must be greater than zero.</value>
+    </data>
+    <data name="CommonConfig_ReceiveBufferInvalid" xml:space="preserve">
+        <value>The receive buffer size must not be less than -1.</value>
+    </data>
+    <data name="CommonConfig_ValueMustBePositive" xml:space="preserve">
+        <value>The value must be greater than zero.</value>
+    </data>
+    <data name="CommonConfig_ValueMustNotBeNegative" xml:space="preserve">
+        <value>The value must not be negative.</value>
+    </data>
+    <data name="ProducerConfig_LingerInvalid" xml:space="preserve">
+        <value>The linger time must be a finite number from 0 to Int32.MaxValue.</value>
+    </data>
+    <data name="ProducerConfig_DeliveryTimeoutTooShort" xml:space="preserve">
+        <value>The delivery timeout must be at least the sum of LingerMs and RequestTimeoutMs.</value>
+    </data>
+    <data name="ProducerConfig_AcksInvalid" xml:space="preserve">
+        <value>The acknowledgement mode is invalid.</value>
+    </data>
+    <data name="ProducerConfig_CompressionInvalid" xml:space="preserve">
+        <value>The compression type is invalid.</value>
+    </data>
+    <data name="PartitionerConfig_Invalid" xml:space="preserve">
+        <value>The partitioner algorithm is invalid.</value>
+    </data>
+    <data name="ClusterConfig_MetadataUpdateTimeoutInvalid" xml:space="preserve">
+        <value>MetadataUpdateTimeoutMs must be greater than zero.</value>
+    </data>
+    <data name="ClusterConfig_ClusterInitTimeoutInvalid" xml:space="preserve">
+        <value>ClusterInitTimeoutMs must be greater than zero.</value>
+    </data>
+    <data name="ConsumerConfig_ChannelSizeInvalid" xml:space="preserve">
+        <value>The channel size must be greater than zero.</value>
+    </data>
+    <data name="ConsumerConfig_GroupIdRequired" xml:space="preserve">
+        <value>GroupId must not be empty.</value>
+    </data>
+    <data name="ConsumerConfig_AutoCommitIntervalInvalid" xml:space="preserve">
+        <value>AutoCommitIntervalMs must be greater than zero when automatic commits are enabled.</value>
+    </data>
+    <data name="ConsumerConfig_PartitionAssignorsRequired" xml:space="preserve">
+        <value>At least one partition assignor must be configured.</value>
+    </data>
+    <data name="ConsumerConfig_PartitionAssignorsNotUnique" xml:space="preserve">
+        <value>Partition assignors must have unique names.</value>
+    </data>
+    <data name="ConsumerConfig_HeartbeatInvalid" xml:space="preserve">
+        <value>The heartbeat interval must be less than the session timeout.</value>
+    </data>
+    <data name="ConsumerConfig_MaxPollIntervalInvalid" xml:space="preserve">
+        <value>MaxPollIntervalMs must be greater than zero.</value>
+    </data>
+    <data name="SaslSettings_OAuthBearerUnsupported" xml:space="preserve">
+        <value>OAUTHBEARER is not supported by the runtime authentication path.</value>
+    </data>
+    <data name="SaslSettings_KerberosUnsupported" xml:space="preserve">
+        <value>Kerberos/GSSAPI is not supported by the runtime authentication path.</value>
+    </data>
+    <data name="SaslSettings_CredentialsRequired" xml:space="preserve">
+        <value>{0} authentication requires both UserName and Password.</value>
     </data>
 </root>

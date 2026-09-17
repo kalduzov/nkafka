@@ -21,6 +21,8 @@
  * limitations under the License.
  */
 
+using NKafka.Exceptions;
+
 namespace NKafka.Config;
 
 /// <summary>
@@ -139,6 +141,52 @@ public record ProducerConfig: CommonConfig
     internal override void Validate()
     {
         base.Validate();
+
+        if (EnqueueTimeoutMs <= 0)
+        {
+            throw new KafkaConfigException(nameof(EnqueueTimeoutMs), EnqueueTimeoutMs, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (DeliveryTimeoutMs <= 0)
+        {
+            throw new KafkaConfigException(nameof(DeliveryTimeoutMs), DeliveryTimeoutMs, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (double.IsNaN(LingerMs) || double.IsInfinity(LingerMs) || LingerMs < 0 || LingerMs > int.MaxValue)
+        {
+            throw new KafkaConfigException(nameof(LingerMs), LingerMs, ConfigurationMessages.ProducerConfig_LingerInvalid);
+        }
+
+        if (DeliveryTimeoutMs < LingerMs + RequestTimeoutMs)
+        {
+            throw new KafkaConfigException(nameof(DeliveryTimeoutMs), DeliveryTimeoutMs, ConfigurationMessages.ProducerConfig_DeliveryTimeoutTooShort);
+        }
+
+        if (BufferMemory <= 0)
+        {
+            throw new KafkaConfigException(nameof(BufferMemory), BufferMemory, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (BatchSize <= 0)
+        {
+            throw new KafkaConfigException(nameof(BatchSize), BatchSize, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (MaxRequestSize <= 0)
+        {
+            throw new KafkaConfigException(nameof(MaxRequestSize), MaxRequestSize, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (!Enum.IsDefined(Acks))
+        {
+            throw new KafkaConfigException(nameof(Acks), Acks, ConfigurationMessages.ProducerConfig_AcksInvalid);
+        }
+
+        if (!Enum.IsDefined(Compression.CompressionType))
+        {
+            throw new KafkaConfigException(nameof(Compression), Compression.CompressionType, ConfigurationMessages.ProducerConfig_CompressionInvalid);
+        }
+
         PartitionerConfig.Validate();
     }
 }

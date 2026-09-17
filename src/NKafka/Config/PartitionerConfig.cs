@@ -43,6 +43,11 @@ public class PartitionerConfig
 
     internal void Validate()
     {
+        if (!Enum.IsDefined(Partitioner))
+        {
+            throw new KafkaConfigException(nameof(Partitioner), Partitioner, ConfigurationMessages.PartitionerConfig_Invalid);
+        }
+
         if (CustomPartitionerClass != typeof(object))
         {
             if (Partitioner != Partitioner.Custom)

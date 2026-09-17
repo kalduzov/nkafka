@@ -239,14 +239,23 @@ public abstract record CommonConfig
         SecurityProtocolValidate();
         BrokerVersionValidate();
 
+        ValidatePositive(nameof(MessageMaxBytes), MessageMaxBytes);
+        ValidateNonNegative(nameof(ReconnectBackoffMs), ReconnectBackoffMs);
+        ValidateNonNegative(nameof(ReconnectBackoffMaxMs), ReconnectBackoffMaxMs);
+        ValidatePositive(nameof(SocketConnectionSetupTimeoutMs), SocketConnectionSetupTimeoutMs);
+        ValidatePositive(nameof(SocketConnectionSetupTimeoutMaxMs), SocketConnectionSetupTimeoutMaxMs);
+        ValidatePositive(nameof(ConnectionsMaxIdleMs), ConnectionsMaxIdleMs);
+        ValidatePositive(nameof(RequestTimeoutMs), RequestTimeoutMs);
+        ValidateNonNegative(nameof(RetryBackoffMs), RetryBackoffMs);
+        ValidatePositive(nameof(CloseConnectionTimeoutMs), CloseConnectionTimeoutMs);
         if (ClientDisposeTimeoutMs <= 0)
         {
-            throw new KafkaConfigException(nameof(ClientDisposeTimeoutMs), ClientDisposeTimeoutMs, "Срок освобождения клиента должен быть больше нуля");
+            throw new KafkaConfigException(nameof(ClientDisposeTimeoutMs), ClientDisposeTimeoutMs, ConfigurationMessages.CommonConfig_ClientDisposeTimeoutInvalid);
         }
 
         if (ReceiveBufferBytes < -1)
         {
-            throw new KafkaConfigException(nameof(ReceiveBufferBytes), ReceiveBufferBytes, "Размер буфера не может быть меньше -1");
+            throw new KafkaConfigException(nameof(ReceiveBufferBytes), ReceiveBufferBytes, ConfigurationMessages.CommonConfig_ReceiveBufferInvalid);
         }
 
         //validate dependent configs
@@ -257,6 +266,22 @@ public abstract record CommonConfig
 
         Sasl.Validate();
         Ssl.Validate();
+    }
+
+    private static void ValidatePositive(string optionName, long value)
+    {
+        if (value <= 0)
+        {
+            throw new KafkaConfigException(optionName, value, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+    }
+
+    private static void ValidateNonNegative(string optionName, long value)
+    {
+        if (value < 0)
+        {
+            throw new KafkaConfigException(optionName, value, ConfigurationMessages.CommonConfig_ValueMustNotBeNegative);
+        }
     }
 
     /// <summary>

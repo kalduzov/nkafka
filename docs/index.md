@@ -1,6 +1,4 @@
-# Docs
+# NKafka documentation / Документация NKafka
 
-1. [For developers](for_developers.md)
-2. [About nkafka client](nkafka.md)
-3. [Producing message](producer/index.md)
-4. [Consuming messages](consumer/index.md)
+- [English — base language](en/index.md)
+- [Русский](ru/index.md)

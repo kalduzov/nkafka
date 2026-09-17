@@ -17,15 +17,31 @@
     <File Path="update_repo.sh" />
   </Folder>
   <Folder Name="/docs/">
-    <File Path="docs/for_developers.md" />
     <File Path="docs/index.md" />
-    <File Path="docs/nkafka.md" />
   </Folder>
-  <Folder Name="/docs/consumer/">
-    <File Path="docs/consumer/index.md" />
+  <Folder Name="/docs/en/">
+    <File Path="docs/en/index.md" />
+    <File Path="docs/en/for_developers.md" />
+    <File Path="docs/en/nkafka.md" />
+    <File Path="docs/en/client-lifetime.md" />
   </Folder>
-  <Folder Name="/docs/producer/">
-    <File Path="docs/producer/index.md" />
+  <Folder Name="/docs/en/consumer/">
+    <File Path="docs/en/consumer/index.md" />
+  </Folder>
+  <Folder Name="/docs/en/producer/">
+    <File Path="docs/en/producer/index.md" />
+  </Folder>
+  <Folder Name="/docs/ru/">
+    <File Path="docs/ru/index.md" />
+    <File Path="docs/ru/for_developers.md" />
+    <File Path="docs/ru/nkafka.md" />
+    <File Path="docs/ru/client-lifetime.md" />
+  </Folder>
+  <Folder Name="/docs/ru/consumer/">
+    <File Path="docs/ru/consumer/index.md" />
+  </Folder>
+  <Folder Name="/docs/ru/producer/">
+    <File Path="docs/ru/producer/index.md" />
   </Folder>
   <Folder Name="/infra/">
     <File Path="infra/.env" />
@@ -361,6 +377,11 @@
   <Folder Name="/spec/KIP/">
     <File Path="spec/KIP/client-side-kips.md" />
     <File Path="spec/KIP/client-side-kips-table.md" />
+  </Folder>
+  <Folder Name="/spec/KIP/KIP-98/">
+    <File Path="spec/KIP/KIP-98/README.md" />
+    <File Path="spec/KIP/KIP-98/01-public-interfaces.md" />
+    <File Path="spec/KIP/KIP-98/vision.md" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />

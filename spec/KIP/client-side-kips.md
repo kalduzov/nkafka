@@ -50,6 +50,7 @@ Additional filter for this document:
 
 ### Producer and transactions
 
+- [KIP-98: проектирование продюсеров и транзакций NKafka](KIP-98/README.md) — отдельная работа по публичным интерфейсам, идемпотентности и транзакциям; начато проектирование, реализация не завершена.
 - [KIP-359: Verify leader epoch in produce requests](https://cwiki.apache.org/confluence/display/KAFKA/KIP-359%3A%2BVerify%2Bleader%2Bepoch%2Bin%2Bproduce%2Brequests)
 - [KIP-890: Transactions Server-Side Defense](https://cwiki.apache.org/confluence/display/KAFKA/KIP-890%3A%2BTransactions%2BServer-Side%2BDefense)
 

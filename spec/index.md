@@ -211,6 +211,7 @@ KIP должен попадать в roadmap клиента только есл�
 - [Code map](K:\nkafka\spec\code-map.md)
 - [Code gaps](K:\nkafka\spec\code-gaps.md)
 - [Client-side KIPs overview](K:\nkafka\spec\KIP\client-side-kips.md)
+- [KIP-98: проектирование продюсеров и транзакций](KIP/KIP-98/README.md)
 - [Client-side KIPs table](K:\nkafka\spec\KIP\client-side-kips-table.md)
 
 ## Качество и инженерные правила

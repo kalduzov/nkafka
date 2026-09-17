@@ -201,6 +201,7 @@ KIP должен попадать в roadmap клиента только есл�
 Связанные документы:
 
 - [Technical requirements](K:\nkafka\spec\technical-requirements.md)
+- [Cluster-first client architecture](K:\nkafka\spec\cluster-first-client-architecture.md)
 - [Protocol interaction spec](K:\nkafka\spec\protocol-interaction.md)
 - [Network interaction spec](K:\nkafka\spec\network-interaction.md)
 - [Network layer decoupling plan](K:\nkafka\spec\network-layer-decoupling-plan.md)

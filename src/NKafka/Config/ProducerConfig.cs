@@ -21,8 +21,6 @@
  * limitations under the License.
  */
 
-using NKafka.Metrics;
-
 namespace NKafka.Config;
 
 /// <summary>

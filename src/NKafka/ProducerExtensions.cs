@@ -23,7 +23,6 @@
 
 using NKafka.Clients.Producer;
 using NKafka.Config;
-using NKafka.Serialization;
 
 namespace NKafka;
 

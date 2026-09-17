@@ -31,7 +31,6 @@ using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Metrics;
 using NKafka.Protocol.Records;
-using NKafka.Serialization;
 
 using EM = NKafka.Resources.ExceptionMessages;
 

@@ -669,6 +669,7 @@ NKafka.Protocol.ApiKeys.JoinGroup = 11 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.LeaderAndIsr = 4 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.LeaveGroup = 13 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.ListClientMetricsResources = 74 -> NKafka.Protocol.ApiKeys
+NKafka.Protocol.ApiKeys.ListConfigResources = 74 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.ListGroups = 16 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.ListOffsets = 2 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.ListPartitionReassignments = 46 -> NKafka.Protocol.ApiKeys
@@ -1097,6 +1098,7 @@ override NKafka.TopicDescription.ToString() -> string!
 override NKafka.TopicMetadata.Equals(object? obj) -> bool
 override NKafka.TopicMetadata.GetHashCode() -> int
 override NKafka.TopicMetadata.ToString() -> string!
+override NKafka.TopicPartition.Equals(object? obj) -> bool
 override NKafka.TopicPartition.GetHashCode() -> int
 override NKafka.TopicPartition.ToString() -> string!
 override sealed NKafka.Clients.Admin.CreateTopicsOptions.Equals(NKafka.Clients.Admin.AdminOptions? other) -> bool
@@ -1202,7 +1204,6 @@ static NKafka.ConsumerExtensions.BuildConsumer<TKey, TValue>(this NKafka.IKafkaC
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
-static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.IClusterConfigFactory! clusterConfigFactory, bool openImmediately, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.Node.NoNode.get -> NKafka.Node!
 static NKafka.Node.operator !=(NKafka.Node? left, NKafka.Node? right) -> bool
 static NKafka.Node.operator ==(NKafka.Node? left, NKafka.Node? right) -> bool
@@ -1274,6 +1275,8 @@ static readonly NKafka.Serialization.Serializers.Short -> NKafka.Serialization.I
 static readonly NKafka.Serialization.Serializers.String -> NKafka.Serialization.ISerializer<string!>!
 static readonly NKafka.Timestamp.UnixTimeEpoch -> System.DateTime
 static readonly NKafka.TopicPartition.Null -> NKafka.TopicPartition!
+static NKafka.TopicPartition.operator !=(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
+static NKafka.TopicPartition.operator ==(NKafka.TopicPartition? left, NKafka.TopicPartition? right) -> bool
 virtual NKafka.Clients.Admin.AclBinding.<Clone>$() -> NKafka.Clients.Admin.AclBinding!
 virtual NKafka.Clients.Admin.AclBinding.EqualityContract.get -> System.Type!
 virtual NKafka.Clients.Admin.AclBinding.Equals(NKafka.Clients.Admin.AclBinding? other) -> bool

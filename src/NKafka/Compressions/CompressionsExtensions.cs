@@ -20,7 +20,6 @@
 //  limitations under the License.
 
 using NKafka.Config;
-using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 
 namespace NKafka.Compressions;

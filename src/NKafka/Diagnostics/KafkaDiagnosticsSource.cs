@@ -29,7 +29,6 @@ using System.Text;
 using FastEnumUtility;
 
 using NKafka.Clients.Admin;
-using NKafka.Clients.Consumer;
 using NKafka.Protocol;
 
 namespace NKafka.Diagnostics;

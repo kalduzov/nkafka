@@ -23,7 +23,6 @@
 
 using NKafka.Clients.Consumer;
 using NKafka.Exceptions;
-using NKafka.Metrics;
 
 namespace NKafka.Config;
 

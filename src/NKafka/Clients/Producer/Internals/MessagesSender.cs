@@ -26,7 +26,6 @@ using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
 using NKafka.Protocol;
-using NKafka.Resources;
 
 namespace NKafka.Clients.Producer.Internals;
 

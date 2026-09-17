@@ -27,7 +27,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NKafka.Config;
 using NKafka.Connection;
 using NKafka.Exceptions;
-using NKafka.Protocol;
 using NKafka.Resources;
 
 namespace NKafka;

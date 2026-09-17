@@ -19,7 +19,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading.Channels;
 
@@ -29,9 +28,7 @@ using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
 using NKafka.Diagnostics;
 using NKafka.Exceptions;
-using NKafka.Messages;
 using NKafka.Metrics;
-using NKafka.Protocol;
 using NKafka.Serialization;
 
 using EM = NKafka.Resources.ExceptionMessages;

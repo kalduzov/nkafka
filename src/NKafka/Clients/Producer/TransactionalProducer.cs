@@ -7,8 +7,10 @@ namespace NKafka.Clients.Producer;
 /// <summary>
 /// Adapts the internal producer transaction operations to the explicit transactional producer contract.
 /// </summary>
-internal sealed class TransactionalProducer(Producer producer) : ITransactionalProducer
+internal sealed class TransactionalProducer(Producer producer, Action releaseTransactionalId) : ITransactionalProducer
 {
+    private int _disposed;
+
     public ValueTask<IProducerTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -17,5 +19,20 @@ internal sealed class TransactionalProducer(Producer producer) : ITransactionalP
         return ValueTask.FromResult<IProducerTransaction>(new ProducerTransaction(producer));
     }
 
-    public ValueTask DisposeAsync() => producer.DisposeAsync();
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0)
+        {
+            return;
+        }
+
+        try
+        {
+            await producer.DisposeAsync();
+        }
+        finally
+        {
+            releaseTransactionalId();
+        }
+    }
 }

@@ -59,6 +59,7 @@ internal sealed class KafkaCluster: IKafkaCluster
     private readonly ConcurrentDictionary<string, SortedSet<PartitionMetadata>> _partitionsMetadatas = new();
     private readonly ConcurrentDictionary<string, IReadOnlyList<Partition>> _topicPartitions = new();
     private readonly ConcurrentDictionary<string, IProducer?> _producers = new();
+    private readonly ConcurrentDictionary<string, byte> _transactionalIds = new(StringComparer.Ordinal);
     private IReadOnlyDictionary<int, Node> _nodes;
 
     private readonly ConcurrentDictionary<string, TopicMetadata> _topics;
@@ -291,6 +292,14 @@ internal sealed class KafkaCluster: IKafkaCluster
 
         effectiveConfig.Validate();
 
+        if (!_transactionalIds.TryAdd(effectiveConfig.TransactionalId, 0))
+        {
+            throw new KafkaConfigException(
+                nameof(TransactionalProducerConfig.TransactionalId),
+                effectiveConfig.TransactionalId,
+                ConfigExceptionMessages.TransactionalProducerConfig_AlreadyInUse);
+        }
+
         var producer = new Producer(
             this,
             $"__TransactionalProducer_{Guid.NewGuid():N}",
@@ -300,11 +309,14 @@ internal sealed class KafkaCluster: IKafkaCluster
         try
         {
             await producer.InitTransactionsAsync(cancellationToken);
-            return new TransactionalProducer(producer);
+            return new TransactionalProducer(
+                producer,
+                () => _transactionalIds.TryRemove(effectiveConfig.TransactionalId, out _));
         }
         catch
         {
             await producer.DisposeAsync();
+            _transactionalIds.TryRemove(effectiveConfig.TransactionalId, out _);
             throw;
         }
     }

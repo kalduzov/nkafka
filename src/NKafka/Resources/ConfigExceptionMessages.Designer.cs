@@ -73,6 +73,11 @@ namespace NKafka.Resources {
             get { return ResourceManager.GetString("TransactionalProducerConfig_AcksRequired", resourceCulture); }
         }
 
+        /// <summary>Looks up the localized string for an already reserved transactional identifier.</summary>
+        internal static string TransactionalProducerConfig_AlreadyInUse {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_AlreadyInUse", resourceCulture); }
+        }
+
         /// <summary>Looks up the localized string for the explicit transactional identifier mismatch.</summary>
         internal static string TransactionalProducerConfig_ExplicitIdDiffers {
             get { return ResourceManager.GetString("TransactionalProducerConfig_ExplicitIdDiffers", resourceCulture); }

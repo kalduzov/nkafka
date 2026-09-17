@@ -221,6 +221,7 @@ NKafka.Clients.Producer.MessageDeliveryResult.MessageDeliveryResult(NKafka.Clien
 NKafka.Clients.Producer.MessageDeliveryResult.Error.get -> NKafka.Clients.Producer.ProducerError?
 NKafka.Clients.Producer.MessageDeliveryResult.Error.init -> void
 NKafka.Clients.Producer.ProducerError
+NKafka.Clients.Producer.ProducerError.Equals(NKafka.Clients.Producer.ProducerError? other) -> bool
 NKafka.Clients.Producer.ProducerError.ErrorCode.get -> NKafka.Protocol.ErrorCodes
 NKafka.Clients.Producer.ProducerError.LocalError.get -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.ProducerError.ProducerError(NKafka.Protocol.ErrorCodes errorCode, NKafka.Clients.Producer.ProducerLocalError localError) -> void
@@ -731,6 +732,7 @@ NKafka.Protocol.ApiVersion.Version7 = 7 -> NKafka.Protocol.ApiVersion
 NKafka.Protocol.ApiVersion.Version8 = 8 -> NKafka.Protocol.ApiVersion
 NKafka.Protocol.ApiVersion.Version9 = 9 -> NKafka.Protocol.ApiVersion
 NKafka.Protocol.ErrorCodes
+NKafka.Protocol.ErrorCodes.ClientError = -32768 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.ErrorCodes.BrokerIdNotRegistered = 102 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.ErrorCodes.BrokerNotAvailable = 8 -> NKafka.Protocol.ErrorCodes
 NKafka.Protocol.ErrorCodes.ClusterAuthorizationFailed = 31 -> NKafka.Protocol.ErrorCodes
@@ -1039,6 +1041,9 @@ override NKafka.Clients.Consumer.ConsumerGroupMetadata.ToString() -> string!
 override NKafka.Clients.Producer.MessageDeliveryResult.Equals(object? obj) -> bool
 override NKafka.Clients.Producer.MessageDeliveryResult.GetHashCode() -> int
 override NKafka.Clients.Producer.MessageDeliveryResult.ToString() -> string!
+override NKafka.Clients.Producer.ProducerError.Equals(object? obj) -> bool
+override NKafka.Clients.Producer.ProducerError.GetHashCode() -> int
+override NKafka.Clients.Producer.ProducerError.ToString() -> string!
 override NKafka.Clients.Producer.RecordMetadata.Equals(object? obj) -> bool
 override NKafka.Clients.Producer.RecordMetadata.GetHashCode() -> int
 override NKafka.Clients.Producer.RecordMetadata.ToString() -> string!
@@ -1178,6 +1183,8 @@ static NKafka.Clients.Consumer.ConsumerGroupMetadata.operator ==(NKafka.Clients.
 static NKafka.Clients.Consumer.Subscription.Deserialize(byte[]! data) -> NKafka.Clients.Consumer.Subscription!
 static NKafka.Clients.Producer.MessageDeliveryResult.operator !=(NKafka.Clients.Producer.MessageDeliveryResult? left, NKafka.Clients.Producer.MessageDeliveryResult? right) -> bool
 static NKafka.Clients.Producer.MessageDeliveryResult.operator ==(NKafka.Clients.Producer.MessageDeliveryResult? left, NKafka.Clients.Producer.MessageDeliveryResult? right) -> bool
+static NKafka.Clients.Producer.ProducerError.operator !=(NKafka.Clients.Producer.ProducerError? left, NKafka.Clients.Producer.ProducerError? right) -> bool
+static NKafka.Clients.Producer.ProducerError.operator ==(NKafka.Clients.Producer.ProducerError? left, NKafka.Clients.Producer.ProducerError? right) -> bool
 static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, NKafka.TopicPartition! topicPartition, System.Collections.Generic.IReadOnlyCollection<NKafka.Message!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
 static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, string! topicName, NKafka.Message! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
 static NKafka.Clients.Producer.ProducerExtensions.ProduceAsync(this NKafka.Clients.Producer.IProducer! producer, string! topicName, System.Collections.Generic.IReadOnlyCollection<NKafka.Message!>! messages, System.Threading.CancellationToken token) -> System.Collections.Generic.IAsyncEnumerable<NKafka.Clients.Producer.MessageDeliveryResult!>!
@@ -1388,6 +1395,7 @@ virtual NKafka.Clients.Producer.MessageDeliveryResult.<Clone>$() -> NKafka.Clien
 virtual NKafka.Clients.Producer.MessageDeliveryResult.EqualityContract.get -> System.Type!
 virtual NKafka.Clients.Producer.MessageDeliveryResult.Equals(NKafka.Clients.Producer.MessageDeliveryResult? other) -> bool
 virtual NKafka.Clients.Producer.MessageDeliveryResult.PrintMembers(System.Text.StringBuilder! builder) -> bool
+NKafka.Clients.Producer.ProducerError.<Clone>$() -> NKafka.Clients.Producer.ProducerError!
 virtual NKafka.Clients.Producer.RecordMetadata.<Clone>$() -> NKafka.Clients.Producer.RecordMetadata!
 virtual NKafka.Clients.Producer.RecordMetadata.EqualityContract.get -> System.Type!
 virtual NKafka.Clients.Producer.RecordMetadata.Equals(NKafka.Clients.Producer.RecordMetadata? other) -> bool

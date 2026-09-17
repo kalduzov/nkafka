@@ -12,7 +12,9 @@ The transactional interface is implemented as part of [KIP-98](../../../spec/KIP
 
 The transactional configuration sets valid initial values, including `EnableIdempotence = true` and `Acks = Acks.All`. Inherited properties remain writable, but incompatible user changes cause `KafkaConfigException` during validation, before network initialization. The exception identifies the invalid option; the library does not silently correct it.
 
-The validator runs the base configuration checks and then the transactional checks on the final configuration. Direct creation and every extension overload follow the same validation path, including configurations supplied through a configuration callback. The copy API for deriving configurations from a shared base is still being specified in KIP-98.
+The validator runs the base configuration checks and then the transactional checks on the final configuration. Direct creation and every extension overload follow the same validation path, including configurations supplied through a configuration callback. Configuration copies preserve common settings and clone mutable nested settings, so changing a derived configuration does not change its source.
+
+`ClientDisposeTimeoutMs` is the common positive timeout for client disposal. `EnqueueTimeoutMs` limits how long a producer waits for a message to be accepted into its accumulator; `DeliveryTimeoutMs` limits delivery after acceptance. `DeliveryTimeoutMs` is not silently increased to include `LingerMs` or `RequestTimeoutMs`, so incompatible values are rejected by configuration validation.
 
 When an overload receives an explicit ID and a configuration, an unset ID (`null` or an empty string) is filled from the argument, and an identical ID is accepted. A different non-empty ID causes `KafkaConfigException` before ID reservation or network initialization. Comparison is ordinal and case-sensitive, without trimming whitespace. The supplied configuration is not modified. The same check runs after a configuration callback; the explicit argument must itself be a valid non-blank ID.
 
@@ -75,9 +77,11 @@ An ordinary producer also supports `Produce` with an `Action<MessageDeliveryResu
 
 Use this form when delivery outcomes are processed later and individual tasks are not awaited. Keep the handler short: it must not block the producer's delivery path.
 
+An unsuccessful delivery is represented by `MessageDeliveryResult.Error`. A broker failure uses its Kafka `ErrorCode` and `ProducerLocalError.None`. A client-side failure uses `ErrorCodes.ClientError` and a `ProducerLocalError`, such as `EnqueueTimedOut` or `DeliveryTimedOut`. `NotPersisted` means the message was not accepted by the producer; `PossiblyPersisted` means that the producer may already have handed it to Kafka and the application must treat the outcome as unknown.
+
 ## Message ownership
 
-NKafka does not copy a message key, value, or headers when it accepts a message for sending. From the call to `ProduceAsync`, or a send that uses a delivery handler, until the final delivery result, application code must leave the `Message` unchanged. This includes the contents of its key and value arrays and the set of headers. Do not return those arrays to a pool during that interval.
+`Message.Key` and `Message.Value` are nullable. `null` is preserved as distinct from an empty byte array; a null value is encoded as a Kafka tombstone. NKafka does not copy a message key, value, or headers when it accepts a message for sending. From the call to `ProduceAsync`, or a send that uses a delivery handler, until the final delivery result, application code must leave the `Message` unchanged. This includes the contents of its key and value arrays and the set of headers. Do not return those arrays to a pool during that interval.
 
 The final result is the completion of the returned task or invocation of the delivery handler. If cancellation removes a message before its batch is closed, the result has `NotPersisted` status and `Cancelled` as its local error; the task is not itself cancelled. Once the batch is closed, cancellation does not make a message available for reuse because the producer may still deliver it internally. This rule avoids an extra copy on every send; changing an array after handing it to the producer is unsupported.
 
@@ -85,10 +89,10 @@ During shutdown, stop accepting new work, complete the active transaction accord
 
 ## Asynchronous disposal and timeout
 
-The transactional producer API uses `DisposeAsync`, without synchronous `IDisposable` or a separate cancellable `CloseAsync`. A common disposal timeout is still being specified separately.
+The transactional producer API uses `DisposeAsync`, without synchronous `IDisposable` or a separate cancellable `CloseAsync`. The common disposal timeout is configured through `ClientDisposeTimeoutMs`.
 
 Disposal stops accepting new operations and uses one deadline for completing work and stopping the client's own background operations. Requests, retries, and nested transaction disposal do not receive a fresh full timeout. Disposing an active transaction separately uses the same setting from its owner's configuration.
 
 At the deadline, the client stops waiting for the broker, completes pending operations with an error or unknown outcome, and performs necessary local cleanup without another broker-wait period. It cannot resume normal operation. Runtime scheduling prevents a hard real-time timing guarantee, but blocked work must not turn disposal into an indefinite wait.
 
-Local disposal does not guarantee that Kafka aborted a transaction or that messages were never written. Shared cluster connections remain available to other clients. `CloseConnectionTimeoutMs` continues to govern physical connection closure, and `TransactionTimeoutMs` has a separate purpose. See [client lifetime](../client-lifetime.md) for the common producer, consumer, and admin contract. The exact timeout exception and preservation of an existing application exception remain under design.
+Local disposal does not guarantee that Kafka aborted a transaction or that messages were never written. Shared cluster connections remain available to other clients. `CloseConnectionTimeoutMs` continues to govern physical connection closure, and `TransactionTimeoutMs` has a separate purpose. See [client lifetime](../client-lifetime.md) for the common producer, consumer, and admin contract.

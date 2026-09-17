@@ -29,7 +29,7 @@ The setting applies to supported disposal paths. Introducing it does not by itse
 
 At expiration, stop broker waiting, complete pending operations with an error or unknown outcome, and perform local cleanup without another broker-wait period. A disposed client cannot resume work. Shared connections must not be closed to dispose one client. Dedicated resources may be released according to ownership and the remaining deadline.
 
-The implementation must not wait indefinitely for a blocked operation or user callback. Runtime scheduling is not a hard real-time guarantee. Unknown delivery, transaction, or administrative outcomes must not be reported as successful cancellation on the broker. The exact public error contract remains under design.
+The implementation must not wait indefinitely for a blocked operation or user callback. Runtime scheduling is not a hard real-time guarantee. Unknown delivery, transaction, or administrative outcomes must not be reported as successful cancellation on the broker. Producer delivery outcomes are returned through `MessageDeliveryResult.Error`; local failures use `ErrorCodes.ClientError` and `ProducerLocalError`.
 
 ## Other timeouts
 

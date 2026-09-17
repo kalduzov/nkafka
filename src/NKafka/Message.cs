@@ -30,17 +30,17 @@ namespace NKafka;
 /// </summary>
 /// <param name="key"></param>
 /// <param name="value"></param>
-public class Message(byte[] key, byte[] value)
+public class Message(byte[]? key, byte[]? value)
 {
     /// <summary>
-    ///  Gets the message key value (not null).
+    ///  Gets or sets the message key value. A null key is distinct from an empty key.
     /// </summary>
-    public byte[] Key { get; set; } = key;
+    public byte[]? Key { get; set; } = key;
 
     /// <summary>
-    /// Gets the message value (not null).
+    /// Gets or sets the message value. A null value represents a tombstone.
     /// </summary>
-    public byte[] Value { get; set; } = value;
+    public byte[]? Value { get; set; } = value;
 
     /// <summary>
     /// The collection of message headers (default Empty). 
@@ -57,7 +57,7 @@ public class Message(byte[] key, byte[] value)
     /// <summary>
     /// Initializes a new instance of the <see cref="T:NKafka.Message" /> class.
     /// </summary>
-    public Message(byte[] value)
+    public Message(byte[]? value)
         : this(Serializers.Null.Serialize(default), value)
     {
     }

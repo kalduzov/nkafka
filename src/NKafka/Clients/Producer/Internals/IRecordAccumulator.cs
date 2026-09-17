@@ -55,7 +55,7 @@ internal interface IRecordAccumulator
     /// <returns>The status of the add record operation</returns>
     internal RecordAppendResult Append(TopicPartition topicPartition,
         long timestamp,
-        byte[] serializedKey,
-        byte[] serializedValue,
+        byte[]? serializedKey,
+        byte[]? serializedValue,
         Headers headers);
 }

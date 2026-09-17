@@ -100,8 +100,8 @@ internal sealed class RecordAccumulator(
     public RecordAppendResult Append(
         TopicPartition topicPartition,
         long timestamp,
-        byte[] serializedKey,
-        byte[] serializedValue,
+        byte[]? serializedKey,
+        byte[]? serializedValue,
         Headers headers)
     {
         Interlocked.Increment(ref _appendsInProgress);
@@ -172,8 +172,8 @@ internal sealed class RecordAccumulator(
         int partition,
         Deque<ProducerBatch> deque,
         long timestamp,
-        byte[] key,
-        byte[] value,
+        byte[]? key,
+        byte[]? value,
         Headers headers,
         ArrayBuffer buffer)
     {
@@ -207,8 +207,8 @@ internal sealed class RecordAccumulator(
     /// <exception cref="KafkaException"></exception>
     private bool TryAppend(
         long timestamp,
-        byte[] key,
-        byte[] value,
+        byte[]? key,
+        byte[]? value,
         Headers headers,
         Deque<ProducerBatch> deque,
         out RecordAppendResult recordAppendResult)

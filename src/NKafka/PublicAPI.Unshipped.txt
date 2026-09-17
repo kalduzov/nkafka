@@ -207,7 +207,7 @@ NKafka.Clients.Consumer.Subscription.SupportPartitionAssignors.get -> System.Col
 NKafka.Clients.Consumer.Subscription.Topics.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 NKafka.Clients.IClient
 NKafka.Clients.Producer.IPartitioner
-NKafka.Clients.Producer.IPartitioner.Partition(string! topic, byte[]! keyBytes, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
+NKafka.Clients.Producer.IPartitioner.Partition(string! topic, byte[]? keyBytes, byte[]? valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer
 NKafka.Clients.Producer.IProducer.FlushAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Action<NKafka.Clients.Producer.MessageDeliveryResult!, System.Exception?>! callback, System.Threading.CancellationToken cancellationToken) -> void
@@ -559,13 +559,13 @@ NKafka.KafkaClusterExtensions
 NKafka.Message
 NKafka.Message.Headers.get -> NKafka.Headers!
 NKafka.Message.Headers.set -> void
-NKafka.Message.Key.get -> byte[]!
+NKafka.Message.Key.get -> byte[]?
 NKafka.Message.Key.set -> void
-NKafka.Message.Message(byte[]! key, byte[]! value) -> void
-NKafka.Message.Message(byte[]! value) -> void
+NKafka.Message.Message(byte[]? key, byte[]? value) -> void
+NKafka.Message.Message(byte[]? value) -> void
 NKafka.Message.Timestamp.get -> NKafka.Timestamp
 NKafka.Message.Timestamp.set -> void
-NKafka.Message.Value.get -> byte[]!
+NKafka.Message.Value.get -> byte[]?
 NKafka.Message.Value.set -> void
 NKafka.Metrics.NullConsumerMetrics
 NKafka.Metrics.NullConsumerMetrics.NullConsumerMetrics() -> void
@@ -1402,7 +1402,7 @@ virtual NKafka.Config.SslSettings.EqualityContract.get -> System.Type!
 virtual NKafka.Config.SslSettings.Equals(NKafka.Config.SslSettings? other) -> bool
 virtual NKafka.Config.SslSettings.PrintMembers(System.Text.StringBuilder! builder) -> bool
 virtual NKafka.Headers.Add(NKafka.Header! header) -> void
-virtual NKafka.Headers.Add(string! key, byte[]! val) -> void
+virtual NKafka.Headers.Add(string! key, byte[]? val) -> void
 virtual NKafka.Headers.Remove(string! key) -> void
 virtual NKafka.Node.<Clone>$() -> NKafka.Node!
 virtual NKafka.Node.EqualityContract.get -> System.Type!

@@ -96,7 +96,7 @@ public class Headers: IEnumerable<Header>
     ///     header value is distinct from an empty header
     ///     value (array of length 0).
     /// </param>
-    public virtual void Add(string key, byte[] val)
+    public virtual void Add(string key, byte[]? val)
     {
         if (key is null)
         {
@@ -162,7 +162,7 @@ public class Headers: IEnumerable<Header>
 
     private sealed class EmptyHeaders(): Headers(null)
     {
-        public override void Add(string key, byte[] val)
+        public override void Add(string key, byte[]? val)
         {
             throw new NotImplemented();
         }

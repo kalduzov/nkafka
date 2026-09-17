@@ -33,8 +33,8 @@ internal class RoundRobinPartitioner: IPartitioner
     ///<inheritdoc /> 
     public async ValueTask<int> Partition(
         string topic,
-        byte[] keyBytes,
-        byte[] valueBytes,
+        byte[]? keyBytes,
+        byte[]? valueBytes,
         IKafkaCluster cluster,
         CancellationToken token)
     {

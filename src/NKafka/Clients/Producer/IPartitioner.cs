@@ -39,8 +39,8 @@ public interface IPartitioner
     /// <returns>The partition number</returns>
     public ValueTask<int> Partition(
         string topic,
-        byte[] keyBytes,
-        byte[] valueBytes,
+        byte[]? keyBytes,
+        byte[]? valueBytes,
         IKafkaCluster cluster,
         CancellationToken token);
 }

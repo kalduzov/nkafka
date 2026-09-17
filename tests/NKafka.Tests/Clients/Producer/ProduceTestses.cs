@@ -34,8 +34,8 @@ public sealed class ProduceTests: ClientTests
     private class TestPartitioner: IPartitioner
     {
         public ValueTask<int> Partition(string topic,
-            byte[] keyBytes,
-            byte[] valueBytes,
+            byte[]? keyBytes,
+            byte[]? valueBytes,
             IKafkaCluster cluster,
             CancellationToken token)
         {

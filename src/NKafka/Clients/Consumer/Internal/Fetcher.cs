@@ -282,9 +282,7 @@ internal class Fetcher<TKey, TValue>(
             {
                 try
                 {
-                    var key = record.Key ?? [];
-                    var value = record.Value ?? [];
-                    var message = new Message(key, value);
+                    var message = new Message(record.Key, record.Value);
                     var consumeRecord = new ConsumerRecord<TKey, TValue>(message)
                     {
                         Partition = partitionDataMessage.PartitionIndex,

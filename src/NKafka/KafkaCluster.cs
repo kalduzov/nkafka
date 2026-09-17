@@ -257,6 +257,59 @@ internal sealed class KafkaCluster: IKafkaCluster
     }
 
     /// <inheritdoc />
+    public IProducer CreateProducer(ProducerConfig producerConfig)
+    {
+        ThrowExceptionIfClusterClosed();
+        ArgumentNullException.ThrowIfNull(producerConfig);
+
+        var effectiveConfig = producerConfig != ProducerConfig.EmptyProducerConfig
+            ? producerConfig.MergeFrom(Config)
+            : ProducerConfig.BaseFrom(Config);
+
+        return new Producer(
+            this,
+            $"__Producer_{Guid.NewGuid():N}",
+            effectiveConfig,
+            _loggerFactory);
+    }
+
+    /// <inheritdoc />
+    public async Task<ITransactionalProducer> CreateTransactionalProducerAsync(
+        TransactionalProducerConfig producerConfig,
+        CancellationToken cancellationToken = default)
+    {
+        ThrowExceptionIfClusterClosed();
+        ArgumentNullException.ThrowIfNull(producerConfig);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var effectiveConfig = producerConfig with
+        {
+            BootstrapServers = Config.BootstrapServers,
+            ApiVersionRequest = Config.ApiVersionRequest,
+            MaxRetries = Config.MaxRetries
+        };
+
+        effectiveConfig.Validate();
+
+        var producer = new Producer(
+            this,
+            $"__TransactionalProducer_{Guid.NewGuid():N}",
+            effectiveConfig,
+            _loggerFactory);
+
+        try
+        {
+            await producer.InitTransactionsAsync(cancellationToken);
+            return new TransactionalProducer(producer);
+        }
+        catch
+        {
+            await producer.DisposeAsync();
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
     public IConsumer<TKey, TValue> BuildConsumer<TKey, TValue>(ConsumerConfig consumerConfig,
         IDeserializer<TKey> keyDeserializer,
         IDeserializer<TValue> valueDeserializer)

@@ -54,6 +54,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     private readonly Task _senderTask;
     private readonly IMessagesSender _messagesSender;
     private readonly int _deliveryTimeoutMs;
+    private int _disposeState;
 
     /// <summary>
     /// Use this constructor to create a producer
@@ -118,46 +119,49 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         }
     }
 
-    string IProducer.Name => _name;
-
-    /// <inheritdoc/>
-    public void Produce(TopicPartition topicPartition,
+    /// <inheritdoc />
+    public void Produce(
+        TopicPartition topicPartition,
         Message message,
         Action<MessageDeliveryResult, Exception?> callback,
         CancellationToken cancellationToken)
     {
-        var tp = topicPartition;
-        var m = message;
+        ArgumentNullException.ThrowIfNull(callback);
 
         _ = InternalProduceAsync(topicPartition, message, true, cancellationToken)
-            .ContinueWith(task =>
+            .ContinueWith(
+                task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.WriteLine($"The message {m} was sent successfully");
                         callback(task.Result, null);
-
-                        return;
                     }
-
-                    if (task.IsFaulted)
+                    else if (task.IsFaulted)
                     {
-                        callback(task.Result, task.Exception);
-
-                        return;
+                        callback(CreateCallbackFailureResult(topicPartition, message), task.Exception);
                     }
-
-                    if (task.IsCanceled)
+                    else if (task.IsCanceled)
                     {
-                        callback(task.Result, new OperationCanceledException("The message was canceled"));
-
-                        return;
+                        callback(
+                            CreateCallbackFailureResult(topicPartition, message),
+                            new OperationCanceledException("The message was canceled"));
                     }
-
-                    _logger.ProduceMessageError(task.Exception!, tp);
-
                 },
-                cancellationToken);
+                CancellationToken.None,
+                TaskContinuationOptions.ExecuteSynchronously,
+                TaskScheduler.Default);
+
+        static MessageDeliveryResult CreateCallbackFailureResult(TopicPartition topicPartition, Message message)
+        {
+            return new MessageDeliveryResult(
+                PersistenceStatus.NotPersisted,
+                topicPartition,
+                message.Timestamp.UnixTimestampMs,
+                Offset.Unset,
+                message.Key.Length,
+                message.Value.Length,
+                message);
+        }
     }
 
     /// <inheritdoc/>
@@ -185,14 +189,6 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         CancellationToken token)
     {
         return InternalProduceAsync(topicPartition, message, false, token);
-    }
-
-    /// <inheritdoc/>
-    public ValueTask CloseAsync(CancellationToken cancellationToken)
-    {
-        _closed = true;
-
-        return ValueTask.CompletedTask;
     }
 
     private void Close(TimeSpan timeSpan, bool swallowException)
@@ -419,7 +415,39 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public override void Dispose()
     {
+        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
+        {
+            return;
+        }
+
+        _closed = true;
+        _tokenSource.Cancel();
+        _senderTask.GetAwaiter().GetResult();
+        _messagesSender.Dispose();
         _tokenSource.Dispose();
-        base.Dispose();
+        LoggerScope?.Dispose();
+    }
+
+    /// <summary>Releases the producer without closing the owning cluster.</summary>
+    public override async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
+        {
+            return;
+        }
+
+        _closed = true;
+        _tokenSource.Cancel();
+
+        try
+        {
+            await _senderTask.ConfigureAwait(false);
+        }
+        finally
+        {
+            await _messagesSender.DisposeAsync().ConfigureAwait(false);
+            _tokenSource.Dispose();
+            LoggerScope?.Dispose();
+        }
     }
 }

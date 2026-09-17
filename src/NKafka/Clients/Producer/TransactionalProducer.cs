@@ -17,8 +17,5 @@ internal sealed class TransactionalProducer(Producer producer) : ITransactionalP
         return ValueTask.FromResult<IProducerTransaction>(new ProducerTransaction(producer));
     }
 
-    public ValueTask DisposeAsync()
-    {
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask DisposeAsync() => producer.DisposeAsync();
 }

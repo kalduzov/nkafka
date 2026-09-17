@@ -26,25 +26,13 @@ namespace NKafka.Clients.Producer;
 /// <summary>
 /// Base interface for the producer
 /// </summary>
-public interface IProducer: IDisposable, IAsyncDisposable
+public interface IProducer: IAsyncDisposable
 {
-    /// <summary>
-    /// Producer internal name
-    /// </summary>
-    internal string Name { get; }
-
     /// <summary>
     /// Sends all pending accumulated messages and waits for a response to confirm their delivery
     /// </summary>
     /// <param name="token"></param>
     public Task FlushAsync(CancellationToken token);
-
-    /// <summary>
-    /// Closes the asynchronous operation.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    public ValueTask CloseAsync(CancellationToken cancellationToken);
 
     #region Produce
 
@@ -61,13 +49,14 @@ public interface IProducer: IDisposable, IAsyncDisposable
         CancellationToken token);
 
     /// <summary>
-    /// Sends a message to the specified topic and partition, invoking a callback upon delivery or failure.
+    /// Sends a message without awaiting the result and invokes the callback after delivery or failure.
     /// </summary>
-    /// <param name="topicPartition">The target topic and partition to produce the message to.</param>
-    /// <param name="message">The message to be produced.</param>
-    /// <param name="callback">The callback to invoke with the delivery result or exception.</param>
-    /// <param name="cancellationToken">A token to cancel the operation.</param>
-    public void Produce(TopicPartition topicPartition,
+    /// <param name="topicPartition">The target topic and partition.</param>
+    /// <param name="message">The message to send.</param>
+    /// <param name="callback">The callback receiving the delivery result or error.</param>
+    /// <param name="cancellationToken">Token used to cancel the operation.</param>
+    public void Produce(
+        TopicPartition topicPartition,
         Message message,
         Action<MessageDeliveryResult, Exception?> callback,
         CancellationToken cancellationToken);

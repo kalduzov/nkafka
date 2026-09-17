@@ -42,6 +42,19 @@ public sealed class CreateProducerTests: ClientTests
     }
 
     [Fact]
+    public async Task CreateProducer_ReturnsNewInstances()
+    {
+        await using var cluster = CreateKafkaClusterForTests();
+
+        await cluster.OpenAsync(CancellationToken.None);
+
+        await using var first = cluster.CreateProducer(new ProducerConfig());
+        await using var second = cluster.CreateProducer(new ProducerConfig());
+
+        first.Should().NotBeSameAs(second);
+    }
+
+    [Fact]
     public void CtorSimpleProducer_Successful()
     {
         var kafkaCluster = CreateKafkaClusterForTests();

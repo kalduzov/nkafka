@@ -176,8 +176,11 @@ internal sealed partial class Producer
     {
     }
 
-    private static void ThrowIfNotTransactional()
+    private void ThrowIfNotTransactional()
     {
-        throw new ProducerException("This producer is not in a transactional state.");
+        if (!_transactionManager.IsTransactional)
+        {
+            throw new ProducerException("This producer is not in a transactional state.");
+        }
     }
 }

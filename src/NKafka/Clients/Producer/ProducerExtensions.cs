@@ -93,52 +93,46 @@ public static class ProducerExtensions
     }
 
     /// <summary>
-    /// Fire and forget producing a message
+    /// Sends a message without awaiting the result and ignores the callback payload.
     /// </summary>
-    /// <param name="producer"></param>
-    /// <param name="topicName"></param>
-    /// <param name="message"></param>
-    /// <param name="cancellationToken"></param>
-    public static void Produce(this IProducer producer,
+    public static void Produce(
+        this IProducer producer,
         string topicName,
         Message message,
         CancellationToken cancellationToken)
     {
-        var topicPartition = new TopicPartition(topicName, Partition.Any);
-        producer.Produce(topicPartition, message, (_, _) => { }, cancellationToken);
+        producer.Produce(
+            new TopicPartition(topicName, Partition.Any),
+            message,
+            static (_, _) => { },
+            cancellationToken);
     }
 
     /// <summary>
-    ///     Fire and forget producing messages
+    /// Sends messages without awaiting their individual results.
     /// </summary>
-    /// <param name="producer"></param>
-    /// <param name="topicName"></param>
-    /// <param name="messages"></param>
-    /// <param name="cancellationToken"></param>
-    public static void Produce(this IProducer producer,
+    public static void Produce(
+        this IProducer producer,
         string topicName,
         IReadOnlyCollection<Message> messages,
         CancellationToken cancellationToken)
     {
-        var topicPartition = new TopicPartition(topicName, Partition.Any);
-        producer.Produce(topicPartition, messages, cancellationToken);
+        producer.Produce(new TopicPartition(topicName, Partition.Any), messages, cancellationToken);
     }
 
     /// <summary>
-    ///     Fire and forget producing messages
+    /// Sends messages to the specified topic partition without awaiting their individual results.
     /// </summary>
-    /// <param name="producer"></param>
-    /// <param name="topicPartition"></param>
-    /// <param name="messages"></param>
-    /// <param name="cancellationToken"></param>
-    public static void Produce(this IProducer producer,
+    public static void Produce(
+        this IProducer producer,
         TopicPartition topicPartition,
         IEnumerable<Message> messages,
         CancellationToken cancellationToken)
     {
         foreach (var message in messages)
         {
-            producer.Produce(topicPartition, message, (_, _) => { }, cancellationToken);
+            producer.Produce(topicPartition, message, static (_, _) => { }, cancellationToken);
         }
     }
+
 }

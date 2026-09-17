@@ -130,6 +130,23 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         ProducerConfig producerConfig);
 
     /// <summary>
+    /// Creates a new ordinary producer owned by the caller.
+    /// </summary>
+    /// <param name="producerConfig">Producer configuration.</param>
+    /// <returns>A new producer instance associated with this cluster.</returns>
+    IProducer CreateProducer(ProducerConfig producerConfig);
+
+    /// <summary>
+    /// Creates and initializes a new transactional producer owned by the caller.
+    /// </summary>
+    /// <param name="producerConfig">Transactional producer configuration.</param>
+    /// <param name="cancellationToken">Token used to cancel initialization.</param>
+    /// <returns>A fully initialized transactional producer.</returns>
+    Task<ITransactionalProducer> CreateTransactionalProducerAsync(
+        TransactionalProducerConfig producerConfig,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Creates a consumer associated with the current cluster
     /// </summary>
     /// <param name="consumerConfig">Конфигурация консьюмера</param>

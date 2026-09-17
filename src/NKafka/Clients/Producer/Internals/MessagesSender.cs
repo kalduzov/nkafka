@@ -197,8 +197,6 @@ internal sealed class MessagesSender(
     {
         await CastAndDispose(_tokenSource);
         await CastAndDispose(_resetEvent);
-        await kafkaCluster.DisposeAsync();
-        await CastAndDispose(loggerFactory);
 
         return;
 
@@ -220,7 +218,5 @@ internal sealed class MessagesSender(
     {
         _tokenSource.Dispose();
         _resetEvent.Dispose();
-        kafkaCluster.Dispose();
-        loggerFactory.Dispose();
     }
 }

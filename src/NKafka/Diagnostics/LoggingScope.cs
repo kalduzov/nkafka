@@ -6,7 +6,7 @@ internal sealed class LoggingScope(IDisposable?[] disposables): IDisposable
     {
         for (var i = disposables.Length; i > 0; i--)
         {
-            disposables[i]?.Dispose();
+            disposables[i - 1]?.Dispose();
         }
     }
 }

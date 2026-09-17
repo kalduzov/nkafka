@@ -31,6 +31,11 @@ namespace NKafka.Protocol;
 public enum ErrorCodes: short
 {
     /// <summary>
+    /// An error produced locally by the client rather than by Kafka.
+    /// </summary>
+    ClientError = short.MinValue,
+
+    /// <summary>
     ///  An error occurred on the server for which the client doesn't have a corresponding error code. This is generally an unexpected error.
     /// </summary>
     UnknownServerError = -0x1,

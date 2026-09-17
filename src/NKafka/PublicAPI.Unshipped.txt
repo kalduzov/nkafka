@@ -218,6 +218,19 @@ NKafka.Clients.Producer.MessageDeliveryResult.Message.get -> NKafka.Message!
 NKafka.Clients.Producer.MessageDeliveryResult.Message.init -> void
 NKafka.Clients.Producer.MessageDeliveryResult.MessageDeliveryResult(NKafka.Clients.Producer.MessageDeliveryResult! original) -> void
 NKafka.Clients.Producer.MessageDeliveryResult.MessageDeliveryResult(NKafka.Clients.Producer.PersistenceStatus Status, NKafka.TopicPartition! TopicPartition, long Timestamp, NKafka.Offset Offset, int SerializedKeySize, int SerializedValueSize, NKafka.Message! Message) -> void
+NKafka.Clients.Producer.MessageDeliveryResult.Error.get -> NKafka.Clients.Producer.ProducerError?
+NKafka.Clients.Producer.MessageDeliveryResult.Error.init -> void
+NKafka.Clients.Producer.ProducerError
+NKafka.Clients.Producer.ProducerError.ErrorCode.get -> NKafka.Protocol.ErrorCodes
+NKafka.Clients.Producer.ProducerError.LocalError.get -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerError.ProducerError(NKafka.Protocol.ErrorCodes errorCode, NKafka.Clients.Producer.ProducerLocalError localError) -> void
+NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.Cancelled = 1 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.EnqueueTimedOut = 2 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.DeliveryTimedOut = 3 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.TransportFailure = 4 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.ProducerClosing = 5 -> NKafka.Clients.Producer.ProducerLocalError
+NKafka.Clients.Producer.ProducerLocalError.None = 0 -> NKafka.Clients.Producer.ProducerLocalError
 NKafka.Clients.Producer.MessageDeliveryResult.Offset.get -> NKafka.Offset
 NKafka.Clients.Producer.MessageDeliveryResult.Offset.init -> void
 NKafka.Clients.Producer.MessageDeliveryResult.SerializedKeySize.get -> int

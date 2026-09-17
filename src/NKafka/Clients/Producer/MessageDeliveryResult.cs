@@ -33,4 +33,10 @@ public record MessageDeliveryResult(
     Offset Offset,
     int SerializedKeySize,
     int SerializedValueSize,
-    Message Message);
+    Message Message)
+{
+    /// <summary>
+    /// Gets the error associated with the delivery result, if any.
+    /// </summary>
+    public ProducerError? Error { get; init; }
+}

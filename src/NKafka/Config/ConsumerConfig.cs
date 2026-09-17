@@ -140,13 +140,15 @@ public record ConsumerConfig: CommonConfig
     /// </summary>
     public static ConsumerConfig BaseFrom(CommonConfig config)
     {
-        return new ConsumerConfig
+        ArgumentNullException.ThrowIfNull(config);
+
+        var result = new ConsumerConfig
         {
-            ClientId = config.ClientId,
-            BootstrapServers = config.BootstrapServers,
-            ApiVersionRequest = config.ApiVersionRequest,
-            MaxRetries = config.MaxRetries
+            Heartbeat = new HeartbeatSettings()
         };
+
+        config.CopyCommonSettingsTo(result);
+        return result;
     }
 
     /// <summary>
@@ -155,12 +157,17 @@ public record ConsumerConfig: CommonConfig
     /// <remarks>All parameters of the current configuration are overwritten by the parameters of the main</remarks>
     public ConsumerConfig MergeFrom(CommonConfig config)
     {
-        return this with
+        ArgumentNullException.ThrowIfNull(config);
+
+        var result = this with
         {
-            BootstrapServers = config.BootstrapServers,
-            ApiVersionRequest = config.ApiVersionRequest,
-            MaxRetries = config.MaxRetries,
+            Heartbeat = Heartbeat with { },
+            GroupUserData = GroupUserData is null ? null : [.. GroupUserData],
+            PartitionAssignors = [.. PartitionAssignors]
         };
+
+        config.CopyCommonSettingsTo(result);
+        return result;
     }
 
     /// <summary>

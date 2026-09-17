@@ -34,24 +34,17 @@ public record ProducerConfig: CommonConfig
     public static readonly ProducerConfig EmptyProducerConfig = new();
 
     /// <summary>
-    /// Specifies whether to enable notification of delivery reports. Typically
-    /// you should set this parameter to true. Set it to false for "fire and
-    /// forget" semantics and a small boost in performance.
-    /// default: true
-    /// </summary>
-    /// <remarks>
-    /// If the producer is used only to send "fire and forget" semantics, then it makes sense to set this field to false
-    /// to avoid unnecessary processing of responses from the server.
-    /// </remarks>
-    public bool EnableDeliveryReports { get; set; } = true;
-
-    /// <summary>
     /// Message delivery timeout
     /// </summary>
     /// <remarks>
     /// The producer will try to send messages before this timeout expires.
     /// </remarks>
     public int DeliveryTimeoutMs { get; set; } = 120 * 1000;
+
+    /// <summary>
+    /// Maximum time allowed for accepting a message into the producer.
+    /// </summary>
+    public int EnqueueTimeoutMs { get; set; } = 60_000;
 
     /// <summary>
     /// Сonfiguration of the message distribution algorithm by sections
@@ -106,13 +99,16 @@ public record ProducerConfig: CommonConfig
     /// </summary>
     public static ProducerConfig BaseFrom(CommonConfig config)
     {
-        return new ProducerConfig
+        ArgumentNullException.ThrowIfNull(config);
+
+        var result = new ProducerConfig
         {
-            ClientId = config.ClientId,
-            BootstrapServers = config.BootstrapServers,
-            ApiVersionRequest = config.ApiVersionRequest,
-            MaxRetries = config.MaxRetries
+            PartitionerConfig = new PartitionerConfig(),
+            Compression = new CompressionConfig()
         };
+
+        config.CopyCommonSettingsTo(result);
+        return result;
     }
 
     /// <summary>
@@ -121,12 +117,20 @@ public record ProducerConfig: CommonConfig
     /// <remarks>All parameters of the current configuration are overwritten by the parameters of the main</remarks>
     public ProducerConfig MergeFrom(CommonConfig config)
     {
-        return this with
+        ArgumentNullException.ThrowIfNull(config);
+
+        var result = this with
         {
-            BootstrapServers = config.BootstrapServers,
-            ApiVersionRequest = config.ApiVersionRequest,
-            MaxRetries = config.MaxRetries,
+            PartitionerConfig = new PartitionerConfig
+            {
+                Partitioner = PartitionerConfig.Partitioner,
+                CustomPartitionerClass = PartitionerConfig.CustomPartitionerClass
+            },
+            Compression = Compression with { }
         };
+
+        config.CopyCommonSettingsTo(result);
+        return result;
     }
 
     /// <summary>

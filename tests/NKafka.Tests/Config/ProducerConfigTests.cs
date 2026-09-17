@@ -43,4 +43,68 @@ public sealed class ProducerConfigTests
 
         FluentActions.Invoking(Validate).Should().NotThrow();
     }
+
+    [Fact]
+    public void BaseFrom_CopiesCommonSettingsWithoutSharingMutableValues()
+    {
+        var common = new TestCommonConfig
+        {
+            BootstrapServers = ["broker:9092"],
+            ClientId = "client",
+            MaxRetries = 7,
+            ClientDisposeTimeoutMs = 1234,
+            Ssl = new SslSettings { TrustServerCertificate = true },
+            PerBrokerConfigs = new Dictionary<int, BrokerConfig>
+            {
+                [1] = new BrokerConfig { BrokerVersion = new Version(3, 8) }
+            }
+        };
+
+        var producer = ProducerConfig.BaseFrom(common);
+
+        producer.ClientId.Should().Be("client");
+        producer.MaxRetries.Should().Be(7);
+        producer.ClientDisposeTimeoutMs.Should().Be(1234);
+        producer.BootstrapServers.Should().BeEquivalentTo("broker:9092");
+        producer.Ssl.Should().NotBeSameAs(common.Ssl);
+        producer.PerBrokerConfigs.Should().NotBeSameAs(common.PerBrokerConfigs);
+        producer.PerBrokerConfigs[1].Should().NotBeSameAs(common.PerBrokerConfigs[1]);
+
+        common.BootstrapServers = ["changed:9092"];
+        common.PerBrokerConfigs[1].BrokerVersion = new Version(3, 9);
+
+        producer.BootstrapServers.Should().BeEquivalentTo("broker:9092");
+        producer.PerBrokerConfigs[1].BrokerVersion.Should().Be(new Version(3, 8));
+    }
+
+    [Fact]
+    public void MergeFrom_PreservesProducerAndTransactionalSettings()
+    {
+        var config = new TransactionalProducerConfig
+        {
+            TransactionalId = "tx-1",
+            TransactionTimeoutMs = 12_000,
+            EnqueueTimeoutMs = 2_000,
+            BatchSize = 42,
+            Compression = new CompressionConfig(CompressionType.Gzip)
+        };
+        var common = new TestCommonConfig
+        {
+            BootstrapServers = ["broker:9092"],
+            ClientDisposeTimeoutMs = 9_000
+        };
+
+        var merged = config.MergeFrom(common);
+
+        merged.Should().BeOfType<TransactionalProducerConfig>();
+        var transactional = (TransactionalProducerConfig)merged;
+        transactional.TransactionalId.Should().Be("tx-1");
+        transactional.TransactionTimeoutMs.Should().Be(12_000);
+        transactional.EnqueueTimeoutMs.Should().Be(2_000);
+        transactional.BatchSize.Should().Be(42);
+        transactional.Compression.Should().NotBeSameAs(config.Compression);
+        transactional.ClientDisposeTimeoutMs.Should().Be(9_000);
+    }
+
+    private sealed record TestCommonConfig : CommonConfig;
 }

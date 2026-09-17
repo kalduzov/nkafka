@@ -164,6 +164,11 @@ public abstract record CommonConfig
     public int CloseConnectionTimeoutMs { get; set; } = 5000;
 
     /// <summary>
+    /// The maximum time allowed for client disposal.
+    /// </summary>
+    public int ClientDisposeTimeoutMs { get; set; } = 10_000;
+
+    /// <summary>
     /// The maximum number of requests per connection.
     /// </summary>
     /// <remarks>This field is still constant and cannot be changed</remarks>
@@ -234,6 +239,11 @@ public abstract record CommonConfig
         SecurityProtocolValidate();
         BrokerVersionValidate();
 
+        if (ClientDisposeTimeoutMs <= 0)
+        {
+            throw new KafkaConfigException(nameof(ClientDisposeTimeoutMs), ClientDisposeTimeoutMs, "Срок освобождения клиента должен быть больше нуля");
+        }
+
         if (ReceiveBufferBytes < -1)
         {
             throw new KafkaConfigException(nameof(ReceiveBufferBytes), ReceiveBufferBytes, "Размер буфера не может быть меньше -1");
@@ -247,6 +257,44 @@ public abstract record CommonConfig
 
         Sasl.Validate();
         Ssl.Validate();
+    }
+
+    /// <summary>
+    /// Copies all common settings into a derived configuration snapshot.
+    /// </summary>
+    internal void CopyCommonSettingsTo(CommonConfig target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+
+        target.BootstrapServers = BootstrapServers is null ? null! : [.. BootstrapServers];
+        target.ClientId = ClientId;
+        target.MaxRetries = MaxRetries;
+        target.MessageMaxBytes = MessageMaxBytes;
+        target.ApiVersionRequest = ApiVersionRequest;
+        target.ReconnectBackoffMs = ReconnectBackoffMs;
+        target.ReconnectBackoffMaxMs = ReconnectBackoffMaxMs;
+        target.SecurityProtocol = SecurityProtocol;
+        target.Ssl = Ssl with { };
+        target.Sasl = Sasl with { };
+        target.SocketConnectionSetupTimeoutMs = SocketConnectionSetupTimeoutMs;
+        target.SocketConnectionSetupTimeoutMaxMs = SocketConnectionSetupTimeoutMaxMs;
+        target.ConnectionsMaxIdleMs = ConnectionsMaxIdleMs;
+        target.RequestTimeoutMs = RequestTimeoutMs;
+        target.RetryBackoffMs = RetryBackoffMs;
+        target.CloseConnectionTimeoutMs = CloseConnectionTimeoutMs;
+        target.ClientDisposeTimeoutMs = ClientDisposeTimeoutMs;
+        target.ReceiveBufferBytes = ReceiveBufferBytes;
+        target.AllowAutoTopicCreation = AllowAutoTopicCreation;
+        target.FallbackBrokerVersion = FallbackBrokerVersion is null ? null! : new Version(FallbackBrokerVersion.ToString());
+        target.UseMinimalSupportVersion = UseMinimalSupportVersion;
+        target.PerBrokerConfigs = PerBrokerConfigs.ToDictionary(
+            static pair => pair.Key,
+            static pair => new BrokerConfig
+            {
+                BrokerVersion = pair.Value.BrokerVersion is null ? null! : new Version(pair.Value.BrokerVersion.ToString()),
+                Ssl = pair.Value.Ssl with { },
+                Sasl = pair.Value.Sasl with { }
+            });
     }
 
     private void BrokerVersionValidate()

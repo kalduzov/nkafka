@@ -283,12 +283,7 @@ internal sealed class KafkaCluster: IKafkaCluster
         ArgumentNullException.ThrowIfNull(producerConfig);
         cancellationToken.ThrowIfCancellationRequested();
 
-        var effectiveConfig = producerConfig with
-        {
-            BootstrapServers = Config.BootstrapServers,
-            ApiVersionRequest = Config.ApiVersionRequest,
-            MaxRetries = Config.MaxRetries
-        };
+        var effectiveConfig = (TransactionalProducerConfig)producerConfig.MergeFrom(Config);
 
         effectiveConfig.Validate();
 

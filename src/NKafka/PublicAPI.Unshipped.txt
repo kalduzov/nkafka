@@ -296,6 +296,8 @@ NKafka.Config.CommonConfig.ClientId.get -> string!
 NKafka.Config.CommonConfig.ClientId.set -> void
 NKafka.Config.CommonConfig.CloseConnectionTimeoutMs.get -> int
 NKafka.Config.CommonConfig.CloseConnectionTimeoutMs.set -> void
+NKafka.Config.CommonConfig.ClientDisposeTimeoutMs.get -> int
+NKafka.Config.CommonConfig.ClientDisposeTimeoutMs.set -> void
 NKafka.Config.CommonConfig.CommonConfig() -> void
 NKafka.Config.CommonConfig.CommonConfig(NKafka.Config.CommonConfig! original) -> void
 NKafka.Config.CommonConfig.ConnectionsMaxIdleMs.get -> int
@@ -420,8 +422,8 @@ NKafka.Config.ProducerConfig.Compression.get -> NKafka.Config.CompressionConfig!
 NKafka.Config.ProducerConfig.Compression.set -> void
 NKafka.Config.ProducerConfig.DeliveryTimeoutMs.get -> int
 NKafka.Config.ProducerConfig.DeliveryTimeoutMs.set -> void
-NKafka.Config.ProducerConfig.EnableDeliveryReports.get -> bool
-NKafka.Config.ProducerConfig.EnableDeliveryReports.set -> void
+NKafka.Config.ProducerConfig.EnqueueTimeoutMs.get -> int
+NKafka.Config.ProducerConfig.EnqueueTimeoutMs.set -> void
 NKafka.Config.ProducerConfig.EnableIdempotence.get -> bool
 NKafka.Config.ProducerConfig.EnableIdempotence.set -> void
 NKafka.Config.ProducerConfig.LingerMs.get -> double

@@ -135,5 +135,21 @@ public sealed class ConfigTests
         config.Validate();
     }
 
+    [Fact]
+    public void Validate_WhenClientDisposeTimeoutIsNotPositive_MustThrowException()
+    {
+        var config = new TestCommonConfig
+        {
+            BootstrapServers = ["test"],
+            ClientDisposeTimeoutMs = 0
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.ClientDisposeTimeoutMs));
+    }
+
     private record TestCommonConfig: CommonConfig;
 }

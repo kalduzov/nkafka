@@ -384,7 +384,7 @@
     <File Path="spec/KIP/KIP-98/implementation-plan.md" />
     <File Path="spec/KIP/KIP-98/vision.md" />
     <File Path="spec/KIP/KIP-98/02-configuration-results-errors.md" />
-    <File Path="spec/KIP/KIP-98/03-reliable-delivery-and-resources.md" />
+    <File Path="spec/KIP/KIP-98/03.2-reliable-delivery-and-resources.md" />
     <File Path="spec/KIP/KIP-98/04-idempotence-and-recovery.md" />
     <File Path="spec/KIP/KIP-98/05-transaction-protocol-and-lifetime.md" />
     <File Path="spec/KIP/KIP-98/06-consumer-offsets-and-processing.md" />

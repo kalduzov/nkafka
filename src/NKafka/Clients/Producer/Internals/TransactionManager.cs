@@ -45,8 +45,12 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
         FatalError
     }
 
-    private readonly string _transactionalId = config.TransactionalId;
-    private readonly int _transactionTimeoutMs = config.TransactionTimeoutMs;
+    private readonly string _transactionalId = config is TransactionalProducerConfig transactionalConfig
+        ? transactionalConfig.TransactionalId
+        : string.Empty;
+    private readonly int _transactionTimeoutMs = config is TransactionalProducerConfig transactionalConfig
+        ? transactionalConfig.TransactionTimeoutMs
+        : 0;
     private readonly bool _enableIdempotence = config.EnableIdempotence;
     private readonly ILogger<TransactionManager> _logger = loggerFactory.CreateLogger<TransactionManager>();
 

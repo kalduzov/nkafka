@@ -42,4 +42,19 @@
   <data name="PartitionerConfig_CustomClassNotFound" xml:space="preserve">
         <value>In the settings, the type of distribution by sections Custom is specified, but the custom class is not specified</value>
     </data>
+  <data name="TransactionalProducerConfig_TransactionalIdRequired" xml:space="preserve">
+        <value>TransactionalId must not be empty.</value>
+    </data>
+  <data name="TransactionalProducerConfig_TransactionTimeoutInvalid" xml:space="preserve">
+        <value>TransactionTimeoutMs must be greater than zero.</value>
+    </data>
+  <data name="TransactionalProducerConfig_IdempotenceRequired" xml:space="preserve">
+        <value>Transactions require idempotence to be enabled.</value>
+    </data>
+  <data name="TransactionalProducerConfig_AcksRequired" xml:space="preserve">
+        <value>Transactions require Acks.All.</value>
+    </data>
+  <data name="TransactionalProducerConfig_ExplicitIdDiffers" xml:space="preserve">
+        <value>The configured TransactionalId differs from the explicit identifier.</value>
+    </data>
 </root>

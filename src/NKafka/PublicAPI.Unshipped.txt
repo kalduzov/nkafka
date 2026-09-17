@@ -433,10 +433,6 @@ NKafka.Config.ProducerConfig.PartitionerConfig.get -> NKafka.Config.PartitionerC
 NKafka.Config.ProducerConfig.PartitionerConfig.set -> void
 NKafka.Config.ProducerConfig.ProducerConfig() -> void
 NKafka.Config.ProducerConfig.ProducerConfig(NKafka.Config.ProducerConfig! original) -> void
-NKafka.Config.ProducerConfig.TransactionalId.get -> string!
-NKafka.Config.ProducerConfig.TransactionalId.set -> void
-NKafka.Config.ProducerConfig.TransactionTimeoutMs.get -> int
-NKafka.Config.ProducerConfig.TransactionTimeoutMs.set -> void
 NKafka.Config.SaslMechanism
 NKafka.Config.SaslMechanism.Kerberos = 4 -> NKafka.Config.SaslMechanism
 NKafka.Config.SaslMechanism.OAuthBearer = 3 -> NKafka.Config.SaslMechanism
@@ -606,6 +602,7 @@ NKafka.PartitionMetadata.PartitionMetadata() -> void
 NKafka.PartitionMetadata.PartitionMetadata(NKafka.Partition partition, int leader, int leaderEpoch, System.Collections.Generic.IReadOnlyCollection<int>! replicas, System.Collections.Generic.IReadOnlyCollection<int>! isr, System.Collections.Generic.IReadOnlyCollection<int>! offlineReplicas) -> void
 NKafka.PartitionMetadata.Replicas.get -> System.Collections.Generic.IReadOnlyCollection<int>!
 NKafka.ProducerExtensions
+NKafka.TransactionalProducerExtensions
 NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.AddOffsetsToTxn = 25 -> NKafka.Protocol.ApiKeys
 NKafka.Protocol.ApiKeys.AddPartitionsToTxn = 24 -> NKafka.Protocol.ApiKeys
@@ -1197,6 +1194,9 @@ static NKafka.Config.SaslSettings.operator ==(NKafka.Config.SaslSettings? left, 
 static NKafka.Config.SslSettings.operator !=(NKafka.Config.SslSettings? left, NKafka.Config.SslSettings? right) -> bool
 static NKafka.Config.SslSettings.operator ==(NKafka.Config.SslSettings? left, NKafka.Config.SslSettings? right) -> bool
 static NKafka.ConsumerExtensions.BuildConsumer<TKey, TValue>(this NKafka.IKafkaCluster! kafkaCluster, NKafka.Config.ConsumerConfig! consumerConfig) -> NKafka.Clients.Consumer.IConsumer<TKey, TValue>!
+static NKafka.TransactionalProducerExtensions.CreateTransactionalProducerAsync(this NKafka.IKafkaCluster! cluster, string! transactionalId, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.ITransactionalProducer!>!
+static NKafka.TransactionalProducerExtensions.CreateTransactionalProducerAsync(this NKafka.IKafkaCluster! cluster, string! transactionalId, NKafka.Config.TransactionalProducerConfig! config, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.ITransactionalProducer!>!
+static NKafka.TransactionalProducerExtensions.CreateTransactionalProducerAsync(this NKafka.IKafkaCluster! cluster, string! transactionalId, System.Action<NKafka.Config.TransactionalProducerConfig!>! configure, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.ITransactionalProducer!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, Microsoft.Extensions.Logging.ILoggerFactory! loggerFactory, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
 static NKafka.KafkaClusterExtensions.CreateCluster(this NKafka.Config.ClusterConfig! config, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.IKafkaCluster!>!
@@ -1422,6 +1422,10 @@ NKafka.Clients.Producer.IProducerTransaction.SendOffsetsAsync(System.Collections
 NKafka.Clients.Producer.ITransactionalProducer
 NKafka.Clients.Producer.ITransactionalProducer.BeginTransactionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<NKafka.Clients.Producer.IProducerTransaction!>
 NKafka.Config.TransactionalProducerConfig
+NKafka.Config.TransactionalProducerConfig.TransactionalId.get -> string!
+NKafka.Config.TransactionalProducerConfig.TransactionalId.set -> void
+NKafka.Config.TransactionalProducerConfig.TransactionTimeoutMs.get -> int
+NKafka.Config.TransactionalProducerConfig.TransactionTimeoutMs.set -> void
 NKafka.Config.TransactionalProducerConfig.TransactionalProducerConfig() -> void
 NKafka.Config.TransactionalProducerConfig.TransactionalProducerConfig(NKafka.Config.TransactionalProducerConfig! original) -> void
 override NKafka.Config.TransactionalProducerConfig.<Clone>$() -> NKafka.Config.TransactionalProducerConfig!

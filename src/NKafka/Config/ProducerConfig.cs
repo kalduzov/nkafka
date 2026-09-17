@@ -97,19 +97,6 @@ public record ProducerConfig: CommonConfig
     public int BufferMemory { get; set; } = 32 * 1024 * 1024;
 
     /// <summary>
-    /// Gets or sets the unique identifier for a transaction.
-    /// </summary>
-    /// <value>
-    /// The transactional identifier.
-    /// </value>
-    public string TransactionalId { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the transaction timeout in milliseconds.
-    /// </summary>
-    public int TransactionTimeoutMs { get; set; } = 60000;
-
-    /// <summary>
     /// Gets or sets a value indicating whether idempotence is enabled.
     /// </summary>
     public bool EnableIdempotence { get; set; } = false;

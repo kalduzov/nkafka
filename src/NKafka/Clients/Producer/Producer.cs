@@ -86,7 +86,9 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         _logger = loggerFactory.CreateLogger(name);
 
         var clientId = config.ClientId;
-        var transactionId = config.TransactionalId;
+        var transactionId = config is TransactionalProducerConfig transactionalConfig
+            ? transactionalConfig.TransactionalId
+            : string.Empty;
 
         LoggerScope = _logger.Begin("producer", clientId, transactionId);
 

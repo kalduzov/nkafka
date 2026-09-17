@@ -67,6 +67,31 @@ namespace NKafka.Resources {
                 return ResourceManager.GetString("BrokerVersionInvalid", resourceCulture);
             }
         }
+
+        /// <summary>Looks up the localized string for the transaction acknowledgement requirement.</summary>
+        internal static string TransactionalProducerConfig_AcksRequired {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_AcksRequired", resourceCulture); }
+        }
+
+        /// <summary>Looks up the localized string for the explicit transactional identifier mismatch.</summary>
+        internal static string TransactionalProducerConfig_ExplicitIdDiffers {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_ExplicitIdDiffers", resourceCulture); }
+        }
+
+        /// <summary>Looks up the localized string for the idempotence requirement.</summary>
+        internal static string TransactionalProducerConfig_IdempotenceRequired {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_IdempotenceRequired", resourceCulture); }
+        }
+
+        /// <summary>Looks up the localized string for the transaction timeout validation.</summary>
+        internal static string TransactionalProducerConfig_TransactionTimeoutInvalid {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_TransactionTimeoutInvalid", resourceCulture); }
+        }
+
+        /// <summary>Looks up the localized string for the transactional identifier requirement.</summary>
+        internal static string TransactionalProducerConfig_TransactionalIdRequired {
+            get { return ResourceManager.GetString("TransactionalProducerConfig_TransactionalIdRequired", resourceCulture); }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to BootstrapServers not set.

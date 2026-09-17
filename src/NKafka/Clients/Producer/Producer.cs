@@ -30,6 +30,7 @@ using NKafka.Config;
 using NKafka.Diagnostics;
 using NKafka.Exceptions;
 using NKafka.Metrics;
+using NKafka.Protocol;
 using NKafka.Protocol.Records;
 
 using EM = NKafka.Resources.ExceptionMessages;
@@ -102,7 +103,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         try
         {
             _partitioner = InitPartitioner(config.PartitionerConfig);
-            _deliveryTimeoutMs = ConfigureDeliveryTimeout();
+            _deliveryTimeoutMs = config.DeliveryTimeoutMs;
             _transactionManager = transactionManager ?? new TransactionManager(config, loggerFactory, kafkaCluster);
             _accumulator = recordAccumulator
                            ?? new RecordAccumulator(config, _transactionManager, _deliveryTimeoutMs, _producerMetrics, loggerFactory);
@@ -160,8 +161,8 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                 topicPartition,
                 message.Timestamp.UnixTimestampMs,
                 Offset.Unset,
-                message.Key.Length,
-                message.Value.Length,
+                message.Key?.Length ?? -1,
+                message.Value?.Length ?? -1,
                 message);
         }
     }
@@ -202,26 +203,6 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
             _senderTask.Dispose();
         }
 
-    }
-
-    private static int LingerMs(ProducerConfig config)
-    {
-        return (int)Math.Min(config.LingerMs, int.MaxValue);
-    }
-
-    private int ConfigureDeliveryTimeout()
-    {
-        var deliveryTimeoutMs = Config.DeliveryTimeoutMs;
-        var lingerMs = LingerMs(Config);
-        var requestTimeoutMs = Config.RequestTimeoutMs;
-        var lingerAndRequestTimeoutMs = (int)Math.Min((long)lingerMs + requestTimeoutMs, int.MaxValue);
-
-        if (deliveryTimeoutMs < lingerAndRequestTimeoutMs)
-        {
-            deliveryTimeoutMs = lingerAndRequestTimeoutMs;
-        }
-
-        return deliveryTimeoutMs;
     }
 
     private static IPartitioner InitPartitioner(PartitionerConfig partitionerConfig)
@@ -288,8 +269,9 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
         using var activity = KafkaDiagnosticsSource.ProduceMessage(actualTopicPartition, message, isFireAndForget);
 
-        var serializedKeySize = message.Key.Length;
-        var serializedValueSize = message.Value.Length;
+        var serializedKeySize = message.Key?.Length ?? -1;
+        var serializedValueSize = message.Value?.Length ?? -1;
+        var accepted = false;
 
         try
         {
@@ -328,6 +310,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                 message.Key,
                 message.Value,
                 headers);
+            accepted = true;
 
             if (_transactionManager.IsTransactional)
             {
@@ -371,25 +354,57 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
             }
 
         }
+        catch (ProtocolKafkaException exception)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+
+            return CreateFailureResult(
+                accepted ? PersistenceStatus.PossiblyPersisted : PersistenceStatus.NotPersisted,
+                ProducerLocalError.None,
+                exception.InternalError);
+        }
         catch (TimeoutException)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "Timeout exception");
 
             var topicPartitionOffset = new TopicPartitionOffset(topicPartition, Offset.Unset);
 
-            return new MessageDeliveryResult(PersistenceStatus.NotPersisted,
+            return new MessageDeliveryResult(accepted ? PersistenceStatus.PossiblyPersisted : PersistenceStatus.NotPersisted,
                 topicPartitionOffset.TopicPartition,
-                message.Timestamp.UnixTimestampMs,
+                Timestamp.Default.UnixTimestampMs,
                 topicPartitionOffset.Offset,
                 serializedKeySize,
                 serializedValueSize,
-                message);
+                message)
+            {
+                Error = new ProducerError(
+                    ErrorCodes.ClientError,
+                    accepted ? ProducerLocalError.DeliveryTimedOut : ProducerLocalError.EnqueueTimedOut)
+            };
         }
         catch (Exception exc)
         {
             activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
 
             throw;
+        }
+
+        MessageDeliveryResult CreateFailureResult(
+            PersistenceStatus status,
+            ProducerLocalError localError,
+            ErrorCodes errorCode)
+        {
+            return new MessageDeliveryResult(
+                status,
+                actualTopicPartition,
+                Timestamp.Default.UnixTimestampMs,
+                Offset.Unset,
+                serializedKeySize,
+                serializedValueSize,
+                message)
+            {
+                Error = new ProducerError(errorCode == ErrorCodes.None ? ErrorCodes.ClientError : errorCode, localError)
+            };
         }
     }
 

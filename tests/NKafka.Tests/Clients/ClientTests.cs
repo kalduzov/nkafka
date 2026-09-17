@@ -67,6 +67,8 @@ public abstract class ClientTests
     {
         var kafkaCluster = Substitute.For<IKafkaCluster>();
         kafkaCluster.Closed.Returns(true);
+        kafkaCluster.GetPartitions(Arg.Any<string>(), Arg.Any<CancellationToken>())
+            .Returns([new Partition(1)]);
 
         var transactionManager = Substitute.For<ITransactionManager>();
         var recordAccumulator = Substitute.For<IRecordAccumulator>();

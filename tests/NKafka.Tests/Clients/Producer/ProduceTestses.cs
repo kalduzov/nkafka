@@ -83,6 +83,7 @@ public sealed class ProduceTests: ClientTests
         var valueBytes = Serializers.String.Serialize(value);
         var action = async () => await producer.ProduceAsync("test_topic", new Message(keyBytes, valueBytes), CancellationToken.None);
         var result = await action.Should().NotThrowAsync();
-        result.Subject.Status.Should().Be(PersistenceStatus.NotPersisted);
+        result.Subject.Status.Should().Be(PersistenceStatus.PossiblyPersisted);
+        result.Subject.Error!.LocalError.Should().Be(ProducerLocalError.DeliveryTimedOut);
     }
 }

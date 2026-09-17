@@ -25,6 +25,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Clients.Producer.Internals;
 using NKafka.Protocol;
+using NKafka.Protocol.Buffers;
 
 namespace NKafka.Tests.Clients.Producer;
 
@@ -116,5 +117,46 @@ public class ProduceBathSerializationTests
         // producerBatch.TryAppend(0, null, "test"u8.ToArray(), Headers.Empty, out _);
         // producerBatch.Close();
         // buffer[.._testSerialization.Length].Should().BeEquivalentTo(_testSerialization);
+    }
+
+    [Fact]
+    public void ProducerBatch_StateMustFollowTheLifecycle()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.State.Should().Be(ProducerBatch.BatchState.Open);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+        batch.State.Should().Be(ProducerBatch.BatchState.Closed);
+
+        batch.MarkCompressed();
+        batch.State.Should().Be(ProducerBatch.BatchState.Compressed);
+        batch.MarkFinalized();
+        batch.State.Should().Be(ProducerBatch.BatchState.Finalized);
+        batch.MarkSent();
+        batch.State.Should().Be(ProducerBatch.BatchState.Sent);
+
+        batch.Complete(10, 1);
+        batch.State.Should().Be(ProducerBatch.BatchState.Completed);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustRejectWritesAndRepeatedTransitionsAfterClose()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.Close();
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out var task).Should().BeFalse();
+        (task is null).Should().BeTrue();
+        var close = () => batch.Close();
+        close.Should().Throw<InvalidOperationException>();
+
+        ArrayBufferPool.Return(buffer);
     }
 }

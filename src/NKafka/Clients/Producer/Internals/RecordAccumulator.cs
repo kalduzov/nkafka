@@ -229,7 +229,10 @@ internal sealed class RecordAccumulator(
 
         if (!lastBatch.TryAppend(timestamp, key, value, headers, out var sendResultTask))
         {
-            lastBatch.Close();
+            if (lastBatch.State == ProducerBatch.BatchState.Open)
+            {
+                lastBatch.Close();
+            }
             lastBatch.SetReady();
 
             return false;
@@ -332,7 +335,10 @@ internal sealed class RecordAccumulator(
                         continue;
                     }
                 }
-                firstBatch.Close();
+                if (firstBatch.State == ProducerBatch.BatchState.Open)
+                {
+                    firstBatch.Close();
+                }
                 size += firstBatch.Size;
 
                 yield return firstBatch;

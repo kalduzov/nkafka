@@ -42,6 +42,16 @@ namespace NKafka.Clients.Producer.Internals;
 /// <param name="loggerFactory"></param>
 internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory)
 {
+    internal enum BatchState
+    {
+        Open,
+        Closed,
+        Compressed,
+        Finalized,
+        Sent,
+        Completed
+    }
+
     /// <summary>
     /// This default bath 
     /// </summary>
@@ -69,6 +79,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     private int _lastOffset = -1;
     private readonly List<Record> _records = new(16);
     private readonly ILogger<ProducerBatch> _logger = loggerFactory.CreateLogger<ProducerBatch>();
+
+    internal BatchState State { get; private set; } = BatchState.Open;
 
     /// <summary>
     /// How many bytes are left to add so that the batch is complete?
@@ -133,6 +145,13 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         Headers headers,
         out SendResultTask? sendResultTask)
     {
+        if (State != BatchState.Open)
+        {
+            sendResultTask = null;
+
+            return false;
+        }
+
         var estimateSizeInBytesUpperBound = RecordExtensions.EstimateSizeInBytesUpperBound(key, value, headers);
 
         if (_buffer.Remaining - estimateSizeInBytesUpperBound < 0)
@@ -165,10 +184,39 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// </summary>
     public void Close()
     {
+        EnsureState(BatchState.Open, "close");
+
         var bufferWriter = new BufferWriter(ref _buffer);
         WriteRecords(ref bufferWriter);
         WriteHeader(ref bufferWriter);
         IsFull = true;
+        State = BatchState.Closed;
+    }
+
+    internal void MarkCompressed()
+    {
+        EnsureState(BatchState.Closed, "compress");
+        State = BatchState.Compressed;
+    }
+
+    internal void MarkFinalized()
+    {
+        if (State is not (BatchState.Closed or BatchState.Compressed))
+        {
+            throw new InvalidOperationException($"Cannot finalize a batch in state {State}.");
+        }
+
+        State = BatchState.Finalized;
+    }
+
+    internal void MarkSent()
+    {
+        if (State is not (BatchState.Closed or BatchState.Compressed or BatchState.Finalized))
+        {
+            throw new InvalidOperationException($"Cannot send a batch in state {State}.");
+        }
+
+        State = BatchState.Sent;
     }
 
     private void WriteRecords(ref BufferWriter bufferWriter)
@@ -230,6 +278,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// <param name="appendTime">The appended time of the batch</param>
     public void Complete(long baseOffset, long appendTime)
     {
+        EnsureNotCompleted("complete");
+
         foreach (var recordTask in _recordTasks)
         {
             recordTask.SetResult(new RecordMetadata
@@ -239,6 +289,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
             });
         }
         _produceRequestResult.SetResult();
+        State = BatchState.Completed;
     }
 
     /// <summary>
@@ -247,6 +298,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// <param name="errorCode">The error code for the failure.</param>
     public void Fail(ErrorCodes errorCode)
     {
+        EnsureNotCompleted("fail");
+
         var exception = new ProtocolKafkaException(errorCode);
 
         foreach (var recordTask in _recordTasks)
@@ -254,10 +307,27 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
             recordTask.SetException(exception);
         }
         _produceRequestResult.SetException(exception);
+        State = BatchState.Completed;
     }
 
     public void SetReady()
     {
         IsReady = true;
+    }
+
+    private void EnsureState(BatchState expected, string operation)
+    {
+        if (State != expected)
+        {
+            throw new InvalidOperationException($"Cannot {operation} a batch in state {State}.");
+        }
+    }
+
+    private void EnsureNotCompleted(string operation)
+    {
+        if (State == BatchState.Completed)
+        {
+            throw new InvalidOperationException($"Cannot {operation} a completed batch.");
+        }
     }
 }

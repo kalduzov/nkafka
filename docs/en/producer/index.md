@@ -69,6 +69,18 @@ await foreach (var message in messages.WithCancellation(cancellationToken))
 
 Here, `messages` is a stream of messages prepared by the application; this example does not cover committing Kafka consumer offsets. The producer is created once for its owner's lifetime, while transaction objects are created sequentially within the loop.
 
+## Delivery handler
+
+An ordinary producer also supports `Produce` with an `Action<MessageDeliveryResult>` delivery handler. The handler is called once for every accepted message and receives the same result as `ProduceAsync`, including `Error` for an unsuccessful delivery. It does not receive an exception as a separate parameter.
+
+Use this form when delivery outcomes are processed later and individual tasks are not awaited. Keep the handler short: it must not block the producer's delivery path.
+
+## Message ownership
+
+NKafka does not copy a message key, value, or headers when it accepts a message for sending. From the call to `ProduceAsync`, or a send that uses a delivery handler, until the final delivery result, application code must leave the `Message` unchanged. This includes the contents of its key and value arrays and the set of headers. Do not return those arrays to a pool during that interval.
+
+The final result is the completion of the returned task or invocation of the delivery handler. If cancellation removes a message before its batch is closed, the result has `NotPersisted` status and `Cancelled` as its local error; the task is not itself cancelled. Once the batch is closed, cancellation does not make a message available for reuse because the producer may still deliver it internally. This rule avoids an extra copy on every send; changing an array after handing it to the producer is unsupported.
+
 During shutdown, stop accepting new work, complete the active transaction according to its state, dispose the producer, and only then close the cluster. A commit timeout does not guarantee an abort: do not automatically repeat the business operation or switch to abort when the commit outcome is unknown. Error handling and bounded disposal are being specified in the [transaction design overview](../../../spec/KIP/KIP-98/vision.md).
 
 ## Asynchronous disposal and timeout

@@ -8,7 +8,7 @@ This page describes a planned common disposal setting. The current implementatio
 
 ## Common disposal deadline
 
-A separate option in `CommonConfig` will limit disposal of producers, transactional producers, consumers, and administrative clients. The proposed name is `ClientDisposeTimeoutMs`, with a proposed default of 5000 ms and a positive integer range. These details remain subject to approval.
+A separate option in `CommonConfig` will limit disposal of producers, transactional producers, consumers, and administrative clients. The agreed name is `ClientDisposeTimeoutMs`, its type is `int`, its default is 10,000 ms, and only positive integer values are allowed. The validator rejects zero and negative values; infinite waiting is not supported.
 
 Producers and consumers use their effective inherited configuration. The current administrative client has no separate `AdminConfig` and uses the cluster configuration. Configuration copying and merging must preserve this option. Common validation must reject invalid values before client initialization.
 

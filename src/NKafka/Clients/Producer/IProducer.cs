@@ -21,9 +21,6 @@
  * limitations under the License.
  */
 
-using NKafka.Clients.Consumer;
-using NKafka.Config;
-
 namespace NKafka.Clients.Producer;
 
 /// <summary>
@@ -77,38 +74,4 @@ public interface IProducer: IDisposable, IAsyncDisposable
 
     #endregion Produce
 
-    #region Transaction
-
-    /// <summary>
-    /// Needs to be called before any other methods when the <see cref="ProducerConfig.TransactionalId"/> is set in the configuration.
-    /// </summary>
-    /// <param name="token"></param>
-    public Task InitTransactionsAsync(CancellationToken token);
-
-    /// <summary>
-    /// Should be called before the start of each new transaction.
-    /// </summary>
-    public void BeginTransaction();
-
-    /// <summary>
-    /// Commits the ongoing transaction
-    /// </summary>
-    public Task CommitTransactionAsync(CancellationToken token);
-
-    /// <summary>
-    /// Aborts the ongoing transaction
-    /// </summary>
-    public Task AbortTransactionAsync(CancellationToken token);
-
-    /// <summary>
-    /// Sends a list of specified offsets to the consumer group coordinator, and also marks those offsets as part of the current transaction.
-    /// </summary>
-    /// <param name="offsets"></param>
-    /// <param name="groupMetadata"></param>
-    /// <param name="token"></param>
-    public Task SendOffsetsToTransactionAsync(IReadOnlyCollection<TopicPartitionOffset> offsets,
-        ConsumerGroupMetadata groupMetadata,
-        CancellationToken token);
-
-    #endregion
 }

@@ -209,15 +209,10 @@ NKafka.Clients.IClient
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition(string! topic, byte[]! keyBytes, byte[]! valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer
-NKafka.Clients.Producer.IProducer.AbortTransactionAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.IProducer.BeginTransaction() -> void
 NKafka.Clients.Producer.IProducer.CloseAsync(System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-NKafka.Clients.Producer.IProducer.CommitTransactionAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer.FlushAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
-NKafka.Clients.Producer.IProducer.InitTransactionsAsync(System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.IProducer.Produce(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Action<NKafka.Clients.Producer.MessageDeliveryResult!, System.Exception?>! callback, System.Threading.CancellationToken cancellationToken) -> void
 NKafka.Clients.Producer.IProducer.ProduceAsync(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
-NKafka.Clients.Producer.IProducer.SendOffsetsToTransactionAsync(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken token) -> System.Threading.Tasks.Task!
 NKafka.Clients.Producer.MessageDeliveryResult
 NKafka.Clients.Producer.MessageDeliveryResult.Deconstruct(out NKafka.Clients.Producer.PersistenceStatus Status, out NKafka.TopicPartition! TopicPartition, out long Timestamp, out NKafka.Offset Offset, out int SerializedKeySize, out int SerializedValueSize, out NKafka.Message! Message) -> void
 NKafka.Clients.Producer.MessageDeliveryResult.Message.get -> NKafka.Message!
@@ -1418,5 +1413,25 @@ virtual NKafka.TopicMetadata.<Clone>$() -> NKafka.TopicMetadata!
 virtual NKafka.TopicMetadata.EqualityContract.get -> System.Type!
 virtual NKafka.TopicMetadata.Equals(NKafka.TopicMetadata? other) -> bool
 virtual NKafka.TopicMetadata.PrintMembers(System.Text.StringBuilder! builder) -> bool
+NKafka.Clients.Producer.IProducerTransaction
+NKafka.Clients.Producer.IProducerTransaction.AbortAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducerTransaction.CommitAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.IProducerTransaction.ProduceAsync(NKafka.TopicPartition! topicPartition, NKafka.Message! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<NKafka.Clients.Producer.MessageDeliveryResult!>!
+NKafka.Clients.Producer.IProducerTransaction.SendOffsetsAsync(System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Producer.TopicPartitionOffset!>! offsets, NKafka.Clients.Consumer.ConsumerGroupMetadata! groupMetadata, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+NKafka.Clients.Producer.ITransactionalProducer
+NKafka.Clients.Producer.ITransactionalProducer.BeginTransactionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<NKafka.Clients.Producer.IProducerTransaction!>
+NKafka.Config.TransactionalProducerConfig
+NKafka.Config.TransactionalProducerConfig.TransactionalProducerConfig() -> void
+NKafka.Config.TransactionalProducerConfig.TransactionalProducerConfig(NKafka.Config.TransactionalProducerConfig! original) -> void
+override NKafka.Config.TransactionalProducerConfig.<Clone>$() -> NKafka.Config.TransactionalProducerConfig!
+override NKafka.Config.TransactionalProducerConfig.EqualityContract.get -> System.Type!
+virtual NKafka.Config.TransactionalProducerConfig.Equals(NKafka.Config.TransactionalProducerConfig? other) -> bool
+override NKafka.Config.TransactionalProducerConfig.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override NKafka.Config.TransactionalProducerConfig.GetHashCode() -> int
+override NKafka.Config.TransactionalProducerConfig.Equals(object? obj) -> bool
+static NKafka.Config.TransactionalProducerConfig.operator ==(NKafka.Config.TransactionalProducerConfig? left, NKafka.Config.TransactionalProducerConfig? right) -> bool
+static NKafka.Config.TransactionalProducerConfig.operator !=(NKafka.Config.TransactionalProducerConfig? left, NKafka.Config.TransactionalProducerConfig? right) -> bool
+override sealed NKafka.Config.TransactionalProducerConfig.Equals(NKafka.Config.ProducerConfig? other) -> bool
+override NKafka.Config.TransactionalProducerConfig.ToString() -> string!
 ~override NKafka.Null.Equals(object obj) -> bool
 ~override NKafka.Null.ToString() -> string

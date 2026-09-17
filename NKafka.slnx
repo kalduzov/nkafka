@@ -389,6 +389,8 @@
     <File Path="spec/KIP/KIP-98/05-transaction-protocol-and-lifetime.md" />
     <File Path="spec/KIP/KIP-98/06-consumer-offsets-and-processing.md" />
     <File Path="spec/KIP/KIP-98/07-production-readiness.md" />
+    <File Path="spec/KIP/KIP-98/08-delivery-handlers.md" />
+    <File Path="spec/KIP/KIP-98/03.1-record-batch-accumulation.md" />
   </Folder>
   <Folder Name="/src/">
     <File Path="src/Directory.Build.props" />

@@ -11,6 +11,10 @@ namespace NKafka;
 /// <summary>
 /// Convenience methods for creating transactional producers.
 /// </summary>
+/// <remarks>
+/// These methods validate and prepare configuration, then delegate creation and initialization to the cluster.
+/// The caller owns the returned producer and must dispose it asynchronously.
+/// </remarks>
 public static class TransactionalProducerExtensions
 {
     extension(IKafkaCluster cluster)

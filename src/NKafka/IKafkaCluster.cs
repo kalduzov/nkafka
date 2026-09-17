@@ -142,6 +142,12 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
     /// <param name="producerConfig">Transactional producer configuration.</param>
     /// <param name="cancellationToken">Token used to cancel initialization.</param>
     /// <returns>A fully initialized transactional producer.</returns>
+    /// <remarks>
+    /// The transactional identifier is reserved atomically within this cluster before network initialization.
+    /// A second active producer with the same identifier is rejected. The identifier is released after the
+    /// returned producer has completed asynchronous disposal. The caller owns the returned producer.
+    /// </remarks>
+    /// <exception cref="KafkaConfigException">The configuration is invalid or the transactional identifier is already in use.</exception>
     Task<ITransactionalProducer> CreateTransactionalProducerAsync(
         TransactionalProducerConfig producerConfig,
         CancellationToken cancellationToken = default);

@@ -4,11 +4,11 @@
 
 ## Transactional interface status
 
-The transactional interface is being designed as part of [KIP-98](../../../spec/KIP/KIP-98/README.md). This page describes the target contract and its usage rules. The example uses proposed methods and is not yet a runnable example for the current library version.
+The transactional interface is implemented as part of [KIP-98](../../../spec/KIP/KIP-98/README.md). The examples use the public transactional producer contract.
 
 ## Transactional configuration
 
-The planned `TransactionalProducerConfig` inherits from `ProducerConfig`, preserving the configuration hierarchy used by the library. Common send settings are inherited; `TransactionalId` and `TransactionTimeoutMs` belong to the transactional configuration.
+`TransactionalProducerConfig` inherits from `ProducerConfig`, preserving the configuration hierarchy used by the library. Common send settings are inherited; `TransactionalId` and `TransactionTimeoutMs` belong to the transactional configuration.
 
 The transactional configuration sets valid initial values, including `EnableIdempotence = true` and `Acks = Acks.All`. Inherited properties remain writable, but incompatible user changes cause `KafkaConfigException` during validation, before network initialization. The exception identifies the invalid option; the library does not silently correct it.
 
@@ -73,7 +73,7 @@ During shutdown, stop accepting new work, complete the active transaction accord
 
 ## Asynchronous disposal and timeout
 
-The planned producer API uses only `DisposeAsync`, without synchronous `IDisposable` or a separate cancellable `CloseAsync`. A new common setting, provisionally named `ClientDisposeTimeoutMs`, limits client disposal. Its proposed default is 5000 ms; the name, default, and valid range still need approval. This is a planned contract, not an implemented setting.
+The transactional producer API uses `DisposeAsync`, without synchronous `IDisposable` or a separate cancellable `CloseAsync`. A common disposal timeout is still being specified separately.
 
 Disposal stops accepting new operations and uses one deadline for completing work and stopping the client's own background operations. Requests, retries, and nested transaction disposal do not receive a fresh full timeout. Disposing an active transaction separately uses the same setting from its owner's configuration.
 

@@ -381,6 +381,7 @@
   <Folder Name="/spec/KIP/KIP-98/">
     <File Path="spec/KIP/KIP-98/README.md" />
     <File Path="spec/KIP/KIP-98/01-public-interfaces.md" />
+    <File Path="spec/KIP/KIP-98/implementation-plan.md" />
     <File Path="spec/KIP/KIP-98/vision.md" />
   </Folder>
   <Folder Name="/src/">

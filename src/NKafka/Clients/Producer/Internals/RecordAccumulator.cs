@@ -347,7 +347,7 @@ internal sealed class RecordAccumulator(
 
                     if (firstBatch.IsReady)
                     {
-                        firstBatch = deque.RemoveLast();
+                        firstBatch = deque.RemoveFirst();
                     }
                     else
                     {

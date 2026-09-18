@@ -115,47 +115,59 @@ internal sealed class MessagesSender(
 
         foreach (var batch in batches)
         {
-            var node = await TryGetNodeAsync(batch.TopicPartition, token);
-            batch.MarkFinalized();
-
-            var produceRequestMessage = new ProduceRequestMessage
+            try
             {
-                TimeoutMs = config.RequestTimeoutMs,
-                Acks = (short)config.Acks,
-                TopicData =
-                [
-                    new ProduceRequestMessage.TopicProduceDataMessage
-                    {
-                        Name = batch.TopicPartition.Topic,
-                        PartitionData =
-                        [
-                            new ProduceRequestMessage.PartitionProduceDataMessage
-                            {
-                                Index = batch.TopicPartition.Partition,
-                                Records = batch.GetAsRecords()
-                            }
-                        ]
-                    }
-                ]
-            };
+                var node = await TryGetNodeAsync(batch.TopicPartition, token);
+                batch.MarkFinalized();
 
-            batch.MarkSent();
-            var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
-
-            foreach (var response in result.Responses)
-            {
-                foreach (var partitionResponse in response.PartitionResponses)
+                var produceRequestMessage = new ProduceRequestMessage
                 {
-                    if (partitionResponse.Code == ErrorCodes.None)
+                    TimeoutMs = config.RequestTimeoutMs,
+                    Acks = (short)config.Acks,
+                    TopicData =
+                    [
+                        new ProduceRequestMessage.TopicProduceDataMessage
+                        {
+                            Name = batch.TopicPartition.Topic,
+                            PartitionData =
+                            [
+                                new ProduceRequestMessage.PartitionProduceDataMessage
+                                {
+                                    Index = batch.TopicPartition.Partition,
+                                    Records = batch.GetAsRecords()
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                batch.MarkSent();
+                var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
+
+                foreach (var response in result.Responses)
+                {
+                    foreach (var partitionResponse in response.PartitionResponses)
                     {
-                        batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
-                    }
-                    else
-                    {
-                        _logger.Error(partitionResponse.Code);
-                        batch.Fail(partitionResponse.Code);
+                        if (partitionResponse.Code == ErrorCodes.None)
+                        {
+                            batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
+                        }
+                        else
+                        {
+                            _logger.Error(partitionResponse.Code);
+                            batch.Fail(partitionResponse.Code);
+                        }
                     }
                 }
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Ошибка отправки пакета {TopicPartition}", batch.TopicPartition);
+                batch.Fail(ErrorCodes.NetworkException);
             }
         }
 

@@ -116,6 +116,7 @@ internal sealed class MessagesSender(
         foreach (var batch in batches)
         {
             var node = await TryGetNodeAsync(batch.TopicPartition, token);
+            batch.MarkFinalized();
 
             var produceRequestMessage = new ProduceRequestMessage
             {
@@ -138,6 +139,7 @@ internal sealed class MessagesSender(
                 ]
             };
 
+            batch.MarkSent();
             var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
 
             foreach (var response in result.Responses)

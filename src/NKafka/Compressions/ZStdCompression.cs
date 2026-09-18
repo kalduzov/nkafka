@@ -19,6 +19,27 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using ZstdSharp;
+
 namespace NKafka.Compressions;
 
-internal sealed class ZStdCompression(int compressionLevel): ICompression;
+internal sealed class ZStdCompression(int compressionLevel): ICompression
+{
+    public byte[] Encode(byte[] data)
+    {
+        using var compressor = new Compressor(compressionLevel);
+        return compressor.Wrap(data).ToArray();
+    }
+
+    public byte[] Decode(byte[] data)
+    {
+        using var decompressor = new Decompressor();
+        return decompressor.Unwrap(data).ToArray();
+    }
+
+    public Stream Encode(Stream stream)
+        => new CompressionStream(stream, compressionLevel);
+
+    public Stream Decode(Stream stream)
+        => new DecompressionStream(stream);
+}

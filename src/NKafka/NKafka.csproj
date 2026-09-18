@@ -18,6 +18,7 @@
     </PackageReference>
     <PackageReference Include="Snappier"/>
     <PackageReference Include="K4os.Compression.LZ4"/>
+    <PackageReference Include="ZstdSharp.Port"/>
     <PackageReference Include="MinVer">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

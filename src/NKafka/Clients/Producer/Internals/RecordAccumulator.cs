@@ -72,7 +72,8 @@ internal sealed class RecordAccumulator(
     private readonly ILogger _logger = loggerFactory.CreateLogger<RecordAccumulator>();
     private readonly long _retryBackoffMs = config.RetryBackoffMs;
     private readonly ITransactionManager _transactionManager = transactionManager;
-    private volatile int _appendsInProgress;
+    // Number of Append operations currently processing records.
+    private int _appendsInProgress;
     private volatile int _flushesInProgress = 0;
     private readonly IProducerMetrics _metrics = metrics;
 
@@ -175,7 +176,6 @@ internal sealed class RecordAccumulator(
         finally
         {
             ArrayBufferPool.Return(buffer);
-
             Interlocked.Decrement(ref _appendsInProgress);
         }
     }
@@ -265,38 +265,33 @@ internal sealed class RecordAccumulator(
     /// <inheritdoc/>
     public async Task FlushAllAsync(CancellationToken cancellationToken)
     {
-        if (_flushesInProgress > 0)
-        {
-            return;
-        }
-
         Interlocked.Increment(ref _flushesInProgress);
 
         try
         {
-            // 1. Выбираем все батчи
-            // 2. Помечаем их как готовые к отправке, вне зависимости от размера, времени и т.п.
-            // 3. Ждем когда sender их отправит или выставит в ошибку
-
             var waitingTasks = new List<Task>();
 
             foreach (var batches in _batchesByTopics.Values)
             {
                 foreach (var batchesByPartition in batches.Values)
                 {
-                    foreach (var batch in batchesByPartition)
+                    lock (batchesByPartition)
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-
-                        batch.Close();
-                        batch.Compress();
-                        batch.SetReady();
-                        var completion = batch.CompletionTask;
-                        waitingTasks.Add(completion);
+                        foreach (var batch in batchesByPartition)
+                        {
+                            if (batch.State == ProducerBatch.BatchState.Open)
+                            {
+                                batch.Close();
+                                batch.Compress();
+                            }
+                            batch.SetReady();
+                            waitingTasks.Add(batch.CompletionTask);
+                        }
                     }
                 }
             }
-            await Task.WhenAll(waitingTasks);
+
+            await Task.WhenAll(waitingTasks).WaitAsync(cancellationToken);
         }
         finally
         {

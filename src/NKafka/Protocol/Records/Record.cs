@@ -52,6 +52,10 @@ internal sealed class Record
     /// </summary>
     public long OffsetDelta { get; private set; }
 
+    internal long Timestamp { get; private set; }
+
+    internal long Offset { get; private set; }
+
     /// <summary>
     /// 
     /// </summary>
@@ -87,6 +91,8 @@ internal sealed class Record
         Value = value;
         TimestampDelta = timestampDelta;
         OffsetDelta = offsetDelta;
+        Timestamp = timestampDelta;
+        Offset = offsetDelta;
     }
 
     /// <summary>
@@ -108,6 +114,8 @@ internal sealed class Record
         Attributes = reader.ReadSByte();
         TimestampDelta = reader.ReadVarInt64();
         OffsetDelta = reader.ReadVarInt32();
+        Timestamp = TimestampDelta;
+        Offset = OffsetDelta;
 
         var keyLen = reader.ReadVarInt32();
 
@@ -118,20 +126,23 @@ internal sealed class Record
             return;
         }
 
-        if (keyLen > 0)
+        if (keyLen >= 0)
         {
             Key = reader.ReadBytes(keyLen);
         }
 
         var valueLen = reader.ReadVarInt32();
 
-        if (reader.Remaining < valueLen)
+        if (valueLen >= 0 && reader.Remaining < valueLen)
         {
             IsValid = false;
 
             return;
         }
-        Value = reader.ReadBytes(valueLen);
+        if (valueLen >= 0)
+        {
+            Value = reader.ReadBytes(valueLen);
+        }
 
         var countHeader = reader.ReadVarInt32();
 
@@ -150,7 +161,7 @@ internal sealed class Record
 
                 var headerKeyLen = reader.ReadVarInt32();
 
-                if (reader.Remaining < headerKeyLen + 4)
+                if (headerKeyLen < 0 || reader.Remaining < headerKeyLen + 1)
                 {
                     IsValid = false;
 
@@ -159,13 +170,13 @@ internal sealed class Record
                 var headerKey = reader.ReadString(headerKeyLen);
                 var headerValueLen = reader.ReadVarInt32();
 
-                if (reader.Remaining < headerValueLen)
+                if (headerValueLen >= 0 && reader.Remaining < headerValueLen)
                 {
                     IsValid = false;
 
                     return;
                 }
-                var headerValue = reader.ReadBytes(headerValueLen);
+                var headerValue = headerValueLen >= 0 ? reader.ReadBytes(headerValueLen) : null;
 
                 var header = new Header(headerKey, headerValue);
                 headers.Add(header);
@@ -179,14 +190,17 @@ internal sealed class Record
     }
 
     public int WriteTo(ref BufferWriter bufferWriter)
+        => WriteTo(ref bufferWriter, TimestampDelta, (int)OffsetDelta);
+
+    internal int WriteTo(ref BufferWriter bufferWriter, long timestampDelta, int offsetDelta)
     {
         const byte attributes = 0; //  bit 0~7: unused in the current version of the protocol
 
-        var sizeInBytes = RecordExtensions.SizeOfBodyInBytes((int)OffsetDelta, TimestampDelta, Key, Value, Headers);
+        var sizeInBytes = RecordExtensions.SizeOfBodyInBytes(offsetDelta, timestampDelta, Key, Value, Headers);
         bufferWriter.WriteVarInt32(sizeInBytes);
         bufferWriter.WriteByte(attributes);
-        bufferWriter.WriteVarInt64(TimestampDelta);
-        bufferWriter.WriteVarInt64(OffsetDelta);
+        bufferWriter.WriteVarInt64(timestampDelta);
+        bufferWriter.WriteVarInt64(offsetDelta);
 
         if (Key is null)
         {
@@ -225,4 +239,5 @@ internal sealed class Record
 
         return sizeInBytes.SizeOfVarInt() + sizeInBytes;
     }
+
 }

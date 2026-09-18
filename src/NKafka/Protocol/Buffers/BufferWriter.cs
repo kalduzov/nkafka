@@ -130,9 +130,12 @@ internal ref partial struct BufferWriter
     }
 
     public void WriteBytes(byte[] bytes)
+        => WriteBytes(bytes.AsSpan());
+
+    public void WriteBytes(ReadOnlySpan<byte> bytes)
     {
         ref var dest = ref GetSpanReference(bytes.Length);
-        ref var src = ref Unsafe.As<byte, byte>(ref MemoryMarshal.GetReference(bytes.AsSpan()));
+        ref var src = ref Unsafe.As<byte, byte>(ref MemoryMarshal.GetReference(bytes));
         Unsafe.CopyBlockUnaligned(ref dest, ref src, (uint)bytes.Length);
 
         Advance(bytes.Length);
@@ -215,7 +218,10 @@ internal ref partial struct BufferWriter
         {
             return;
         }
-        WriteBytes(records.Buffer.ToArrayAndReset());
+        foreach (var segment in records.Buffer)
+        {
+            WriteBytes(segment.Span);
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

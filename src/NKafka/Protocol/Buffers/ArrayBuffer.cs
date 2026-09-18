@@ -49,12 +49,44 @@ internal sealed class ArrayBuffer(bool useFirstBuffer, bool pinned, int bufferSi
 
     private bool UseFirstBuffer => _firstBuffer != _noUseFirstBufferSentinel;
 
+    internal int Capacity => _firstBuffer.Length;
+
     public int Remaining => bufferSize - TotalWritten;
 
     public static ArrayBuffer Null => new(true, false, 0);
 
     public byte[] DangerousGetFirstBuffer()
         => _firstBuffer;
+
+    internal Span<byte> WrittenFirstSpan
+        => _firstBuffer.AsSpan(0, _firstBufferWritten);
+
+    internal void WriteAt(int offset, ReadOnlySpan<byte> value)
+    {
+        if (offset < 0 || offset > _firstBufferWritten - value.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(offset));
+        }
+
+        value.CopyTo(_firstBuffer.AsSpan(offset, value.Length));
+    }
+
+    public Enumerator GetEnumerator() => new(this);
+
+    internal void CopyWrittenTo(Span<byte> destination)
+    {
+        if (destination.Length < TotalWritten)
+        {
+            throw new ArgumentException("Destination is smaller than the written buffer.", nameof(destination));
+        }
+
+        var offset = 0;
+        foreach (var segment in this)
+        {
+            segment.Span.CopyTo(destination[offset..]);
+            offset += segment.Length;
+        }
+    }
 
     public Memory<byte> GetMemory(int sizeHint = 0)
     {

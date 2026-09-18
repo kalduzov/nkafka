@@ -24,6 +24,8 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
+using System.Buffers.Binary;
+
 using NKafka.Exceptions;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
@@ -59,18 +61,22 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         ArrayBuffer.Null,
         NullLoggerFactory.Instance);
 
-    internal const int RECORD_BATCH_OVERHEAD = 61;
-
     private ArrayBuffer _buffer = buffer;
 
-    /// <summary>
-    /// Batch header length
-    /// </summary>
-    internal const int BATCH_HEADER_LEN = 54;
+    // Batch header length
+    internal const int BATCH_HEADER_LEN = RecordBatch.RECORD_BATCH_OVERHEAD;
 
-    private const int _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET = RECORD_BATCH_OVERHEAD - 4;
+    // RecordBatch.length follows the eight-byte baseOffset field.
+    private const int _LENGTH_OFFSET = sizeof(long);
 
-    private const int _ATTRIBUTES_OFFSET = 17;
+    // The CRC follows baseOffset, length, partitionLeaderEpoch, and magic.
+    private const int _CRC_OFFSET = _LENGTH_OFFSET + sizeof(int) + sizeof(int) + sizeof(byte);
+
+    // Kafka calculates the CRC over the bytes after the CRC field, starting with attributes.
+    private const int _CRC_DATA_OFFSET = _CRC_OFFSET + sizeof(uint);
+
+    // The length field excludes baseOffset and the length field itself.
+    private const int _RECORD_BATCH_PREFIX_LENGTH = _LENGTH_OFFSET + sizeof(int);
 
     private readonly TaskCompletionSource _produceRequestResult = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private int _maxRecordSize;
@@ -127,6 +133,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
     public long MaxTimestamp { get; set; }
 
+    internal uint Crc { get; private set; }
+
     internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestampNow)
         : this(topicPartition, buffer, loggerFactory)
     {
@@ -165,9 +173,17 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
 
         var offset = Interlocked.Increment(ref _lastOffset);
 
+        if (_recordsCount == 0)
+        {
+            BaseTimestamp = timestamp;
+            MaxTimestamp = timestamp;
+        }
+        else
+        {
+            MaxTimestamp = Math.Max(MaxTimestamp, timestamp);
+        }
+
         var record = new Record(headers, key, value, timestamp, offset);
-        //_baseTimestamp = timestamp;
-        // _maxTimestamp = Math.Max(_baseTimestamp, timestamp);
 
         _records.Add(record);
 
@@ -188,10 +204,25 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     {
         EnsureState(BatchState.Open, "close");
 
+        _buffer.Reset();
         var bufferWriter = new BufferWriter(ref _buffer);
-        WriteRecords(ref bufferWriter);
         WriteHeader(ref bufferWriter);
-        Size = EstimatedSizeInBytes;
+
+        for (var index = 0; index < _records.Count; index++)
+        {
+            var record = _records[index];
+            record.WriteTo(ref bufferWriter, record.Timestamp - BaseTimestamp, index);
+        }
+
+        Size = _buffer.TotalWritten;
+        Span<byte> integerBytes = stackalloc byte[4];
+        BinaryPrimitives.WriteInt32BigEndian(integerBytes, Size - _RECORD_BATCH_PREFIX_LENGTH);
+        _buffer.WriteAt(_LENGTH_OFFSET, integerBytes);
+
+        Crc = global::NKafka.Crc.Crc.Calculate(_buffer.WrittenFirstSpan[_CRC_DATA_OFFSET..]);
+        BinaryPrimitives.WriteUInt32BigEndian(integerBytes, Crc);
+        _buffer.WriteAt(_CRC_OFFSET, integerBytes);
+
         IsFull = true;
         State = BatchState.Closed;
     }
@@ -222,41 +253,21 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         State = BatchState.Sent;
     }
 
-    private void WriteRecords(ref BufferWriter bufferWriter)
-    {
-        // bufferWriter.Position = _BATCH_OVERHEAD_WITHOUT_RECORDS_OFFSET;
-        //
-        // bufferWriter.WriteInt(_records.Count);
-        //
-        // var size = 0;
-        //
-        // foreach (var record in _records)
-        // {
-        //     size += record.WriteTo(ref bufferWriter);
-        // }
-        // //Length += size;
-        // _buffer.Position = 0;
-    }
-
     private void WriteHeader(ref BufferWriter bufferWriter)
     {
-        // bufferWriter.Position = 0;
-        // // https://kafka.apache.org/documentation/#recordbatch
-        // bufferWriter.WriteLong(BaseOffset);
-        // bufferWriter.WriteInt(Length - 12);
-        // bufferWriter.WriteInt(PartitionLeaderEpoch);
-        // bufferWriter.WriteByte(Magic);
-        // bufferWriter.WriteUInt(Crc); //reserve
-        // bufferWriter.WriteShort(Attributes);
-        // bufferWriter.WriteInt(_lastOffset);
-        // bufferWriter.WriteLong(BaseTimestamp);
-        // bufferWriter.WriteLong(MaxTimestamp);
-        // bufferWriter.WriteLong(ProducerId);
-        // bufferWriter.WriteShort(ProducerEpoch);
-        // bufferWriter.WriteInt(BaseSequence);
-        // Crc = CrcUtils.Calculate(bufferWriter.AsSpan(_ATTRIBUTES_OFFSET + 4, Length));
-        // bufferWriter.PutUInt(_ATTRIBUTES_OFFSET, Crc); //
-        // _bufferWriter.Position = 0;
+        bufferWriter.WriteLong(0);
+        bufferWriter.WriteInt(0);
+        bufferWriter.WriteInt(-1);
+        bufferWriter.WriteByte(2);
+        bufferWriter.WriteUInt(0);
+        bufferWriter.WriteShort(0);
+        bufferWriter.WriteInt(_lastOffset);
+        bufferWriter.WriteLong(BaseTimestamp);
+        bufferWriter.WriteLong(MaxTimestamp);
+        bufferWriter.WriteLong(-1);
+        bufferWriter.WriteShort(-1);
+        bufferWriter.WriteInt(-1);
+        bufferWriter.WriteInt(_recordsCount);
     }
 
     /// <summary>
@@ -265,13 +276,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// <returns>A new Records object containing the data.</returns>
     public Records GetAsRecords()
     {
-        var list = new[]
-        {
-            this
-        };
-
-        return new Records(_buffer);
-        //return new Records(Length, list);
+        return new Records(_buffer, Size, true);
     }
 
     /// <summary>

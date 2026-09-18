@@ -19,6 +19,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Buffers.Binary;
 using System.Text;
 
 using Microsoft.Extensions.Logging.Abstractions;
@@ -170,4 +171,218 @@ public class ProduceBathSerializationTests
             .Should()
             .Be(RecordBatch.RECORD_BATCH_OVERHEAD + RecordExtensions.EstimateSizeInBytesUpperBound(value, value, Headers.Empty));
     }
+
+    [Fact]
+    public void ProducerBatch_CloseMustWriteReadableRecordBatch()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1678512922757, null, "test"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+
+        batch.Close();
+
+        var bytes = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        var reader = new BufferReader(bytes);
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.CountRecords.Should().Be(1);
+        recordBatch.Records.Single().Value.Should().BeEquivalentTo("test"u8.ToArray());
+        recordBatch.BaseTimestamp.Should().Be(1678512922757);
+        recordBatch.LastOffsetDelta.Should().Be(0);
+        recordBatch.Crc.Should().Be(global::NKafka.Crc.Crc.Calculate(bytes[21..]));
+
+        var recordsReader = new BufferReader(bytes);
+        var records = recordsReader.ReadRecords(bytes.Length);
+        records.Should().NotBeNull();
+        records!.SizeInBytes.Should().Be(bytes.Length);
+        records.Batches.Should().ContainSingle();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustWriteRecordDeltasAndMaximumTimestamp()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1000, "key-1"u8.ToArray(), "value-1"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.TryAppend(1010, "key-2"u8.ToArray(), "value-2"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        var bytes = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        var reader = new BufferReader(bytes);
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.CountRecords.Should().Be(2);
+        recordBatch.BaseTimestamp.Should().Be(1000);
+        recordBatch.MaxTimestamp.Should().Be(1010);
+        recordBatch.LastOffsetDelta.Should().Be(1);
+        recordBatch.Records.Select(record => record.TimestampDelta).Should().Equal(0, 10);
+        recordBatch.Records.Select(record => record.OffsetDelta).Should().Equal(0, 1);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustWriteHeadersAndNullValues()
+    {
+        var headers = new Headers(
+        [
+            new Header("trace-id", "abc"u8.ToArray()),
+            new Header("empty", null)
+        ]);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1000, null, null, headers, out _).Should().BeTrue();
+        batch.Close();
+
+        var bytes = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        var reader = new BufferReader(bytes);
+        var record = new RecordBatch(ref reader).Records.Single();
+
+        record.Key.Should().BeNull();
+        record.Value.Should().BeNull();
+        record.Headers.Count.Should().Be(2);
+        record.Headers[0].Key.Should().Be("trace-id");
+        record.Headers[0].Value.Should().BeEquivalentTo("abc"u8.ToArray());
+        record.Headers[1].Key.Should().Be("empty");
+        record.Headers[1].Value.Should().BeNull();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_CrcMustChangeWhenRecordDataChanges()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        var bytes = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        var originalCrc = BinaryPrimitives.ReadUInt32BigEndian(bytes.AsSpan(17, sizeof(uint)));
+        bytes[^1] ^= 0x01;
+
+        global::NKafka.Crc.Crc.Calculate(bytes[21..]).Should().NotBe(originalCrc);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_EmptyBatchMustHaveAValidHeader()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.Close();
+
+        batch.Size.Should().Be(RecordBatch.RECORD_BATCH_OVERHEAD);
+        var reader = new BufferReader(buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size));
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.CountRecords.Should().Be(0);
+        recordBatch.Length.Should().Be(RecordBatch.RECORD_BATCH_OVERHEAD - 12);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustPreserveUnicodeAndEmptyArrays()
+    {
+        var headers = new Headers([new Header("ключ", [])]);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1000, [], "Привет, Kafka"u8.ToArray(), headers, out _).Should().BeTrue();
+        batch.Close();
+
+        var reader = new BufferReader(buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size));
+        var record = new RecordBatch(ref reader).Records.Single();
+
+        record.Key.Should().BeEmpty();
+        record.Value.Should().BeEquivalentTo("Привет, Kafka"u8.ToArray());
+        record.Headers[0].Key.Should().Be("ключ");
+        record.Headers[0].Value.Should().BeEmpty();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustWriteProtocolHeaderFields()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        var reader = new BufferReader(buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size));
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.Magic.Should().Be(2);
+        recordBatch.PartitionLeaderEpoch.Should().Be(-1);
+        recordBatch.ProducerId.Should().Be(-1);
+        recordBatch.ProducerEpoch.Should().Be(-1);
+        recordBatch.BaseSequence.Should().Be(-1);
+        recordBatch.Length.Should().Be(batch.Size - 12);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_BytesMustRemainStableAfterClose()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        var first = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        _ = batch.GetAsRecords();
+        var second = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+
+        second.Should().Equal(first);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_RecordsViewMustKeepSizeAndSupportRepeatedSerialization()
+    {
+        var sourceBuffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), sourceBuffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        var records = batch.GetAsRecords();
+        records.SizeInBytes.Should().Be(batch.Size);
+
+        var firstRequestBuffer = ArrayBufferPool.Rent(batch.Size);
+        var firstWriter = new BufferWriter(ref firstRequestBuffer);
+        firstWriter.WriteRecords(records);
+        firstRequestBuffer.TotalWritten.Should().Be(batch.Size);
+
+        var secondRequestBuffer = ArrayBufferPool.Rent(batch.Size);
+        var secondWriter = new BufferWriter(ref secondRequestBuffer);
+        secondWriter.WriteRecords(records);
+        secondRequestBuffer.TotalWritten.Should().Be(batch.Size);
+
+        sourceBuffer.TotalWritten.Should().Be(batch.Size);
+
+        ArrayBufferPool.Return(firstRequestBuffer);
+        ArrayBufferPool.Return(secondRequestBuffer);
+        ArrayBufferPool.Return(sourceBuffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustRejectRecordWhenBufferCannotFitHeaderAndRecord()
+    {
+        var buffer = new ArrayBuffer(true, false, RecordBatch.RECORD_BATCH_OVERHEAD);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out var sendResult).Should().BeFalse();
+        (sendResult is null).Should().BeTrue();
+    }
+
 }

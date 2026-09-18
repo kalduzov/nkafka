@@ -33,7 +33,7 @@ internal class RecordBatch: IRecordsBatch
     /// </summary>
     internal const int RECORD_BATCH_OVERHEAD = 61;
 
-    private const int _MAX_RECORD_OVERHEAD = 21;
+    private const int _MIN_RECORD_SIZE = 7;
     internal const long NO_TIMESTAMP = -1;
     internal const long NO_PRODUCER_ID = -1;
     private const int _NO_SEQUENCE = -1;
@@ -146,7 +146,7 @@ internal class RecordBatch: IRecordsBatch
 
         for (var i = 0; i < CountRecords; i++)
         {
-            if (reader.Remaining < _MAX_RECORD_OVERHEAD)
+            if (reader.Remaining < _MIN_RECORD_SIZE)
             {
                 //No space left to read even for a record with the minimum size
                 break;

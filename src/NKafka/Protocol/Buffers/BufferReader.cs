@@ -261,8 +261,10 @@ internal ref partial struct BufferReader
         ref var src = ref GetSpanReference(length);
         var arrayBuffer = new ArrayBuffer(false, false, length);
         var bw = new BufferWriter(ref arrayBuffer);
+        bw.WriteBytes(MemoryMarshal.CreateReadOnlySpan(ref src, length));
+        Advance(length);
 
-        return new Records.Records(arrayBuffer);
+        return new Records.Records(arrayBuffer, length, parse: true);
     }
 
     /// <summary>

@@ -30,9 +30,15 @@ internal static class ArrayBufferPool
 
     public static ArrayBuffer Rent(int size)
     {
-        return _queue.TryDequeue(out var writer)
-            ? writer
-            : new ArrayBuffer(useFirstBuffer: true, pinned: false, size);
+        while (_queue.TryDequeue(out var writer))
+        {
+            if (writer.Capacity >= size)
+            {
+                return writer;
+            }
+        }
+
+        return new ArrayBuffer(useFirstBuffer: true, pinned: false, size);
     }
 
     public static void Return(ArrayBuffer? buffer)

@@ -1,5 +1,8 @@
 using System.Text;
 
+using System.IO.Compression;
+
+using NKafka.Config;
 using NKafka.Compressions;
 
 namespace NKafka.Tests.Compressions;
@@ -41,4 +44,57 @@ public sealed class ZStdCompressionTests
         compressed.CanRead.Should().BeTrue();
         compressed.CanWrite.Should().BeTrue();
     }
+
+    [Theory]
+    [InlineData(CompressionType.None)]
+    [InlineData(CompressionType.Gzip)]
+    [InlineData(CompressionType.Snappy)]
+    [InlineData(CompressionType.Lz4)]
+    [InlineData(CompressionType.ZStd)]
+    public void EveryCompressionType_EncodeAndDecodeStream_ReturnsOriginalData(CompressionType type)
+    {
+        var data = Encoding.UTF8.GetBytes("record batch payload ".PadRight(8192, 'x'));
+        var compression = CreateCompression(type);
+        using var source = new MemoryStream(data);
+        using var encoded = new MemoryStream();
+
+        var encoder = compression.Encode(encoded);
+        source.CopyTo(encoder);
+        if (ReferenceEquals(encoder, encoded))
+        {
+            encoder.Flush();
+        }
+        else
+        {
+            encoder.Dispose();
+        }
+
+        encoded.Position = 0;
+        var decoder = compression.Decode(encoded);
+        using var decoded = new MemoryStream();
+        decoder.CopyTo(decoded);
+        if (ReferenceEquals(decoder, encoded))
+        {
+            decoder.Flush();
+        }
+        else
+        {
+            decoder.Dispose();
+        }
+
+        decoded.ToArray().Should().Equal(data);
+        encoded.CanRead.Should().BeTrue();
+        encoded.CanWrite.Should().BeTrue();
+    }
+
+    private static ICompression CreateCompression(CompressionType type)
+        => type switch
+        {
+            CompressionType.None => new NoCompression(),
+            CompressionType.Gzip => new GZIPCompression(CompressionLevel.Fastest),
+            CompressionType.Snappy => new SnappyCompression(),
+            CompressionType.Lz4 => new LZ4Compression(0),
+            CompressionType.ZStd => new ZStdCompression(3),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
 }

@@ -27,6 +27,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System.Buffers.Binary;
 
 using NKafka.Exceptions;
+using NKafka.Compressions;
+using NKafka.Config;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
@@ -42,7 +44,14 @@ namespace NKafka.Clients.Producer.Internals;
 /// <param name="topicPartition">The <see cref="TopicPartition"/> associated with the batch.</param>
 /// <param name="buffer">The <see cref="BufferWriter"/> used for writing the batch data.</param>
 /// <param name="loggerFactory"></param>
-internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory)
+/// <param name="compression">The compression implementation used after the batch is closed.</param>
+/// <param name="compressionType">The compression type written to the batch attributes.</param>
+internal class ProducerBatch(
+    TopicPartition topicPartition,
+    ArrayBuffer buffer,
+    ILoggerFactory loggerFactory,
+    ICompression? compression = null,
+    CompressionType compressionType = CompressionType.None)
 {
     internal enum BatchState
     {
@@ -75,6 +84,12 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     // Kafka calculates the CRC over the bytes after the CRC field, starting with attributes.
     private const int _CRC_DATA_OFFSET = _CRC_OFFSET + sizeof(uint);
 
+    // The attributes field starts after the CRC in the RecordBatch header.
+    private const int _ATTRIBUTES_OFFSET = _CRC_OFFSET + sizeof(uint);
+
+    // The compression type occupies the lowest three bits of attributes.
+    private const short _COMPRESSION_MASK = 0b111;
+
     // The length field excludes baseOffset and the length field itself.
     private const int _RECORD_BATCH_PREFIX_LENGTH = _LENGTH_OFFSET + sizeof(int);
 
@@ -85,6 +100,8 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     private int _lastOffset = -1;
     private readonly List<Record> _records = new(16);
     private readonly ILogger<ProducerBatch> _logger = loggerFactory.CreateLogger<ProducerBatch>();
+    private readonly ICompression _compression = compression ?? new NoCompression();
+    private readonly CompressionType _compressionType = compressionType;
 
     internal BatchState State { get; private set; } = BatchState.Open;
 
@@ -233,6 +250,64 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
         State = BatchState.Compressed;
     }
 
+    internal void Compress()
+    {
+        EnsureState(BatchState.Closed, "compress");
+
+        if (_compressionType == CompressionType.None)
+        {
+            return;
+        }
+
+        var serializedBatch = new byte[Size];
+        _buffer.CopyWrittenTo(serializedBatch);
+
+        try
+        {
+            var records = serializedBatch.AsSpan(BATCH_HEADER_LEN).ToArray();
+            var compressedRecords = CompressRecords(records);
+            var compressedSize = checked(BATCH_HEADER_LEN + compressedRecords.Length);
+            var compressedBuffer = ArrayBufferPool.Rent(compressedSize);
+            var writer = new BufferWriter(ref compressedBuffer);
+            writer.WriteBytes(serializedBatch.AsSpan(0, BATCH_HEADER_LEN));
+            writer.WriteBytes(compressedRecords);
+
+            Span<byte> integerBytes = stackalloc byte[4];
+            BinaryPrimitives.WriteInt32BigEndian(integerBytes, compressedSize - _RECORD_BATCH_PREFIX_LENGTH);
+            compressedBuffer.WriteAt(_LENGTH_OFFSET, integerBytes);
+
+            Span<byte> shortBytes = stackalloc byte[2];
+            BinaryPrimitives.WriteInt16BigEndian(shortBytes, (short)((short)_compressionType & _COMPRESSION_MASK));
+            compressedBuffer.WriteAt(_ATTRIBUTES_OFFSET, shortBytes);
+
+            var crc = global::NKafka.Crc.Crc.Calculate(compressedBuffer.WrittenFirstSpan[_CRC_DATA_OFFSET..]);
+            BinaryPrimitives.WriteUInt32BigEndian(integerBytes, crc);
+            compressedBuffer.WriteAt(_CRC_OFFSET, integerBytes);
+
+            ArrayBufferPool.Return(_buffer);
+            _buffer = compressedBuffer;
+            Size = compressedSize;
+            Crc = crc;
+            State = BatchState.Compressed;
+        }
+        catch (Exception exception) when (exception is not OutOfMemoryException)
+        {
+            _logger.LogWarning(exception, "Не удалось сжать пакет {TopicPartition}; будет отправлена несжатая версия", TopicPartition);
+        }
+    }
+
+    private byte[] CompressRecords(byte[] records)
+    {
+        using var input = new MemoryStream(records, writable: false);
+        using var output = new MemoryStream(records.Length);
+        using (var compressionStream = _compression.Encode(output))
+        {
+            input.CopyTo(compressionStream);
+        }
+
+        return output.ToArray();
+    }
+
     internal void MarkFinalized()
     {
         if (State is not (BatchState.Closed or BatchState.Compressed))
@@ -276,7 +351,7 @@ internal class ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, 
     /// <returns>A new Records object containing the data.</returns>
     public Records GetAsRecords()
     {
-        return new Records(_buffer, Size, true);
+        return new Records(_buffer, Size);
     }
 
     /// <summary>

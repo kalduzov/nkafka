@@ -198,7 +198,12 @@ internal sealed class RecordAccumulator(
 
         var topicPartition = new TopicPartition(topic, partition);
 
-        var batch = new ProducerBatch(topicPartition, buffer, loggerFactory);
+        var batch = new ProducerBatch(
+            topicPartition,
+            buffer,
+            loggerFactory,
+            _compression,
+            config.Compression.CompressionType);
 
         _logger.AddNewBatchTrace(topicPartition);
 
@@ -284,6 +289,7 @@ internal sealed class RecordAccumulator(
                         cancellationToken.ThrowIfCancellationRequested();
 
                         batch.Close();
+                        batch.Compress();
                         batch.SetReady();
                         var completion = batch.CompletionTask;
                         waitingTasks.Add(completion);
@@ -352,6 +358,7 @@ internal sealed class RecordAccumulator(
                 {
                     firstBatch.Close();
                 }
+                firstBatch.Compress();
                 size += firstBatch.Size;
 
                 yield return firstBatch;

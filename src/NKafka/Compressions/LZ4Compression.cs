@@ -19,6 +19,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using K4os.Compression.LZ4;
+using K4os.Compression.LZ4.Streams;
+
 namespace NKafka.Compressions;
 
-internal sealed class LZ4Compression(int compressionLevel): ICompression;
+internal sealed class LZ4Compression(int compressionLevel): ICompression
+{
+    public Stream Encode(Stream stream)
+        => LZ4Stream.Encode(stream, (LZ4Level)compressionLevel, 0, true);
+
+    public Stream Decode(Stream stream)
+        => LZ4Stream.Decode(stream, 0, true, false);
+}

@@ -25,6 +25,8 @@ using System.Text;
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Clients.Producer.Internals;
+using NKafka.Compressions;
+using NKafka.Config;
 using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
@@ -373,6 +375,33 @@ public class ProduceBathSerializationTests
         ArrayBufferPool.Return(firstRequestBuffer);
         ArrayBufferPool.Return(secondRequestBuffer);
         ArrayBufferPool.Return(sourceBuffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_CompressesOnlyRecordsAndRecalculatesHeader()
+    {
+        var buffer = ArrayBufferPool.Rent(4096);
+        var batch = new ProducerBatch(
+            new TopicPartition("test", 0),
+            buffer,
+            NullLoggerFactory.Instance,
+            new ZStdCompression(3),
+            CompressionType.ZStd);
+
+        batch.TryAppend(1000, null, Encoding.UTF8.GetBytes(new string('x', 512)), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+        batch.Compress();
+
+        batch.State.Should().Be(ProducerBatch.BatchState.Compressed);
+        var serialized = batch.GetAsRecords().Buffer;
+        var reader = new BufferReader(serialized.DangerousGetFirstBuffer().AsSpan(0, batch.Size));
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.Attributes.Should().Be((short)CompressionType.ZStd);
+        recordBatch.Length.Should().Be(batch.Size - 12);
+        recordBatch.Crc.Should().Be(global::NKafka.Crc.Crc.Calculate(serialized.WrittenFirstSpan[21..batch.Size]));
+
+        ArrayBufferPool.Return(serialized);
     }
 
     [Fact]

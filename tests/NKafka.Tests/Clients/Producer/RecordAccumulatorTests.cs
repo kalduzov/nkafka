@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging.Abstractions;
 
+using NKafka.Clients.Producer;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Metrics;
+using NKafka.Protocol;
 using NKafka.Protocol.Buffers;
 using NKafka.Protocol.Records;
 
@@ -69,5 +71,35 @@ public sealed class RecordAccumulatorTests
         var reader = new BufferReader(records.Buffer.DangerousGetFirstBuffer().AsSpan(0, records.SizeInBytes));
         var recordBatch = new RecordBatch(ref reader);
         recordBatch.BaseTimestamp.Should().Be(1_000);
+    }
+
+    [Fact]
+    public void Append_WhenBufferMemoryIsExhausted_ReturnsEnqueueTimeout()
+    {
+        var config = new ProducerConfig
+        {
+            BatchSize = 80,
+            BufferMemory = 120,
+            EnqueueTimeoutMs = 10,
+            MaxRequestSize = 1024 * 1024
+        };
+        var accumulator = new RecordAccumulator(
+            config,
+            Substitute.For<ITransactionManager>(),
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var accepted = accumulator.Append(new TopicPartition("test", 0), 1_000, null, new byte[1], Headers.Empty);
+        var rejected = accumulator.Append(new TopicPartition("test", 1), 1_001, null, new byte[1], Headers.Empty);
+
+        accepted.Error.Should().BeNull();
+        rejected.Error.Should().Be(new ProducerError(ErrorCodes.ClientError, ProducerLocalError.EnqueueTimedOut));
+
+        Thread.Sleep(5);
+        accumulator.PullReadyBatches(config.MaxRequestSize).Single();
+
+        var acceptedAfterRelease = accumulator.Append(new TopicPartition("test", 1), 1_002, null, new byte[1], Headers.Empty);
+        acceptedAfterRelease.Error.Should().BeNull();
     }
 }

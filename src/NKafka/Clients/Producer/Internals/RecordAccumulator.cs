@@ -76,6 +76,8 @@ internal sealed class RecordAccumulator(
     private int _appendsInProgress;
     private volatile int _flushesInProgress = 0;
     private readonly IProducerMetrics _metrics = metrics;
+    private readonly object _memoryLock = new();
+    private int _availableMemory = config.BufferMemory;
 
     private static ICompression GetCompression(CompressionConfig compression)
     {
@@ -112,6 +114,7 @@ internal sealed class RecordAccumulator(
         var topicBatches = _batchesByTopics.GetOrAdd(topicPartition.Topic, _ => new PartitionedBatchCollection());
 
         ArrayBuffer? buffer = null;
+        var reservedMemory = 0;
 
         try
         {
@@ -149,6 +152,17 @@ internal sealed class RecordAccumulator(
 
                     // We calculate what buffer size we need and try to get it 
                     var size = Math.Max(_batchSize, recordSize);
+                    if (!TryReserveMemory(size))
+                    {
+                        return new RecordAppendResult(
+                            null,
+                            false,
+                            false,
+                            0,
+                            new ProducerError(ErrorCodes.ClientError, ProducerLocalError.EnqueueTimedOut));
+                    }
+
+                    reservedMemory = size;
                     buffer = ArrayBufferPool.Rent(size);
                 }
 
@@ -161,12 +175,19 @@ internal sealed class RecordAccumulator(
                         serializedKey,
                         serializedValue,
                         headers,
-                        buffer);
+                        buffer,
+                        reservedMemory);
 
                     // It is possible that the batch was already created in another thread while we were preparing the buffer
                     if (recordAppendResult.NewBatchCreated)
                     {
+                        reservedMemory = 0;
                         buffer = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
+                    }
+                    else
+                    {
+                        ReleaseMemory(reservedMemory);
+                        reservedMemory = 0;
                     }
 
                     return recordAppendResult;
@@ -176,7 +197,60 @@ internal sealed class RecordAccumulator(
         finally
         {
             ArrayBufferPool.Return(buffer);
+            if (reservedMemory != 0)
+            {
+                ReleaseMemory(reservedMemory);
+            }
             Interlocked.Decrement(ref _appendsInProgress);
+        }
+    }
+
+    private bool TryReserveMemory(int size)
+    {
+        var deadline = Environment.TickCount64 + config.EnqueueTimeoutMs;
+
+        lock (_memoryLock)
+        {
+            while (_availableMemory < size)
+            {
+                var remaining = deadline - Environment.TickCount64;
+
+                if (remaining <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(_memoryLock, (int)Math.Min(remaining, int.MaxValue));
+            }
+
+            _availableMemory -= size;
+
+            return true;
+        }
+    }
+
+    private void ReleaseMemory(int size)
+    {
+        lock (_memoryLock)
+        {
+            _availableMemory = checked(_availableMemory + size);
+            Monitor.PulseAll(_memoryLock);
+        }
+    }
+
+    private void CloseBatch(ProducerBatch batch)
+    {
+        if (batch.State == ProducerBatch.BatchState.Open)
+        {
+            batch.Close();
+            var reservation = batch.ReleaseMemoryReservation();
+
+            if (reservation != 0)
+            {
+                ReleaseMemory(reservation);
+            }
+
+            batch.Compress();
         }
     }
 
@@ -188,7 +262,8 @@ internal sealed class RecordAccumulator(
         byte[]? key,
         byte[]? value,
         Headers headers,
-        ArrayBuffer buffer)
+        ArrayBuffer buffer,
+        int reservedMemory)
     {
         // We are trying to add, all of a sudden, while we were preparing to add, someone has already added a new batch
         if (TryAppend(timestamp, key, value, headers, deque, out var recordAppendResult))
@@ -211,6 +286,8 @@ internal sealed class RecordAccumulator(
         {
             throw new ArgumentNullException(nameof(sendResultTask));
         }
+
+        batch.SetMemoryReservation(reservedMemory);
 
         deque.AddLast(batch);
 
@@ -249,7 +326,7 @@ internal sealed class RecordAccumulator(
         {
             if (lastBatch.State == ProducerBatch.BatchState.Open)
             {
-                lastBatch.Close();
+                CloseBatch(lastBatch);
             }
             lastBatch.SetReady();
 
@@ -281,8 +358,7 @@ internal sealed class RecordAccumulator(
                         {
                             if (batch.State == ProducerBatch.BatchState.Open)
                             {
-                                batch.Close();
-                                batch.Compress();
+                                CloseBatch(batch);
                             }
                             batch.SetReady();
                             waitingTasks.Add(batch.CompletionTask);
@@ -351,7 +427,7 @@ internal sealed class RecordAccumulator(
                 }
                 if (firstBatch.State == ProducerBatch.BatchState.Open)
                 {
-                    firstBatch.Close();
+                    CloseBatch(firstBatch);
                 }
                 firstBatch.Compress();
                 size += firstBatch.Size;

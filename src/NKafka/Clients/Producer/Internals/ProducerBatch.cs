@@ -102,6 +102,7 @@ internal class ProducerBatch(
     private readonly ILogger<ProducerBatch> _logger = loggerFactory.CreateLogger<ProducerBatch>();
     private readonly ICompression _compression = compression ?? new NoCompression();
     private readonly CompressionType _compressionType = compressionType;
+    private int _memoryReservation;
 
     internal BatchState State { get; private set; } = BatchState.Open;
 
@@ -151,6 +152,17 @@ internal class ProducerBatch(
     public long MaxTimestamp { get; set; }
 
     internal uint Crc { get; private set; }
+
+    internal void SetMemoryReservation(int size)
+    {
+        if (size <= 0 || Interlocked.CompareExchange(ref _memoryReservation, size, 0) != 0)
+        {
+            throw new InvalidOperationException("The batch memory reservation is already set or invalid.");
+        }
+    }
+
+    internal int ReleaseMemoryReservation()
+        => Interlocked.Exchange(ref _memoryReservation, 0);
 
     internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestampNow)
         : this(topicPartition, buffer, loggerFactory)

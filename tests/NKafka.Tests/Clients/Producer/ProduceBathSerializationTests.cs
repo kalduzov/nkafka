@@ -165,6 +165,25 @@ public class ProduceBathSerializationTests
     }
 
     [Fact]
+    public void ProducerBatch_PrepareForRetry_ReturnsSentBatchToClosedState()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+        batch.MarkFinalized();
+        batch.MarkSent();
+
+        batch.PrepareForRetry(60_000).Should().BeTrue();
+        batch.State.Should().Be(ProducerBatch.BatchState.Closed);
+        batch.IsReady.Should().BeTrue();
+        batch.PrepareForRetry(60_000).Should().BeFalse();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
     public void RecordBatch_EstimateMustIncludeBatchHeader()
     {
         var value = "value"u8.ToArray();

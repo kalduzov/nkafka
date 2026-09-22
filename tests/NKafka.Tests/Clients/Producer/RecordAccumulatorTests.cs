@@ -43,6 +43,32 @@ public sealed class RecordAccumulatorTests
     }
 
     [Fact]
+    public void Requeue_ReturnsBatchToTheBeginningOfItsPartitionQueue()
+    {
+        var config = new ProducerConfig
+        {
+            BatchSize = 80,
+            MaxRequestSize = 1024 * 1024,
+            LingerMs = 0
+        };
+        var accumulator = new RecordAccumulator(
+            config,
+            Substitute.For<ITransactionManager>(),
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+        var topicPartition = new TopicPartition("test", 0);
+
+        accumulator.Append(topicPartition, 1_000, null, new byte[10], Headers.Empty);
+        Thread.Sleep(5);
+
+        var batch = accumulator.PullReadyBatches(config.MaxRequestSize).Single();
+        accumulator.Requeue(batch);
+
+        accumulator.PullReadyBatches(config.MaxRequestSize).Single().Should().BeSameAs(batch);
+    }
+
+    [Fact]
     public async Task FlushAllAsync_CancellationCancelsOnlyWaitingAndClosesAcceptedBatch()
     {
         var config = new ProducerConfig

@@ -340,6 +340,22 @@ internal class ProducerBatch(
         State = BatchState.Sent;
     }
 
+    internal bool PrepareForRetry(int deliveryTimeoutMs)
+    {
+        if (State != BatchState.Sent ||
+            Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow) - CreateTimestamp >= deliveryTimeoutMs)
+        {
+            return false;
+        }
+
+        State = _compressionType == CompressionType.None
+            ? BatchState.Closed
+            : BatchState.Compressed;
+        IsReady = true;
+
+        return true;
+    }
+
     private void WriteHeader(ref BufferWriter bufferWriter)
     {
         bufferWriter.WriteLong(0);

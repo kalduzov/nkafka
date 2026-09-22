@@ -45,6 +45,11 @@ internal interface IRecordAccumulator
     internal IEnumerable<ProducerBatch> PullReadyBatches(int maxRequestSize);
 
     /// <summary>
+    /// Returns a failed batch to the beginning of its partition queue for a retry.
+    /// </summary>
+    internal void Requeue(ProducerBatch batch);
+
+    /// <summary>
     /// Adds a new record to the accumulator
     /// </summary>
     /// <param name="topicPartition">Topic partition for which the entry is added</param>

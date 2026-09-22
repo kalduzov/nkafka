@@ -436,4 +436,19 @@ internal sealed class RecordAccumulator(
             }
         }
     }
+
+    /// <inheritdoc />
+    public void Requeue(ProducerBatch batch)
+    {
+        if (!_batchesByTopics.TryGetValue(batch.TopicPartition.Topic, out var batches) ||
+            !batches.TryGetValue(batch.TopicPartition.Partition.Value, out var deque))
+        {
+            throw new InvalidOperationException($"The batch queue for {batch.TopicPartition} was not found.");
+        }
+
+        lock (deque)
+        {
+            deque.AddFirst(batch);
+        }
+    }
 }

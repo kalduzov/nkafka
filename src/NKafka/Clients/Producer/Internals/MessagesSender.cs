@@ -167,7 +167,15 @@ internal sealed class MessagesSender(
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Ошибка отправки пакета {TopicPartition}", batch.TopicPartition);
-                batch.Fail(ErrorCodes.NetworkException);
+
+                if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
+                {
+                    batch.Fail(ErrorCodes.NetworkException);
+                }
+                else
+                {
+                    recordAccumulator.Requeue(batch);
+                }
             }
         }
 

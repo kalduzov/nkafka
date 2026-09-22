@@ -20,6 +20,7 @@
 //  limitations under the License.
 
 using NKafka.Config;
+using NKafka.Exceptions;
 
 namespace NKafka.Tests.Config;
 
@@ -42,6 +43,96 @@ public sealed class ProducerConfigTests
         }
 
         FluentActions.Invoking(Validate).Should().NotThrow();
+    }
+
+    [Theory]
+    [InlineData(nameof(ProducerConfig.EnqueueTimeoutMs), 0)]
+    [InlineData(nameof(ProducerConfig.DeliveryTimeoutMs), 0)]
+    [InlineData(nameof(ProducerConfig.BatchSize), 0)]
+    [InlineData(nameof(ProducerConfig.BufferMemory), 0)]
+    [InlineData(nameof(ProducerConfig.MaxRequestSize), 0)]
+    public void Validate_WhenPositiveProducerSettingIsNotPositive_MustThrowException(string optionName, int value)
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"]
+        };
+        typeof(ProducerConfig).GetProperty(optionName)!.SetValue(config, value);
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(optionName);
+    }
+
+    [Fact]
+    public void Validate_WhenDeliveryTimeoutDoesNotCoverLingerAndRequest_MustThrowException()
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            DeliveryTimeoutMs = 100,
+            LingerMs = 50,
+            RequestTimeoutMs = 51
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.DeliveryTimeoutMs));
+    }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    [InlineData(-1)]
+    public void Validate_WhenLingerIsInvalid_MustThrowException(double lingerMs)
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            LingerMs = lingerMs
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.LingerMs));
+    }
+
+    [Fact]
+    public void Validate_WhenAcksIsUnknown_MustThrowException()
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            Acks = (Acks)42
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.Acks));
+    }
+
+    [Fact]
+    public void Validate_WhenCompressionIsUnknown_MustThrowException()
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            Compression = new CompressionConfig((CompressionType)42)
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.Compression));
     }
 
     [Fact]

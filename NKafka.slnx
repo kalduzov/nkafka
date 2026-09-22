@@ -373,6 +373,7 @@
     <File Path="spec/real-kafka-e2e-plan.md" />
     <File Path="spec/technical-requirements.md" />
     <File Path="spec/network-interaction.md" />
+    <File Path="spec/cluster-request-scheduling.md" />
   </Folder>
   <Folder Name="/spec/KIP/">
     <File Path="spec/KIP/client-side-kips.md" />
@@ -385,7 +386,9 @@
     <File Path="spec/KIP/KIP-98/vision.md" />
     <File Path="spec/KIP/KIP-98/02-configuration-results-errors.md" />
     <File Path="spec/KIP/KIP-98/03.2-reliable-delivery-and-resources.md" />
-    <File Path="spec/KIP/KIP-98/04-idempotence-and-recovery.md" />
+    <File Path="spec/KIP/KIP-98/03.3-parallel-broker-dispatch.md" />
+    <File Path="spec/KIP/KIP-98/04.1-basic-idempotence.md" />
+    <File Path="spec/KIP/KIP-98/04.2-idempotence-recovery.md" />
     <File Path="spec/KIP/KIP-98/05-transaction-protocol-and-lifetime.md" />
     <File Path="spec/KIP/KIP-98/06-consumer-offsets-and-processing.md" />
     <File Path="spec/KIP/KIP-98/07-production-readiness.md" />

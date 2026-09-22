@@ -41,6 +41,13 @@ internal sealed class MessagesSender(
     ILoggerFactory loggerFactory)
     : IMessagesSender
 {
+    private enum SendCycleResult
+    {
+        NoWork,
+        WorkCompleted,
+        RetryScheduled
+    }
+
     private readonly ILogger<MessagesSender> _logger = loggerFactory.CreateLogger<MessagesSender>();
     private CancellationTokenSource _tokenSource = new();
     private readonly IProducerMetrics _metrics = metrics;
@@ -84,8 +91,15 @@ internal sealed class MessagesSender(
             while (!token.IsCancellationRequested)
             {
                 _resetEvent.Wait(token);
-                await RunOnceAsync(token);
-                await Task.Delay(delay, token);
+                // Consume the current wakeup only after observing it. A wakeup raised during processing
+                // remains set and is therefore preserved for the next cycle.
+                _resetEvent.Reset();
+                var result = await RunOnceAsync(token);
+
+                if (result is not SendCycleResult.WorkCompleted)
+                {
+                    _resetEvent.Wait(delay, token);
+                }
             }
         }
         catch (OperationCanceledException exc)
@@ -99,22 +113,26 @@ internal sealed class MessagesSender(
 
     }
 
-    private async Task RunOnceAsync(CancellationToken cancellationToken)
+    private async Task<SendCycleResult> RunOnceAsync(CancellationToken cancellationToken)
     {
 
         if (transactionManager.IsTransactional)
         {
             await transactionManager.BumpIdempotentEpochAndResetIdIfNeededAsync(cancellationToken);
         }
-        await SendProducerDataAsync(cancellationToken);
+        return await SendProducerDataAsync(cancellationToken);
     }
 
-    private async Task SendProducerDataAsync(CancellationToken token)
+    private async Task<SendCycleResult> SendProducerDataAsync(CancellationToken token)
     {
         var batches = recordAccumulator.PullReadyBatches(config.MaxRequestSize);
+        var hasBatches = false;
+        var retryScheduled = false;
 
         foreach (var batch in batches)
         {
+            hasBatches = true;
+
             try
             {
                 var node = await TryGetNodeAsync(batch.TopicPartition, token);
@@ -173,6 +191,7 @@ internal sealed class MessagesSender(
                             else
                             {
                                 recordAccumulator.Requeue(batch);
+                                retryScheduled = true;
                             }
                         }
                         else
@@ -198,10 +217,16 @@ internal sealed class MessagesSender(
                 else
                 {
                     recordAccumulator.Requeue(batch);
+                    retryScheduled = true;
                 }
             }
         }
 
+        return retryScheduled
+            ? SendCycleResult.RetryScheduled
+            : hasBatches
+                ? SendCycleResult.WorkCompleted
+                : SendCycleResult.NoWork;
     }
 
     internal static bool IsRetriableProduceError(ErrorCodes errorCode)

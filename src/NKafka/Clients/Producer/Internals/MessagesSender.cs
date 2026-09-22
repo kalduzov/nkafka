@@ -152,6 +152,29 @@ internal sealed class MessagesSender(
                         {
                             batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
                         }
+                        else if (IsRetriableProduceError(partitionResponse.Code))
+                        {
+                            _logger.Error(partitionResponse.Code);
+
+                            // A leader-related response can make the cached node stale.
+                            // Refresh metadata before requeueing so the next attempt can choose a new leader.
+                            if (partitionResponse.Code is ErrorCodes.LeaderNotAvailable or
+                                ErrorCodes.NotLeaderOrFollower or
+                                ErrorCodes.ReplicaNotAvailable)
+                            {
+                                await kafkaCluster.RefreshMetadataAsync([batch.TopicPartition.Topic], token);
+                            }
+
+                            // Requeue the same immutable batch to preserve its bytes, record order, and delivery deadline.
+                            if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
+                            {
+                                batch.Fail(partitionResponse.Code);
+                            }
+                            else
+                            {
+                                recordAccumulator.Requeue(batch);
+                            }
+                        }
                         else
                         {
                             _logger.Error(partitionResponse.Code);
@@ -180,6 +203,15 @@ internal sealed class MessagesSender(
         }
 
     }
+
+    internal static bool IsRetriableProduceError(ErrorCodes errorCode)
+        // Permanent broker errors must be reported to the records instead of being retried indefinitely.
+        => errorCode is ErrorCodes.LeaderNotAvailable
+            or ErrorCodes.NotLeaderOrFollower
+            or ErrorCodes.RequestTimedOut
+            or ErrorCodes.BrokerNotAvailable
+            or ErrorCodes.ReplicaNotAvailable
+            or ErrorCodes.NetworkException;
 
     private async Task<Node> TryGetNodeAsync(TopicPartition topicPartition, CancellationToken token)
     {

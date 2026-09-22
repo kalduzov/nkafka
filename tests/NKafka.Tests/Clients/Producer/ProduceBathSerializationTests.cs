@@ -183,6 +183,20 @@ public class ProduceBathSerializationTests
         ArrayBufferPool.Return(buffer);
     }
 
+    [Theory]
+    [InlineData(ErrorCodes.LeaderNotAvailable, true)]
+    [InlineData(ErrorCodes.NotLeaderOrFollower, true)]
+    [InlineData(ErrorCodes.RequestTimedOut, true)]
+    [InlineData(ErrorCodes.BrokerNotAvailable, true)]
+    [InlineData(ErrorCodes.ReplicaNotAvailable, true)]
+    [InlineData(ErrorCodes.NetworkException, true)]
+    [InlineData(ErrorCodes.MessageTooLarge, false)]
+    [InlineData(ErrorCodes.TopicAuthorizationFailed, false)]
+    public void MessagesSender_ClassifiesProduceErrors(ErrorCodes errorCode, bool expectedRetriable)
+    {
+        MessagesSender.IsRetriableProduceError(errorCode).Should().Be(expectedRetriable);
+    }
+
     [Fact]
     public void RecordBatch_EstimateMustIncludeBatchHeader()
     {

@@ -66,6 +66,14 @@ internal class NullConnector: IKafkaConnector
         throw new NotImplementedException();
     }
 
+    public Task SendAsync<TRequestMessage>(TRequestMessage message,
+        bool isInternalRequest,
+        CancellationToken token)
+        where TRequestMessage : class, IRequestMessage
+    {
+        throw new NotImplementedException();
+    }
+
     public ValueTask OpenAsync(CancellationToken token)
     {
         throw new NotImplementedException();

@@ -160,6 +160,13 @@ internal sealed class MessagesSender(
                 };
 
                 batch.MarkSent();
+                if (config.Acks == Acks.None)
+                {
+                    await kafkaCluster.SendAsync(produceRequestMessage, node.Id, token);
+                    batch.CompleteWithoutAcknowledgement();
+                    continue;
+                }
+
                 var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(produceRequestMessage, node.Id, token);
 
                 foreach (var response in result.Responses)

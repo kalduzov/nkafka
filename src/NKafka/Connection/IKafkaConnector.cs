@@ -73,6 +73,19 @@ internal interface IKafkaConnector: IDisposable, IAsyncDisposable
         where TRequestMessage : class, IRequestMessage;
 
     /// <summary>
+    /// Sends a request frame without registering or waiting for a broker response.
+    /// </summary>
+    /// <param name="message">The request message to write to the broker.</param>
+    /// <param name="isInternalRequest">Whether the request bypasses external request validation.</param>
+    /// <param name="token">The cancellation token for the write operation.</param>
+    /// <returns>A task that completes after the request frame has been written to the stream.</returns>
+    internal Task SendAsync<TRequestMessage>(
+        TRequestMessage message,
+        bool isInternalRequest,
+        CancellationToken token)
+        where TRequestMessage : class, IRequestMessage;
+
+    /// <summary>
     /// Opens a connection to the broker at the specified address and port
     /// </summary>
     ValueTask OpenAsync(CancellationToken token);

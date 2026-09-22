@@ -405,6 +405,23 @@ internal class ProducerBatch(
         State = BatchState.Completed;
     }
 
+    internal void CompleteWithoutAcknowledgement()
+    {
+        EnsureNotCompleted("complete");
+
+        foreach (var recordTask in _recordTasks)
+        {
+            recordTask.SetResult(new RecordMetadata
+            {
+                TopicPartition = TopicPartition,
+                Offset = Offset.Unset
+            });
+        }
+
+        _produceRequestResult.SetResult();
+        State = BatchState.Completed;
+    }
+
     /// <summary>
     /// Method to handle failure by setting exception for all record tasks and produce request result.
     /// </summary>

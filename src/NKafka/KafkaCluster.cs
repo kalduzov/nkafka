@@ -390,6 +390,12 @@ internal sealed class KafkaCluster: IKafkaCluster
             .SendAsync<TRequestMessage, TResponseMessage>(message, false, token);
     }
 
+    Task IKafkaCluster.SendAsync<TRequestMessage>(TRequestMessage message, int nodeId, CancellationToken token)
+    {
+        return GetConnectorForKnownBroker(nodeId)
+            .SendAsync(message, false, token);
+    }
+
     /// <summary>
     /// Notifies when a consumer is disposed.
     /// </summary>

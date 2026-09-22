@@ -361,7 +361,8 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
                 var topicPartitionOffset = new TopicPartitionOffset(actualTopicPartition, sendResult.Offset);
 
-                return new MessageDeliveryResult(PersistenceStatus.Persisted,
+                return new MessageDeliveryResult(
+                    sendResult.Offset == Offset.Unset ? PersistenceStatus.PossiblyPersisted : PersistenceStatus.Persisted,
                     topicPartitionOffset.TopicPartition,
                     message.Timestamp.UnixTimestampMs,
                     topicPartitionOffset.Offset,

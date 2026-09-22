@@ -215,6 +215,21 @@ public class ProduceBathSerializationTests
     }
 
     [Fact]
+    public async Task ProducerBatch_CompleteWithoutAcknowledgement_ReturnsUnknownOffsets()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out var sendTask).Should().BeTrue();
+        batch.CompleteWithoutAcknowledgement();
+
+        (await sendTask!.Task).Offset.Should().Be(Offset.Unset);
+        batch.State.Should().Be(ProducerBatch.BatchState.Completed);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
     public void RecordBatch_EstimateMustIncludeBatchHeader()
     {
         var value = "value"u8.ToArray();

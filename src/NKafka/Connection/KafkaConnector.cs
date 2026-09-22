@@ -257,16 +257,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 // request must be visible in the inflight registry before any bytes are written.
                 WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
 
-                if (CanWrite)
-                {
-                    var bytesSent = await request.WriteToStream(_stream, true, _messageMaxBytes);
-                    Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
-                    _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
-                }
-                else
-                {
-                    throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
-                }
+                await WriteRequestAsync(request, activity);
             }
             catch (Exception exc)
             {
@@ -287,6 +278,73 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         finally
         {
             ArrayBufferPool.Return(arrayBuffer);
+        }
+    }
+
+    async Task IKafkaConnector.SendAsync<TRequestMessage>(
+        TRequestMessage message,
+        bool isInternalRequest,
+        CancellationToken token)
+    {
+        _logger.SendRequestTrace(message, NodeId);
+
+        await EnsureSessionEstablishedAsync(token);
+
+        if (token.IsCancellationRequested)
+        {
+            await Task.FromCanceled(token);
+        }
+
+        var contentVersion = message.ApiKey.GetEffectiveApiVersion(SupportVersions);
+        var headerVersion = message.ApiKey.GetRequestHeaderVersion(contentVersion);
+        var requestId = Interlocked.Increment(ref _requestId);
+        var arrayBuffer = ArrayBufferPool.Rent(_messageMaxBytes);
+
+        try
+        {
+            var request = new SendMessage(
+                new RequestHeader
+                {
+                    ClientId = _clientId,
+                    RequestApiVersion = (short)contentVersion,
+                    CorrelationId = requestId,
+                    RequestApiKey = (short)message.ApiKey
+                },
+                message,
+                contentVersion,
+                headerVersion,
+                arrayBuffer);
+
+            if (!isInternalRequest)
+            {
+                ThrowExceptionIfRequestNotValid(request, null);
+            }
+
+            await WriteRequestAsync(request, null);
+        }
+        finally
+        {
+            ArrayBufferPool.Return(arrayBuffer);
+        }
+    }
+
+    private async Task WriteRequestAsync(SendMessage request, Activity? activity)
+    {
+        if (!CanWrite)
+        {
+            throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
+        }
+
+        try
+        {
+            var bytesSent = await request.WriteToStream(_stream, true, _messageMaxBytes);
+            Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
+            _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
+        }
+        catch (Exception exception)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+            throw;
         }
     }
 

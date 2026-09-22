@@ -227,6 +227,16 @@ public interface IKafkaCluster: IDisposable, IAsyncDisposable
         where TRequestMessage : class, IRequestMessage;
 
     /// <summary>
+    /// Sends a request frame to a broker without waiting for a response.
+    /// </summary>
+    /// <param name="message">The request message to send.</param>
+    /// <param name="nodeId">The target broker identifier.</param>
+    /// <param name="token">The cancellation token for the send operation.</param>
+    /// <returns>A task that completes after the request frame has been written.</returns>
+    internal Task SendAsync<TRequestMessage>(TRequestMessage message, int nodeId, CancellationToken token)
+        where TRequestMessage : class, IRequestMessage;
+
+    /// <summary>
     /// Sends a request to the specified broker
     /// </summary>
     /// <param name="message">Request to send to the broker</param>

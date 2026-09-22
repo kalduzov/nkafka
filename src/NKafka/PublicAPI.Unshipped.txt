@@ -445,6 +445,8 @@ NKafka.Config.ProducerConfig.LingerMs.get -> double
 NKafka.Config.ProducerConfig.LingerMs.set -> void
 NKafka.Config.ProducerConfig.MaxPendingProduceRequests.get -> int
 NKafka.Config.ProducerConfig.MaxPendingProduceRequests.set -> void
+NKafka.Config.ProducerConfig.MaxQueuedMessages.get -> int
+NKafka.Config.ProducerConfig.MaxQueuedMessages.set -> void
 NKafka.Config.ProducerConfig.MaxRequestSize.get -> int
 NKafka.Config.ProducerConfig.MaxRequestSize.set -> void
 NKafka.Config.ProducerConfig.MergeFrom(NKafka.Config.CommonConfig! config) -> NKafka.Config.ProducerConfig!

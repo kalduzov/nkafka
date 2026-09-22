@@ -70,6 +70,8 @@ internal sealed class RecordAccumulator(
     private readonly int _deliveryTimeoutMs = deliveryTimeoutMs;
     private readonly double _lingerMs = config.LingerMs;
     private readonly ILogger _logger = loggerFactory.CreateLogger<RecordAccumulator>();
+    private readonly int _maxQueuedMessages = config.MaxQueuedMessages;
+    private int _queuedMessages;
     private readonly long _retryBackoffMs = config.RetryBackoffMs;
     private readonly ITransactionManager _transactionManager = transactionManager;
     // Number of Append operations currently processing records.
@@ -115,9 +117,22 @@ internal sealed class RecordAccumulator(
 
         ArrayBuffer? buffer = null;
         var reservedMemory = 0;
+        var queuedMessageReserved = false;
 
         try
         {
+            if (!TryReserveQueuedMessage())
+            {
+                return new RecordAppendResult(
+                    null,
+                    false,
+                    false,
+                    0,
+                    new ProducerError(ErrorCodes.ClientError, ProducerLocalError.EnqueueTimedOut));
+            }
+
+            queuedMessageReserved = true;
+
             while (true)
             {
                 var effectivePartition = topicPartition.Partition.Value;
@@ -130,6 +145,7 @@ internal sealed class RecordAccumulator(
                     if (TryAppend(timestamp, serializedKey, serializedValue, headers, deque, out var appendResult))
                     {
                         // the data could be added because a suitable batch already existed
+                        queuedMessageReserved = false;
                         return appendResult;
                     }
                 }
@@ -183,6 +199,7 @@ internal sealed class RecordAccumulator(
                     {
                         reservedMemory = 0;
                         buffer = null; // We do not return the buffer to the pool. This buffer will be used in BufferWriter
+                        queuedMessageReserved = false;
                     }
                     else
                     {
@@ -201,7 +218,53 @@ internal sealed class RecordAccumulator(
             {
                 ReleaseMemory(reservedMemory);
             }
+            if (queuedMessageReserved)
+            {
+                ReleaseQueuedMessage();
+            }
             Interlocked.Decrement(ref _appendsInProgress);
+        }
+    }
+
+    private bool TryReserveQueuedMessage()
+    {
+        var deadline = Environment.TickCount64 + config.EnqueueTimeoutMs;
+
+        lock (_memoryLock)
+        {
+            while (_queuedMessages >= _maxQueuedMessages)
+            {
+                var remaining = deadline - Environment.TickCount64;
+
+                if (remaining <= 0)
+                {
+                    return false;
+                }
+
+                Monitor.Wait(_memoryLock, (int)Math.Min(remaining, int.MaxValue));
+            }
+
+            _queuedMessages++;
+
+            return true;
+        }
+    }
+
+    private void ReleaseQueuedMessage()
+    {
+        lock (_memoryLock)
+        {
+            _queuedMessages--;
+            Monitor.PulseAll(_memoryLock);
+        }
+    }
+
+    private void ReleaseQueuedMessages(int count)
+    {
+        lock (_memoryLock)
+        {
+            _queuedMessages -= count;
+            Monitor.PulseAll(_memoryLock);
         }
     }
 
@@ -290,6 +353,11 @@ internal sealed class RecordAccumulator(
         batch.SetMemoryReservation(reservedMemory);
 
         deque.AddLast(batch);
+        batch.CompletionTask.ContinueWith(
+            _ => ReleaseQueuedMessages(batch.RecordsCount),
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
 
         var batchIsFull = deque.Count > 1 || batch.IsFull;
 

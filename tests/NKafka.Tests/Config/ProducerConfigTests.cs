@@ -152,6 +152,22 @@ public sealed class ProducerConfigTests
     }
 
     [Fact]
+    public void Validate_WhenMaxQueuedMessagesIsNotPositive_MustThrowException()
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            MaxQueuedMessages = 0
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.MaxQueuedMessages));
+    }
+
+    [Fact]
     public void BaseFrom_CopiesCommonSettingsWithoutSharingMutableValues()
     {
         var common = new TestCommonConfig

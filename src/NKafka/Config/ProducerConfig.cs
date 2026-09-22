@@ -54,6 +54,11 @@ public record ProducerConfig: CommonConfig
     public int MaxPendingProduceRequests { get; set; } = 1_000;
 
     /// <summary>
+    /// Maximum number of accepted messages that have not reached a final delivery result.
+    /// </summary>
+    public int MaxQueuedMessages { get; set; } = 100_000;
+
+    /// <summary>
     /// Сonfiguration of the message distribution algorithm by sections
     /// </summary>
     /// <remarks>
@@ -155,6 +160,11 @@ public record ProducerConfig: CommonConfig
         if (MaxPendingProduceRequests <= 0)
         {
             throw new KafkaConfigException(nameof(MaxPendingProduceRequests), MaxPendingProduceRequests, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (MaxQueuedMessages <= 0)
+        {
+            throw new KafkaConfigException(nameof(MaxQueuedMessages), MaxQueuedMessages, ConfigurationMessages.CommonConfig_ValueMustBePositive);
         }
 
         if (DeliveryTimeoutMs <= 0)

@@ -106,6 +106,8 @@ internal class ProducerBatch(
 
     internal BatchState State { get; private set; } = BatchState.Open;
 
+    internal int RecordsCount => _recordsCount;
+
     /// <summary>
     /// How many bytes are left to add so that the batch is complete?
     /// </summary>

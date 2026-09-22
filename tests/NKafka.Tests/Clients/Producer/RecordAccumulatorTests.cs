@@ -128,4 +128,34 @@ public sealed class RecordAccumulatorTests
         var acceptedAfterRelease = accumulator.Append(new TopicPartition("test", 1), 1_002, null, new byte[1], Headers.Empty);
         acceptedAfterRelease.Error.Should().BeNull();
     }
+
+    [Fact]
+    public void Append_WhenQueuedMessageLimitIsReached_ReleasesCapacityAfterBatchCompletion()
+    {
+        var config = new ProducerConfig
+        {
+            BatchSize = 80,
+            MaxQueuedMessages = 1,
+            EnqueueTimeoutMs = 10,
+            MaxRequestSize = 1024 * 1024
+        };
+        var accumulator = new RecordAccumulator(
+            config,
+            Substitute.For<ITransactionManager>(),
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var accepted = accumulator.Append(new TopicPartition("test", 0), 1_000, null, new byte[1], Headers.Empty);
+        var rejected = accumulator.Append(new TopicPartition("test", 1), 1_001, null, new byte[1], Headers.Empty);
+
+        accepted.Error.Should().BeNull();
+        rejected.Error.Should().Be(new ProducerError(ErrorCodes.ClientError, ProducerLocalError.EnqueueTimedOut));
+
+        Thread.Sleep(5);
+        var batch = accumulator.PullReadyBatches(config.MaxRequestSize).Single();
+        batch.Complete(0, 1_000);
+
+        accumulator.Append(new TopicPartition("test", 1), 1_002, null, new byte[1], Headers.Empty).Error.Should().BeNull();
+    }
 }

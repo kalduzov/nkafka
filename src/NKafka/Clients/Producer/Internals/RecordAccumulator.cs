@@ -519,4 +519,34 @@ internal sealed class RecordAccumulator(
             deque.AddFirst(batch);
         }
     }
+
+    /// <inheritdoc />
+    public void FailAllPending()
+    {
+        foreach (var batches in _batchesByTopics.Values)
+        {
+            foreach (var deque in batches.Values)
+            {
+                lock (deque)
+                {
+                    while (deque.Count > 0)
+                    {
+                        var batch = deque.RemoveFirst();
+
+                        if (batch.State == ProducerBatch.BatchState.Open)
+                        {
+                            var reservation = batch.ReleaseMemoryReservation();
+
+                            if (reservation != 0)
+                            {
+                                ReleaseMemory(reservation);
+                            }
+                        }
+
+                        batch.FailForClosing();
+                    }
+                }
+            }
+        }
+    }
 }

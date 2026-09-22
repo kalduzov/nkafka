@@ -50,6 +50,11 @@ internal interface IRecordAccumulator
     internal void Requeue(ProducerBatch batch);
 
     /// <summary>
+    /// Completes all batches that are still owned by the accumulator during producer shutdown.
+    /// </summary>
+    internal void FailAllPending();
+
+    /// <summary>
     /// Adds a new record to the accumulator
     /// </summary>
     /// <param name="topicPartition">Topic partition for which the entry is added</param>

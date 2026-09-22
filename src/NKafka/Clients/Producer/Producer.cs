@@ -392,6 +392,15 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                 ProducerLocalError.None,
                 exception.InternalError);
         }
+        catch (ProducerClosingException exception)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, "Producer is closing");
+
+            return CreateFailureResult(
+                exception.Status,
+                ProducerLocalError.ProducerClosing,
+                ErrorCodes.ClientError);
+        }
         catch (TimeoutException)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "Timeout exception");
@@ -477,6 +486,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         _closed = true;
         _tokenSource.Cancel();
         _senderTask.GetAwaiter().GetResult();
+        _accumulator.FailAllPending();
         _messagesSender.Dispose();
         _tokenSource.Dispose();
         LoggerScope?.Dispose();
@@ -496,6 +506,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         try
         {
             await _senderTask.ConfigureAwait(false);
+            _accumulator.FailAllPending();
         }
         finally
         {

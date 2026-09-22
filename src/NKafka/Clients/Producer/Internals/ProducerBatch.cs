@@ -423,6 +423,24 @@ internal class ProducerBatch(
         State = BatchState.Completed;
     }
 
+    internal void FailForClosing()
+    {
+        EnsureNotCompleted("fail");
+
+        var status = State == BatchState.Sent
+            ? PersistenceStatus.PossiblyPersisted
+            : PersistenceStatus.NotPersisted;
+        var exception = new ProducerClosingException(status);
+
+        foreach (var recordTask in _recordTasks)
+        {
+            recordTask.SetException(exception);
+        }
+
+        _produceRequestResult.SetException(exception);
+        State = BatchState.Completed;
+    }
+
     public void SetReady()
     {
         IsReady = true;

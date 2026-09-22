@@ -204,6 +204,7 @@ internal sealed class MessagesSender(
             }
             catch (OperationCanceledException) when (token.IsCancellationRequested)
             {
+                batch.FailForClosing();
                 throw;
             }
             catch (Exception exception)

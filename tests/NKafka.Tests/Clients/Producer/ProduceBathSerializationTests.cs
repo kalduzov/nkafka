@@ -24,6 +24,7 @@ using System.Text;
 
 using Microsoft.Extensions.Logging.Abstractions;
 
+using NKafka.Clients.Producer;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Compressions;
 using NKafka.Config;
@@ -195,6 +196,22 @@ public class ProduceBathSerializationTests
     public void MessagesSender_ClassifiesProduceErrors(ErrorCodes errorCode, bool expectedRetriable)
     {
         MessagesSender.IsRetriableProduceError(errorCode).Should().Be(expectedRetriable);
+    }
+
+    [Fact]
+    public async Task ProducerBatch_FailForClosing_ReportsNotPersistedBeforeSend()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.FailForClosing();
+
+        var exception = await Assert.ThrowsAsync<ProducerClosingException>(() => batch.CompletionTask);
+        exception.Status.Should().Be(PersistenceStatus.NotPersisted);
+        batch.State.Should().Be(ProducerBatch.BatchState.Completed);
+
+        ArrayBufferPool.Return(buffer);
     }
 
     [Fact]

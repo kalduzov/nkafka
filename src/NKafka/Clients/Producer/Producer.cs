@@ -45,6 +45,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     private readonly IRecordAccumulator _accumulator;
     private readonly ILogger _logger;
     private readonly int _maxRequestSize;
+    private readonly int _maxPendingProduceRequests;
     private readonly string _name;
     private readonly IProducerMetrics _producerMetrics;
     private readonly IPartitioner _partitioner;
@@ -56,6 +57,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     private readonly IMessagesSender _messagesSender;
     private readonly int _deliveryTimeoutMs;
     private int _disposeState;
+    private int _pendingProduceRequests;
 
     /// <summary>
     /// Use this constructor to create a producer
@@ -97,6 +99,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
         _producerMetrics = producerMetrics ?? new DefaultProducerMetrics();
         _maxRequestSize = config.MaxRequestSize;
+        _maxPendingProduceRequests = config.MaxPendingProduceRequests;
         _totalMemorySize = config.BufferMemory;
         _senderTask = Task.CompletedTask; //initialize in order not to make it nullable
 
@@ -263,6 +266,25 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     {
         ThrowIfProducerClosed();
 
+        // This limit covers only the acceptance phase. Once a record enters the accumulator,
+        // its lifetime is accounted for by the accumulator and no longer consumes this slot.
+        if (Interlocked.Increment(ref _pendingProduceRequests) > _maxPendingProduceRequests)
+        {
+            Interlocked.Decrement(ref _pendingProduceRequests);
+
+            return new MessageDeliveryResult(
+                PersistenceStatus.NotPersisted,
+                topicPartition,
+                message.Timestamp.UnixTimestampMs,
+                Offset.Unset,
+                message.Key?.Length ?? -1,
+                message.Value?.Length ?? -1,
+                message)
+            {
+                Error = new ProducerError(ErrorCodes.ClientError, ProducerLocalError.EnqueueTimedOut)
+            };
+        }
+
         var actualTopicPartition = topicPartition;
 
         _logger.ProduceMessage(actualTopicPartition);
@@ -317,6 +339,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
             }
 
             accepted = true;
+            Interlocked.Decrement(ref _pendingProduceRequests);
 
             if (_transactionManager.IsTransactional)
             {
@@ -393,6 +416,14 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
             activity?.SetStatus(ActivityStatusCode.Error, exc.Message);
 
             throw;
+        }
+        finally
+        {
+            // Release the slot when acceptance fails before the record reaches the accumulator.
+            if (!accepted)
+            {
+                Interlocked.Decrement(ref _pendingProduceRequests);
+            }
         }
 
         MessageDeliveryResult CreateFailureResult(

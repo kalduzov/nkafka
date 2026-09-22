@@ -136,6 +136,22 @@ public sealed class ProducerConfigTests
     }
 
     [Fact]
+    public void Validate_WhenMaxPendingProduceRequestsIsNotPositive_MustThrowException()
+    {
+        var config = new ProducerConfig
+        {
+            BootstrapServers = ["test"],
+            MaxPendingProduceRequests = 0
+        };
+
+        FluentActions.Invoking(() => config.Validate())
+            .Should()
+            .Throw<KafkaConfigException>()
+            .Which.OptionName.Should()
+            .Be(nameof(config.MaxPendingProduceRequests));
+    }
+
+    [Fact]
     public void BaseFrom_CopiesCommonSettingsWithoutSharingMutableValues()
     {
         var common = new TestCommonConfig

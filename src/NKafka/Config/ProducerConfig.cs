@@ -49,6 +49,11 @@ public record ProducerConfig: CommonConfig
     public int EnqueueTimeoutMs { get; set; } = 60_000;
 
     /// <summary>
+    /// Maximum number of produce calls that may wait for metadata, partition selection, or buffer space.
+    /// </summary>
+    public int MaxPendingProduceRequests { get; set; } = 1_000;
+
+    /// <summary>
     /// Сonfiguration of the message distribution algorithm by sections
     /// </summary>
     /// <remarks>
@@ -145,6 +150,11 @@ public record ProducerConfig: CommonConfig
         if (EnqueueTimeoutMs <= 0)
         {
             throw new KafkaConfigException(nameof(EnqueueTimeoutMs), EnqueueTimeoutMs, ConfigurationMessages.CommonConfig_ValueMustBePositive);
+        }
+
+        if (MaxPendingProduceRequests <= 0)
+        {
+            throw new KafkaConfigException(nameof(MaxPendingProduceRequests), MaxPendingProduceRequests, ConfigurationMessages.CommonConfig_ValueMustBePositive);
         }
 
         if (DeliveryTimeoutMs <= 0)

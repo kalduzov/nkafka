@@ -355,6 +355,22 @@ public class KafkaConnectorTests
     }
 
     [Fact]
+    public async Task SendAsyncWithoutResponse_CompletesAfterWritingWithoutInflightRegistration()
+    {
+        var kafkaConnector = CreateConnector(apiRequest: true, requestsWithoutResponse: [ApiKeys.Metadata]);
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        await ((IKafkaConnector)kafkaConnector).SendAsync(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        kafkaConnector.CurrentNumberInflightRequests.Should().Be(0);
+
+        await kafkaConnector.DisposeAsync();
+    }
+
+    [Fact]
     public async Task SendAsync_WhenRequestTimesOut_FailsRequestAndClearsInflightRegistry()
     {
         var kafkaConnector = CreateConnector(

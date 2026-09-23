@@ -74,6 +74,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
     private readonly int _maxInflightRequests;
     private readonly int _messageMaxBytes;
     private readonly int _requestTimeoutMs;
+    private readonly SemaphoreSlim _requestWriteLock = new(1, 1);
 
     private CancellationTokenSource _responseProcessingTokenSource = new();
     private int _responseProcessingSessionId;
@@ -257,7 +258,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 // request must be visible in the inflight registry before any bytes are written.
                 WakeupProcessingResponses(); //"пробуждаем" обработку ответов на запрос
 
-                await WriteRequestAsync(request, activity);
+                await WriteRequestAsync(request, activity, requestLifetimeCts.Token);
             }
             catch (Exception exc)
             {
@@ -320,7 +321,7 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 ThrowExceptionIfRequestNotValid(request, null);
             }
 
-            await WriteRequestAsync(request, null);
+            await WriteRequestAsync(request, null, token);
         }
         finally
         {
@@ -328,15 +329,17 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         }
     }
 
-    private async Task WriteRequestAsync(SendMessage request, Activity? activity)
+    private async Task WriteRequestAsync(SendMessage request, Activity? activity, CancellationToken token)
     {
-        if (!CanWrite)
-        {
-            throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
-        }
+        await _requestWriteLock.WaitAsync(token);
 
         try
         {
+            if (!CanWrite)
+            {
+                throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
+            }
+
             var bytesSent = await request.WriteToStream(_stream, true, _messageMaxBytes);
             Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
             _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
@@ -345,6 +348,10 @@ internal sealed partial class KafkaConnector: IKafkaConnector
         {
             activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
             throw;
+        }
+        finally
+        {
+            _requestWriteLock.Release();
         }
     }
 

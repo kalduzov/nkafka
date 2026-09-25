@@ -458,6 +458,21 @@ internal class ProducerBatch(
         State = BatchState.Completed;
     }
 
+    internal void FailForTransport(PersistenceStatus status)
+    {
+        EnsureNotCompleted("fail");
+
+        var exception = new ProducerTransportException(status);
+
+        foreach (var recordTask in _recordTasks)
+        {
+            recordTask.SetException(exception);
+        }
+
+        _produceRequestResult.SetException(exception);
+        State = BatchState.Completed;
+    }
+
     public void SetReady()
     {
         IsReady = true;

@@ -56,9 +56,14 @@ internal struct SendMessage(
     /// <param name="writableStream"></param>
     /// <param name="throwIfSizeLargeThen"></param>
     /// <param name="messageMaxBytes"></param>
+    /// <param name="onWriteStarted">Called immediately before the first write to the stream.</param>
     /// <returns></returns>
     /// <exception cref="ProtocolKafkaException"></exception>
-    public async Task<long> WriteToStream(Stream writableStream, bool throwIfSizeLargeThen = false, int messageMaxBytes = 1000000)
+    public async Task<long> WriteToStream(
+        Stream writableStream,
+        bool throwIfSizeLargeThen = false,
+        int messageMaxBytes = 1000000,
+        Action? onWriteStarted = null)
     {
         if (!writableStream.CanWrite)
         {
@@ -70,13 +75,16 @@ internal struct SendMessage(
         Header.Write(ref writer, headerVersion);
         RequestMessage.Write(ref writer, messageVersion);
 
-        if (writer.BufferLength + 4 > messageMaxBytes && throwIfSizeLargeThen)
+        if (writer.WrittenCount + 4 > messageMaxBytes && throwIfSizeLargeThen)
         {
             var logMessage = $"Размер запроса превышает допустимый предел указанный в конфигурации {messageMaxBytes}";
 
             throw new ProtocolKafkaException(ErrorCodes.MessageTooLarge, logMessage);
         }
 
+        // Signal immediately before the first network write so callers can distinguish
+        // serialization failures from failures with an uncertain delivery outcome.
+        onWriteStarted?.Invoke();
         writableStream.WriteInt(writer.WrittenCount); // First we write down the length of all data
         await _buffer.WriteToAndResetAsync(writableStream, CancellationToken.None);
 

@@ -340,7 +340,22 @@ internal sealed partial class KafkaConnector: IKafkaConnector
                 throw new ConnectionKafkaException($"Текущее соединение по адресу {Endpoint} к брокеру {NodeId} не может отправлять запросы");
             }
 
-            var bytesSent = await request.WriteToStream(_stream, true, _messageMaxBytes);
+            var writeStarted = false;
+            long bytesSent;
+
+            try
+            {
+                bytesSent = await request.WriteToStream(
+                    _stream,
+                    true,
+                    _messageMaxBytes,
+                    () => writeStarted = true);
+            }
+            catch (Exception exception) when (writeStarted)
+            {
+                throw new RequestWriteException(exception);
+            }
+
             Debug.WriteLine("Send request {0}, Size={1}", request.RequestMessage.ApiKey, bytesSent);
             _totalBytesSent = Interlocked.Add(ref _totalBytesSent, bytesSent);
         }

@@ -51,7 +51,10 @@ public class SendMessageTests
 
             using var stream = new MemoryStream();
 
-            await sendMessage.WriteToStream(stream);
+            await sendMessage.WriteToStream(
+                stream,
+                throwIfSizeLargeThen: true,
+                messageMaxBytes: 18);
 
             stream.Length.Should().Be(18); //Всего байт данных в запросе
             stream.Seek(3, SeekOrigin.Begin);

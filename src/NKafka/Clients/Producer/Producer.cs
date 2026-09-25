@@ -402,6 +402,15 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
                 ProducerLocalError.ProducerClosing,
                 ErrorCodes.ClientError);
         }
+        catch (ProducerTransportException exception)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, "Producer transport failed");
+
+            return CreateFailureResult(
+                exception.Status,
+                exception.Error.LocalError,
+                exception.Error.ErrorCode);
+        }
         catch (TimeoutException)
         {
             activity?.SetStatus(ActivityStatusCode.Error, "Timeout exception");

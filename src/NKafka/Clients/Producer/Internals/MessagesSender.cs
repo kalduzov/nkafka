@@ -22,6 +22,7 @@
 using Microsoft.Extensions.Logging;
 
 using NKafka.Config;
+using NKafka.Connection;
 using NKafka.Exceptions;
 using NKafka.Messages;
 using NKafka.Metrics;
@@ -41,7 +42,7 @@ internal sealed class MessagesSender(
     ILoggerFactory loggerFactory)
     : IMessagesSender
 {
-    private enum SendCycleResult
+    internal enum SendCycleResult
     {
         NoWork,
         WorkCompleted,
@@ -123,7 +124,7 @@ internal sealed class MessagesSender(
         return await SendProducerDataAsync(cancellationToken);
     }
 
-    private async Task<SendCycleResult> SendProducerDataAsync(CancellationToken token)
+    internal async Task<SendCycleResult> SendProducerDataAsync(CancellationToken token)
     {
         var batches = recordAccumulator.PullReadyBatches(config.MaxRequestSize);
         var hasBatches = false;
@@ -218,7 +219,16 @@ internal sealed class MessagesSender(
             {
                 _logger.LogError(exception, "Ошибка отправки пакета {TopicPartition}", batch.TopicPartition);
 
-                if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
+                // With acks=0, a failed write may have reached the broker partially or completely,
+                // so retrying could duplicate records and the client cannot verify the outcome.
+                if (config.Acks == Acks.None)
+                {
+                    var status = exception is RequestWriteException
+                        ? PersistenceStatus.PossiblyPersisted
+                        : PersistenceStatus.NotPersisted;
+                    batch.FailForTransport(status);
+                }
+                else if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
                 {
                     batch.Fail(ErrorCodes.NetworkException);
                 }

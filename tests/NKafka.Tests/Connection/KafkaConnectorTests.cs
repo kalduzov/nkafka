@@ -357,7 +357,10 @@ public class KafkaConnectorTests
     [Fact]
     public async Task SendAsyncWithoutResponse_CompletesAfterWritingWithoutInflightRegistration()
     {
-        var kafkaConnector = CreateConnector(apiRequest: true, requestsWithoutResponse: [ApiKeys.Metadata]);
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            messageMaxBytes: 10_000,
+            requestsWithoutResponse: [ApiKeys.Metadata]);
         await kafkaConnector.OpenAsync(CancellationToken.None);
 
         await ((IKafkaConnector)kafkaConnector).SendAsync(
@@ -366,6 +369,27 @@ public class KafkaConnectorTests
             CancellationToken.None);
 
         kafkaConnector.CurrentNumberInflightRequests.Should().Be(0);
+
+        await kafkaConnector.DisposeAsync();
+    }
+
+    [Fact]
+    public async Task SendAsyncWithoutResponse_WhenSocketWriteFails_ReportsUncertainWriteOutcome()
+    {
+        var kafkaConnector = CreateConnector(
+            apiRequest: true,
+            messageMaxBytes: 10_000,
+            requestsWithWriteFailure: [ApiKeys.Metadata]);
+        await kafkaConnector.OpenAsync(CancellationToken.None);
+
+        var sendTask = ((IKafkaConnector)kafkaConnector).SendAsync(
+            MetadataRequestMessage.Build(false, null),
+            false,
+            CancellationToken.None);
+
+        await FluentActions.Awaiting(async () => await sendTask)
+            .Should()
+            .ThrowAsync<RequestWriteException>();
 
         await kafkaConnector.DisposeAsync();
     }
@@ -417,6 +441,7 @@ public class KafkaConnectorTests
 
     private KafkaConnector CreateConnector(
         bool apiRequest,
+        int messageMaxBytes = 1000,
         IEnumerable<ApiKeys>? requestsWithoutResponse = null,
         IEnumerable<ApiKeys>? requestsWithWriteFailure = null,
         SecurityProtocols securityProtocol = SecurityProtocols.PlainText,
@@ -427,7 +452,7 @@ public class KafkaConnectorTests
         => new(
             CreateEndpoint(),
             100,
-            1000,
+            messageMaxBytes,
             1000,
             1000,
             requestTimeoutMs,

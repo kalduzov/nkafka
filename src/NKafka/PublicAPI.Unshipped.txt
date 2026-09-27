@@ -205,7 +205,6 @@ NKafka.Clients.Consumer.Subscription.IsAssignedTopicPartitions(string! topic, NK
 NKafka.Clients.Consumer.Subscription.SerializeAsMetadata() -> byte[]!
 NKafka.Clients.Consumer.Subscription.SupportPartitionAssignors.get -> System.Collections.Generic.IReadOnlyCollection<NKafka.Clients.Consumer.IPartitionAssignor!>!
 NKafka.Clients.Consumer.Subscription.Topics.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
-NKafka.Clients.IClient
 NKafka.Clients.Producer.IPartitioner
 NKafka.Clients.Producer.IPartitioner.Partition(string! topic, byte[]? keyBytes, byte[]? valueBytes, NKafka.IKafkaCluster! cluster, System.Threading.CancellationToken token) -> System.Threading.Tasks.ValueTask<int>
 NKafka.Clients.Producer.IProducer

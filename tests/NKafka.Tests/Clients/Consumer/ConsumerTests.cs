@@ -22,6 +22,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NKafka.Clients.Consumer;
+using NKafka.Clients.Consumer.Internal;
 using NKafka.Config;
 using NKafka.Metrics;
 using NKafka.Serialization;
@@ -78,6 +79,35 @@ public partial class ConsumerTests: IDisposable
                 metrics: new NullConsumerMetrics(),
                 NullLoggerFactory.Instance);
         }
+    }
+
+    [Fact]
+    public async Task DisposeAsync_StopsOwnedResourcesWithoutDisposingSharedCluster()
+    {
+        var fetcher = Substitute.For<IFetcher<int, string>>();
+        var coordinator = Substitute.For<ICoordinator>();
+        var consumer = new Consumer<int, string>(
+            _kafkaCluster,
+            new ConsumerConfig(),
+            NoneDeserializer<int>.Instance,
+            NoneDeserializer<string>.Instance,
+            fetcher,
+            coordinator,
+            new NullConsumerMetrics(),
+            NullLoggerFactory.Instance);
+
+        consumer.Should().NotBeAssignableTo<IDisposable>();
+
+        var firstDispose = consumer.DisposeAsync().AsTask();
+        var repeatedDispose = consumer.DisposeAsync().AsTask();
+        repeatedDispose.Should().BeSameAs(firstDispose);
+        await firstDispose;
+
+        await fetcher.Received(1).StopAsync(CancellationToken.None);
+        fetcher.Received(1).Dispose();
+        await coordinator.Received(1).DisposeAsync();
+        _kafkaCluster.DidNotReceive().Dispose();
+        await _kafkaCluster.DidNotReceive().DisposeAsync();
     }
 
     private static IKafkaCluster BuildMockForKafkaCluster()

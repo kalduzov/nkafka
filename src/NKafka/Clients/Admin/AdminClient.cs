@@ -35,16 +35,11 @@ internal class AdminClient(IKafkaCluster kafkaCluster, ILogger<AdminClient> logg
 {
     private readonly int _defaultTimeout = kafkaCluster.Config.RequestTimeoutMs;
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    public void Dispose()
-    {
-    }
-
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
     /// <returns>A task that represents the asynchronous dispose operation.</returns>
     public ValueTask DisposeAsync()
     {
-        return default;
+        return ValueTask.CompletedTask;
     }
 
     /// <inheritdoc/>

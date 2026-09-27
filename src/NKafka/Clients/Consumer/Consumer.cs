@@ -63,6 +63,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
     private Subscription? _currentSubscription;
     private readonly SemaphoreSlim _subscribeSyncBlock;
     private readonly IConsumerMetrics _metrics;
+    private readonly Lazy<Task> _disposeTask;
 
     public string GroupId { get; }
 
@@ -98,6 +99,7 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         //config.EventListeners.ToImmutableList();
         _logger = LoggerFactory.CreateLogger(GetType());
         _metrics = metrics ?? new DefaultConsumerMetrics();
+        _disposeTask = new Lazy<Task>(DisposeCoreAsync, LazyThreadSafetyMode.ExecutionAndPublication);
 
         _coordinator = coordinator
                        ?? new Coordinator(kafkaCluster,
@@ -257,22 +259,31 @@ internal class Consumer<TKey, TValue>: Client<ConsumerConfig>, IConsumer<TKey, T
         return channel;
     }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    public override void Dispose()
+    /// <summary>Releases the consumer without closing the owning cluster.</summary>
+    public ValueTask DisposeAsync()
     {
-        base.Dispose();
-        _subscribeSyncBlock.Dispose();
+        return new ValueTask(_disposeTask.Value);
     }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    public override ValueTask DisposeAsync()
+    private async Task DisposeCoreAsync()
     {
-        var result = base.DisposeAsync();
-
-        _subscribeSyncBlock.Dispose();
-
-        return result;
-
+        try
+        {
+            await _fetcher.StopAsync(CancellationToken.None).ConfigureAwait(false);
+        }
+        finally
+        {
+            try
+            {
+                await _coordinator.DisposeAsync().ConfigureAwait(false);
+            }
+            finally
+            {
+                _currentChannel?.Writer.TryComplete();
+                _fetcher.Dispose();
+                _subscribeSyncBlock.Dispose();
+                LoggerScope?.Dispose();
+            }
+        }
     }
 }

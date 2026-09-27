@@ -26,7 +26,7 @@ namespace NKafka.Clients.Consumer;
 /// <summary>
 /// 
 /// </summary>
-public interface IConsumer: IClient
+public interface IConsumer: IAsyncDisposable
 {
     /// <summary>
     /// 

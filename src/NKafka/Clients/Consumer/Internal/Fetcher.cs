@@ -401,7 +401,6 @@ internal class Fetcher<TKey, TValue>(
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public void Dispose()
     {
-        kafkaCluster.Dispose();
         _cts.Dispose();
         _currentFetcherTask.Dispose();
     }

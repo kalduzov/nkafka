@@ -31,6 +31,45 @@ namespace NKafka.Tests.Clients.Producer;
 public sealed class CreateProducerTests: ClientTests
 {
     [Fact]
+    public async Task DisposeAsync_WhenSenderExceedsTimeout_DefersResourceDisposalUntilSenderStops()
+    {
+        var senderTask = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var resourcesDisposed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sender = Substitute.For<IMessagesSender>();
+        sender.StartAsync(Arg.Any<CancellationToken>()).Returns(senderTask.Task);
+        sender.DisposeAsync().Returns(_ =>
+        {
+            resourcesDisposed.TrySetResult();
+            return ValueTask.CompletedTask;
+        });
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+
+        var producer = new NKafka.Clients.Producer.Producer(
+            kafkaCluster,
+            "test_producer",
+            new ProducerConfig { ClientDisposeTimeoutMs = 20 },
+            Substitute.For<ITransactionManager>(),
+            Substitute.For<IRecordAccumulator>(),
+            sender,
+            new NullProducerMetrics(),
+            NullLoggerFactory.Instance);
+
+        var firstDispose = producer.DisposeAsync().AsTask();
+        var repeatedDispose = producer.DisposeAsync().AsTask();
+
+        producer.Should().NotBeAssignableTo<IDisposable>();
+        await firstDispose.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
+        repeatedDispose.Should().BeSameAs(firstDispose);
+        resourcesDisposed.Task.IsCompleted.Should().BeFalse();
+
+        senderTask.SetResult();
+        await resourcesDisposed.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
+        await sender.Received(1).DisposeAsync();
+        kafkaCluster.DidNotReceive().Dispose();
+        await kafkaCluster.DidNotReceive().DisposeAsync();
+    }
+
+    [Fact]
     public async Task BuildProducer_DefaultConfig_Successful()
     {
         await using var cluster = CreateKafkaClusterForTests();

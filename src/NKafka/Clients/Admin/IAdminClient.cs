@@ -24,7 +24,7 @@ namespace NKafka.Clients.Admin;
 /// <summary>
 /// The administrative client for Kafka, which supports managing and inspecting topics, brokers, configurations and ACLs.
 /// </summary>
-public interface IAdminClient: IClient
+public interface IAdminClient: IAsyncDisposable
 {
     /// <summary>
     /// Create a batch of new topics

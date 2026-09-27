@@ -27,7 +27,7 @@ using Microsoft.Extensions.Logging;
 
 namespace NKafka.Clients;
 
-internal abstract class Client<TConfig>(IKafkaCluster kafkaCluster, TConfig config, ILoggerFactory loggerFactory): IClient
+internal abstract class Client<TConfig>(IKafkaCluster kafkaCluster, TConfig config, ILoggerFactory loggerFactory)
 {
     private IDisposable? _loggerScope;
 
@@ -52,17 +52,4 @@ internal abstract class Client<TConfig>(IKafkaCluster kafkaCluster, TConfig conf
     protected ILoggerFactory LoggerFactory { get; } = loggerFactory;
 
     protected TConfig Config { get; } = config;
-
-    public virtual void Dispose()
-    {
-        LoggerScope?.Dispose();
-        KafkaCluster.Dispose();
-    }
-
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources asynchronously.</summary>
-    /// <returns>A task that represents the asynchronous dispose operation.</returns>
-    public virtual async ValueTask DisposeAsync()
-    {
-        await KafkaCluster.DisposeAsync();
-    }
 }

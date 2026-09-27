@@ -56,7 +56,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     private readonly Task _senderTask;
     private readonly IMessagesSender _messagesSender;
     private readonly int _deliveryTimeoutMs;
-    private int _disposeState;
+    private readonly Lazy<Task> _disposeTask;
     private int _pendingProduceRequests;
 
     /// <summary>
@@ -96,6 +96,7 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         LoggerScope = _logger.Begin("producer", clientId, transactionId);
 
         _logger.StartProducerTrace(_name);
+        _disposeTask = new Lazy<Task>(DisposeCoreAsync, LazyThreadSafetyMode.ExecutionAndPublication);
 
         _producerMetrics = producerMetrics ?? new DefaultProducerMetrics();
         _maxRequestSize = config.MaxRequestSize;
@@ -485,44 +486,65 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
         }
     }
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    public override void Dispose()
+    /// <summary>Releases the producer without closing the owning cluster.</summary>
+    public ValueTask DisposeAsync()
     {
-        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
-        {
-            return;
-        }
-
-        _closed = true;
-        _tokenSource.Cancel();
-        _senderTask.GetAwaiter().GetResult();
-        _accumulator.FailAllPending();
-        _messagesSender.Dispose();
-        _tokenSource.Dispose();
-        LoggerScope?.Dispose();
+        return new ValueTask(_disposeTask.Value);
     }
 
-    /// <summary>Releases the producer without closing the owning cluster.</summary>
-    public override async ValueTask DisposeAsync()
+    private async Task DisposeCoreAsync()
     {
-        if (Interlocked.Exchange(ref _disposeState, 1) != 0)
-        {
-            return;
-        }
-
         _closed = true;
         _tokenSource.Cancel();
 
         try
         {
-            await _senderTask.ConfigureAwait(false);
+            await _senderTask.WaitAsync(TimeSpan.FromMilliseconds(Config.ClientDisposeTimeoutMs)).ConfigureAwait(false);
             _accumulator.FailAllPending();
         }
-        finally
+        catch (TimeoutException)
         {
-            await _messagesSender.DisposeAsync().ConfigureAwait(false);
-            _tokenSource.Dispose();
-            LoggerScope?.Dispose();
+            // Do not dispose resources while the sender may still be using them.
+            _accumulator.FailAllPending();
+            _ = DisposeResourcesWhenSenderStopsAsync();
+            return;
         }
+        catch
+        {
+            _accumulator.FailAllPending();
+            await DisposeResourcesAsync().ConfigureAwait(false);
+            throw;
+        }
+
+        await DisposeResourcesAsync().ConfigureAwait(false);
+    }
+
+    private async Task DisposeResourcesWhenSenderStopsAsync()
+    {
+        try
+        {
+            try
+            {
+                await _senderTask.ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Message sender stopped with an error during producer disposal.");
+            }
+
+            _accumulator.FailAllPending();
+            await DisposeResourcesAsync().ConfigureAwait(false);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to dispose producer resources after sender stopped.");
+        }
+    }
+
+    private async ValueTask DisposeResourcesAsync()
+    {
+        await _messagesSender.DisposeAsync().ConfigureAwait(false);
+        _tokenSource.Dispose();
+        LoggerScope?.Dispose();
     }
 }

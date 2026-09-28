@@ -15,6 +15,41 @@ namespace NKafka.Tests.Clients.Producer;
 public sealed class MessagesSenderTests
 {
     [Fact]
+    public async Task SendProducerDataAsync_WithNoLeaderAfterMetadataRefresh_RequeuesBatch()
+    {
+        var config = new ProducerConfig { Acks = Acks.Leader };
+        var topicPartition = new TopicPartition("test", 0);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(topicPartition, buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1_000, null, "value"u8.ToArray(), Headers.Empty, out var resultTask).Should().BeTrue();
+        batch.Close();
+
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([batch]);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        kafkaCluster.LeaderFor(topicPartition).Returns(Node.NoNode);
+        kafkaCluster.RefreshMetadataAsync([topicPartition.Topic], Arg.Any<CancellationToken>())
+            .Returns(Task.CompletedTask);
+
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            Substitute.For<ITransactionManager>(),
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var sendResult = await sender.SendProducerDataAsync(CancellationToken.None);
+
+        sendResult.Should().Be(MessagesSender.SendCycleResult.RetryScheduled);
+        batch.State.Should().Be(ProducerBatch.BatchState.Closed);
+        accumulator.Received(1).Requeue(batch);
+        (resultTask!.Task.IsCompleted).Should().BeFalse();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
     public async Task SendProducerDataAsync_WithMultiplePartitionsOnSameBroker_SendsOneRequestAndMatchesResponses()
     {
         var config = new ProducerConfig { Acks = Acks.Leader };

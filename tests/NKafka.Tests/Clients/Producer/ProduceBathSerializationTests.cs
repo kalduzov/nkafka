@@ -179,6 +179,37 @@ public class ProduceBathSerializationTests
         batch.PrepareForRetry(60_000).Should().BeTrue();
         batch.State.Should().Be(ProducerBatch.BatchState.Closed);
         batch.IsReady.Should().BeTrue();
+        batch.PrepareForRetry(60_000).Should().BeTrue();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_PrepareForRetry_AllowsRetryBeforeSending()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+
+        batch.PrepareForRetry(60_000).Should().BeTrue();
+        batch.State.Should().Be(ProducerBatch.BatchState.Closed);
+        batch.IsReady.Should().BeTrue();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_PrepareForRetry_DoesNotRetryFinalizedBatch()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        batch.TryAppend(1, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.Close();
+        batch.MarkFinalized();
+
         batch.PrepareForRetry(60_000).Should().BeFalse();
 
         ArrayBufferPool.Return(buffer);
@@ -190,6 +221,12 @@ public class ProduceBathSerializationTests
     [InlineData(ErrorCodes.RequestTimedOut, true)]
     [InlineData(ErrorCodes.BrokerNotAvailable, true)]
     [InlineData(ErrorCodes.ReplicaNotAvailable, true)]
+    [InlineData(ErrorCodes.NotEnoughReplicas, true)]
+    [InlineData(ErrorCodes.NotEnoughReplicasAfterAppend, true)]
+    [InlineData(ErrorCodes.UnknownTopicOrPartition, true)]
+    [InlineData(ErrorCodes.FencedLeaderEpoch, true)]
+    [InlineData(ErrorCodes.UnknownLeaderEpoch, true)]
+    [InlineData(ErrorCodes.PreferredLeaderNotAvailable, true)]
     [InlineData(ErrorCodes.NetworkException, true)]
     [InlineData(ErrorCodes.MessageTooLarge, false)]
     [InlineData(ErrorCodes.TopicAuthorizationFailed, false)]

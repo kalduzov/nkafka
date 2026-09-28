@@ -344,7 +344,10 @@ internal class ProducerBatch(
 
     internal bool PrepareForRetry(int deliveryTimeoutMs)
     {
-        if (State != BatchState.Sent ||
+        // A batch can be retried before sending (for example, while its partition has no leader)
+        // or after sending (for a retriable broker/network failure). A finalized batch has not
+        // entered the send path and must not hide a local request-construction error.
+        if (State is not (BatchState.Closed or BatchState.Compressed or BatchState.Sent) ||
             Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow) - CreateTimestamp >= deliveryTimeoutMs)
         {
             return false;

@@ -239,7 +239,10 @@ internal sealed class MessagesSender(
                                 // Refresh metadata before requeueing so the next attempt can choose a new leader.
                                 if (partitionResponse.Code is ErrorCodes.LeaderNotAvailable or
                                     ErrorCodes.NotLeaderOrFollower or
-                                    ErrorCodes.ReplicaNotAvailable)
+                                    ErrorCodes.ReplicaNotAvailable or
+                                    ErrorCodes.FencedLeaderEpoch or
+                                    ErrorCodes.UnknownLeaderEpoch or
+                                    ErrorCodes.PreferredLeaderNotAvailable)
                                 {
                                     await kafkaCluster.RefreshMetadataAsync([batch.TopicPartition.Topic], token);
                                 }
@@ -339,6 +342,12 @@ internal sealed class MessagesSender(
             or ErrorCodes.RequestTimedOut
             or ErrorCodes.BrokerNotAvailable
             or ErrorCodes.ReplicaNotAvailable
+            or ErrorCodes.NotEnoughReplicas
+            or ErrorCodes.NotEnoughReplicasAfterAppend
+            or ErrorCodes.UnknownTopicOrPartition
+            or ErrorCodes.FencedLeaderEpoch
+            or ErrorCodes.UnknownLeaderEpoch
+            or ErrorCodes.PreferredLeaderNotAvailable
             or ErrorCodes.NetworkException;
 
     private async Task<Node> TryGetNodeAsync(TopicPartition topicPartition, CancellationToken token)

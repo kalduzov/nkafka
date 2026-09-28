@@ -14,6 +14,12 @@ The transactional configuration sets valid initial values, including `EnableIdem
 
 The validator runs the base configuration checks and then the transactional checks on the final configuration. Direct creation and every extension overload follow the same validation path, including configurations supplied through a configuration callback. Configuration copies preserve common settings and clone mutable nested settings, so changing a derived configuration does not change its source.
 
+## Idempotent ordinary producer
+
+Set `ProducerConfig.EnableIdempotence = true` to let Kafka recognize an internal retry of the same record batch and avoid writing that batch twice. Initialization is performed by the producer's background sender; creating the producer does not wait for the broker. The current implementation allows only one in-flight batch per partition, while other partitions can continue independently.
+
+This protection applies to retries performed by the producer for the same batch. Calling `Produce` or `ProduceAsync` again is a new application operation and may write another record. Idempotence does not make writes across partitions atomic and does not replace transactions. After an application restart, resending a previously submitted operation is a new operation and may create a duplicate. Idempotence also does not resolve every unknown delivery outcome; applications must handle delivery errors and decide whether an application-level retry is appropriate.
+
 `ClientDisposeTimeoutMs` is the common positive timeout for client disposal. `EnqueueTimeoutMs` limits how long a producer waits for a message to be accepted into its accumulator; `DeliveryTimeoutMs` limits delivery after acceptance. `DeliveryTimeoutMs` is not silently increased to include `LingerMs` or `RequestTimeoutMs`, so incompatible values are rejected by configuration validation.
 
 When an overload receives an explicit ID and a configuration, an unset ID (`null` or an empty string) is filled from the argument, and an identical ID is accepted. A different non-empty ID causes `KafkaConfigException` before ID reservation or network initialization. Comparison is ordinal and case-sensitive, without trimming whitespace. The supplied configuration is not modified. The same check runs after a configuration callback; the explicit argument must itself be a valid non-blank ID.

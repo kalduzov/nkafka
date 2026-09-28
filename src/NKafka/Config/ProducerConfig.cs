@@ -102,8 +102,14 @@ public record ProducerConfig: CommonConfig
     public int BufferMemory { get; set; } = 32 * 1024 * 1024;
 
     /// <summary>
-    /// Gets or sets a value indicating whether idempotence is enabled.
+    /// Gets or sets whether the producer assigns Kafka producer IDs and per-partition sequences
+    /// so an internal retry of the same batch does not create duplicate records.
     /// </summary>
+    /// <remarks>
+    /// This does not deduplicate separate application calls, provide transactions, or make
+    /// writes across partitions atomic. The current implementation permits one in-flight batch
+    /// per partition when idempotence is enabled.
+    /// </remarks>
     public bool EnableIdempotence { get; set; } = false;
 
     /// <summary>

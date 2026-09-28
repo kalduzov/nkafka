@@ -4,6 +4,7 @@ using NKafka.Clients.Producer;
 using NKafka.Clients.Producer.Internals;
 using NKafka.Config;
 using NKafka.Connection;
+using NKafka.Exceptions;
 using NKafka.Metrics;
 using NKafka.Messages;
 using NKafka.Protocol;
@@ -191,6 +192,80 @@ public sealed class MessagesSenderTests
 
         ArrayBufferPool.Return(firstBuffer);
         ArrayBufferPool.Return(secondBuffer);
+    }
+
+    [Fact]
+    public async Task SendProducerDataAsync_WithNetworkFailure_RetriesBatch()
+    {
+        var config = new ProducerConfig { Acks = Acks.Leader };
+        var topicPartition = new TopicPartition("test", 0);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(topicPartition, buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1_000, null, "value"u8.ToArray(), Headers.Empty, out var resultTask).Should().BeTrue();
+        batch.Close();
+
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([batch]);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        kafkaCluster.LeaderFor(topicPartition).Returns(new Node(1, "localhost", 9092));
+        kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(),
+                Arg.Any<int>(),
+                Arg.Any<CancellationToken>())
+            .Returns<Task<ProduceResponseMessage>>(_ => throw new ProtocolKafkaException(ErrorCodes.NetworkException));
+
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            Substitute.For<ITransactionManager>(),
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var sendResult = await sender.SendProducerDataAsync(CancellationToken.None);
+
+        sendResult.Should().Be(MessagesSender.SendCycleResult.RetryScheduled);
+        accumulator.Received(1).Requeue(batch);
+        resultTask!.Task.IsCompleted.Should().BeFalse();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public async Task SendProducerDataAsync_WithPermanentRequestFailure_FailsBatchWithoutRetry()
+    {
+        var config = new ProducerConfig { Acks = Acks.Leader };
+        var topicPartition = new TopicPartition("test", 0);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(topicPartition, buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1_000, null, "value"u8.ToArray(), Headers.Empty, out var resultTask).Should().BeTrue();
+        batch.Close();
+
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([batch]);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        kafkaCluster.LeaderFor(topicPartition).Returns(new Node(1, "localhost", 9092));
+        kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(),
+                Arg.Any<int>(),
+                Arg.Any<CancellationToken>())
+            .Returns<Task<ProduceResponseMessage>>(_ => throw new ProtocolKafkaException(ErrorCodes.InvalidRequiredAcks));
+
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            Substitute.For<ITransactionManager>(),
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        await sender.SendProducerDataAsync(CancellationToken.None);
+
+        var exception = await Assert.ThrowsAsync<ProtocolKafkaException>(() => resultTask!.Task);
+        exception.InternalError.Should().Be(ErrorCodes.InvalidRequiredAcks);
+        accumulator.DidNotReceive().Requeue(batch);
+
+        ArrayBufferPool.Return(buffer);
     }
 
     [Fact]

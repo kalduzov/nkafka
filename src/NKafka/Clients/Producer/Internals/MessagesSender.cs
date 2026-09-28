@@ -139,6 +139,15 @@ internal sealed class MessagesSender(
                 try
                 {
                     var node = await TryGetNodeAsync(batch.TopicPartition, token);
+
+                    if (node == Node.NoNode)
+                    {
+                        ownedBatches.Remove(batch);
+                        retryScheduled |= RetryBatch(batch, ErrorCodes.LeaderNotAvailable);
+
+                        continue;
+                    }
+
                     batch.MarkFinalized();
 
                     if (!batchesByNode.TryGetValue(node.Id, out var nodeBatches))
@@ -248,15 +257,7 @@ internal sealed class MessagesSender(
                                 }
 
                                 // Requeue the same immutable batch to preserve its bytes, record order, and delivery deadline.
-                                if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
-                                {
-                                    batch.Fail(partitionResponse.Code);
-                                }
-                                else
-                                {
-                                    recordAccumulator.Requeue(batch);
-                                    retryScheduled = true;
-                                }
+                                retryScheduled |= RetryBatch(batch, partitionResponse.Code);
                             }
                             else
                             {
@@ -323,9 +324,24 @@ internal sealed class MessagesSender(
             return false;
         }
 
+        if (!IsRetriableSendFailure(exception))
+        {
+            var errorCode = exception is ProtocolKafkaException protocolException
+                ? protocolException.InternalError
+                : ErrorCodes.NetworkException;
+            batch.Fail(errorCode);
+
+            return false;
+        }
+
+        return RetryBatch(batch, ErrorCodes.NetworkException);
+    }
+
+    private bool RetryBatch(ProducerBatch batch, ErrorCodes errorCode)
+    {
         if (!batch.PrepareForRetry(config.DeliveryTimeoutMs))
         {
-            batch.Fail(ErrorCodes.NetworkException);
+            batch.Fail(errorCode);
 
             return false;
         }
@@ -334,6 +350,11 @@ internal sealed class MessagesSender(
 
         return true;
     }
+
+    private static bool IsRetriableSendFailure(Exception exception)
+        => exception is RequestWriteException or ConnectionKafkaException or TimeoutException ||
+           exception is ProtocolKafkaException protocolException &&
+           IsRetriableProduceError(protocolException.InternalError);
 
     internal static bool IsRetriableProduceError(ErrorCodes errorCode)
         // Permanent broker errors must be reported to the records instead of being retried indefinitely.
@@ -373,8 +394,7 @@ internal sealed class MessagesSender(
 
         if (node == Node.NoNode)
         {
-            // todo данное исключение нужно обрабатывать для батча и перевыставлять батч на отправку позже
-            throw new ProduceException("Отсутствует лидер для указанной парции");
+            return Node.NoNode;
         }
 
         return node;

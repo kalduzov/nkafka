@@ -271,6 +271,26 @@ public sealed class MessagesSenderTests
     [Fact]
     public async Task SendProducerDataAsync_WithPartitionsOnDifferentBrokers_SendsSeparateRequests()
     {
+        static ProduceResponseMessage CreateResponse(Partition partition, long baseOffset)
+            => new()
+            {
+                Responses =
+                [
+                    new ProduceResponseMessage.TopicProduceResponseMessage
+                    {
+                        Name = "test",
+                        PartitionResponses =
+                        [
+                            new ProduceResponseMessage.PartitionProduceResponseMessage
+                            {
+                                Index = partition,
+                                BaseOffset = baseOffset
+                            }
+                        ]
+                    }
+                ]
+            };
+
         var config = new ProducerConfig { Acks = Acks.Leader };
         var firstPartition = new TopicPartition("test", 0);
         var secondPartition = new TopicPartition("test", 1);
@@ -291,33 +311,28 @@ public sealed class MessagesSenderTests
         var kafkaCluster = Substitute.For<IKafkaCluster>();
         kafkaCluster.LeaderFor(firstPartition).Returns(firstNode);
         kafkaCluster.LeaderFor(secondPartition).Returns(secondNode);
+        var firstResponse = new TaskCompletionSource<ProduceResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondResponse = new TaskCompletionSource<ProduceResponseMessage>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var firstRequestStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondRequestStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
                 Arg.Any<ProduceRequestMessage>(),
                 Arg.Any<int>(),
                 Arg.Any<CancellationToken>())
             .Returns(call =>
             {
-                var request = call.Arg<ProduceRequestMessage>();
                 var nodeId = call.ArgAt<int>(1);
 
-                return new ProduceResponseMessage
+                if (nodeId == firstNode.Id)
                 {
-                    Responses =
-                    [
-                        new ProduceResponseMessage.TopicProduceResponseMessage
-                        {
-                            Name = "test",
-                            PartitionResponses =
-                            [
-                                new ProduceResponseMessage.PartitionProduceResponseMessage
-                                {
-                                    Index = request.TopicData.Single().PartitionData.Single().Index,
-                                    BaseOffset = nodeId == firstNode.Id ? 10 : 20
-                                }
-                            ]
-                        }
-                    ]
-                };
+                    firstRequestStarted.TrySetResult();
+
+                    return firstResponse.Task;
+                }
+
+                secondRequestStarted.TrySetResult();
+
+                return secondResponse.Task;
             });
 
         var sender = new MessagesSender(
@@ -328,8 +343,33 @@ public sealed class MessagesSenderTests
             Substitute.For<IProducerMetrics>(),
             NullLoggerFactory.Instance);
 
-        var result = await sender.SendProducerDataAsync(CancellationToken.None);
+        var sendTask = sender.SendProducerDataAsync(CancellationToken.None);
+        var requestsStartedConcurrently = false;
+        var secondCompletedWhileFirstWasWaiting = false;
 
+        try
+        {
+            await Task.WhenAll(firstRequestStarted.Task, secondRequestStarted.Task)
+                .WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+            requestsStartedConcurrently = true;
+            secondResponse.TrySetResult(CreateResponse(secondPartition.Partition, 20));
+            await secondResult!.Task.WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+            secondCompletedWhileFirstWasWaiting = !firstResult!.Task.IsCompleted;
+        }
+        catch (TimeoutException)
+        {
+            // Complete the first response below so a sequential implementation can finish cleanly.
+        }
+        finally
+        {
+            firstResponse.TrySetResult(CreateResponse(firstPartition.Partition, 10));
+            secondResponse.TrySetResult(CreateResponse(secondPartition.Partition, 20));
+        }
+
+        var result = await sendTask;
+
+        requestsStartedConcurrently.Should().BeTrue();
+        secondCompletedWhileFirstWasWaiting.Should().BeTrue();
         result.Should().Be(MessagesSender.SendCycleResult.WorkCompleted);
         await kafkaCluster.Received(1).SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
             Arg.Any<ProduceRequestMessage>(),

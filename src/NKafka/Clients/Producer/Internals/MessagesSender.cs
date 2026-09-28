@@ -170,129 +170,23 @@ internal sealed class MessagesSender(
                 }
             }
 
-            // Keep broker requests sequential; batches for partitions on the same broker share one frame.
+            var sendTasks = new Task<bool>[batchesByNode.Count];
+            var sendTaskIndex = 0;
+
             foreach (var nodeBatches in batchesByNode.Values)
             {
-                var requestBatches = nodeBatches.Batches;
-
-                try
+                foreach (var batch in nodeBatches.Batches)
                 {
-                    var topics = new ProduceRequestMessage.TopicProduceDataCollection();
-                    foreach (var topicGroup in requestBatches.GroupBy(batch => batch.TopicPartition.Topic))
-                    {
-                        topics.Add(new ProduceRequestMessage.TopicProduceDataMessage
-                        {
-                            Name = topicGroup.Key,
-                            PartitionData = topicGroup
-                                .Select(batch => new ProduceRequestMessage.PartitionProduceDataMessage
-                                {
-                                    Index = batch.TopicPartition.Partition,
-                                    Records = batch.GetAsRecords()
-                                })
-                                .ToList()
-                        });
-                    }
-
-                    var produceRequestMessage = new ProduceRequestMessage
-                    {
-                        TimeoutMs = config.RequestTimeoutMs,
-                        Acks = (short)config.Acks,
-                        TopicData = topics
-                    };
-
-                    foreach (var batch in requestBatches)
-                    {
-                        batch.MarkSent();
-                    }
-
-                    if (config.Acks == Acks.None)
-                    {
-                        await kafkaCluster.SendAsync(produceRequestMessage, nodeBatches.Node.Id, token);
-
-                        foreach (var batch in requestBatches)
-                        {
-                            batch.CompleteWithoutAcknowledgement();
-                            ownedBatches.Remove(batch);
-                        }
-
-                        continue;
-                    }
-
-                    var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
-                        produceRequestMessage,
-                        nodeBatches.Node.Id,
-                        token);
-                    var unresolvedBatches = requestBatches.ToDictionary(batch => batch.TopicPartition);
-
-                    foreach (var response in result.Responses)
-                    {
-                        foreach (var partitionResponse in response.PartitionResponses)
-                        {
-                            var topicPartition = new TopicPartition(response.Name, partitionResponse.Index);
-
-                            if (!unresolvedBatches.Remove(topicPartition, out var batch))
-                            {
-                                // Ignore unexpected or duplicate entries; missing expected entries below are retried.
-                                continue;
-                            }
-
-                            if (partitionResponse.Code == ErrorCodes.None)
-                            {
-                                batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
-                            }
-                            else if (IsRetriableProduceError(partitionResponse.Code))
-                            {
-                                _logger.Error(partitionResponse.Code);
-
-                                // A leader-related response can make the cached node stale.
-                                // Refresh metadata before requeueing so the next attempt can choose a new leader.
-                                if (partitionResponse.Code is ErrorCodes.LeaderNotAvailable or
-                                    ErrorCodes.NotLeaderOrFollower or
-                                    ErrorCodes.ReplicaNotAvailable or
-                                    ErrorCodes.FencedLeaderEpoch or
-                                    ErrorCodes.UnknownLeaderEpoch or
-                                    ErrorCodes.PreferredLeaderNotAvailable)
-                                {
-                                    await kafkaCluster.RefreshMetadataAsync([batch.TopicPartition.Topic], token);
-                                }
-
-                                // Requeue the same immutable batch to preserve its bytes, record order, and delivery deadline.
-                                retryScheduled |= RetryBatch(batch, partitionResponse.Code);
-                            }
-                            else
-                            {
-                                _logger.Error(partitionResponse.Code);
-                                batch.Fail(partitionResponse.Code);
-                            }
-
-                            ownedBatches.Remove(batch);
-                        }
-                    }
-
-                    if (unresolvedBatches.Count != 0)
-                    {
-                        throw new ProtocolKafkaException(
-                            ErrorCodes.NetworkException,
-                            "The Produce response did not contain a result for every requested partition.");
-                    }
+                    ownedBatches.Remove(batch);
                 }
-                catch (OperationCanceledException) when (token.IsCancellationRequested)
-                {
-                    throw;
-                }
-                catch (Exception exception)
-                {
-                    _logger.LogError(exception, "Ошибка отправки Produce-запроса узлу {NodeId}", nodeBatches.Node.Id);
 
-                    foreach (var batch in requestBatches)
-                    {
-                        if (ownedBatches.Remove(batch))
-                        {
-                            retryScheduled |= FailBatchForSend(batch, exception);
-                        }
-                    }
-                }
+                // Each broker task owns its batches and their results independently.
+                // Start every request before awaiting any response.
+                sendTasks[sendTaskIndex++] = SendNodeBatchesAsync(nodeBatches, token);
             }
+
+            var retryResults = await Task.WhenAll(sendTasks);
+            retryScheduled |= retryResults.Any(retry => retry);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -309,6 +203,140 @@ internal sealed class MessagesSender(
             : hasBatches
                 ? SendCycleResult.WorkCompleted
                 : SendCycleResult.NoWork;
+    }
+
+    private async Task<bool> SendNodeBatchesAsync(
+        (Node Node, List<ProducerBatch> Batches) nodeBatches,
+        CancellationToken token)
+    {
+        var ownedBatches = new HashSet<ProducerBatch>(nodeBatches.Batches);
+        var retryScheduled = false;
+        var requestBatches = nodeBatches.Batches;
+
+        try
+        {
+            var topics = new ProduceRequestMessage.TopicProduceDataCollection();
+            foreach (var topicGroup in requestBatches.GroupBy(batch => batch.TopicPartition.Topic))
+            {
+                topics.Add(new ProduceRequestMessage.TopicProduceDataMessage
+                {
+                    Name = topicGroup.Key,
+                    PartitionData = topicGroup
+                        .Select(batch => new ProduceRequestMessage.PartitionProduceDataMessage
+                        {
+                            Index = batch.TopicPartition.Partition,
+                            Records = batch.GetAsRecords()
+                        })
+                        .ToList()
+                });
+            }
+
+            var produceRequestMessage = new ProduceRequestMessage
+            {
+                TimeoutMs = config.RequestTimeoutMs,
+                Acks = (short)config.Acks,
+                TopicData = topics
+            };
+
+            foreach (var batch in requestBatches)
+            {
+                batch.MarkSent();
+            }
+
+            if (config.Acks == Acks.None)
+            {
+                await kafkaCluster.SendAsync(produceRequestMessage, nodeBatches.Node.Id, token);
+
+                foreach (var batch in requestBatches)
+                {
+                    batch.CompleteWithoutAcknowledgement();
+                    ownedBatches.Remove(batch);
+                }
+
+                return false;
+            }
+
+            var result = await kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                produceRequestMessage,
+                nodeBatches.Node.Id,
+                token);
+            var unresolvedBatches = requestBatches.ToDictionary(batch => batch.TopicPartition);
+
+            foreach (var response in result.Responses)
+            {
+                foreach (var partitionResponse in response.PartitionResponses)
+                {
+                    var topicPartition = new TopicPartition(response.Name, partitionResponse.Index);
+
+                    if (!unresolvedBatches.Remove(topicPartition, out var batch))
+                    {
+                        // Ignore unexpected or duplicate entries; missing expected entries below are retried.
+                        continue;
+                    }
+
+                    if (partitionResponse.Code == ErrorCodes.None)
+                    {
+                        batch.Complete(partitionResponse.BaseOffset, partitionResponse.LogAppendTimeMs);
+                    }
+                    else if (IsRetriableProduceError(partitionResponse.Code))
+                    {
+                        _logger.Error(partitionResponse.Code);
+
+                        // A leader-related response can make the cached node stale.
+                        // Refresh metadata before requeueing so the next attempt can choose a new leader.
+                        if (partitionResponse.Code is ErrorCodes.LeaderNotAvailable or
+                            ErrorCodes.NotLeaderOrFollower or
+                            ErrorCodes.ReplicaNotAvailable or
+                            ErrorCodes.FencedLeaderEpoch or
+                            ErrorCodes.UnknownLeaderEpoch or
+                            ErrorCodes.PreferredLeaderNotAvailable)
+                        {
+                            await kafkaCluster.RefreshMetadataAsync([batch.TopicPartition.Topic], token);
+                        }
+
+                        // Requeue the same immutable batch to preserve its bytes, record order, and delivery deadline.
+                        retryScheduled |= RetryBatch(batch, partitionResponse.Code);
+                    }
+                    else
+                    {
+                        _logger.Error(partitionResponse.Code);
+                        batch.Fail(partitionResponse.Code);
+                    }
+
+                    ownedBatches.Remove(batch);
+                }
+            }
+
+            if (unresolvedBatches.Count != 0)
+            {
+                throw new ProtocolKafkaException(
+                    ErrorCodes.NetworkException,
+                    "The Produce response did not contain a result for every requested partition.");
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            foreach (var batch in ownedBatches)
+            {
+                batch.FailForClosing();
+            }
+
+            throw;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Ошибка отправки Produce-запроса узлу {NodeId}", nodeBatches.Node.Id);
+
+            foreach (var batch in requestBatches)
+            {
+                if (ownedBatches.Remove(batch))
+                {
+                    retryScheduled |= FailBatchForSend(batch, exception);
+                }
+            }
+        }
+
+        return retryScheduled;
     }
 
     private bool FailBatchForSend(ProducerBatch batch, Exception exception)

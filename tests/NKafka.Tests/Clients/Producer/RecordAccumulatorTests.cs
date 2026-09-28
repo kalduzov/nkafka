@@ -43,6 +43,37 @@ public sealed class RecordAccumulatorTests
     }
 
     [Fact]
+    public async Task PullReadyBatches_ReturnsPartitionBatchesInOrderOneAtATime()
+    {
+        var config = new ProducerConfig
+        {
+            MaxRequestSize = 1024 * 1024,
+            LingerMs = 0
+        };
+        var accumulator = new RecordAccumulator(
+            config,
+            Substitute.For<ITransactionManager>(),
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+        var topicPartition = new TopicPartition("test", 0);
+
+        accumulator.Append(topicPartition, 1_000, null, new byte[10], Headers.Empty);
+        var flushFirstBatch = accumulator.FlushAllAsync(CancellationToken.None);
+        accumulator.Append(topicPartition, 2_000, null, new byte[10], Headers.Empty);
+        Thread.Sleep(5);
+
+        var firstBatch = accumulator.PullReadyBatches(config.MaxRequestSize).Should().ContainSingle().Which;
+        firstBatch.BaseTimestamp.Should().Be(1_000);
+        firstBatch.Complete(0, 1_000);
+        await flushFirstBatch;
+
+        var secondBatch = accumulator.PullReadyBatches(config.MaxRequestSize).Should().ContainSingle().Which;
+        secondBatch.BaseTimestamp.Should().Be(2_000);
+        secondBatch.Complete(1, 2_000);
+    }
+
+    [Fact]
     public void Requeue_ReturnsBatchToTheBeginningOfItsPartitionQueue()
     {
         var config = new ProducerConfig

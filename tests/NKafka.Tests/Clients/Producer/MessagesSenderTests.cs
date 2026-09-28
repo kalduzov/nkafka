@@ -271,7 +271,10 @@ public sealed class MessagesSenderTests
     [Fact]
     public async Task SendProducerDataAsync_WithPartitionsOnDifferentBrokers_SendsSeparateRequests()
     {
-        static ProduceResponseMessage CreateResponse(Partition partition, long baseOffset)
+        static ProduceResponseMessage CreateResponse(
+            Partition partition,
+            long baseOffset,
+            ErrorCodes code = ErrorCodes.None)
             => new()
             {
                 Responses =
@@ -284,7 +287,8 @@ public sealed class MessagesSenderTests
                             new ProduceResponseMessage.PartitionProduceResponseMessage
                             {
                                 Index = partition,
-                                BaseOffset = baseOffset
+                                BaseOffset = baseOffset,
+                                ErrorCode = (short)code
                             }
                         ]
                     }
@@ -362,7 +366,8 @@ public sealed class MessagesSenderTests
         }
         finally
         {
-            firstResponse.TrySetResult(CreateResponse(firstPartition.Partition, 10));
+            firstResponse.TrySetResult(
+                CreateResponse(firstPartition.Partition, 10, ErrorCodes.InvalidRequiredAcks));
             secondResponse.TrySetResult(CreateResponse(secondPartition.Partition, 20));
         }
 
@@ -379,8 +384,85 @@ public sealed class MessagesSenderTests
             Arg.Any<ProduceRequestMessage>(),
             secondNode.Id,
             Arg.Any<CancellationToken>());
-        (await firstResult!.Task).Offset.Should().Be(new Offset(10));
+        var firstException = await Assert.ThrowsAsync<ProtocolKafkaException>(() => firstResult!.Task);
+        firstException.InternalError.Should().Be(ErrorCodes.InvalidRequiredAcks);
         (await secondResult!.Task).Offset.Should().Be(new Offset(20));
+
+        ArrayBufferPool.Return(firstBuffer);
+        ArrayBufferPool.Return(secondBuffer);
+    }
+
+    [Fact]
+    public async Task SendProducerDataAsync_WhenCancelledWithMultipleBrokerRequests_FailsEveryOwnedBatch()
+    {
+        static async Task<ProduceResponseMessage> WaitForCancellationAsync(CancellationToken token)
+        {
+            await Task.Delay(Timeout.Infinite, token);
+
+            return new ProduceResponseMessage();
+        }
+
+        var config = new ProducerConfig { Acks = Acks.Leader };
+        var firstPartition = new TopicPartition("test", 0);
+        var secondPartition = new TopicPartition("test", 1);
+        var firstBuffer = ArrayBufferPool.Rent(1024);
+        var secondBuffer = ArrayBufferPool.Rent(1024);
+        var firstBatch = new ProducerBatch(firstPartition, firstBuffer, NullLoggerFactory.Instance);
+        var secondBatch = new ProducerBatch(secondPartition, secondBuffer, NullLoggerFactory.Instance);
+        firstBatch.TryAppend(1_000, null, "first"u8.ToArray(), Headers.Empty, out var firstResult).Should().BeTrue();
+        secondBatch.TryAppend(1_000, null, "second"u8.ToArray(), Headers.Empty, out var secondResult).Should().BeTrue();
+        firstBatch.Close();
+        secondBatch.Close();
+
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([firstBatch, secondBatch]);
+        var firstNode = new Node(7, "localhost", 9092);
+        var secondNode = new Node(8, "localhost", 9093);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        kafkaCluster.LeaderFor(firstPartition).Returns(firstNode);
+        kafkaCluster.LeaderFor(secondPartition).Returns(secondNode);
+        var firstRequestStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var secondRequestStarted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(),
+                Arg.Any<int>(),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                var token = call.Arg<CancellationToken>();
+
+                if (call.ArgAt<int>(1) == firstNode.Id)
+                {
+                    firstRequestStarted.TrySetResult();
+                }
+                else
+                {
+                    secondRequestStarted.TrySetResult();
+                }
+
+                return WaitForCancellationAsync(token);
+            });
+
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            Substitute.For<ITransactionManager>(),
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+        using var cancellation = new CancellationTokenSource();
+
+        var sendTask = sender.SendProducerDataAsync(cancellation.Token);
+        await Task.WhenAll(firstRequestStarted.Task, secondRequestStarted.Task)
+            .WaitAsync(TimeSpan.FromSeconds(3), TestContext.Current.CancellationToken);
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sendTask);
+
+        var firstException = await Assert.ThrowsAsync<ProducerClosingException>(() => firstResult!.Task);
+        var secondException = await Assert.ThrowsAsync<ProducerClosingException>(() => secondResult!.Task);
+        firstException.Status.Should().Be(PersistenceStatus.PossiblyPersisted);
+        secondException.Status.Should().Be(PersistenceStatus.PossiblyPersisted);
 
         ArrayBufferPool.Return(firstBuffer);
         ArrayBufferPool.Return(secondBuffer);

@@ -195,6 +195,44 @@ public sealed class RecordAccumulatorTests
         secondBatch.Complete(0, 1_000);
     }
 
+    [Fact]
+    public async Task Append_SeparateCallsRemainSeparateRecordsInIdempotentBatch()
+    {
+        var config = new ProducerConfig
+        {
+            EnableIdempotence = true,
+            MaxRequestSize = 1024 * 1024,
+            LingerMs = 0
+        };
+        var transactionManager = Substitute.For<ITransactionManager>();
+        transactionManager.CurrentProducerIdAndEpoch.Returns(new ProducerIdAndEpoch(42, 3));
+        var accumulator = new RecordAccumulator(
+            config,
+            transactionManager,
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+        var topicPartition = new TopicPartition("test", 0);
+        var firstValue = "first"u8.ToArray();
+        var secondValue = "second"u8.ToArray();
+
+        accumulator.Append(topicPartition, 1_000, null, firstValue, Headers.Empty);
+        accumulator.Append(topicPartition, 1_001, null, secondValue, Headers.Empty);
+        var flushTask = accumulator.FlushAllAsync(CancellationToken.None);
+
+        var batch = accumulator.PullReadyBatches(config.MaxRequestSize).Should().ContainSingle().Which;
+        var recordBatch = ReadRecordBatch(batch);
+
+        recordBatch.CountRecords.Should().Be(2);
+        var records = recordBatch.Records.ToArray();
+        records.Should().HaveCount(2);
+        records[0].Value.Should().Equal(firstValue);
+        records[1].Value.Should().Equal(secondValue);
+
+        batch.Complete(0, 1_000);
+        await flushTask;
+    }
+
     private static RecordBatch ReadRecordBatch(ProducerBatch batch)
     {
         var records = batch.GetAsRecords();

@@ -340,6 +340,86 @@ public sealed class MessagesSenderTests
     }
 
     [Fact]
+    public async Task SendProducerDataAsync_AfterLostResponse_RetriesIdenticalIdempotentBatch()
+    {
+        var config = new ProducerConfig { Acks = Acks.Leader };
+        var topicPartition = new TopicPartition("test", 0);
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(topicPartition, buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1_000, null, "value"u8.ToArray(), Headers.Empty, out var resultTask).Should().BeTrue();
+        batch.SetProducerState(new ProducerIdAndEpoch(123, 4), 17);
+        batch.Close();
+
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([batch]);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        kafkaCluster.LeaderFor(topicPartition).Returns(new Node(1, "localhost", 9092));
+        var requests = new List<byte[]>();
+        var attempts = 0;
+        kafkaCluster.SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(),
+                Arg.Any<int>(),
+                Arg.Any<CancellationToken>())
+            .Returns(call =>
+            {
+                var request = call.Arg<ProduceRequestMessage>();
+                var records = request.TopicData.Single().PartitionData.Single().Records!;
+                requests.Add(records.Buffer.DangerousGetFirstBuffer().AsSpan(0, records.SizeInBytes).ToArray());
+
+                if (++attempts == 1)
+                {
+                    throw new TimeoutException("The Produce response was lost.");
+                }
+
+                return Task.FromResult(new ProduceResponseMessage
+                {
+                    Responses =
+                    [
+                        new ProduceResponseMessage.TopicProduceResponseMessage
+                        {
+                            Name = "test",
+                            PartitionResponses =
+                            [
+                                new ProduceResponseMessage.PartitionProduceResponseMessage
+                                {
+                                    Index = 0,
+                                    BaseOffset = 42
+                                }
+                            ]
+                        }
+                    ]
+                });
+            });
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            Substitute.For<ITransactionManager>(),
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var firstAttempt = await sender.SendProducerDataAsync(CancellationToken.None);
+        firstAttempt.Should().Be(MessagesSender.SendCycleResult.RetryScheduled);
+        batch.State.Should().Be(ProducerBatch.BatchState.Closed);
+        resultTask!.Task.IsCompleted.Should().BeFalse();
+
+        var retryAttempt = await sender.SendProducerDataAsync(CancellationToken.None);
+
+        retryAttempt.Should().Be(MessagesSender.SendCycleResult.WorkCompleted);
+        requests.Should().HaveCount(2);
+        requests[1].Should().Equal(requests[0]);
+        var reader = new BufferReader(requests[1]);
+        var retriedRecordBatch = new RecordBatch(ref reader);
+        retriedRecordBatch.ProducerId.Should().Be(123);
+        retriedRecordBatch.ProducerEpoch.Should().Be(4);
+        retriedRecordBatch.BaseSequence.Should().Be(17);
+        (await resultTask.Task).Offset.Should().Be(new Offset(42));
+        accumulator.Received(1).Requeue(batch);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
     public async Task SendProducerDataAsync_WithPermanentRequestFailure_FailsBatchWithoutRetry()
     {
         var config = new ProducerConfig { Acks = Acks.Leader };

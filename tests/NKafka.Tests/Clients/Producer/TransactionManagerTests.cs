@@ -20,6 +20,7 @@ public sealed class TransactionManagerTests
     public async Task EnsureIdempotentProducerIdAsync_SendsInitProducerIdWithoutTransactionalId()
     {
         var cluster = Substitute.For<IKafkaCluster>();
+        SetProduceApiVersion(cluster, ApiVersion.Version3);
         InitProducerIdRequestMessage? capturedRequest = null;
         cluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
                 Arg.Do<InitProducerIdRequestMessage>(request => capturedRequest = request),
@@ -61,6 +62,7 @@ public sealed class TransactionManagerTests
     public async Task EnsureIdempotentProducerIdAsync_RetriesRetriableResponse()
     {
         var cluster = Substitute.For<IKafkaCluster>();
+        SetProduceApiVersion(cluster, ApiVersion.Version3);
         cluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
                 Arg.Any<InitProducerIdRequestMessage>(),
                 Arg.Any<CancellationToken>())
@@ -118,5 +120,73 @@ public sealed class TransactionManagerTests
             .SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
                 Arg.Any<InitProducerIdRequestMessage>(),
                 Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureIdempotentProducerIdAsync_StopsRetryingAfterDeliveryTimeout()
+    {
+        var cluster = Substitute.For<IKafkaCluster>();
+        cluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
+                Arg.Any<InitProducerIdRequestMessage>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new InitProducerIdResponseMessage
+            {
+                ErrorCode = (short)ErrorCodes.CoordinatorNotAvailable
+            }));
+        var manager = new TransactionManager(
+            new ProducerConfig { EnableIdempotence = true, DeliveryTimeoutMs = 1 },
+            NullLoggerFactory.Instance,
+            cluster);
+
+        var firstAttempt = await manager.EnsureIdempotentProducerIdAsync(CancellationToken.None);
+        Thread.Sleep(5);
+        var secondAttempt = await manager.EnsureIdempotentProducerIdAsync(CancellationToken.None);
+
+        firstAttempt.Should().BeFalse();
+        secondAttempt.Should().BeFalse();
+        manager.IdempotenceInitializationError.Should().NotBeNull();
+        await cluster.Received(1)
+            .SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
+                Arg.Any<InitProducerIdRequestMessage>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task EnsureIdempotentProducerIdAsync_FailsWhenProduceCannotCarryIdempotenceFields()
+    {
+        var cluster = Substitute.For<IKafkaCluster>();
+        SetProduceApiVersion(cluster, ApiVersion.Version2);
+        cluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
+                Arg.Any<InitProducerIdRequestMessage>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new InitProducerIdResponseMessage
+            {
+                ProducerId = 789,
+                ProducerEpoch = 0
+            }));
+        var manager = new TransactionManager(
+            new ProducerConfig { EnableIdempotence = true },
+            NullLoggerFactory.Instance,
+            cluster);
+
+        var initialized = await manager.EnsureIdempotentProducerIdAsync(CancellationToken.None);
+
+        initialized.Should().BeFalse();
+        manager.IdempotenceInitializationError.Should().Be(
+            new ProducerError(ErrorCodes.ClientError, ProducerLocalError.IdempotenceInitializationFailed));
+        await cluster.DidNotReceive()
+            .SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(), Arg.Any<int>(), Arg.Any<CancellationToken>());
+    }
+
+    private static void SetProduceApiVersion(IKafkaCluster cluster, ApiVersion maxVersion)
+    {
+        var metadata = new ClusterMetadata();
+        metadata.AggregationApiByVersion[ApiKeys.Produce] = new ApiMetadata
+        {
+            MinVersion = ApiVersion.Version0,
+            MaxVersion = maxVersion
+        };
+        cluster.GetClusterMetadata().Returns(metadata);
     }
 }

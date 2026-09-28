@@ -81,6 +81,18 @@ internal sealed class RecordAccumulator(
     private readonly object _memoryLock = new();
     private int _availableMemory = config.BufferMemory;
 
+    /// <inheritdoc />
+    public bool HasPendingRecords
+    {
+        get
+        {
+            lock (_memoryLock)
+            {
+                return _queuedMessages != 0;
+            }
+        }
+    }
+
     private static ICompression GetCompression(CompressionConfig compression)
     {
         return compression.CompressionType switch
@@ -521,7 +533,17 @@ internal sealed class RecordAccumulator(
     }
 
     /// <inheritdoc />
-    public void FailAllPending()
+    public void FailAllPending() => FailAllPendingCore(null);
+
+    /// <inheritdoc />
+    public void FailAllPending(ProducerError error)
+    {
+        ArgumentNullException.ThrowIfNull(error);
+
+        FailAllPendingCore(error);
+    }
+
+    private void FailAllPendingCore(ProducerError? error)
     {
         foreach (var batches in _batchesByTopics.Values)
         {
@@ -543,7 +565,14 @@ internal sealed class RecordAccumulator(
                             }
                         }
 
-                        batch.FailForClosing();
+                        if (error is null)
+                        {
+                            batch.FailForClosing();
+                        }
+                        else
+                        {
+                            batch.Fail(error);
+                        }
                     }
                 }
             }

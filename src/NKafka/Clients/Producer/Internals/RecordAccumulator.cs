@@ -63,9 +63,12 @@ internal sealed class RecordAccumulator(
 
     //Пачки распределенные по топикам
     private readonly ConcurrentDictionary<string, PartitionedBatchCollection> _batchesByTopics = new();
+    private readonly ConcurrentDictionary<TopicPartition, int> _nextSequenceNumbers = new();
+    private readonly ConcurrentDictionary<TopicPartition, ProducerBatch> _inFlightBatches = new();
 
     private readonly int _batchSize = Math.Max(1, config.BatchSize);
     private readonly bool _closed = false;
+    private readonly bool _enableIdempotence = config.EnableIdempotence;
     private readonly ICompression _compression = GetCompression(config.Compression);
     private readonly int _deliveryTimeoutMs = deliveryTimeoutMs;
     private readonly double _lingerMs = config.LingerMs;
@@ -317,6 +320,22 @@ internal sealed class RecordAccumulator(
     {
         if (batch.State == ProducerBatch.BatchState.Open)
         {
+            if (_enableIdempotence)
+            {
+                // ProducerId and the partition sequence are assigned by the sender immediately before serialization.
+                batch.SetReady();
+
+                return;
+            }
+
+            CloseBatchForSending(batch);
+        }
+    }
+
+    private void CloseBatchForSending(ProducerBatch batch)
+    {
+        if (batch.State == ProducerBatch.BatchState.Open)
+        {
             batch.Close();
             var reservation = batch.ReleaseMemoryReservation();
 
@@ -476,6 +495,17 @@ internal sealed class RecordAccumulator(
                         continue;
                     }
 
+                    if (_enableIdempotence &&
+                        _inFlightBatches.TryGetValue(firstBatch.TopicPartition, out var inFlightBatch))
+                    {
+                        if (inFlightBatch.State != ProducerBatch.BatchState.Completed)
+                        {
+                            continue;
+                        }
+
+                        _inFlightBatches.TryRemove(firstBatch.TopicPartition, out _);
+                    }
+
                     if (Timestamp.DateTimeToUnixTimestampMs(DateTime.UtcNow) - firstBatch.CreateTimestamp > _lingerMs)
                     {
                         firstBatch.SetReady();
@@ -498,7 +528,29 @@ internal sealed class RecordAccumulator(
 
                     if (firstBatch.IsReady)
                     {
+                        if (_enableIdempotence)
+                        {
+                            var producerIdAndEpoch = _transactionManager.CurrentProducerIdAndEpoch;
+
+                            if (!producerIdAndEpoch.IsValid)
+                            {
+                                continue;
+                            }
+
+                            if (!firstBatch.HasProducerState)
+                            {
+                                var baseSequence = _nextSequenceNumbers.GetOrAdd(firstBatch.TopicPartition, 0);
+                                firstBatch.SetProducerState(producerIdAndEpoch, baseSequence);
+                                _nextSequenceNumbers[firstBatch.TopicPartition] = AdvanceSequence(baseSequence, firstBatch.RecordsCount);
+                            }
+                        }
+
                         firstBatch = deque.RemoveFirst();
+
+                        if (_enableIdempotence)
+                        {
+                            _inFlightBatches[firstBatch.TopicPartition] = firstBatch;
+                        }
                     }
                     else
                     {
@@ -507,7 +559,7 @@ internal sealed class RecordAccumulator(
                 }
                 if (firstBatch.State == ProducerBatch.BatchState.Open)
                 {
-                    CloseBatch(firstBatch);
+                    CloseBatchForSending(firstBatch);
                 }
                 firstBatch.Compress();
                 size += firstBatch.Size;
@@ -529,8 +581,16 @@ internal sealed class RecordAccumulator(
         lock (deque)
         {
             deque.AddFirst(batch);
+
+            if (_enableIdempotence)
+            {
+                _inFlightBatches.TryRemove(batch.TopicPartition, out _);
+            }
         }
     }
+
+    private static int AdvanceSequence(int baseSequence, int recordsCount)
+        => (int)(((long)baseSequence + recordsCount) & int.MaxValue);
 
     /// <inheritdoc />
     public void FailAllPending() => FailAllPendingCore(null);

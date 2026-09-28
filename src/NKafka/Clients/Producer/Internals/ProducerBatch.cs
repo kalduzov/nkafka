@@ -105,10 +105,13 @@ internal class ProducerBatch(
     private int _memoryReservation;
     private ProducerIdAndEpoch _producerIdAndEpoch = ProducerIdAndEpoch.None;
     private int _baseSequence = -1;
+    private bool _hasProducerState;
 
     internal BatchState State { get; private set; } = BatchState.Open;
 
     internal int RecordsCount => _recordsCount;
+
+    internal bool HasProducerState => _hasProducerState;
 
     /// <summary>
     /// How many bytes are left to add so that the batch is complete?
@@ -184,6 +187,7 @@ internal class ProducerBatch(
 
         _producerIdAndEpoch = producerIdAndEpoch;
         _baseSequence = baseSequence;
+        _hasProducerState = true;
     }
 
     internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestampNow)
@@ -204,7 +208,7 @@ internal class ProducerBatch(
         Headers headers,
         out SendResultTask? sendResultTask)
     {
-        if (State != BatchState.Open)
+        if (State != BatchState.Open || IsReady)
         {
             sendResultTask = null;
 

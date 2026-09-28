@@ -70,6 +70,8 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
 
     public bool IsTransactional => !string.IsNullOrEmpty(_transactionalId);
 
+    public ProducerIdAndEpoch CurrentProducerIdAndEpoch => _producerIdAndEpoch;
+
     public ProducerError? IdempotenceInitializationError => Volatile.Read(ref _idempotenceInitializationError);
 
     public async Task<bool> EnsureIdempotentProducerIdAsync(CancellationToken cancellationToken)

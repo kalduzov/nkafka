@@ -19,9 +19,12 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+using System.Diagnostics;
+
 using Microsoft.Extensions.Logging;
 
 using NKafka.Clients.Consumer;
+using NKafka.Connection;
 using NKafka.Config;
 using NKafka.Exceptions;
 using NKafka.Messages;
@@ -61,9 +64,121 @@ internal class TransactionManager(ProducerConfig config, ILoggerFactory loggerFa
     private readonly HashSet<TopicPartition> _pendingPartitionsInTransaction = [];
     private bool _clientSideEpochBumpRequired;
     private ProducerIdAndEpoch _producerIdAndEpoch = ProducerIdAndEpoch.None;
+    private ProducerError? _idempotenceInitializationError;
+    private long _idempotenceInitializationStartedAt;
     private bool _isEpochBump;
 
     public bool IsTransactional => !string.IsNullOrEmpty(_transactionalId);
+
+    public ProducerError? IdempotenceInitializationError => Volatile.Read(ref _idempotenceInitializationError);
+
+    public async Task<bool> EnsureIdempotentProducerIdAsync(CancellationToken cancellationToken)
+    {
+        if (!_enableIdempotence || IsTransactional || _producerIdAndEpoch.IsValid)
+        {
+            return true;
+        }
+
+        if (IdempotenceInitializationError is not null)
+        {
+            return false;
+        }
+
+        if (_idempotenceInitializationStartedAt == 0)
+        {
+            _idempotenceInitializationStartedAt = Stopwatch.GetTimestamp();
+        }
+
+        if (Stopwatch.GetElapsedTime(_idempotenceInitializationStartedAt).TotalMilliseconds >= config.DeliveryTimeoutMs)
+        {
+            return FailIdempotenceInitialization(ErrorCodes.NetworkException);
+        }
+
+        try
+        {
+            var request = new InitProducerIdRequestMessage
+            {
+                TransactionalId = null!,
+                TransactionTimeoutMs = int.MaxValue
+            };
+            var response = await kafkaCluster.SendAsync<InitProducerIdRequestMessage, InitProducerIdResponseMessage>(
+                request,
+                cancellationToken);
+
+            if (response.Code == ErrorCodes.None)
+            {
+                ValidateIdempotenceProtocolSupport();
+                _producerIdAndEpoch = new ProducerIdAndEpoch(response.ProducerId, response.ProducerEpoch);
+                HasProducerId = _producerIdAndEpoch.IsValid;
+
+                return HasProducerId;
+            }
+
+            if (response.Code.IsRetriableCode())
+            {
+                return HasInitializationTimedOut()
+                    ? FailIdempotenceInitialization(response.Code)
+                    : false;
+            }
+
+            return FailIdempotenceInitialization(response.Code);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            throw;
+        }
+        catch (ProtocolKafkaException exception) when (exception.InternalError.IsRetriableCode())
+        {
+            _logger.LogWarning(exception, "Retrying idempotent producer initialization");
+
+            return HasInitializationTimedOut()
+                ? FailIdempotenceInitialization(exception.InternalError)
+                : false;
+        }
+        catch (Exception exception) when (exception is ConnectionKafkaException or RequestWriteException or TimeoutException)
+        {
+            _logger.LogWarning(exception, "Retrying idempotent producer initialization");
+
+            return HasInitializationTimedOut()
+                ? FailIdempotenceInitialization(ErrorCodes.NetworkException)
+                : false;
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Idempotent producer initialization failed");
+
+            return FailIdempotenceInitialization(ErrorCodes.ClientError);
+        }
+    }
+
+    private bool HasInitializationTimedOut()
+    {
+        return Stopwatch.GetElapsedTime(_idempotenceInitializationStartedAt).TotalMilliseconds >= config.DeliveryTimeoutMs;
+    }
+
+    private void ValidateIdempotenceProtocolSupport()
+    {
+        var produceVersion = kafkaCluster.GetClusterMetadata().GetMaxCurrentApiVersion(ApiKeys.Produce);
+
+        // Produce v3 is the first version that supports RecordBatch v2 with producer id, epoch, and sequence.
+        if (produceVersion < ApiVersion.Version3)
+        {
+            throw new UnsupportedVersionException(
+                "The Kafka cluster does not support idempotent Produce record batches.");
+        }
+    }
+
+    private bool FailIdempotenceInitialization(ErrorCodes errorCode)
+    {
+        var error = new ProducerError(
+            ErrorCodes.ClientError,
+            ProducerLocalError.IdempotenceInitializationFailed);
+
+        Volatile.Write(ref _idempotenceInitializationError, error);
+        _logger.LogError("Idempotent producer initialization failed with {ErrorCode}", errorCode);
+
+        return false;
+    }
 
     public async Task InitializeTransactionsAsync(ProducerIdAndEpoch producerIdAndEpoch, bool keepPreparedTxn, CancellationToken cancellationToken)
     {

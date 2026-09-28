@@ -27,6 +27,10 @@ internal interface ITransactionManager
 {
     internal bool IsTransactional { get; }
 
+    internal ProducerError? IdempotenceInitializationError { get; }
+
+    internal Task<bool> EnsureIdempotentProducerIdAsync(CancellationToken cancellationToken);
+
     internal Task InitializeTransactionsAsync(ProducerIdAndEpoch producerIdAndEpoch, bool keepPreparedTxn, CancellationToken cancellationToken);
 
     internal Task InitializeTransactionsAsync(bool keepPreparedTxn, CancellationToken cancellationToken)

@@ -26,6 +26,9 @@ namespace NKafka.Clients.Producer.Internals;
 /// </summary>
 internal interface IRecordAccumulator
 {
+    /// <summary>Indicates whether accepted records are waiting in the accumulator.</summary>
+    internal bool HasPendingRecords { get; }
+
     /// <summary>
     /// Flushes all pending changes asynchronously.
     /// </summary>
@@ -53,6 +56,9 @@ internal interface IRecordAccumulator
     /// Completes all batches that are still owned by the accumulator during producer shutdown.
     /// </summary>
     internal void FailAllPending();
+
+    /// <summary>Fails every queued batch with the supplied delivery error.</summary>
+    internal void FailAllPending(ProducerError error);
 
     /// <summary>
     /// Adds a new record to the accumulator

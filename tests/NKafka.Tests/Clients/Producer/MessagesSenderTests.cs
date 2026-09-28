@@ -16,6 +16,114 @@ namespace NKafka.Tests.Clients.Producer;
 public sealed class MessagesSenderTests
 {
     [Fact]
+    public async Task RunOnceAsync_IdempotentProducerRetriesInitializationBeforePullingBatches()
+    {
+        var config = new ProducerConfig { EnableIdempotence = true };
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.HasPendingRecords.Returns(true);
+        var transactionManager = Substitute.For<ITransactionManager>();
+        transactionManager.IsTransactional.Returns(false);
+        transactionManager.EnsureIdempotentProducerIdAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(false));
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            transactionManager,
+            Substitute.For<IKafkaCluster>(),
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var result = await sender.RunOnceAsync(CancellationToken.None);
+
+        result.Should().Be(MessagesSender.SendCycleResult.RetryScheduled);
+        _ = accumulator.DidNotReceive().PullReadyBatches(Arg.Any<int>());
+    }
+
+    [Fact]
+    public async Task RunOnceAsync_PermanentInitializationFailureFailsQueuedBatchesAndStopsSending()
+    {
+        var config = new ProducerConfig { EnableIdempotence = true };
+        var initializationError = new ProducerError(
+            ErrorCodes.ClientError,
+            ProducerLocalError.IdempotenceInitializationFailed);
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.HasPendingRecords.Returns(true);
+        var transactionManager = Substitute.For<ITransactionManager>();
+        transactionManager.IsTransactional.Returns(false);
+        transactionManager.EnsureIdempotentProducerIdAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(false));
+        transactionManager.IdempotenceInitializationError.Returns(initializationError);
+        var kafkaCluster = Substitute.For<IKafkaCluster>();
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            transactionManager,
+            kafkaCluster,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var result = await sender.RunOnceAsync(CancellationToken.None);
+
+        result.Should().Be(MessagesSender.SendCycleResult.WorkCompleted);
+        accumulator.Received(1).FailAllPending(initializationError);
+        _ = accumulator.DidNotReceive().PullReadyBatches(Arg.Any<int>());
+        await kafkaCluster.DidNotReceive()
+            .SendAsync<ProduceRequestMessage, ProduceResponseMessage>(
+                Arg.Any<ProduceRequestMessage>(),
+                Arg.Any<int>(),
+                Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task RunOnceAsync_IdempotentProducerInitializesBeforePullingBatches()
+    {
+        var config = new ProducerConfig { EnableIdempotence = true };
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.HasPendingRecords.Returns(true);
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([]);
+        var transactionManager = Substitute.For<ITransactionManager>();
+        transactionManager.IsTransactional.Returns(false);
+        transactionManager.EnsureIdempotentProducerIdAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(true));
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            transactionManager,
+            Substitute.For<IKafkaCluster>(),
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var result = await sender.RunOnceAsync(CancellationToken.None);
+
+        result.Should().Be(MessagesSender.SendCycleResult.NoWork);
+        await transactionManager.Received(1).EnsureIdempotentProducerIdAsync(Arg.Any<CancellationToken>());
+        _ = accumulator.Received(1).PullReadyBatches(config.MaxRequestSize);
+    }
+
+    [Fact]
+    public async Task RunOnceAsync_DoesNotInitializeIdempotenceWhenNoRecordsArePending()
+    {
+        var config = new ProducerConfig { EnableIdempotence = true };
+        var accumulator = Substitute.For<IRecordAccumulator>();
+        accumulator.HasPendingRecords.Returns(false);
+        accumulator.PullReadyBatches(config.MaxRequestSize).Returns([]);
+        var transactionManager = Substitute.For<ITransactionManager>();
+        transactionManager.IsTransactional.Returns(false);
+        var sender = new MessagesSender(
+            config,
+            accumulator,
+            transactionManager,
+            Substitute.For<IKafkaCluster>(),
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+
+        var result = await sender.RunOnceAsync(CancellationToken.None);
+
+        result.Should().Be(MessagesSender.SendCycleResult.NoWork);
+        await transactionManager.DidNotReceive().EnsureIdempotentProducerIdAsync(Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
     public async Task SendProducerDataAsync_WithNoLeaderAfterMetadataRefresh_RequeuesBatch()
     {
         var config = new ProducerConfig { Acks = Acks.Leader };

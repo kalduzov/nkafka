@@ -443,6 +443,21 @@ internal class ProducerBatch(
         State = BatchState.Completed;
     }
 
+    internal void Fail(ProducerError error)
+    {
+        EnsureNotCompleted("fail");
+
+        var exception = new ProducerInitializationException(error);
+
+        foreach (var recordTask in _recordTasks)
+        {
+            recordTask.SetException(exception);
+        }
+
+        _produceRequestResult.SetException(exception);
+        State = BatchState.Completed;
+    }
+
     internal void FailForClosing()
     {
         EnsureNotCompleted("fail");

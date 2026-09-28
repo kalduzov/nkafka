@@ -267,6 +267,21 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
     {
         ThrowIfProducerClosed();
 
+        if (_transactionManager.IdempotenceInitializationError is { } initializationError)
+        {
+            return new MessageDeliveryResult(
+                PersistenceStatus.NotPersisted,
+                topicPartition,
+                message.Timestamp.UnixTimestampMs,
+                Offset.Unset,
+                message.Key?.Length ?? -1,
+                message.Value?.Length ?? -1,
+                message)
+            {
+                Error = initializationError
+            };
+        }
+
         // This limit covers only the acceptance phase. Once a record enters the accumulator,
         // its lifetime is accounted for by the accumulator and no longer consumes this slot.
         if (Interlocked.Increment(ref _pendingProduceRequests) > _maxPendingProduceRequests)
@@ -409,6 +424,15 @@ internal sealed partial class Producer: Client<ProducerConfig>, IProducer
 
             return CreateFailureResult(
                 exception.Status,
+                exception.Error.LocalError,
+                exception.Error.ErrorCode);
+        }
+        catch (ProducerInitializationException exception)
+        {
+            activity?.SetStatus(ActivityStatusCode.Error, exception.Message);
+
+            return CreateFailureResult(
+                PersistenceStatus.NotPersisted,
                 exception.Error.LocalError,
                 exception.Error.ErrorCode);
         }

@@ -114,13 +114,26 @@ internal sealed class MessagesSender(
 
     }
 
-    private async Task<SendCycleResult> RunOnceAsync(CancellationToken cancellationToken)
+    internal async Task<SendCycleResult> RunOnceAsync(CancellationToken cancellationToken)
     {
 
         if (transactionManager.IsTransactional)
         {
             await transactionManager.BumpIdempotentEpochAndResetIdIfNeededAsync(cancellationToken);
         }
+        else if (config.EnableIdempotence && recordAccumulator.HasPendingRecords &&
+                 !await transactionManager.EnsureIdempotentProducerIdAsync(cancellationToken))
+        {
+            if (transactionManager.IdempotenceInitializationError is { } initializationError)
+            {
+                recordAccumulator.FailAllPending(initializationError);
+
+                return SendCycleResult.WorkCompleted;
+            }
+
+            return SendCycleResult.RetryScheduled;
+        }
+
         return await SendProducerDataAsync(cancellationToken);
     }
 

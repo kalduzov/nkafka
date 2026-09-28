@@ -43,6 +43,29 @@ public sealed class RecordAccumulatorTests
     }
 
     [Fact]
+    public async Task FailAllPending_WithInitializationError_FailsQueuedRecordWithInitializationError()
+    {
+        var config = new ProducerConfig();
+        var accumulator = new RecordAccumulator(
+            config,
+            Substitute.For<ITransactionManager>(),
+            config.DeliveryTimeoutMs,
+            Substitute.For<IProducerMetrics>(),
+            NullLoggerFactory.Instance);
+        var topicPartition = new TopicPartition("test", 0);
+        var append = accumulator.Append(topicPartition, 1_000, null, "value"u8.ToArray(), Headers.Empty);
+        var error = new ProducerError(
+            ErrorCodes.ClientError,
+            ProducerLocalError.IdempotenceInitializationFailed);
+
+        accumulator.FailAllPending(error);
+
+        var exception = await Assert.ThrowsAsync<ProducerInitializationException>(
+            async () => await append.SendResult!.Task);
+        exception.Error.Should().Be(error);
+    }
+
+    [Fact]
     public async Task PullReadyBatches_ReturnsPartitionBatchesInOrderOneAtATime()
     {
         var config = new ProducerConfig

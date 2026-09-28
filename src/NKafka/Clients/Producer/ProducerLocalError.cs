@@ -28,5 +28,8 @@ public enum ProducerLocalError
     ProducerClosing,
 
     /// <summary>The record exceeds the configured request size.</summary>
-    RecordTooLarge
+    RecordTooLarge,
+
+    /// <summary>Idempotent producer initialization failed permanently.</summary>
+    IdempotenceInitializationFailed
 }

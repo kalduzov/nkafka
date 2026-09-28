@@ -435,6 +435,44 @@ public class ProduceBathSerializationTests
     }
 
     [Fact]
+    public void ProducerBatch_MustWriteIdempotenceMetadataAndKeepSerializedBytesStable()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+        batch.TryAppend(1000, null, "value"u8.ToArray(), Headers.Empty, out _).Should().BeTrue();
+        batch.SetProducerState(new ProducerIdAndEpoch(long.MaxValue, short.MaxValue), int.MaxValue);
+
+        batch.Close();
+
+        var first = buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray();
+        var reader = new BufferReader(first);
+        var recordBatch = new RecordBatch(ref reader);
+
+        recordBatch.ProducerId.Should().Be(long.MaxValue);
+        recordBatch.ProducerEpoch.Should().Be(short.MaxValue);
+        recordBatch.BaseSequence.Should().Be(int.MaxValue);
+        recordBatch.Crc.Should().Be(global::NKafka.Crc.Crc.Calculate(first[21..]));
+
+        _ = batch.GetAsRecords();
+        buffer.DangerousGetFirstBuffer().AsSpan(0, batch.Size).ToArray().Should().Equal(first);
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
+    public void ProducerBatch_MustRejectInvalidIdempotenceMetadata()
+    {
+        var buffer = ArrayBufferPool.Rent(1024);
+        var batch = new ProducerBatch(new TopicPartition("test", 0), buffer, NullLoggerFactory.Instance);
+
+        var act = () => batch.SetProducerState(new ProducerIdAndEpoch(1, 0), -1);
+
+        act.Should().Throw<ArgumentOutOfRangeException>();
+
+        ArrayBufferPool.Return(buffer);
+    }
+
+    [Fact]
     public void ProducerBatch_BytesMustRemainStableAfterClose()
     {
         var buffer = ArrayBufferPool.Rent(1024);

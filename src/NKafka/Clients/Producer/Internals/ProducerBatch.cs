@@ -103,6 +103,8 @@ internal class ProducerBatch(
     private readonly ICompression _compression = compression ?? new NoCompression();
     private readonly CompressionType _compressionType = compressionType;
     private int _memoryReservation;
+    private ProducerIdAndEpoch _producerIdAndEpoch = ProducerIdAndEpoch.None;
+    private int _baseSequence = -1;
 
     internal BatchState State { get; private set; } = BatchState.Open;
 
@@ -165,6 +167,24 @@ internal class ProducerBatch(
 
     internal int ReleaseMemoryReservation()
         => Interlocked.Exchange(ref _memoryReservation, 0);
+
+    internal void SetProducerState(ProducerIdAndEpoch producerIdAndEpoch, int baseSequence)
+    {
+        EnsureState(BatchState.Open, "set producer state");
+
+        if (!producerIdAndEpoch.IsValid || producerIdAndEpoch.Epoch < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(producerIdAndEpoch), "Idempotent batch metadata must be non-negative.");
+        }
+
+        if (baseSequence < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(baseSequence), "The base sequence must be non-negative.");
+        }
+
+        _producerIdAndEpoch = producerIdAndEpoch;
+        _baseSequence = baseSequence;
+    }
 
     internal ProducerBatch(TopicPartition topicPartition, ArrayBuffer buffer, ILoggerFactory loggerFactory, long timestampNow)
         : this(topicPartition, buffer, loggerFactory)
@@ -372,9 +392,9 @@ internal class ProducerBatch(
         bufferWriter.WriteInt(_lastOffset);
         bufferWriter.WriteLong(BaseTimestamp);
         bufferWriter.WriteLong(MaxTimestamp);
-        bufferWriter.WriteLong(-1);
-        bufferWriter.WriteShort(-1);
-        bufferWriter.WriteInt(-1);
+        bufferWriter.WriteLong(_producerIdAndEpoch.ProducerId);
+        bufferWriter.WriteShort(_producerIdAndEpoch.Epoch);
+        bufferWriter.WriteInt(_baseSequence);
         bufferWriter.WriteInt(_recordsCount);
     }
 

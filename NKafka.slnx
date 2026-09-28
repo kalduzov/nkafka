@@ -379,6 +379,9 @@
     <File Path="spec/KIP/client-side-kips.md" />
     <File Path="spec/KIP/client-side-kips-table.md" />
   </Folder>
+  <Folder Name="/spec/KIP/KIP-848/">
+    <File Path="spec/KIP/KIP-848/README.md" />
+  </Folder>
   <Folder Name="/spec/KIP/KIP-98/">
     <File Path="spec/KIP/KIP-98/README.md" />
     <File Path="spec/KIP/KIP-98/01-public-interfaces.md" />
@@ -393,6 +396,7 @@
     <File Path="spec/KIP/KIP-98/06-consumer-offsets-and-processing.md" />
     <File Path="spec/KIP/KIP-98/07-production-readiness.md" />
     <File Path="spec/KIP/KIP-98/08-delivery-handlers.md" />
+    <File Path="spec/KIP/KIP-98/09-server-side-transaction-protocol.md" />
     <File Path="spec/KIP/KIP-98/03.1-record-batch-accumulation.md" />
   </Folder>
   <Folder Name="/src/">
